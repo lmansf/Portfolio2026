@@ -115,6 +115,13 @@ function closeProjectModal(modal) {
     }
 }
 
+function shudderDisabledBlog(link) {
+    if (!link) return;
+    link.classList.remove('blog-shuddering');
+    void link.offsetWidth;
+    link.classList.add('blog-shuddering');
+}
+
 document.addEventListener('DOMContentLoaded', () => {
     // Check for file protocol
     if (window.location.protocol === 'file:') {
@@ -122,6 +129,13 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     document.body.addEventListener('click', (e) => {
+        const disabledBlogLink = e.target.closest('a[data-disabled-blog="true"]');
+        if (disabledBlogLink) {
+            e.preventDefault();
+            shudderDisabledBlog(disabledBlogLink);
+            return;
+        }
+
         const modalTrigger = e.target.closest('[data-project-modal-open]');
         if (modalTrigger) {
             e.preventDefault();

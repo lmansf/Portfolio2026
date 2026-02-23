@@ -102,6 +102,28 @@ header {
     color: var(--text-color);
 }
 
+.nav-links a.blog-disabled,
+.nav-links a.blog-disabled:hover,
+.nav-links a.blog-disabled.active {
+    color: #ff4b4b;
+}
+
+.nav-links a.blog-disabled.blog-shuddering {
+    animation: blogShudder 0.7s cubic-bezier(0.22, 0.61, 0.36, 1);
+}
+
+@keyframes blogShudder {
+    0% { transform: translateX(0); }
+    12% { transform: translateX(-3px) rotate(-1.5deg); }
+    24% { transform: translateX(3px) rotate(1.5deg); }
+    36% { transform: translateX(-2.5px) rotate(-1deg); }
+    48% { transform: translateX(2.5px) rotate(1deg); }
+    60% { transform: translateX(-1.5px) rotate(-0.6deg); }
+    72% { transform: translateX(1.5px) rotate(0.6deg); }
+    84% { transform: translateX(-0.8px) rotate(-0.2deg); }
+    100% { transform: translateX(0) rotate(0); }
+}
+
 /* Main Layout */
 main {
     flex: 1;
