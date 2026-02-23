@@ -122,6 +122,34 @@ function shudderDisabledBlog(link) {
     link.classList.add('blog-shuddering');
 }
 
+let blogHoverPopup = null;
+
+function ensureBlogHoverPopup() {
+    if (blogHoverPopup && document.body.contains(blogHoverPopup)) return blogHoverPopup;
+    blogHoverPopup = document.createElement('div');
+    blogHoverPopup.className = 'blog-hover-popup';
+    blogHoverPopup.textContent = 'This page is under construction';
+    document.body.appendChild(blogHoverPopup);
+    return blogHoverPopup;
+}
+
+function moveBlogHoverPopup(e) {
+    if (!blogHoverPopup) return;
+    blogHoverPopup.style.left = `${e.clientX + 12}px`;
+    blogHoverPopup.style.top = `${e.clientY + 12}px`;
+}
+
+function showBlogHoverPopup(e) {
+    const popup = ensureBlogHoverPopup();
+    moveBlogHoverPopup(e);
+    popup.classList.add('is-visible');
+}
+
+function hideBlogHoverPopup() {
+    if (!blogHoverPopup) return;
+    blogHoverPopup.classList.remove('is-visible');
+}
+
 document.addEventListener('DOMContentLoaded', () => {
     // Check for file protocol
     if (window.location.protocol === 'file:') {
@@ -132,6 +160,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const disabledBlogLink = e.target.closest('a[data-disabled-blog="true"]');
         if (disabledBlogLink) {
             e.preventDefault();
+            hideBlogHoverPopup();
             shudderDisabledBlog(disabledBlogLink);
             return;
         }
@@ -175,6 +204,24 @@ document.addEventListener('DOMContentLoaded', () => {
             navigateTo(href);
         }
     });
+
+    document.body.addEventListener('mouseenter', (e) => {
+        const disabledBlogLink = e.target.closest('a[data-disabled-blog="true"]');
+        if (!disabledBlogLink) return;
+        showBlogHoverPopup(e);
+    }, true);
+
+    document.body.addEventListener('mousemove', (e) => {
+        const disabledBlogLink = e.target.closest('a[data-disabled-blog="true"]');
+        if (!disabledBlogLink) return;
+        showBlogHoverPopup(e);
+    });
+
+    document.body.addEventListener('mouseleave', (e) => {
+        const disabledBlogLink = e.target.closest('a[data-disabled-blog="true"]');
+        if (!disabledBlogLink) return;
+        hideBlogHoverPopup();
+    }, true);
 
     document.addEventListener('keydown', (e) => {
         if (e.key === 'Escape' && activeProjectModal) {

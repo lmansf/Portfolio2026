@@ -108,6 +108,29 @@ header {
     color: #ff4b4b;
 }
 
+.blog-hover-popup {
+    position: fixed;
+    top: 0;
+    left: 0;
+    z-index: 10050;
+    padding: 7px 10px;
+    border-radius: 4px;
+    background: rgba(15, 14, 23, 0.95);
+    border: 1px solid rgba(255, 75, 75, 0.55);
+    color: #ff8a8a;
+    font-size: 0.75rem;
+    letter-spacing: 0.3px;
+    pointer-events: none;
+    white-space: nowrap;
+    opacity: 0;
+    transform: translate(12px, 12px);
+    transition: opacity 0.15s ease;
+}
+
+.blog-hover-popup.is-visible {
+    opacity: 1;
+}
+
 .nav-links a.blog-disabled.blog-shuddering {
     animation: blogShudder 0.7s cubic-bezier(0.22, 0.61, 0.36, 1);
 }
