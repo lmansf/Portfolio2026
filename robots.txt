@@ -1,0 +1,5 @@
+User-agent: *
+Allow: /
+
+# Update this to your deployed domain once live
+Sitemap: https://your-domain.com/sitemap.xml
