@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Logan Mansfield | Portfolio</title>
+    <link rel="stylesheet" href="assets/style.css">
+</head>
+<body>
+
+    <!-- Background Typography Layer -->
+    <div class="bg-layer">
+        <div class="gargantuan-text text-top">LOGAN</div>
+        <div class="gargantuan-text text-bottom">MANSFIELD</div>
+    </div>
+
+    <!-- Navigation Header -->
+    <header>
+        <div class="logo-text">L. MANSFIELD</div>
+        <div class="header-time" id="time">00:00 PM</div>
+        <nav class="nav-links">
+            <a href="#" class="active">Home</a>            <a href="blog.html">Blog</a>            <a href="assets/resume2025.pdf" target="_blank">Resume</a>
+        </nav>
+    </header>
+
+    <!-- Main Content Area -->
+    <main>
+        <!-- Profile Card -->
+        <div class="profile-card">
+            <div class="card-image-container">
+                <img src="assets/profilepicCranes.jpeg" alt="Logan Mansfield">
+                <div class="status-badge">
+                    <div class="status-bars">
+                        <div class="bar a"></div>
+                        <div class="bar b"></div>
+                        <div class="bar c"></div>
+                    </div>
+                    <span class="status-text">Taking on New Projects</span>
+                </div>
+            </div>
+            
+            <div class="card-details">
+                <div class="card-name">Logan Mansfield</div>
+                <div class="card-role">IT Professional & Certified Data Analyst</div>
+                
+                <div class="card-pricing">
+                    <span>Let's have a chat:</span>
+                    <span>&#8599;</span>
+                </div>
+
+                <a href="mailto:lmansf96@gmail.com" class="consult-btn" style="text-decoration:none;">
+                    Book a 15-Min Call Today!
+                    <span style="font-size: 1.2rem;">&#128197;</span>
+                </a>
+            </div>
+        </div>
+
+        <!-- Floating Intro Text -->
+        <div class="intro-text">
+            <p>Welcome to my personal corner of the web. I'm dedicated to crafting clean, efficient, and user-centric digital experiences.</p>
+            <br>
+            <p style="font-size: 0.9rem; color: #888;">No project management theater. Just exceptional work from a senior developer who becomes an extension of your team.</p>
+        </div>
+    </main>
+
+    <!-- Bottom Ticker / Footer -->
+    <footer>
+        <div class="marquee">
+            <div class="marquee-content">
+                <span>Power BI</span> <span class="separator">•</span>
+                <span>Python</span> <span class="separator">•</span>
+                <span>Data Analysis</span> <span class="separator">•</span>
+                <span>SQL</span> <span class="separator">•</span>
+                <span>Machine Learning</span> <span class="separator">•</span>
+                <span>Visualization</span> <span class="separator">•</span>
+                <span>Automation</span> <span class="separator">•</span>
+                <!-- Duplicated for seamless loop -->
+                <span>Power BI</span> <span class="separator">•</span>
+                <span>Python</span> <span class="separator">•</span>
+                <span>Data Analysis</span> <span class="separator">•</span>
+                <span>SQL</span> <span class="separator">•</span>
+                <span>Machine Learning</span> <span class="separator">•</span>
+                <span>Visualization</span> <span class="separator">•</span>
+                <span>Automation</span> <span class="separator">•</span>
+            </div>
+        </div>
+        
+        <div class="footer-socials">
+            <a href="https://x.com/StatBird" target="_blank">TWITTER</a>
+            <a href="https://github.com/lmansf" target="_blank">GITHUB</a>
+            <a href="https://www.linkedin.com/in/lmansf96/" target="_blank">LINKEDIN</a>
+        </div>
+    </footer>
+
+    <script>
+        // Simple Time Update
+        function updateTime() {
+            const now = new Date();
+            let hours = now.getHours();
+            const minutes = now.getMinutes().toString().padStart(2, '0');
+            const ampm = hours >= 12 ? 'PM' : 'AM';
+            hours = hours % 12;
+            hours = hours ? hours : 12; 
+            document.getElementById('time').textContent = `Tampa (US) ${hours}:${minutes} ${ampm}`;
+        }
+        setInterval(updateTime, 60000);
+        updateTime();
+    </script>
+</body>
+</html>

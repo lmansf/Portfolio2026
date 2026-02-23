@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Logan Mansfield | Writing</title>
+    <link rel="stylesheet" href="assets/style.css">
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <style>
+        /* Hide scrollbar for cleaner look */
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: #0f0e17; }
+        ::-webkit-scrollbar-thumb { background: #333; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #555; }
+    </style>
+</head>
+<body>
+
+    <!-- Background Typography Layer -->
+    <div class="bg-layer">
+        <div class="gargantuan-text text-top">LOGAN</div>
+        <div class="gargantuan-text text-bottom">WRITING</div>
+    </div>
+
+    <!-- Navigation Header -->
+    <header>
+        <div class="logo-text">L. MANSFIELD</div>
+        <div class="header-time" id="time">00:00 PM</div>
+        <nav class="nav-links">
+            <a href="index.html">Home</a>
+            <a href="#" class="active">Blog</a>
+            <a href="resume2025.pdf" target="_blank">Resume</a>
+        </nav>
+    </header>
+
+    <!-- Main Content Area -->
+    <main class="blog-view">
+        <div id="blog-grid">
+             <!-- Loading State -->
+             <div id="blog-loading" style="grid-column: 1 / -1; text-align: center; color: #888; font-size: 0.9rem;">
+                <p>Loading thoughts...</p>
+            </div>
+        </div>
+    </main>
+
+    <!-- Bottom Ticker / Footer -->
+    <footer>
+        <div class="marquee">
+            <div class="marquee-content">
+                <span>Power BI</span> <span class="separator">•</span>
+                <span>Python</span> <span class="separator">•</span>
+                <span>Data Analysis</span> <span class="separator">•</span>
+                <span>SQL</span> <span class="separator">•</span>
+                <span>Machine Learning</span> <span class="separator">•</span>
+                <span>Visualization</span> <span class="separator">•</span>
+                <span>Automation</span> <span class="separator">•</span>
+                <!-- Duplicated for seamless loop -->
+                <span>Power BI</span> <span class="separator">•</span>
+                <span>Python</span> <span class="separator">•</span>
+                <span>Data Analysis</span> <span class="separator">•</span>
+                <span>SQL</span> <span class="separator">•</span>
+                <span>Machine Learning</span> <span class="separator">•</span>
+                <span>Visualization</span> <span class="separator">•</span>
+                <span>Automation</span> <span class="separator">•</span>
+            </div>
+        </div>
+        
+        <div class="footer-socials">
+            <a href="https://x.com/StatBird" target="_blank">TWITTER</a>
+            <a href="https://github.com/lmansf" target="_blank">GITHUB</a>
+            <a href="https://www.linkedin.com/in/lmansf96/" target="_blank">LINKEDIN</a>
+        </div>
+    </footer>
+
+    <!-- Fullscreen Post Overlay -->
+    <div id="post-overlay" style="display: none; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(15, 14, 23, 0.95); z-index: 9999; overflow-y: auto; flex-direction: column;">
+        <div id="post-overlay-close" style="position: fixed; top: 20px; right: 30px; font-size: 2rem; color: #fff; cursor: pointer; z-index: 10000; background: rgba(255,255,255,0.1); width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center; line-height: 1; transition: background 0.3s;">&times;</div>
+        <div id="post-overlay-image" style="width: 100%; height: 40vh; background-size: cover; background-position: center; flex-shrink: 0; margin-bottom: 2rem;"></div>
+        <div style="max-width: 800px; margin: 0 auto; padding: 0 20px 100px 20px; width: 100%; box-sizing: border-box;">
+            <span id="post-overlay-category" class="project-tag" style="background: transparent; border: 1px solid rgba(255,255,255,0.2); padding: 5px 10px; border-radius: 4px;"></span>
+            <h1 id="post-overlay-title" style="font-size: 3rem; margin: 20px 0 30px 0; line-height: 1.1; font-weight: 800;"></h1>
+            <div id="post-overlay-content" class="blog-markdown-content" style="color: #ccc; line-height: 1.8; font-size: 1.1rem;"></div>
+        </div>
+    </div>
+
+
+    <script>
+        // Simple Time Update
+        function updateTime() {
+            const now = new Date();
+            let hours = now.getHours();
+            const minutes = now.getMinutes().toString().padStart(2, '0');
+            const ampm = hours >= 12 ? 'PM' : 'AM';
+            hours = hours % 12;
+            hours = hours ? hours : 12; 
+            document.getElementById('time').textContent = `Tampa (US) ${hours}:${minutes} ${ampm}`;
+        }
+        setInterval(updateTime, 60000);
+        updateTime();
+
+        // -------------------------------------------------------------
+        // BLOG LOGIC (Adapted)
+        // -------------------------------------------------------------
+        const SUPABASE_URL = 'https://xcubnwvyvhjfyiixunfg.supabase.co';
+        const SUPABASE_ANON_KEY = 'sb_publishable_K5k9vLXtDUo8qoyWrwX3qg_qN_3xWfy';
+        const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+        const CACHE_KEY = 'portfolio_blogs_cache';
+        const CACHE_TIME_KEY = 'portfolio_blogs_cache_time';
+        const ONE_WEEK_MS = 7 * 24 * 60 * 60 * 1000;
+
+        async function loadBlogs() {
+            const blogGrid = document.getElementById('blog-grid');
+            const now = Date.now();
+            const cachedTime = localStorage.getItem(CACHE_TIME_KEY);
+            const cachedBlogs = localStorage.getItem(CACHE_KEY);
+
+            let blogs = [];
+
+            if (cachedTime && cachedBlogs && (now - parseInt(cachedTime)) < ONE_WEEK_MS) {
+                console.log('Loading blogs from local cache');
+                renderBlogs(JSON.parse(cachedBlogs), blogGrid);
+            } else {
+                console.log('Fetching fresh blogs from Supabase');
+                try {
+                    const { data, error } = await supabaseClient
+                        .from('blogposts')
+                        .select('*')
+                        .order('created_at', { ascending: false });
+
+                    if (error) throw error;
+                    
+                    blogs = data || [];
+                    localStorage.setItem(CACHE_KEY, JSON.stringify(blogs));
+                    localStorage.setItem(CACHE_TIME_KEY, now.toString());
+                    renderBlogs(blogs, blogGrid);
+                } catch (err) {
+                    console.error('Error fetching blogs:', err);
+                    if (cachedBlogs) {
+                        renderBlogs(JSON.parse(cachedBlogs), blogGrid);
+                    } else {
+                        blogGrid.innerHTML = `<div style="grid-column: 1 / -1; text-align: center; padding: 50px; color: #ff6b6b;"><p>Failed to load. Check console.</p></div>`;
+                    }
+                }
+            }
+        }
+
+        function renderBlogs(blogs, container) {
+            const validBlogs = blogs ? blogs.filter(post => post.blog && post.blog.trim().length > 0) : [];
+
+            if (validBlogs.length === 0) {
+                container.innerHTML = `<div style="grid-column: 1 / -1; text-align: center; padding: 50px; color: #888;"><p>No blog posts found.</p></div>`;
+                return;
+            }
+
+            container.innerHTML = '';
+
+            validBlogs.forEach(post => {
+                const card = document.createElement('div');
+                card.className = 'project-card';
+                
+                const fallbackImage = 'data:image/svg+xml;charset=UTF-8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22600%22%20height%3D%22400%22%20viewBox%3D%220%200%20600%20400%22%3E%3Crect%20fill%3D%22%231a1a1a%22%20width%3D%22600%22%20height%3D%22400%22%2F%3E%3Ctext%20fill%3D%22%23333333%22%20font-family%3D%22sans-serif%22%20font-size%3D%2230%22%20dy%3D%2210.5%22%20font-weight%3D%22bold%22%20x%3D%2250%25%22%20y%3D%2250%25%22%20text-anchor%3D%22middle%22%3EWriting%3C%2Ftext%3E%3C%2Fsvg%3E';
+                const bgImage = post.image_url || fallbackImage;
+                const category = post.category || 'Thought';
+                
+                let rawMarkdown = post.blog || '';
+                let title = 'Untitled Post';
+
+                // Extract title
+                const lines = rawMarkdown.split('\n');
+                if (lines.length > 0 && lines[0].trim().startsWith('# ')) {
+                    title = lines[0].replace('# ', '').trim();
+                    lines.shift();
+                    rawMarkdown = lines.join('\n').trim();
+                } else if (post.title) {
+                    title = post.title;
+                }
+
+                // Create plain text excerpt for card
+                const excerpt = rawMarkdown.replace(/[#*`_\[\]]/g, '').substring(0, 150) + '...';
+                
+                // Parse full HTML for overlay
+                const parsedHtml = marked.parse(rawMarkdown);
+
+                card.innerHTML = `
+                    <div class="project-card-image" style="background-image: url('${bgImage}');"></div>
+                    <div class="project-card-content">
+                        <div>
+                            <span class="project-tag">${category}</span>
+                            <h2>${title}</h2>
+                            <p class="post-excerpt">${excerpt}</p>
+                        </div>
+                    </div>
+                `;
+
+                card.addEventListener('click', () => {
+                    openPostOverlay(title, category, bgImage, parsedHtml, card);
+                });
+
+                container.appendChild(card);
+            });
+        }
+
+        // Overlay Logic
+        const postOverlay = document.getElementById('post-overlay');
+        const postOverlayClose = document.getElementById('post-overlay-close');
+        
+        function openPostOverlay(title, category, bgImage, parsedHtml, card) {
+            document.getElementById('post-overlay-image').style.backgroundImage = `url('${bgImage}')`;
+            document.getElementById('post-overlay-category').textContent = category;
+            document.getElementById('post-overlay-title').textContent = title;
+            document.getElementById('post-overlay-content').innerHTML = parsedHtml;
+            postOverlay.style.display = 'flex';
+            document.body.style.overflow = 'hidden';
+        }
+
+        postOverlayClose.addEventListener('click', () => {
+            postOverlay.style.display = 'none';
+            document.body.style.overflow = '';
+        });
+
+        document.addEventListener('DOMContentLoaded', loadBlogs);
+    </script>
+</body>
+</html>
