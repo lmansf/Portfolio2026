@@ -32,7 +32,7 @@
         </section>
 
         <section class="projects-layout" aria-label="Project highlights">
-            <article class="project-panel panel-featured">
+            <a class="project-panel panel-featured project-tile" href="#" data-project-modal-open="rfm-project-modal" aria-controls="rfm-project-modal" aria-label="Open RFM Customer Segmentation Analysis details">
                 <div class="panel-label">Featured Build</div>
                 <h2>RFM Customer Segmentation Analysis</h2>
                 <p>Built a Recency, Frequency, Monetary analysis project associated with ZooTampa to identify customer segments and prioritize outreach based on behavior and value patterns.</p>
@@ -40,7 +40,7 @@
                     <span class="project-tag">Power BI / Data Analysis</span>
                     <span>Focus: customer segmentation strategy</span>
                 </div>
-            </article>
+            </a>
 
             <article class="project-panel panel-index">
                 <h3>Project Index</h3>
@@ -53,35 +53,55 @@
                 </ul>
             </article>
 
-            <article class="project-panel panel-split">
+            <a class="project-panel panel-split project-tile" href="#" aria-label="Open Production E-commerce Website project">
                 <div>
                     <div class="panel-label">Current Build</div>
                     <h3>Production E-commerce Website</h3>
                     <p>Designing and shipping a production-ready web experience using HTML, CSS, and JavaScript fundamentals with a focus on reliability and clean user flow.</p>
                 </div>
                 <span class="project-tag">HTML / CSS / JavaScript</span>
-            </article>
+            </a>
 
-            <article class="project-panel panel-vertical-title">
+            <a class="project-panel panel-vertical-title project-tile" href="#" aria-label="Open Project Track details">
                 <span>PROJECT TRACK</span>
                 <p>Current focus: data engineering, analytics, machine learning, and long-term AI/cybersecurity alignment.</p>
-            </article>
+            </a>
 
-            <article class="project-panel panel-compact">
+            <a class="project-panel panel-compact project-tile" href="#" aria-label="Open Snowflake Hands-On Essentials certification">
                 <div class="panel-label">Certification</div>
                 <h3>Snowflake Hands-On Essentials</h3>
                 <p>Completed Snowflake Data Warehousing Workshop to strengthen cloud warehouse modeling and SQL workflow skills.</p>
                 <span class="project-tag">Snowflake / SQL</span>
-            </article>
+            </a>
 
-            <article class="project-panel panel-compact">
+            <a class="project-panel panel-compact project-tile" href="#" aria-label="Open SQL Professional Certificate certification">
                 <div class="panel-label">Certification</div>
                 <h3>SQL Professional Certificate</h3>
                 <p>Completed LearnSQL.com SQL Professional Certificate of Competency with emphasis on query writing and analytical problem solving.</p>
                 <span class="project-tag">SQL</span>
-            </article>
+            </a>
         </section>
     </main>
+
+    <div class="project-modal-overlay" id="rfm-project-modal" aria-hidden="true">
+        <div class="project-modal" role="dialog" aria-modal="true" aria-labelledby="rfm-project-modal-title">
+            <button class="project-modal-close" type="button" data-project-modal-close aria-label="Close modal">×</button>
+            <div class="panel-label">Featured Build</div>
+            <h2 id="rfm-project-modal-title">RFM Customer Segmentation Analysis</h2>
+            <p>This project segments ZooTampa customers by Recency, Frequency, and Monetary value to support more targeted communication and stronger donor/customer retention strategy.</p>
+            <div class="project-modal-media" aria-label="Project placeholder image area">
+                <img
+                    class="project-modal-image"
+                    src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='1400' height='800' viewBox='0 0 1400 800'%3E%3Crect width='1400' height='800' fill='%231a1a24'/%3E%3Crect x='80' y='80' width='1240' height='640' rx='16' fill='none' stroke='%233a3a46' stroke-width='4'/%3E%3Cpath d='M180 620l260-260 210 190 190-210 380 280' fill='none' stroke='%238c8c98' stroke-width='12' stroke-linecap='round' stroke-linejoin='round'/%3E%3Ccircle cx='500' cy='250' r='55' fill='%23666673'/%3E%3Ctext x='700' y='700' text-anchor='middle' fill='%239999a6' font-size='54' font-family='Arial, sans-serif' letter-spacing='6'%3EPLACEHOLDER IMAGE%3C/text%3E%3C/svg%3E"
+                    alt="Placeholder preview image"
+                >
+            </div>
+            <div class="panel-meta">
+                <span class="project-tag">Power BI / Data Analysis</span>
+                <span>Focus: customer segmentation strategy</span>
+            </div>
+        </div>
+    </div>
 
     <footer>
         <div class="marquee">
