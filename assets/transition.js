@@ -13,11 +13,36 @@ function syncBodyElement(currentSelector, incomingDoc) {
     }
 }
 
+function animateProjectsLoadIn() {
+    const main = document.querySelector('main.projects-view');
+    if (!main) return;
+
+    const animationTargets = [
+        document.querySelector('header'),
+        main.querySelector('.projects-intro'),
+        main.querySelector('.projects-layout'),
+        document.querySelector('footer .footer-socials')
+    ].filter(Boolean);
+
+    animationTargets.forEach((element) => {
+        element.classList.remove('projects-load-enter');
+        void element.offsetWidth;
+        element.classList.add('projects-load-enter');
+    });
+
+    setTimeout(() => {
+        animationTargets.forEach((element) => {
+            element.classList.remove('projects-load-enter');
+        });
+    }, 500);
+}
+
 async function navigateTo(url) {
     const main = document.querySelector('main');
     const bgLayer = document.querySelector('.bg-layer');
     const normalizedTarget = (url.split('/').pop() || 'index.html').toLowerCase();
     const isHomeDestination = normalizedTarget === 'index.html';
+    const isProjectsDestination = normalizedTarget === 'projects.html';
 
     if (isHomeDestination) {
         main.classList.add('home-direction');
@@ -98,6 +123,10 @@ async function navigateTo(url) {
         
         main.classList.add('page-enter');
         bgLayer.classList.add('page-enter');
+
+        if (isProjectsDestination) {
+            animateProjectsLoadIn();
+        }
         
         setTimeout(() => {
             main.classList.remove('page-enter');
@@ -172,6 +201,11 @@ document.addEventListener('DOMContentLoaded', () => {
     // Check for file protocol
     if (window.location.protocol === 'file:') {
         console.warn('Page transitions require a local server (e.g. Live Server) due to CORS restrictions on file:// protocol.');
+    }
+
+    const currentPath = window.location.pathname.split('/').pop() || 'index.html';
+    if (currentPath === 'projects.html') {
+        animateProjectsLoadIn();
     }
 
     document.body.addEventListener('click', (e) => {

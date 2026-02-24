@@ -885,6 +885,10 @@ main, .bg-layer {
     animation: fadeInSlideReverse 0.5s ease-out forwards;
 }
 
+.projects-load-enter {
+    animation: fadeInSlide 0.5s ease-out forwards;
+}
+
 @keyframes fadeInSlide {
     from {
         opacity: 0;
