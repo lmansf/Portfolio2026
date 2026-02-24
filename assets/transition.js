@@ -18,6 +18,7 @@ function animateProjectsLoadIn() {
     if (!main) return;
 
     const animationTargets = [
+        document.querySelector('.bg-layer'),
         main.querySelector('.projects-intro'),
         main.querySelector('.projects-layout'),
         document.querySelector('footer .footer-socials')
