@@ -273,9 +273,8 @@ main {
 
 .chatbot-panel {
     position: absolute;
-    top: 45%;
+    bottom: 96px;
     left: 8%;
-    transform: translateY(-50%);
     width: min(430px, 36vw);
     min-width: 320px;
     height: 560px;
