@@ -1,10 +1,10 @@
 :root {
-    --bg-color: #0f0e17;
-    --text-color: #ffffff;
-    --accent-color: #ffffff;
-    --secondary-text: #a0a0a0;
-    --card-bg: rgba(255, 255, 255, 0.03);
-    --card-border: rgba(255, 255, 255, 0.1);
+    --bg-color: #1e1e1e;
+    --text-color: #e9fff5;
+    --accent-color: #99ffcc;
+    --secondary-text: #93c7ae;
+    --card-bg: rgba(153, 255, 204, 0.06);
+    --card-border: rgba(153, 255, 204, 0.22);
     --font-main: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
 }
 
@@ -29,7 +29,7 @@ body {
     font-size: clamp(150px, 35vw, 600px);
     font-weight: 800;
     line-height: 0.8;
-    color: rgba(255, 255, 255, 0.8);
+    color: rgba(153, 255, 204, 0.34);
     position: absolute;
     z-index: 0;
     pointer-events: none;
@@ -54,7 +54,7 @@ body {
 .text-top {
     transform: translateY(-15%);
     left: -2vw;
-    color: #3d3d3d; /* Darker grey for better contrast with foreground content */
+    color: #2b4a3d; /* Dark mint tone for better contrast with foreground content */
 }
 
 .text-bottom {
@@ -62,7 +62,7 @@ body {
     right: -2vw; /* Use right alignment for bottom text usually */
     text-align: right;
     width: 100%;
-    color: #2a2a2a; /* Even darker grey */
+    color: #253a31; /* Even darker mint tone */
 }
 
 /* Header */
@@ -115,7 +115,7 @@ header {
     z-index: 10050;
     padding: 7px 10px;
     border-radius: 4px;
-    background: rgba(15, 14, 23, 0.95);
+    background: rgba(30, 30, 30, 0.95);
     border: 1px solid rgba(255, 75, 75, 0.55);
     color: #ff8a8a;
     font-size: 0.75rem;
@@ -193,7 +193,7 @@ main {
     display: flex;
     align-items: center;
     gap: 10px;
-    background: rgba(0, 0, 0, 0.6);
+    background: rgba(30, 30, 30, 0.78);
     backdrop-filter: blur(4px);
     padding: 8px 12px;
 }
@@ -206,21 +206,22 @@ main {
 .bar {
     width: 2px;
     height: 12px;
-    background-color: #555;
+    background-color: #3f7a62;
 }
 
 .bar.a { height: 8px; }
-.bar.b { height: 14px; background-color: #fff;}
+.bar.b { height: 14px; background-color: var(--accent-color);}
 .bar.c { height: 10px; }
 .bar.d { height: 6px; }
 
 
 .status-text {
-    font-size: 0.75rem;
+    font-size: 0.8rem;
     font-weight: 500;
-    color: #fff;
+    color: #f2fff9;
+    line-height: 1.35;
     text-transform: uppercase;
-    letter-spacing: 0.5px;
+    letter-spacing: 0.2px;
 }
 
 .card-details {
@@ -253,8 +254,8 @@ main {
 .consult-btn {
     width: 100%;
     padding: 15px;
-    background: white;
-    color: black;
+    background: var(--accent-color);
+    color: #1e1e1e;
     border: none;
     font-weight: 700;
     cursor: pointer;
@@ -265,7 +266,7 @@ main {
 }
 
 .consult-btn:hover {
-    background: #e0e0e0;
+    background: #84e3b4;
 }
 
 /* Context Text (Right Side) */
@@ -281,7 +282,7 @@ main {
 .intro-text p {
     font-size: 1.1rem;
     line-height: 1.4;
-    color: #e0e0e0;
+    color: #d2fce7;
 }
 
 /* Footer Ticker */
@@ -290,7 +291,7 @@ footer {
     bottom: 0;
     width: 100%;
     z-index: 10;
-    background: black;
+    background: var(--bg-color);
     border-top: 1px solid var(--card-border);
     display: flex;
     align-items: center;
@@ -322,7 +323,7 @@ footer {
 .marquee-content span {
     font-size: 1.5rem; /* Larger like the bold logos */
     font-weight: 700;
-    color: #888;
+    color: #93c7ae;
     text-transform: uppercase;
     white-space: nowrap;
     display: inline-block;
@@ -330,7 +331,7 @@ footer {
 
 .separator {
     margin: 0 1.5rem;
-    color: #333; /* Dim separator */
+    color: #2f5a49; /* Dim separator */
 }
 
 @keyframes scroll {
@@ -342,7 +343,7 @@ footer {
     display: flex;
     gap: 20px;
     padding: 0 2rem;
-    background: black; /* Cover marquee if it slides under */
+    background: var(--bg-color); /* Cover marquee if it slides under */
     z-index: 2;
     height: 100%;
     align-items: center;
@@ -350,7 +351,7 @@ footer {
 }
 
 .footer-socials a {
-    color: #fff;
+    color: var(--text-color);
     text-decoration: none;
     font-size: 0.8rem;
     font-weight: 700;
@@ -405,7 +406,7 @@ footer {
 }
 
 .project-panel {
-    background: rgba(15, 14, 23, 0.85);
+    background: rgba(30, 30, 30, 0.85);
     backdrop-filter: blur(10px);
     border: 1px solid var(--card-border);
     padding: 22px;
@@ -436,7 +437,7 @@ footer {
 
 .project-panel h2,
 .project-panel h3 {
-    color: #fff;
+    color: var(--text-color);
     line-height: 1.25;
     margin-bottom: 10px;
 }
@@ -450,7 +451,7 @@ footer {
 }
 
 .project-panel p {
-    color: #b9b9b9;
+    color: #c7edd9;
     font-size: 0.95rem;
     line-height: 1.55;
 }
@@ -469,7 +470,7 @@ footer {
     justify-content: space-between;
     align-items: center;
     gap: 16px;
-    color: #989898;
+    color: #9ccfb7;
     font-size: 0.85rem;
 }
 
@@ -481,7 +482,7 @@ footer {
 .panel-index {
     grid-column: span 4;
     min-height: 280px;
-    background: #151f2f;
+    background: #1f2a26;
     cursor: default;
 }
 
@@ -499,8 +500,8 @@ footer {
 }
 
 .panel-index li {
-    color: #d4d4d4;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.07);
+    color: #d2fce7;
+    border-bottom: 1px solid rgba(153, 255, 204, 0.16);
     padding-bottom: 10px;
     font-size: 0.9rem;
 }
@@ -530,15 +531,15 @@ footer {
     transform: rotate(180deg);
     font-size: 0.9rem;
     letter-spacing: 1px;
-    color: #d8d8d8;
+    color: #c9f5de;
     font-weight: 700;
 }
 
 .churn-bar-icon {
     width: 152px;
     height: 132px;
-    border: 1px solid rgba(255, 255, 255, 0.25);
-    background: rgba(255, 255, 255, 0.02);
+    border: 1px solid rgba(153, 255, 204, 0.28);
+    background: rgba(153, 255, 204, 0.06);
     display: flex;
     align-items: flex-end;
     justify-content: center;
@@ -551,7 +552,7 @@ footer {
 .churn-bar-icon span {
     display: block;
     width: 22px;
-    background: rgba(255, 255, 255, 0.72);
+    background: rgba(153, 255, 204, 0.78);
 }
 
 .churn-bar-icon span:nth-child(1) { height: 36%; }
@@ -589,7 +590,7 @@ footer {
 .project-modal {
     width: min(1200px, 96vw);
     height: min(900px, 88vh);
-    background: rgba(15, 14, 23, 0.92);
+    background: rgba(30, 30, 30, 0.92);
     border: 1px solid var(--card-border);
     backdrop-filter: blur(10px);
     padding: 26px;
@@ -609,21 +610,21 @@ footer {
 }
 
 .project-modal h2 {
-    color: #fff;
+    color: var(--text-color);
     line-height: 1.25;
     margin-bottom: 10px;
     font-size: clamp(1.3rem, 2.2vw, 2rem);
 }
 
 .project-modal p {
-    color: #b9b9b9;
+    color: #c7edd9;
     font-size: 0.95rem;
     line-height: 1.55;
 }
 
 .project-modal-media {
     border: 1px solid var(--card-border);
-    background: rgba(255, 255, 255, 0.02);
+    background: rgba(153, 255, 204, 0.05);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -650,8 +651,8 @@ footer {
     width: 34px;
     height: 34px;
     border: 1px solid var(--card-border);
-    background: rgba(255, 255, 255, 0.03);
-    color: #fff;
+    background: rgba(153, 255, 204, 0.08);
+    color: var(--text-color);
     font-size: 1.2rem;
     line-height: 1;
     cursor: pointer;
@@ -674,7 +675,7 @@ footer {
 
 /* Project Card in Blog Grid */
 .project-card {
-    background: rgba(15, 14, 23, 0.85); /* Darker background for better readability against large text */
+    background: rgba(30, 30, 30, 0.85); /* Darker background for better readability against large text */
     backdrop-filter: blur(10px);
     border: 1px solid var(--card-border);
     border-radius: 4px;
@@ -687,7 +688,7 @@ footer {
 
 .project-card:hover {
     transform: translateY(-8px); /* Deeper lift on hover */
-    border-color: rgba(255, 255, 255, 0.5); /* Brighter border on hover for separation */
+    border-color: rgba(153, 255, 204, 0.5); /* Brighter border on hover for separation */
     box-shadow: 0 10px 30px -10px rgba(0,0,0,0.5); /* Added shadow for depth */
 }
 
@@ -728,12 +729,12 @@ footer {
     margin-bottom: 10px;
     line-height: 1.3;
     font-weight: 700;
-    color: #fff;
+    color: var(--text-color);
 }
 
 .post-excerpt {
     font-size: 0.9rem;
-    color: #bbb;
+    color: #c7edd9;
     margin-bottom: 15px;
     display: -webkit-box;
     line-clamp: 3;
@@ -750,7 +751,7 @@ footer {
 .blog-markdown-content h1, 
 .blog-markdown-content h2, 
 .blog-markdown-content h3 {
-    color: #fff;
+    color: var(--text-color);
     margin-top: 2em;
     margin-bottom: 0.5em;
     font-weight: 700;
@@ -758,13 +759,13 @@ footer {
 
 .blog-markdown-content p {
     margin-bottom: 1.5em;
-    color: #ccc;
+    color: #c7edd9;
     font-size: 1.1rem;
     line-height: 1.8;
 }
 
 .blog-markdown-content a {
-    color: #fff;
+    color: var(--accent-color);
     text-decoration: underline;
 }
 
@@ -788,7 +789,7 @@ footer {
     background: rgba(255,255,255,0.1);
     padding: 2px 5px;
     border-radius: 3px;
-    color: #e0e0e0;
+    color: #d2fce7;
 }
 
 /* Responsive adjustments */
@@ -853,11 +854,11 @@ footer {
     margin-bottom: 20px;
     font-weight: 800;
     letter-spacing: -1px;
-    color: #fff;
+    color: var(--text-color);
 }
 
 .blog-intro p {
-    color: #BBB;
+    color: #c7edd9;
     font-size: 1.1rem;
     line-height: 1.6;
 }
@@ -921,6 +922,6 @@ main, .bg-layer {
 
 /* Global Scrollbar Styles */
 ::-webkit-scrollbar { width: 8px; }
-::-webkit-scrollbar-track { background: #0f0e17; }
-::-webkit-scrollbar-thumb { background: #333; border-radius: 4px; }
-::-webkit-scrollbar-thumb:hover { background: #555; }
+::-webkit-scrollbar-track { background: #1e1e1e; }
+::-webkit-scrollbar-thumb { background: #2f5a49; border-radius: 4px; }
+::-webkit-scrollbar-thumb:hover { background: #3f7a62; }

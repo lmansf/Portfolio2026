@@ -13,6 +13,18 @@
     <priority>0.8</priority>
   </url>
   <url>
+    <loc>https://portfolio2-main-phi.vercel.app/resume.html</loc>
+    <lastmod>2026-02-26</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://portfolio2-main-phi.vercel.app/feedback.html</loc>
+    <lastmod>2026-02-27</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
     <loc>https://portfolio2-main-phi.vercel.app/blog</loc>
     <lastmod>2026-02-23</lastmod>
     <changefreq>weekly</changefreq>

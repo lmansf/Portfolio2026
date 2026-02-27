@@ -1,10 +1,10 @@
 :root {
-    --bg-color: #0f0e17;
-    --text-color: #ffffff;
-    --accent-color: #ffffff;
-    --secondary-text: #a0a0a0;
-    --card-bg: rgba(255, 255, 255, 0.03);
-    --card-border: rgba(255, 255, 255, 0.1);
+    --bg-color: #1e1e1e;
+    --text-color: #e9fff5;
+    --accent-color: #99ffcc;
+    --secondary-text: #93c7ae;
+    --card-bg: rgba(153, 255, 204, 0.06);
+    --card-border: rgba(153, 255, 204, 0.22);
     --font-main: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
 }
 
@@ -28,7 +28,7 @@ body {
     font-size: clamp(150px, 35vw, 600px);
     font-weight: 800;
     line-height: 0.8;
-    color: rgba(255, 255, 255, 0.8);
+    color: rgba(153, 255, 204, 0.34);
     position: absolute;
     z-index: 0;
     pointer-events: none;
@@ -52,7 +52,7 @@ body {
 .text-top {
     transform: translateY(-15%);
     left: -2vw;
-    color: #3d3d3d;
+    color: #2b4a3d;
 }
 
 .text-bottom {
@@ -60,7 +60,7 @@ body {
     right: -2vw;
     text-align: right;
     width: 100%;
-    color: #2a2a2a;
+    color: #253a31;
 }
 
 header {
@@ -86,11 +86,18 @@ header {
 .nav-links a {
     color: var(--secondary-text);
     text-decoration: none;
-    transition: color 0.3s;
+    transition: color 0.3s, text-shadow 0.2s;
 }
 
 .nav-links a:hover,
 .nav-links a.active {
+    color: var(--text-color);
+    text-shadow: 0 0 10px rgba(153, 255, 204, 0.25);
+}
+
+.nav-links a:focus-visible {
+    outline: 2px solid var(--accent-color);
+    outline-offset: 3px;
     color: var(--text-color);
 }
 
@@ -107,7 +114,7 @@ header {
     z-index: 10050;
     padding: 7px 10px;
     border-radius: 4px;
-    background: rgba(15, 14, 23, 0.95);
+    background: rgba(30, 30, 30, 0.95);
     border: 1px solid rgba(255, 75, 75, 0.55);
     color: #ff8a8a;
     font-size: 0.75rem;
@@ -183,7 +190,7 @@ main {
     display: flex;
     align-items: center;
     gap: 10px;
-    background: rgba(0, 0, 0, 0.6);
+    background: rgba(30, 30, 30, 0.78);
     backdrop-filter: blur(4px);
     padding: 8px 12px;
 }
@@ -196,19 +203,20 @@ main {
 .bar {
     width: 2px;
     height: 12px;
-    background-color: #555;
+    background-color: #3f7a62;
 }
 
 .bar.a { height: 8px; }
-.bar.b { height: 14px; background-color: #fff; }
+.bar.b { height: 14px; background-color: var(--accent-color); }
 .bar.c { height: 10px; }
 
 .status-text {
-    font-size: 0.75rem;
+    font-size: 0.8rem;
     font-weight: 500;
-    color: #fff;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
+    color: #f2fff9;
+    line-height: 1.35;
+    /* text-transform: uppercase; */
+    letter-spacing: 0.2px;
 }
 
 .card-details {
@@ -241,19 +249,26 @@ main {
 .consult-btn {
     width: 100%;
     padding: 15px;
-    background: white;
-    color: black;
+    background: var(--accent-color);
+    color: #1e1e1e;
     border: none;
     font-weight: 700;
     cursor: pointer;
     display: flex;
     justify-content: space-between;
     align-items: center;
-    transition: background 0.2s;
+    transition: background 0.2s, box-shadow 0.2s;
 }
 
 .consult-btn:hover {
-    background: #e0e0e0;
+    background: #adffd8;
+    box-shadow: 0 0 0 2px rgba(153, 255, 204, 0.28);
+}
+
+.consult-btn:focus-visible {
+    outline: 2px solid var(--accent-color);
+    outline-offset: 3px;
+    box-shadow: 0 0 0 3px rgba(153, 255, 204, 0.2);
 }
 
 .intro-text {
@@ -268,7 +283,7 @@ main {
 .intro-text p {
     font-size: 1.1rem;
     line-height: 1.4;
-    color: #e0e0e0;
+    color: #d2fce7;
 }
 
 .chatbot-panel {
@@ -319,7 +334,7 @@ footer {
     bottom: 0;
     width: 100%;
     z-index: 10;
-    background: black;
+    background: var(--bg-color);
     border-top: 1px solid var(--card-border);
     display: flex;
     align-items: center;
@@ -347,7 +362,7 @@ footer {
 .marquee-content span {
     font-size: 1.5rem;
     font-weight: 700;
-    color: #888;
+    color: #93c7ae;
     text-transform: uppercase;
     white-space: nowrap;
     display: inline-block;
@@ -355,7 +370,7 @@ footer {
 
 .separator {
     margin: 0 1.5rem;
-    color: #333;
+    color: #2f5a49;
 }
 
 @keyframes scroll {
@@ -367,7 +382,7 @@ footer {
     display: flex;
     gap: 20px;
     padding: 0 2rem;
-    background: black;
+    background: var(--bg-color);
     z-index: 2;
     height: 100%;
     align-items: center;
@@ -375,10 +390,22 @@ footer {
 }
 
 .footer-socials a {
-    color: #fff;
+    color: var(--text-color);
     text-decoration: none;
     font-size: 0.8rem;
     font-weight: 700;
+    transition: color 0.2s, text-shadow 0.2s;
+}
+
+.footer-socials a:hover {
+    color: var(--accent-color);
+    text-shadow: 0 0 10px rgba(153, 255, 204, 0.28);
+}
+
+.footer-socials a:focus-visible {
+    outline: 2px solid var(--accent-color);
+    outline-offset: 3px;
+    color: var(--accent-color);
 }
 
 main,
@@ -430,9 +457,9 @@ main,
 }
 
 ::-webkit-scrollbar { width: 8px; }
-::-webkit-scrollbar-track { background: #0f0e17; }
-::-webkit-scrollbar-thumb { background: #333; border-radius: 4px; }
-::-webkit-scrollbar-thumb:hover { background: #555; }
+::-webkit-scrollbar-track { background: #1e1e1e; }
+::-webkit-scrollbar-thumb { background: #2f5a49; border-radius: 4px; }
+::-webkit-scrollbar-thumb:hover { background: #3f7a62; }
 
 @media (max-width: 900px) {
     .gargantuan-text {
