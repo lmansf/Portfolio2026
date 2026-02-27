@@ -90,6 +90,9 @@ async function syncManagedStylesheet(incomingDoc) {
 }
 
 async function navigateTo(url, options = {}) {
+    if (navigateTo.isNavigating) return;
+    navigateTo.isNavigating = true;
+
     const { updateHistory = true } = options;
     const main = document.querySelector('main');
     const normalizedTarget = normalizeInternalPath(url);
@@ -183,6 +186,8 @@ async function navigateTo(url, options = {}) {
     } catch (err) {
         console.error('Navigation failed:', err);
         window.location.href = url; // Fallback
+    } finally {
+        navigateTo.isNavigating = false;
     }
 }
 
@@ -362,7 +367,15 @@ document.addEventListener('DOMContentLoaded', () => {
         
         const href = link.getAttribute('href');
         // Check if internal link
-        if (!href || href.startsWith('#') || href.startsWith('http') || href.startsWith('mailto:') || link.target === '_blank' || href.endsWith('.pdf')) return;
+        if (!href) return;
+
+        if (href === '#') {
+            e.preventDefault();
+            closeMobileNav();
+            return;
+        }
+
+        if (href.startsWith('#') || href.startsWith('http') || href.startsWith('mailto:') || link.target === '_blank' || href.endsWith('.pdf')) return;
 
         closeMobileNav();
 
