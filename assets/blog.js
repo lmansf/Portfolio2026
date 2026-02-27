@@ -113,7 +113,7 @@ function renderBlogs(blogs, container) {
         card.className = 'project-card';
         
         // COLUMN MAPPING: Adjust these if your Supabase columns are named differently
-        const bgImage = post.image_url || post.cover_image || post.image || 'assets/profilepicCranes.jpeg'; 
+        const bgImage = post.image_url || post.cover_image || post.image || 'assets/crane.jpg'; 
         const category = post.category || post.tags || 'Update';
 
         // Format Date

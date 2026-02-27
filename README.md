@@ -25,9 +25,12 @@ portfolio2-main/
    ├─ style.css              # Shared styling for projects/blog
    ├─ transition.min.js      # Optimized transition script
    ├─ blog.js                # Blog page logic
-   ├─ profilepicCranes-400.avif
-   ├─ profilepicCranes-400.jpg
-   ├─ profilepicCranes.jpeg
+   ├─ crane.jpg
+   ├─ archive/
+   │  └─ profile-images/
+   │     ├─ profilepicCranes-400.avif
+   │     ├─ profilepicCranes-400.jpg
+   │     └─ profilepicCranes.jpeg
    ├─ resume_current.pdf
    └─ resume_ats.txt
 ```

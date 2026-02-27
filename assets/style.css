@@ -24,45 +24,31 @@ body {
     flex-direction: column;
 }
 
-/* Typography Constants */
-.gargantuan-text {
-    font-size: clamp(150px, 35vw, 600px);
-    font-weight: 800;
-    line-height: 0.8;
-    color: rgba(153, 255, 204, 0.34);
-    position: absolute;
-    z-index: 0;
-    pointer-events: none;
-    white-space: nowrap;
-    letter-spacing: -0.05em;
-}
-
 /* Background Layers */
-.bg-layer {
+body::before,
+body::after {
+    content: "";
     position: fixed;
     top: 0;
     left: 0;
     width: 100%;
     height: 100%;
     z-index: 0;
-    overflow: hidden;
-    display: flex;
-    flex-direction: column;
-    justify-content: space-between;
+    pointer-events: none;
 }
 
-.text-top {
-    transform: translateY(-15%);
-    left: -2vw;
-    color: #2b4a3d; /* Dark mint tone for better contrast with foreground content */
+body::before {
+    background-image:
+        repeating-linear-gradient(112deg, transparent 0 18px, rgba(153, 255, 204, 0.14) 18px 19px, transparent 19px 42px),
+        repeating-linear-gradient(158deg, transparent 0 34px, rgba(153, 255, 204, 0.1) 34px 37px, transparent 37px 76px);
+    opacity: 0.38;
 }
 
-.text-bottom {
-    bottom: -5%;
-    right: -2vw; /* Use right alignment for bottom text usually */
-    text-align: right;
-    width: 100%;
-    color: #253a31; /* Even darker mint tone */
+body::after {
+    background-image:
+        repeating-linear-gradient(38deg, transparent 0 22px, rgba(153, 255, 204, 0.12) 22px 24px, transparent 24px 58px),
+        repeating-linear-gradient(136deg, transparent 0 48px, rgba(153, 255, 204, 0.08) 48px 54px, transparent 54px 98px);
+    opacity: 0.24;
 }
 
 /* Header */
@@ -848,13 +834,6 @@ footer {
         border-bottom: 0;
     }
 
-    .gargantuan-text {
-        font-size: 20vw;
-    }
-    
-    .text-top { top: 10%; transform: none; }
-    .text-bottom { bottom: 10%; }
-
     .intro-text, .footer-socials {
         display: none; 
     }
@@ -919,7 +898,7 @@ footer {
 
 
 /* Page Transitions */
-main, .bg-layer {
+main {
     transition: opacity 0.5s ease-in-out;
 }
 
