@@ -173,6 +173,9 @@ async function navigateTo(url, options = {}) {
             element.classList.add('page-enter');
         });
 
+        applyBlogUnlockState();
+        setupInteractiveSnake();
+
         if (isProjectsDestination) {
             animateProjectsLoadIn();
         }
@@ -208,6 +211,143 @@ function closeProjectModal(modal) {
     if (activeProjectModal === modal) {
         activeProjectModal = null;
     }
+}
+
+const BLOG_UNLOCK_KEY = 'portfolio_blog_unlocked';
+let interactiveSnakeHandle = null;
+let isSnakeDragging = false;
+let snakePointerOffsetX = 0;
+let snakePointerOffsetY = 0;
+
+function isBlogUnlocked() {
+    return localStorage.getItem(BLOG_UNLOCK_KEY) === 'true';
+}
+
+function setBlogUnlocked(unlocked) {
+    localStorage.setItem(BLOG_UNLOCK_KEY, unlocked ? 'true' : 'false');
+}
+
+function applyBlogUnlockState(root = document) {
+    const links = root.querySelectorAll('a[data-disabled-blog="true"], a.blog-disabled');
+    const unlocked = isBlogUnlocked();
+
+    links.forEach((link) => {
+        if (unlocked) {
+            link.classList.remove('blog-disabled', 'blog-shuddering');
+            link.removeAttribute('data-disabled-blog');
+            link.removeAttribute('aria-disabled');
+            link.setAttribute('href', 'blog.html');
+            return;
+        }
+
+        link.classList.add('blog-disabled');
+        link.setAttribute('data-disabled-blog', 'true');
+        link.setAttribute('aria-disabled', 'true');
+        if (normalizeInternalPath(window.location.pathname) !== 'blog.html') {
+            link.setAttribute('href', 'blog.html');
+        }
+    });
+
+    if (unlocked) {
+        hideBlogHoverPopup();
+    }
+}
+
+function isPointInsideRect(x, y, rect) {
+    return x >= rect.left && x <= rect.right && y >= rect.top && y <= rect.bottom;
+}
+
+function isDroppedOnBlogTarget(x, y) {
+    const blogTargets = Array.from(document.querySelectorAll('header .nav-links a')).filter((link) => {
+        const href = normalizeInternalPath(link.getAttribute('href') || '');
+        return href === 'blog.html' || link.textContent.trim().toLowerCase() === 'blog';
+    });
+
+    return blogTargets.some((target) => isPointInsideRect(x, y, target.getBoundingClientRect()));
+}
+
+function positionSnakeAtPoint(clientX, clientY) {
+    if (!interactiveSnakeHandle) return;
+    interactiveSnakeHandle.style.left = `${clientX - snakePointerOffsetX}px`;
+    interactiveSnakeHandle.style.top = `${clientY - snakePointerOffsetY}px`;
+}
+
+function moveSnakeDrag(e) {
+    if (!interactiveSnakeHandle || !isSnakeDragging) return;
+    positionSnakeAtPoint(e.clientX, e.clientY);
+}
+
+function stopSnakeDrag(e) {
+    if (!interactiveSnakeHandle || !isSnakeDragging) return;
+
+    isSnakeDragging = false;
+    interactiveSnakeHandle.classList.remove('is-dragging');
+    positionSnakeAtPoint(e.clientX, e.clientY);
+
+    document.removeEventListener('pointermove', moveSnakeDrag);
+    document.removeEventListener('pointerup', stopSnakeDrag);
+
+    if (isDroppedOnBlogTarget(e.clientX, e.clientY)) {
+        setBlogUnlocked(true);
+        applyBlogUnlockState();
+    }
+}
+
+function startSnakeDrag(e) {
+    if (!interactiveSnakeHandle || e.button !== 0) return;
+    e.preventDefault();
+
+    const rect = interactiveSnakeHandle.getBoundingClientRect();
+    snakePointerOffsetX = e.clientX - rect.left;
+    snakePointerOffsetY = e.clientY - rect.top;
+
+    interactiveSnakeHandle.style.position = 'fixed';
+    interactiveSnakeHandle.style.margin = '0';
+    interactiveSnakeHandle.style.zIndex = '10060';
+    positionSnakeAtPoint(e.clientX, e.clientY);
+    document.body.appendChild(interactiveSnakeHandle);
+
+    isSnakeDragging = true;
+    interactiveSnakeHandle.classList.add('is-dragging');
+
+    document.addEventListener('pointermove', moveSnakeDrag);
+    document.addEventListener('pointerup', stopSnakeDrag);
+}
+
+function setupInteractiveSnake() {
+    if (interactiveSnakeHandle) {
+        interactiveSnakeHandle.removeEventListener('pointerdown', startSnakeDrag);
+        if (!interactiveSnakeHandle.closest('.marquee-content')) {
+            interactiveSnakeHandle.remove();
+        }
+    }
+
+    const snakeSpans = Array.from(document.querySelectorAll('.marquee-content span')).filter((span) => {
+        return span.textContent.includes('🐍');
+    });
+
+    const secondSnakeSpan = snakeSpans[1];
+    if (!secondSnakeSpan) {
+        interactiveSnakeHandle = null;
+        return;
+    }
+
+    const snakeText = secondSnakeSpan.textContent || '';
+    const pythonText = snakeText.replace('🐍', '').trim();
+
+    secondSnakeSpan.textContent = '';
+
+    const snakeHandle = document.createElement('span');
+    snakeHandle.className = 'marquee-snake-handle';
+    snakeHandle.textContent = '🐍';
+    secondSnakeSpan.appendChild(snakeHandle);
+
+    if (pythonText) {
+        secondSnakeSpan.append(` ${pythonText}`);
+    }
+
+    interactiveSnakeHandle = snakeHandle;
+    interactiveSnakeHandle.addEventListener('pointerdown', startSnakeDrag);
 }
 
 function shudderDisabledBlog(link) {
@@ -307,6 +447,8 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     closeMobileNav();
+    applyBlogUnlockState();
+    setupInteractiveSnake();
 
     window.addEventListener('resize', () => {
         if (window.innerWidth > 900) {

@@ -334,6 +334,17 @@ footer {
     display: inline-block;
 }
 
+.marquee-snake-handle {
+    display: inline-block;
+    cursor: grab;
+    user-select: none;
+    touch-action: none;
+}
+
+.marquee-snake-handle.is-dragging {
+    cursor: grabbing;
+}
+
 .separator {
     margin: 0 1.5rem;
     color: #2f5a49; /* Dim separator */
