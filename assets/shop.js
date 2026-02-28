@@ -560,6 +560,12 @@ async function loadProducts() {
             const stock = Number(row.stock);
 
             if (!id || !name || !Number.isFinite(price) || !Number.isFinite(stock)) {
+                const missingFields = [];
+                if (!id) missingFields.push('id');
+                if (!name) missingFields.push('product_name');
+                if (!Number.isFinite(price)) missingFields.push('unit_price');
+                if (!Number.isFinite(stock)) missingFields.push('stock');
+                console.warn(`Skipping invalid product row. Missing/invalid fields: ${missingFields.join(', ')}`, row);
                 return null;
             }
 
