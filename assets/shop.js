@@ -88,6 +88,13 @@ function isTicketProduct(product) {
     return category === 'experience' || category === 'education' || /ticket|pass|workshop|tour/.test(name);
 }
 
+function requiresVisitDate(product) {
+    if (!product) return false;
+    const category = String(product.category || '').toLowerCase();
+    const name = String(product.name || '').toLowerCase();
+    return category === 'experience' || /ticket|tour|workshop/.test(name);
+}
+
 function getInventoryLimit(product) {
     if (!product) return 0;
     const sourceValue = isTicketProduct(product) ? product.capacity : product.stock;
@@ -294,7 +301,7 @@ function renderCart() {
 
         controls.append(quantityInput, lineTotalElement, removeButton);
 
-        if (isTicketProduct(product)) {
+        if (requiresVisitDate(product)) {
             const dateWrapper = document.createElement('label');
             dateWrapper.className = 'shop-ticket-date-label';
             dateWrapper.textContent = 'Visit Date';
@@ -442,7 +449,7 @@ function validateCheckoutForm(form) {
     }
 
     const missingTicketDate = getCartEntries().find(({ product }) => {
-        return isTicketProduct(product) && !getTicketDate(product.id);
+        return requiresVisitDate(product) && !getTicketDate(product.id);
     });
 
     if (missingTicketDate) {
