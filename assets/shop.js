@@ -600,10 +600,6 @@ function createProductCard(product) {
     const card = document.createElement('article');
     card.className = 'shop-product-card';
 
-    const category = document.createElement('span');
-    category.className = 'shop-product-category';
-    category.textContent = product.category;
-
     const title = document.createElement('h3');
     title.textContent = product.name;
 
@@ -630,8 +626,41 @@ function createProductCard(product) {
     addButton.addEventListener('click', () => addToCart(product.id));
 
     footer.append(price, addButton);
-    card.append(category, title, description, inventory, footer);
+    card.append(title, description, inventory, footer);
     return card;
+}
+
+function getProductsByCategory(products) {
+    const groupedProducts = new Map();
+
+    products.forEach((product) => {
+        const categoryName = String(product.category || '').trim() || 'General';
+        if (!groupedProducts.has(categoryName)) {
+            groupedProducts.set(categoryName, []);
+        }
+        groupedProducts.get(categoryName).push(product);
+    });
+
+    return groupedProducts;
+}
+
+function createProductCategorySection(categoryName, products) {
+    const section = document.createElement('section');
+    section.className = 'shop-category-section';
+
+    const heading = document.createElement('h3');
+    heading.className = 'shop-category-title';
+    heading.textContent = categoryName;
+
+    const categoryGrid = document.createElement('div');
+    categoryGrid.className = 'shop-category-grid';
+
+    products.forEach((product) => {
+        categoryGrid.appendChild(createProductCard(product));
+    });
+
+    section.append(heading, categoryGrid);
+    return section;
 }
 
 function renderProducts() {
@@ -648,8 +677,10 @@ function renderProducts() {
         return;
     }
 
-    shopState.products.forEach((product) => {
-        productGrid.appendChild(createProductCard(product));
+    const productsByCategory = getProductsByCategory(shopState.products);
+    productsByCategory.forEach((products, categoryName) => {
+        if (!products.length) return;
+        productGrid.appendChild(createProductCategorySection(categoryName, products));
     });
 }
 
