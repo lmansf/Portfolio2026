@@ -33,6 +33,11 @@ Write behavior in use:
 
 - `assets/shop.js` updates `public.products.stock` during mock checkout.
 
+External automation boundary:
+
+- Ticket-buying, dynamic-pricing, and inventory replenishment agents are orchestrated externally in n8n workflows.
+- Those agent workflows are not stored in this repository; this repo contains only the user-facing web app and direct Supabase interactions.
+
 No additional Supabase tables are referenced in this repository at this time.
 
 ## Layout and File Structure

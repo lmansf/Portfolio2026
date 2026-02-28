@@ -37,9 +37,12 @@
         <section class="shop-intro">
             <h1>Mock E-Commerce Store</h1>
             <p>Browse products, add them to your cart, and complete a simulated checkout flow.</p>
+            <p>This mock webstore also highlights external automation agents that simulate live ticket market behavior.</p>
+            <p>One agent buys tickets when prices are fair relative to nearby facilities like Owl Park, one agent adjusts pricing from demand and historical willingness to pay, and one agent tracks inventory and replenishes from a virtual warehouse.</p>
+            <p>User purchases by ticket type and day update conditions in real time, so customer behavior can influence how the market moves.</p>
             <div class="shop-intro-tiles" aria-label="Shop capabilities overview">
                 <article class="shop-intro-tile">
-                    <h3>Features</h3>
+                    <h3>In App</h3>
                     <div class="shop-intro-tags">
                         <span>Live Stock/Capacity Tracking</span>
                         <span>Automatic Rounding Option</span>
@@ -48,15 +51,17 @@
                     </div>
                 </article>
                 <article class="shop-intro-tile">
-                    <h3>Coming Soon</h3>
+                    <h3>External Agents</h3>
                     <div class="shop-intro-tags">
-                        <span>Live Dynamic Pricing</span>
-                        <span>Automated Restocking by Demand</span>
-                        <span>Confirmation Email</span>
+                        <span>Fair-Price Ticket Buying (vs Owl Park)</span>
+                        <span>Demand + Willingness-to-Pay Pricing</span>
+                        <span>Automated Virtual-Warehouse Restocking</span>
+                        <span>Real-Time Market Response to Purchases</span>
                         
                     </div>
                 </article>
             </div>
+            <p class="shop-intro-note">Agent workflows run externally in n8n and are intentionally not included in this repository.</p>
         </section>
 
         <section class="shop-layout" aria-label="Shop and checkout layout">

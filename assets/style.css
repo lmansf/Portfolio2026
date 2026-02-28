@@ -731,6 +731,12 @@ footer {
     font-size: 0.98rem;
 }
 
+.shop-intro-note {
+    margin-top: 12px;
+    color: var(--secondary-text);
+    font-size: 0.84rem;
+}
+
 .shop-intro-tiles {
     margin-top: 14px;
     display: grid;
