@@ -2,6 +2,7 @@ const SUPABASE_URL = 'https://xcubnwvyvhjfyiixunfg.supabase.co';
 const SUPABASE_ANON_KEY = 'sb_publishable_K5k9vLXtDUo8qoyWrwX3qg_qN_3xWfy';
 const SHOP_PRODUCTS_TABLE = 'products';
 const TRANSACTIONS_TABLE = 'transactions';
+const VISIT_DATES_TABLE = 'visit_dates';
 const PROMOTIONS_TABLE = 'promotions';
 const SHOP_PRODUCTS_CACHE_KEY = 'portfolio_shop_products_cache_v1';
 const SHOP_PRODUCTS_CACHE_TIME_KEY = 'portfolio_shop_products_cache_time_v1';
@@ -472,6 +473,43 @@ async function insertTransactionRows(rows) {
 
     if (error) {
         throw new Error(`Could not record transaction rows: ${error.message}`);
+    }
+}
+
+function createVisitDateRows(transactionId, contactName, cartEntries) {
+    if (!transactionId || !Array.isArray(cartEntries) || !cartEntries.length) return [];
+
+    const visitorsByDate = new Map();
+    for (const { product, quantity } of cartEntries) {
+        if (!requiresVisitDate(product)) continue;
+        const visitDate = getTicketDate(product.id);
+        if (!visitDate) continue;
+        const currentVisitors = visitorsByDate.get(visitDate) || 0;
+        const nextVisitors = currentVisitors + Math.max(0, Math.floor(Number(quantity) || 0));
+        visitorsByDate.set(visitDate, nextVisitors);
+    }
+
+    if (!visitorsByDate.size) return [];
+
+    const visitorContact = String(contactName || '').trim();
+    return Array.from(visitorsByDate.entries()).map(([visitDate, totalVisitors]) => ({
+        transaction_id: transactionId,
+        date_visiting: visitDate,
+        total_visitors: totalVisitors,
+        visitor_contact: visitorContact
+    }));
+}
+
+async function insertVisitDateRows(rows) {
+    if (!rows.length) return;
+
+    const client = getSupabaseClient();
+    const { error } = await client
+        .from(VISIT_DATES_TABLE)
+        .insert(rows);
+
+    if (error) {
+        throw new Error(`Could not record visit dates: ${error.message}`);
     }
 }
 
@@ -1079,14 +1117,25 @@ function attachCheckoutHandler() {
         }
 
         const transactionRows = createTransactionRows(transactionId, contactDetails, cartEntries, transactionStatus);
+        let transactionRowsInserted = false;
         try {
             await insertTransactionRows(transactionRows);
+            transactionRowsInserted = true;
         } catch (transactionError) {
             console.error(transactionError);
-        } finally {
-            if (placeOrderButton) {
-                delete placeOrderButton.dataset.pending;
+        }
+
+        if (transactionRowsInserted) {
+            const visitDateRows = createVisitDateRows(transactionId, contactDetails.name, cartEntries);
+            try {
+                await insertVisitDateRows(visitDateRows);
+            } catch (visitDateError) {
+                console.error(visitDateError);
             }
+        }
+
+        if (placeOrderButton) {
+            delete placeOrderButton.dataset.pending;
         }
 
         if (inventoryError) {
