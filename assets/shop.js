@@ -538,9 +538,14 @@ function syncRoundPreference() {
     shopState.roundToNearestDollar = Boolean(roundToggle && roundToggle.checked);
 }
 
-function getRoundingProduct() {
+function isRoundingProductName(name) {
+    const normalizedName = String(name || '').trim().toLowerCase();
+    return normalizedName === 'rounding' || normalizedName.includes('rounding');
+}
+
+async function getRoundingProduct() {
     if (!Array.isArray(shopState.products) || !shopState.products.length) {
-        return null;
+        shopState.products = [];
     }
 
     const exactMatch = shopState.products.find((product) => {
@@ -552,10 +557,46 @@ function getRoundingProduct() {
         return exactMatch;
     }
 
-    return shopState.products.find((product) => {
-        const normalizedName = String(product.name || '').trim().toLowerCase();
-        return normalizedName.includes('rounding');
+    const fuzzyMatch = shopState.products.find((product) => {
+        return isRoundingProductName(product.name);
     }) || null;
+
+    if (fuzzyMatch) {
+        return fuzzyMatch;
+    }
+
+    try {
+        const client = getSupabaseClient();
+        const { data, error } = await client
+            .from(SHOP_PRODUCTS_TABLE)
+            .select('id, product_name, category, description, unit_price, stock, is_hidden')
+            .ilike('product_name', '%rounding%')
+            .order('product_name', { ascending: true })
+            .limit(25);
+
+        if (error) {
+            return null;
+        }
+
+        const mappedMatches = mapProductsResponseRows(data);
+        const fallbackRounding = mappedMatches.find((product) => {
+            const normalizedName = String(product.name || '').trim().toLowerCase();
+            return normalizedName === 'rounding';
+        }) || mappedMatches.find((product) => isRoundingProductName(product.name)) || null;
+
+        if (!fallbackRounding) {
+            return null;
+        }
+
+        const alreadyTracked = shopState.products.some((product) => product.id === fallbackRounding.id);
+        if (!alreadyTracked) {
+            shopState.products.push(fallbackRounding);
+        }
+
+        return fallbackRounding;
+    } catch {
+        return null;
+    }
 }
 
 function createQuantityInput(product, quantity) {
@@ -777,7 +818,11 @@ function renderProducts() {
 
     productGrid.innerHTML = '';
 
-    if (!shopState.products.length) {
+    const visibleProducts = shopState.products.filter((product) => {
+        return !product.isHidden && !isRoundingProductName(product.name);
+    });
+
+    if (!visibleProducts.length) {
         const errorState = document.createElement('p');
         errorState.className = 'shop-products-empty';
         errorState.textContent = 'Products are unavailable right now. Please refresh and try again.';
@@ -785,7 +830,7 @@ function renderProducts() {
         return;
     }
 
-    const productsByCategory = getProductsByCategory(shopState.products);
+    const productsByCategory = getProductsByCategory(visibleProducts);
     productsByCategory.forEach((products, categoryName) => {
         if (!products.length) return;
         productGrid.appendChild(createProductCategorySection(categoryName, products));
@@ -994,7 +1039,7 @@ function attachCheckoutHandler() {
         };
 
         if (shopState.roundToNearestDollar) {
-            const roundingProduct = getRoundingProduct();
+            const roundingProduct = await getRoundingProduct();
             if (!roundingProduct) {
                 setFormMessage('Rounding product is missing from products. Add a product named "Rounding" to continue with rounding.', 'error');
                 if (placeOrderButton) {
@@ -1092,13 +1137,14 @@ function mapProductsResponseRows(rows) {
             const price = Number(row.unit_price);
             const stock = Number(row.stock);
             const isHidden = Boolean(row.is_hidden);
+            const isRoundingProduct = isRoundingProductName(name);
 
-            if (!id || !name || !Number.isFinite(price) || !Number.isFinite(stock)) {
+            if (!id || !name || (!isRoundingProduct && (!Number.isFinite(price) || !Number.isFinite(stock)))) {
                 const missingFields = [];
                 if (!id) missingFields.push('id');
                 if (!name) missingFields.push('product_name');
-                if (!Number.isFinite(price)) missingFields.push('unit_price');
-                if (!Number.isFinite(stock)) missingFields.push('stock');
+                if (!isRoundingProduct && !Number.isFinite(price)) missingFields.push('unit_price');
+                if (!isRoundingProduct && !Number.isFinite(stock)) missingFields.push('stock');
                 console.warn(`Skipping invalid product row. Missing/invalid fields: ${missingFields.join(', ')}`, row);
                 return null;
             }
@@ -1108,16 +1154,19 @@ function mapProductsResponseRows(rows) {
                 name,
                 category,
                 description,
-                price,
-                stock: isUnlimitedInventoryValue(stock) ? -1 : Math.max(0, Math.floor(stock)),
-                capacity: isUnlimitedInventoryValue(stock) ? -1 : Math.max(0, Math.floor(stock)),
+                price: Number.isFinite(price) ? price : 0,
+                stock: Number.isFinite(stock)
+                    ? (isUnlimitedInventoryValue(stock) ? -1 : Math.max(0, Math.floor(stock)))
+                    : -1,
+                capacity: Number.isFinite(stock)
+                    ? (isUnlimitedInventoryValue(stock) ? -1 : Math.max(0, Math.floor(stock)))
+                    : -1,
                 isHidden
             };
 
             return mappedProduct;
         })
-        .filter(Boolean)
-        .filter((product) => !product.isHidden);
+        .filter(Boolean);
 }
 
 function readCachedProducts() {
