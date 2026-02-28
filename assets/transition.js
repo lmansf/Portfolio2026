@@ -746,6 +746,16 @@ document.addEventListener('DOMContentLoaded', () => {
         // Check if internal link
         if (!href) return;
 
+        const normalizedHref = normalizeInternalPath(href);
+        const currentPath = normalizeInternalPath(window.location.pathname);
+
+        if (currentPath === 'shop.html' && normalizedHref === 'blog.html') {
+            e.preventDefault();
+            hideBlogHoverPopup();
+            shudderDisabledBlog(link);
+            return;
+        }
+
         if (href === '#') {
             e.preventDefault();
             closeMobileNav();
@@ -755,9 +765,6 @@ document.addEventListener('DOMContentLoaded', () => {
         if (href.startsWith('#') || href.startsWith('http') || href.startsWith('mailto:') || link.target === '_blank' || href.endsWith('.pdf')) return;
 
         closeMobileNav();
-
-        const normalizedHref = normalizeInternalPath(href);
-        const currentPath = normalizeInternalPath(window.location.pathname);
 
         if (normalizedHref === 'index.html' && currentPath !== 'index.html') {
             e.preventDefault();
