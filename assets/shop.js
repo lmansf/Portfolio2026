@@ -218,6 +218,7 @@ function updateTotals() {
     const serviceFeeElement = document.getElementById('shop-service-fee');
     const roundingRowElement = document.getElementById('shop-rounding-row');
     const roundingElement = document.getElementById('shop-rounding');
+    const roundingHelpElement = document.getElementById('shop-rounding-help');
     const totalElement = document.getElementById('shop-total');
 
     if (subtotalElement) subtotalElement.textContent = formatCurrency(pricingSummary.subtotal);
@@ -228,6 +229,18 @@ function updateTotals() {
         const showRoundingLine = pricingSummary.subtotal > 0 && shopState.roundToNearestDollar;
         roundingRowElement.hidden = !showRoundingLine;
     }
+
+    if (roundingHelpElement) {
+        if (pricingSummary.subtotal <= 0) {
+            roundingHelpElement.textContent = 'Add items to preview how rounding affects your total.';
+        } else if (shopState.roundToNearestDollar) {
+            roundingHelpElement.textContent = `Rounding adjustment applied: ${formatSignedCurrency(pricingSummary.roundingAdjustment)}.`;
+        } else {
+            const roundedPreview = getPricingSummary(subtotal, true);
+            roundingHelpElement.textContent = `If enabled now, adjustment would be ${formatSignedCurrency(roundedPreview.roundingAdjustment)}.`;
+        }
+    }
+
     if (totalElement) totalElement.textContent = formatCurrency(pricingSummary.total);
 
     const placeOrderButton = document.getElementById('shop-place-order');
