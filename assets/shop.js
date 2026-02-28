@@ -1,72 +1,9 @@
-const SHOP_PRODUCT_SOURCE = 'assets/data/products.json';
+const SUPABASE_URL = 'https://xcubnwvyvhjfyiixunfg.supabase.co';
+const SUPABASE_ANON_KEY = 'sb_publishable_K5k9vLXtDUo8qoyWrwX3qg_qN_3xWfy';
+const SHOP_PRODUCTS_TABLE = 'products';
 const SALES_TAX_RATE = 0.07;
 const SERVICE_FEE = 2.49;
-const SHOP_FALLBACK_PRODUCTS = [
-    {
-        id: 'owl-adoption-plush',
-        name: 'Adopt-an-Owl Plush',
-        description: 'Soft rescue owl plush with a name tag from the nocturnal aviary.',
-        price: 24.99,
-        category: 'Gift Shop',
-        stock: 28
-    },
-    {
-        id: 'moonlight-owl-tour',
-        name: 'Moonlight Owl Walk Ticket',
-        description: 'After-hours guided tour through the owl habitat and rehab observation deck.',
-        price: 42.99,
-        category: 'Experience',
-        capacity: 16
-    },
-    {
-        id: 'keeper-for-day-pass',
-        name: 'Junior Keeper Pass',
-        description: 'Hands-on educational session assisting keepers with owl enrichment setup.',
-        price: 79.99,
-        category: 'Education',
-        capacity: 10
-    },
-    {
-        id: 'owl-cafe-combo',
-        name: 'Owl Cafe Snack Bundle',
-        description: 'Facility cafe combo with hot cocoa, themed pastry, and souvenir cup.',
-        price: 18.99,
-        category: 'Cafe',
-        stock: 35
-    },
-    {
-        id: 'night-vision-binocular-rental',
-        name: 'Night Vision Binocular Rental',
-        description: 'Two-hour rental for dusk feeding demos and owl flight observation.',
-        price: 16.99,
-        category: 'Rental',
-        stock: 12
-    },
-    {
-        id: 'owl-habitat-donation',
-        name: 'Habitat Restoration Donation',
-        description: 'Contribute directly to enclosure upgrades and medical care supplies.',
-        price: 25.99,
-        category: 'Support',
-        stock: 999
-    },
-    {
-        id: 'owl-feather-journal',
-        name: 'Field Notes Journal',
-        description: 'Recycled paper journal inspired by owl tracking logs used by staff.',
-        price: 14.99,
-        category: 'Gift Shop',
-        stock: 40
-    },
-    {
-        id: 'kids-owl-workshop',
-        name: 'Kids Owl Discovery Workshop',
-        description: 'Weekend workshop with interactive stations, pellets lab, and storytelling.',
-        price: 29.99,
-        category: 'Education',
-        capacity: 14
-    }
-];
+let supabaseClient;
 
 const shopState = {
     products: [],
@@ -592,21 +529,59 @@ function attachCheckoutHandler() {
 }
 
 async function loadProducts() {
-    try {
-        const response = await fetch(SHOP_PRODUCT_SOURCE, { cache: 'no-store' });
-        if (!response.ok) {
-            throw new Error(`Failed to load catalog (${response.status})`);
-        }
+    if (!window.supabase || typeof window.supabase.createClient !== 'function') {
+        throw new Error('Supabase client is unavailable on this page.');
+    }
 
-        const products = await response.json();
-        if (!Array.isArray(products)) {
-            throw new Error('Invalid product catalog format.');
-        }
+    if (!supabaseClient) {
+        supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+    }
 
-        return products;
-    } catch (error) {
-        console.warn('Using fallback product catalog because JSON fetch failed.', error);
-        return SHOP_FALLBACK_PRODUCTS;
+    const { data, error } = await supabaseClient
+        .from(SHOP_PRODUCTS_TABLE)
+        .select('id, product_name, category, description, unit_price, stock')
+        .order('product_name', { ascending: true });
+
+    if (error) {
+        throw new Error(`Failed to load Supabase products: ${error.message}`);
+    }
+
+    if (!Array.isArray(data)) {
+        throw new Error('Supabase products response was not an array.');
+    }
+
+    return data
+        .map((row) => {
+            const id = String(row.id || '').trim();
+            const name = String(row.product_name || '').trim();
+            const category = String(row.category || '').trim() || 'General';
+            const description = String(row.description || '').trim() || 'No description available.';
+            const price = Number(row.unit_price);
+            const stock = Number(row.stock);
+
+            if (!id || !name || !Number.isFinite(price) || !Number.isFinite(stock)) {
+                return null;
+            }
+
+            const mappedProduct = {
+                id,
+                name,
+                category,
+                description,
+                price,
+                stock: Math.max(0, Math.floor(stock)),
+                capacity: Math.max(0, Math.floor(stock))
+            };
+
+            return mappedProduct;
+        })
+        .filter(Boolean);
+}
+
+function setProductsLoadError() {
+    const productGrid = document.getElementById('shop-product-grid');
+    if (productGrid) {
+        productGrid.innerHTML = '<p class="shop-products-empty">Could not load products. Please try again later.</p>';
     }
 }
 
@@ -632,7 +607,11 @@ async function initializeShopPage() {
         setFormMessage('Add items to your cart to begin checkout.');
     } catch (error) {
         console.error(error);
-        productGrid.innerHTML = '<p class="shop-products-empty">Could not load products. Please try again later.</p>';
+        shopState.products = [];
+        shopState.cart.clear();
+        shopState.ticketDates.clear();
+        setProductsLoadError();
+        setCheckoutInputsDisabled(true);
         setFormMessage('Checkout is unavailable until products load.', 'error');
     }
 }

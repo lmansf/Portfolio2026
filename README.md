@@ -9,6 +9,22 @@ The website has three core views:
 - **Home page** (`index.html`) — the main landing experience.
 - **Projects page** (`projects.html`) — a curated overview of selected work.
 - **Blog page** (`blog.html`) — blog content powered by frontend JavaScript.
+- **Mock Shop page** (`shop.html`) — product catalog loaded from Supabase.
+
+## Supabase Data Sources
+
+The site currently reads Supabase data directly in the browser using the public anon key model.
+
+- `assets/blog.js` reads `public.blogposts`.
+- `assets/shop.js` reads `public.products` and maps these fields:
+   - `id` (required, unique)
+   - `product_name` (required)
+   - `category`
+   - `description`
+   - `unit_price` (required)
+   - `stock` (required; used for both product stock and ticket capacity)
+
+RLS policies should allow read access only to intended public product rows/columns.
 
 ## Layout and File Structure
 
