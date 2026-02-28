@@ -62,6 +62,10 @@
                             <span>Service Fee</span>
                             <strong id="shop-service-fee">$0.00</strong>
                         </div>
+                        <div id="shop-promo-row" hidden>
+                            <span>Promotion</span>
+                            <strong id="shop-promo-discount">-$0.00</strong>
+                        </div>
                         <div id="shop-rounding-row" hidden>
                             <span>Rounding</span>
                             <strong id="shop-rounding">$0.00</strong>
@@ -104,6 +108,15 @@
                         Round total to nearest dollar
                     </label>
                     <p id="shop-rounding-help" class="shop-rounding-help">Enable rounding to adjust your final total to a whole dollar.</p>
+                    <div class="shop-promo-field">
+                        <label for="shop-promo-code">Promotion Code</label>
+                        <div class="shop-promo-controls">
+                            <input id="shop-promo-code" type="text" name="promotionCode" autocomplete="off" placeholder="Enter promo code">
+                            <button id="shop-apply-promo" class="shop-secondary-btn" type="button">Apply</button>
+                            <button id="shop-remove-promo" class="shop-secondary-btn" type="button">Remove</button>
+                        </div>
+                        <p id="shop-promo-message" class="shop-promo-message" role="status" aria-live="polite"></p>
+                    </div>
                     <div class="shop-checkout-actions">
                         <button id="shop-place-order" class="consult-btn" type="submit" disabled>
                             <span>Place Order</span>

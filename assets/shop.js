@@ -1,6 +1,7 @@
 const SUPABASE_URL = 'https://xcubnwvyvhjfyiixunfg.supabase.co';
 const SUPABASE_ANON_KEY = 'sb_publishable_K5k9vLXtDUo8qoyWrwX3qg_qN_3xWfy';
 const SHOP_PRODUCTS_TABLE = 'products';
+const PROMOTIONS_TABLE = 'promotions';
 const SALES_TAX_RATE = 0.07;
 const SERVICE_FEE = 2.49;
 let supabaseClient;
@@ -22,6 +23,7 @@ const shopState = {
     cart: new Map(),
     ticketDates: new Map(),
     roundToNearestDollar: false,
+    appliedPromotion: null,
     isCheckoutComplete: false
 };
 
@@ -32,20 +34,224 @@ function formatSignedCurrency(value) {
     return absoluteAmount;
 }
 
-function getPricingSummary(subtotal, shouldRound) {
+function getPricingSummary(subtotal, shouldRound, promotionDiscountAmount = 0) {
     const tax = subtotal > 0 ? subtotal * SALES_TAX_RATE : 0;
     const serviceFee = subtotal > 0 ? SERVICE_FEE : 0;
     const preRoundTotal = subtotal + tax + serviceFee;
-    const total = shouldRound ? Math.round(preRoundTotal) : preRoundTotal;
-    const roundingAdjustment = shouldRound ? total - preRoundTotal : 0;
+    const promotionDiscount = Math.max(0, Math.min(Number(promotionDiscountAmount) || 0, preRoundTotal));
+    const discountedTotal = Math.max(0, preRoundTotal - promotionDiscount);
+    const total = shouldRound ? Math.round(discountedTotal) : discountedTotal;
+    const roundingAdjustment = shouldRound ? total - discountedTotal : 0;
 
     return {
         subtotal,
         tax,
         serviceFee,
+        promotionDiscount,
         roundingAdjustment,
         total
     };
+}
+
+function normalizePromotionCode(rawValue) {
+    return String(rawValue || '').trim().toUpperCase();
+}
+
+function toNonNegativeNumber(value) {
+    const parsedValue = Number(value);
+    return Number.isFinite(parsedValue) && parsedValue > 0 ? parsedValue : 0;
+}
+
+function getPromotionMessageElement() {
+    return document.getElementById('shop-promo-message');
+}
+
+function setPromoMessage(message, type = 'neutral') {
+    const messageElement = getPromotionMessageElement();
+    if (!messageElement) return;
+    messageElement.textContent = message;
+    messageElement.dataset.type = type;
+}
+
+function getPromotionCodeInput() {
+    return document.getElementById('shop-promo-code');
+}
+
+function getApplyPromotionButton() {
+    return document.getElementById('shop-apply-promo');
+}
+
+function getRemovePromotionButton() {
+    return document.getElementById('shop-remove-promo');
+}
+
+function updatePromotionActionState() {
+    const applyButton = getApplyPromotionButton();
+    const removeButton = getRemovePromotionButton();
+    if (!applyButton && !removeButton) return;
+
+    const promotionInput = getPromotionCodeInput();
+    const hasCode = Boolean(promotionInput && normalizePromotionCode(promotionInput.value));
+    const subtotal = getCartSubtotal();
+    const disableApply = shopState.isCheckoutComplete || subtotal <= 0 || !hasCode;
+    const disableRemove = shopState.isCheckoutComplete || !shopState.appliedPromotion;
+
+    if (applyButton) {
+        applyButton.disabled = disableApply;
+    }
+    if (removeButton) {
+        removeButton.disabled = disableRemove;
+    }
+}
+
+function isPromotionDateRangeValid(startDateRaw, endDateRaw) {
+    const now = new Date();
+
+    if (startDateRaw) {
+        const startDate = new Date(startDateRaw);
+        if (Number.isFinite(startDate.getTime()) && now < startDate) {
+            return false;
+        }
+    }
+
+    if (endDateRaw) {
+        const parsedEndDate = new Date(endDateRaw);
+        if (Number.isFinite(parsedEndDate.getTime())) {
+            const endDateIsDateOnly = /^\d{4}-\d{2}-\d{2}$/.test(String(endDateRaw));
+            if (endDateIsDateOnly) {
+                parsedEndDate.setHours(23, 59, 59, 999);
+            }
+            if (now > parsedEndDate) {
+                return false;
+            }
+        }
+    }
+
+    return true;
+}
+
+function getPromotionDiscountAmount(preDiscountTotal) {
+    if (!shopState.appliedPromotion || preDiscountTotal <= 0) return 0;
+
+    const { flatAmount, percentAmount } = shopState.appliedPromotion;
+    const flatDiscount = toNonNegativeNumber(flatAmount);
+    const percentDiscount = toNonNegativeNumber(percentAmount) > 0
+        ? preDiscountTotal * (toNonNegativeNumber(percentAmount) / 100)
+        : 0;
+
+    const combinedDiscount = flatDiscount + percentDiscount;
+    return Math.max(0, Math.min(combinedDiscount, preDiscountTotal));
+}
+
+async function loadPromotionByCode(promotionCode) {
+    const client = getSupabaseClient();
+    const { data, error } = await client
+        .from(PROMOTIONS_TABLE)
+        .select('promotion_code, start_date, end_date, flat_amount, percent_amount')
+        .ilike('promotion_code', promotionCode)
+        .limit(1);
+
+    if (error) {
+        throw new Error(`Failed to validate promotion code: ${error.message}`);
+    }
+
+    if (!Array.isArray(data) || !data.length) {
+        return null;
+    }
+
+    const promotion = data[0];
+    return {
+        code: normalizePromotionCode(promotion.promotion_code),
+        startDate: promotion.start_date,
+        endDate: promotion.end_date,
+        flatAmount: toNonNegativeNumber(promotion.flat_amount),
+        percentAmount: toNonNegativeNumber(promotion.percent_amount)
+    };
+}
+
+function clearAppliedPromotion({ clearInput = false } = {}) {
+    shopState.appliedPromotion = null;
+    if (clearInput) {
+        const promotionInput = getPromotionCodeInput();
+        if (promotionInput) {
+            promotionInput.value = '';
+        }
+    }
+}
+
+function handleRemovePromotion() {
+    if (!shopState.appliedPromotion) {
+        setPromoMessage('No promotion is currently applied.', 'neutral');
+        updatePromotionActionState();
+        return;
+    }
+
+    clearAppliedPromotion({ clearInput: true });
+    setPromoMessage('Promotion removed.', 'neutral');
+    updateTotals();
+}
+
+async function handleApplyPromotion() {
+    if (shopState.isCheckoutComplete) {
+        setPromoMessage('Start a new order before applying a promotion.', 'warning');
+        return;
+    }
+
+    if (getCartSubtotal() <= 0) {
+        setPromoMessage('Add items to your cart before applying a promotion.', 'warning');
+        return;
+    }
+
+    const promotionInput = getPromotionCodeInput();
+    const rawCode = promotionInput ? promotionInput.value : '';
+    const promotionCode = normalizePromotionCode(rawCode);
+
+    if (!promotionCode) {
+        clearAppliedPromotion();
+        setPromoMessage('Enter a promotion code to apply a discount.', 'neutral');
+        updateTotals();
+        return;
+    }
+
+    setPromoMessage('Checking promotion code...', 'neutral');
+
+    let promotion;
+    try {
+        promotion = await loadPromotionByCode(promotionCode);
+    } catch (error) {
+        console.error(error);
+        setPromoMessage(error.message || 'Could not validate promotion code right now.', 'error');
+        return;
+    }
+
+    if (!promotion || !promotion.code) {
+        clearAppliedPromotion();
+        setPromoMessage('Promotion code not found.', 'error');
+        updateTotals();
+        return;
+    }
+
+    if (!isPromotionDateRangeValid(promotion.startDate, promotion.endDate)) {
+        clearAppliedPromotion();
+        setPromoMessage('This promotion is not currently active.', 'warning');
+        updateTotals();
+        return;
+    }
+
+    if (promotion.flatAmount <= 0 && promotion.percentAmount <= 0) {
+        clearAppliedPromotion();
+        setPromoMessage('This promotion does not have a valid discount amount.', 'warning');
+        updateTotals();
+        return;
+    }
+
+    shopState.appliedPromotion = promotion;
+    if (promotionInput) {
+        promotionInput.value = promotion.code;
+    }
+
+    setPromoMessage(`Promotion ${promotion.code} applied.`, 'success');
+    updateTotals();
 }
 
 function getTodayIsoDate() {
@@ -125,6 +331,11 @@ function setCheckoutInputsDisabled(isDisabled) {
     form.querySelectorAll('input').forEach((input) => {
         input.disabled = isDisabled;
     });
+
+    const applyPromotionButton = getApplyPromotionButton();
+    if (applyPromotionButton) {
+        applyPromotionButton.disabled = isDisabled;
+    }
 }
 
 function updateCheckoutActionState() {
@@ -160,11 +371,15 @@ function getCartSubtotal() {
 
 function updateTotals() {
     const subtotal = getCartSubtotal();
-    const pricingSummary = getPricingSummary(subtotal, shopState.roundToNearestDollar);
+    const basePricingSummary = getPricingSummary(subtotal, false, 0);
+    const promotionDiscountAmount = getPromotionDiscountAmount(basePricingSummary.total);
+    const pricingSummary = getPricingSummary(subtotal, shopState.roundToNearestDollar, promotionDiscountAmount);
 
     const subtotalElement = document.getElementById('shop-subtotal');
     const taxElement = document.getElementById('shop-tax');
     const serviceFeeElement = document.getElementById('shop-service-fee');
+    const promoRowElement = document.getElementById('shop-promo-row');
+    const promoDiscountElement = document.getElementById('shop-promo-discount');
     const roundingRowElement = document.getElementById('shop-rounding-row');
     const roundingElement = document.getElementById('shop-rounding');
     const roundingHelpElement = document.getElementById('shop-rounding-help');
@@ -173,6 +388,10 @@ function updateTotals() {
     if (subtotalElement) subtotalElement.textContent = formatCurrency(pricingSummary.subtotal);
     if (taxElement) taxElement.textContent = formatCurrency(pricingSummary.tax);
     if (serviceFeeElement) serviceFeeElement.textContent = formatCurrency(pricingSummary.serviceFee);
+    if (promoDiscountElement) promoDiscountElement.textContent = formatSignedCurrency(-pricingSummary.promotionDiscount);
+    if (promoRowElement) {
+        promoRowElement.hidden = pricingSummary.promotionDiscount <= 0;
+    }
     if (roundingElement) roundingElement.textContent = formatSignedCurrency(pricingSummary.roundingAdjustment);
     if (roundingRowElement) {
         const showRoundingLine = pricingSummary.subtotal > 0 && shopState.roundToNearestDollar;
@@ -185,7 +404,7 @@ function updateTotals() {
         } else if (shopState.roundToNearestDollar) {
             roundingHelpElement.textContent = `Rounding adjustment applied: ${formatSignedCurrency(pricingSummary.roundingAdjustment)}.`;
         } else {
-            const roundedPreview = getPricingSummary(subtotal, true);
+            const roundedPreview = getPricingSummary(subtotal, true, promotionDiscountAmount);
             roundingHelpElement.textContent = `If enabled now, adjustment would be ${formatSignedCurrency(roundedPreview.roundingAdjustment)}.`;
         }
     }
@@ -197,6 +416,7 @@ function updateTotals() {
         placeOrderButton.disabled = subtotal <= 0 || shopState.isCheckoutComplete;
     }
 
+    updatePromotionActionState();
     updateCheckoutActionState();
 }
 
@@ -522,10 +742,12 @@ async function applyOrderInventoryReduction() {
 function startNewOrder() {
     shopState.isCheckoutComplete = false;
     shopState.ticketDates.clear();
+    clearAppliedPromotion();
     const form = getCheckoutForm();
     if (form) {
         form.reset();
     }
+    setPromoMessage('');
     setCheckoutInputsDisabled(false);
     setFormMessage('New order started. Add items to your cart to check out again.', 'success');
     renderCart();
@@ -546,6 +768,23 @@ function attachCheckoutHandler() {
             syncRoundPreference();
             updateTotals();
         });
+    }
+
+    const promotionInput = getPromotionCodeInput();
+    if (promotionInput) {
+        promotionInput.addEventListener('input', () => {
+            updatePromotionActionState();
+        });
+    }
+
+    const applyPromotionButton = getApplyPromotionButton();
+    if (applyPromotionButton) {
+        applyPromotionButton.addEventListener('click', handleApplyPromotion);
+    }
+
+    const removePromotionButton = getRemovePromotionButton();
+    if (removePromotionButton) {
+        removePromotionButton.addEventListener('click', handleRemovePromotion);
     }
 
     const startNewOrderButton = getStartNewOrderButton();
@@ -596,6 +835,8 @@ function attachCheckoutHandler() {
         shopState.isCheckoutComplete = true;
         shopState.cart.clear();
         shopState.ticketDates.clear();
+        clearAppliedPromotion();
+        setPromoMessage('');
         setCheckoutInputsDisabled(true);
         resetCheckoutForm(form);
         setFormMessage('Order placed successfully. This was a mock checkout.', 'success');
@@ -668,7 +909,9 @@ async function initializeShopPage() {
     shopState.cart = new Map();
     shopState.ticketDates = new Map();
     shopState.roundToNearestDollar = false;
+    shopState.appliedPromotion = null;
     shopState.isCheckoutComplete = false;
+    setPromoMessage('');
     setCheckoutInputsDisabled(false);
     updateCheckoutActionState();
 

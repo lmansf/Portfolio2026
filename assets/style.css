@@ -978,6 +978,53 @@ footer {
     margin: -2px 4px 0;
 }
 
+.shop-promo-field {
+    display: grid;
+    gap: 6px;
+    margin-top: 2px;
+}
+
+.shop-promo-field > label {
+    color: var(--secondary-text);
+    font-size: 0.88rem;
+}
+
+.shop-promo-controls {
+    display: grid;
+    grid-template-columns: 1fr auto auto;
+    gap: 8px;
+}
+
+.shop-promo-controls .shop-secondary-btn {
+    width: auto;
+    min-width: 90px;
+    padding: 10px 12px;
+}
+
+.shop-promo-controls .shop-secondary-btn:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+.shop-promo-message {
+    min-height: 1.1rem;
+    color: var(--secondary-text);
+    font-size: 0.82rem;
+    margin-left: 2px;
+}
+
+.shop-promo-message[data-type="error"] {
+    color: #ff8a8a;
+}
+
+.shop-promo-message[data-type="success"] {
+    color: #9be8be;
+}
+
+.shop-promo-message[data-type="warning"] {
+    color: #ffd27a;
+}
+
 .shop-checkout-form .consult-btn {
     margin-top: 6px;
 }
