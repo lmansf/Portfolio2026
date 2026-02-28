@@ -40,7 +40,7 @@ function getPricingSummary(subtotal, shouldRound, promotionDiscountAmount = 0) {
     const preRoundTotal = subtotal + tax + serviceFee;
     const promotionDiscount = Math.max(0, Math.min(Number(promotionDiscountAmount) || 0, preRoundTotal));
     const discountedTotal = Math.max(0, preRoundTotal - promotionDiscount);
-    const total = shouldRound ? Math.round(discountedTotal) : discountedTotal;
+    const total = shouldRound ? Math.ceil(discountedTotal) : discountedTotal;
     const roundingAdjustment = shouldRound ? total - discountedTotal : 0;
 
     return {
@@ -60,10 +60,6 @@ function normalizePromotionCode(rawValue) {
 function toNonNegativeNumber(value) {
     const parsedValue = Number(value);
     return Number.isFinite(parsedValue) && parsedValue > 0 ? parsedValue : 0;
-}
-
-function escapeLikePattern(value) {
-    return String(value || '').replace(/[\\%_]/g, (character) => `\\${character}`);
 }
 
 function getPromotionMessageElement() {
@@ -154,16 +150,16 @@ async function loadPromotionByCode(promotionCode) {
     }
 
     const todayIso = getTodayIsoDate();
-    const wildcardPattern = `%${escapeLikePattern(normalizedCode)}%`;
     const client = getSupabaseClient();
     const { data, error } = await client
         .from(PROMOTIONS_TABLE)
         .select('promotion_code, start_date, end_date, flat_amount, percent_amount')
-        .ilike('promotion_code', wildcardPattern)
+        .not('start_date', 'is', null)
+        .not('end_date', 'is', null)
         .lte('start_date', todayIso)
         .gte('end_date', todayIso)
         .order('start_date', { ascending: false })
-        .limit(25);
+        .limit(200);
 
     if (error) {
         throw new Error(`Failed to validate promotion code: ${error.message}`);
