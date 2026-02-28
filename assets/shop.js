@@ -1,6 +1,7 @@
 const SUPABASE_URL = 'https://xcubnwvyvhjfyiixunfg.supabase.co';
 const SUPABASE_ANON_KEY = 'sb_publishable_K5k9vLXtDUo8qoyWrwX3qg_qN_3xWfy';
 const SHOP_PRODUCTS_TABLE = 'products';
+const TRANSACTIONS_TABLE = 'transactions';
 const PROMOTIONS_TABLE = 'promotions';
 const SALES_TAX_RATE = 0.07;
 const SERVICE_FEE = 2.49;
@@ -387,6 +388,46 @@ function getCartEntries() {
 
 function getCartSubtotal() {
     return getCartEntries().reduce((sum, item) => sum + item.lineTotal, 0);
+}
+
+function createTransactionId() {
+    if (window.crypto && typeof window.crypto.randomUUID === 'function') {
+        return window.crypto.randomUUID();
+    }
+
+    const timestampPart = Date.now().toString(36);
+    const randomPart = Math.random().toString(36).slice(2, 10);
+    return `${timestampPart}-${randomPart}`;
+}
+
+function createTransactionRows(transactionId, contactDetails, cartEntries, transactionStatus) {
+    const statusValue = transactionStatus ? 1 : 0;
+
+    return cartEntries.map(({ product, quantity }) => ({
+        transaction_id: transactionId,
+        contact_name: contactDetails.name,
+        contact_email: contactDetails.email,
+        contact_shipping_address: contactDetails.shippingAddress,
+        contact_city: contactDetails.city,
+        contact_postal: contactDetails.postalCode,
+        product_id: product.id,
+        product_price: product.price,
+        transaction_status: statusValue,
+        quantity
+    }));
+}
+
+async function insertTransactionRows(rows) {
+    if (!rows.length) return;
+
+    const client = getSupabaseClient();
+    const { error } = await client
+        .from(TRANSACTIONS_TABLE)
+        .insert(rows);
+
+    if (error) {
+        throw new Error(`Could not record transaction rows: ${error.message}`);
+    }
 }
 
 function updateTotals() {
@@ -862,6 +903,17 @@ function attachCheckoutHandler() {
             return;
         }
 
+        const formValues = Object.fromEntries(new FormData(form).entries());
+        const cartEntries = getCartEntries();
+        const transactionId = createTransactionId();
+        const contactDetails = {
+            name: String(formValues.fullName || '').trim(),
+            email: String(formValues.email || '').trim(),
+            shippingAddress: String(formValues.shippingAddress || '').trim(),
+            city: String(formValues.city || '').trim(),
+            postalCode: String(formValues.postalCode || '').trim()
+        };
+
         const placeOrderButton = document.getElementById('shop-place-order');
         if (placeOrderButton) {
             placeOrderButton.disabled = true;
@@ -870,17 +922,32 @@ function attachCheckoutHandler() {
 
         setFormMessage('Processing order...', 'neutral');
 
+        let inventoryError = null;
+        let transactionStatus = 0;
+
         try {
             await applyOrderInventoryReduction();
-        } catch (inventoryError) {
-            console.error(inventoryError);
-            setFormMessage(inventoryError.message || 'Could not complete checkout due to a stock update issue.', 'error');
-            renderCart();
-            return;
+            transactionStatus = 1;
+        } catch (error) {
+            inventoryError = error;
+            console.error(error);
+        }
+
+        const transactionRows = createTransactionRows(transactionId, contactDetails, cartEntries, transactionStatus);
+        try {
+            await insertTransactionRows(transactionRows);
+        } catch (transactionError) {
+            console.error(transactionError);
         } finally {
             if (placeOrderButton) {
                 delete placeOrderButton.dataset.pending;
             }
+        }
+
+        if (inventoryError) {
+            setFormMessage(inventoryError.message || 'Could not complete checkout due to a stock update issue.', 'error');
+            renderCart();
+            return;
         }
 
         shopState.isCheckoutComplete = true;
