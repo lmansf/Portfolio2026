@@ -37,18 +37,24 @@
         <section class="shop-intro">
             <h1>Mock E-Commerce Store</h1>
             <p>Browse products, add them to your cart, and complete a simulated checkout flow.</p>
-            <p>Working Features:</p>
-            <ul>
-                <li>live stock/capacity tracking</li>
-                <li>automatic rounding option</li>
-                <li>working promotion code (try: <code>alltime</code>)</li>
-                <li>items queried live from an item table in supabase</li>
-            </ul>
-            <p>Coming Soon:</p>
-            <ul>
-                <li>dynamic pricing</li>
-                <li>automated restocking by demand</li>
-            </ul>
+            <div class="shop-intro-tiles" aria-label="Shop capabilities overview">
+                <article class="shop-intro-tile">
+                    <h3>Features</h3>
+                    <div class="shop-intro-tags">
+                        <span>Live stock/capacity tracking</span>
+                        <span>Automatic rounding option</span>
+                        <span>Working promotion code (<code>alltime</code>)</span>
+                        <span>Live Supabase item queries</span>
+                    </div>
+                </article>
+                <article class="shop-intro-tile">
+                    <h3>Coming Soon</h3>
+                    <div class="shop-intro-tags">
+                        <span>Live Dynamic Pricing</span>
+                        <span>Automated Restocking by Demand</span>
+                    </div>
+                </article>
+            </div>
         </section>
 
         <section class="shop-layout" aria-label="Shop and checkout layout">
