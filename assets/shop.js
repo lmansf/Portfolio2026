@@ -4,8 +4,8 @@ const SHOP_PRODUCTS_TABLE = 'products';
 const TRANSACTIONS_TABLE = 'transactions';
 const VISIT_DATES_TABLE = 'visit_dates';
 const PROMOTIONS_TABLE = 'promotions';
-const SHOP_PRODUCTS_CACHE_KEY = 'portfolio_shop_products_cache_v1';
-const SHOP_PRODUCTS_CACHE_TIME_KEY = 'portfolio_shop_products_cache_time_v1';
+const SHOP_PRODUCTS_CACHE_KEY = 'portfolio_shop_products_cache_v2';
+const SHOP_PRODUCTS_CACHE_TIME_KEY = 'portfolio_shop_products_cache_time_v2';
 const SHOP_PRODUCTS_CACHE_TTL_MS = 5 * 60 * 1000;
 const SALES_TAX_RATE = 0.07;
 const SERVICE_FEE = 2.49;
@@ -305,6 +305,28 @@ function isUnlimitedInventoryValue(value) {
     return Number(value) === -1;
 }
 
+function toBoolean(value, fallback = false) {
+    if (typeof value === 'boolean') return value;
+    if (typeof value === 'string') {
+        const normalized = value.trim().toLowerCase();
+        if (normalized === 'true') return true;
+        if (normalized === 'false') return false;
+    }
+    if (typeof value === 'number') {
+        if (value === 1) return true;
+        if (value === 0) return false;
+    }
+    return fallback;
+}
+
+function shouldShowAvailability(product) {
+    if (!product) return false;
+    if (isTicketProduct(product)) {
+        return toBoolean(product.showCapacity, true);
+    }
+    return true;
+}
+
 function getInventoryLimit(product) {
     if (!product) return 0;
     const sourceValue = isTicketProduct(product) ? product.capacity : product.stock;
@@ -343,7 +365,7 @@ function getRemainingQuantity(product) {
 }
 
 function getAvailabilityText(product) {
-    if (!product) return '';
+    if (!product || !shouldShowAvailability(product)) return '';
     if (!Number.isFinite(getInventoryLimit(product))) {
         return isTicketProduct(product) ? 'Unlimited spots' : 'Unlimited stock';
     }
@@ -608,7 +630,7 @@ async function getRoundingProduct() {
         const client = getSupabaseClient();
         const { data, error } = await client
             .from(SHOP_PRODUCTS_TABLE)
-            .select('id, product_name, category, description, unit_price, stock, is_hidden')
+            .select('id, product_name, category, description, unit_price, stock, is_hidden, show_capacity')
             .ilike('product_name', '%rounding%')
             .order('product_name', { ascending: true })
             .limit(25);
@@ -709,10 +731,13 @@ function renderCart() {
         price.textContent = `${formatCurrency(product.price)} each`;
 
         const availability = document.createElement('p');
-        availability.className = 'shop-item-availability';
-        availability.textContent = getAvailabilityText(product);
-
-        details.append(name, price, availability);
+        const availabilityText = getAvailabilityText(product);
+        details.append(name, price);
+        if (availabilityText) {
+            availability.className = 'shop-item-availability';
+            availability.textContent = availabilityText;
+            details.appendChild(availability);
+        }
 
         const controls = document.createElement('div');
         controls.className = 'shop-cart-controls';
@@ -796,8 +821,11 @@ function createProductCard(product) {
     description.textContent = product.description;
 
     const inventory = document.createElement('span');
-    inventory.className = 'shop-product-inventory';
-    inventory.textContent = getAvailabilityText(product);
+    const availabilityText = getAvailabilityText(product);
+    if (availabilityText) {
+        inventory.className = 'shop-product-inventory';
+        inventory.textContent = availabilityText;
+    }
 
     const footer = document.createElement('div');
     footer.className = 'shop-product-footer';
@@ -815,7 +843,11 @@ function createProductCard(product) {
     addButton.addEventListener('click', () => addToCart(product.id));
 
     footer.append(price, addButton);
-    card.append(title, description, inventory, footer);
+    card.append(title, description);
+    if (availabilityText) {
+        card.appendChild(inventory);
+    }
+    card.appendChild(footer);
     return card;
 }
 
@@ -1161,7 +1193,7 @@ async function loadProducts() {
 
     const { data, error } = await client
         .from(SHOP_PRODUCTS_TABLE)
-        .select('id, product_name, category, description, unit_price, stock, is_hidden')
+        .select('id, product_name, category, description, unit_price, stock, is_hidden, show_capacity')
         .order('unit_price', { ascending: true })
         .order('product_name', { ascending: true });
 
@@ -1188,6 +1220,7 @@ function mapProductsResponseRows(rows) {
             const price = Number(row.unit_price);
             const stock = Number(row.stock);
             const isHidden = Boolean(row.is_hidden);
+            const showCapacity = toBoolean(row.show_capacity, true);
             const isRoundingProduct = isRoundingProductName(name);
 
             if (!id || !name || (!isRoundingProduct && (!Number.isFinite(price) || !Number.isFinite(stock)))) {
@@ -1212,8 +1245,16 @@ function mapProductsResponseRows(rows) {
                 capacity: Number.isFinite(stock)
                     ? (isUnlimitedInventoryValue(stock) ? -1 : Math.max(0, Math.floor(stock)))
                     : -1,
+                showCapacity,
                 isHidden
             };
+
+            console.debug('[shop] show_capacity mapping', {
+                id: mappedProduct.id,
+                name: mappedProduct.name,
+                show_capacity: row.show_capacity,
+                showCapacity: mappedProduct.showCapacity
+            });
 
             return mappedProduct;
         })
@@ -1248,6 +1289,7 @@ function writeCachedProducts(products) {
             description: product.description,
             unit_price: product.price,
             stock: product.stock,
+            show_capacity: toBoolean(product.showCapacity, true),
             is_hidden: Boolean(product.isHidden)
         }));
 
