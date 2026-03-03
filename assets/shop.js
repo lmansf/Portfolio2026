@@ -1770,7 +1770,7 @@ async function applyOrderInventoryReduction() {
                 throw new Error(`Event data changed for ${product.name} on ${visitDate}. Please reselect a date.`);
             }
 
-            const normalizedEvent = normalizeEventAvailabilityRow(currentEventRow);
+            let normalizedEvent = normalizeEventAvailabilityRow(currentEventRow);
             if (!normalizedEvent) {
                 throw new Error(`Event data is invalid for ${product.name} on ${visitDate}.`);
             }
@@ -1780,30 +1780,58 @@ async function applyOrderInventoryReduction() {
             }
 
             if (!isUnlimitedInventoryValue(normalizedEvent.capacity)) {
-                const nextSpotsPurchased = normalizedEvent.spotsPurchased + quantity;
-                if (nextSpotsPurchased > normalizedEvent.capacity) {
-                    throw new Error(`Requested quantity exceeds capacity for ${product.name} on ${visitDate}.`);
+                let updatedAvailability = null;
+
+                for (let attempt = 0; attempt < 2; attempt += 1) {
+                    if (Number.isFinite(normalizedEvent.remaining) && normalizedEvent.remaining < quantity) {
+                        throw new Error(`Not enough spots for ${product.name} on ${visitDate}. Available: ${normalizedEvent.remaining}.`);
+                    }
+
+                    const nextSpotsPurchased = normalizedEvent.spotsPurchased + quantity;
+                    if (nextSpotsPurchased > normalizedEvent.capacity) {
+                        throw new Error(`Requested quantity exceeds capacity for ${product.name} on ${visitDate}.`);
+                    }
+
+                    const { data: updatedEventRow, error: updateEventError } = await client
+                        .from(EVENTS_TABLE)
+                        .update({ spots_purchased: nextSpotsPurchased })
+                        .eq('id', normalizedEvent.id)
+                        .eq('spots_purchased', normalizedEvent.spotsPurchased)
+                        .select('*')
+                        .maybeSingle();
+
+                    if (updateEventError) {
+                        throw new Error(`Could not update event capacity for ${product.name}: ${updateEventError.message}`);
+                    }
+
+                    if (updatedEventRow) {
+                        updatedAvailability = normalizeEventAvailabilityRow(updatedEventRow);
+                        if (!updatedAvailability) {
+                            throw new Error(`Event data was invalid after update for ${product.name} on ${visitDate}.`);
+                        }
+                        break;
+                    }
+
+                    const { data: refreshedEventRow, error: refreshEventError } = await client
+                        .from(EVENTS_TABLE)
+                        .select('*')
+                        .eq('id', normalizedEvent.id)
+                        .maybeSingle();
+
+                    if (refreshEventError) {
+                        throw new Error(`Could not refresh event capacity for ${product.name}: ${refreshEventError.message}`);
+                    }
+
+                    const refreshedEvent = normalizeEventAvailabilityRow(refreshedEventRow);
+                    if (!refreshedEvent) {
+                        throw new Error(`Event data changed for ${product.name} on ${visitDate}. Please reselect a date.`);
+                    }
+
+                    normalizedEvent = refreshedEvent;
                 }
 
-                const { data: updatedEventRow, error: updateEventError } = await client
-                    .from(EVENTS_TABLE)
-                    .update({ spots_purchased: nextSpotsPurchased })
-                    .eq('id', normalizedEvent.id)
-                    .eq('spots_purchased', normalizedEvent.spotsPurchased)
-                    .select('*')
-                    .maybeSingle();
-
-                if (updateEventError) {
-                    throw new Error(`Could not update event capacity for ${product.name}: ${updateEventError.message}`);
-                }
-
-                if (!updatedEventRow) {
-                    throw new Error(`Availability changed for ${product.name} on ${visitDate} while checking out. Please try again.`);
-                }
-
-                const updatedAvailability = normalizeEventAvailabilityRow(updatedEventRow);
                 if (!updatedAvailability) {
-                    throw new Error(`Event data was invalid after update for ${product.name} on ${visitDate}.`);
+                    throw new Error(`Availability changed for ${product.name} on ${visitDate} while checking out. Please try again.`);
                 }
 
                 const eventKey = getEventAvailabilityKey(product.id, visitDate);
