@@ -565,16 +565,18 @@ function normalizeEventAvailabilityRow(row) {
     const eventType = String(eventTypeRaw || '').trim();
 
     const capacityRaw = Number(getRowFieldValue(row, ['capacity']));
-    const spotsPurchasedRaw = Number(getRowFieldValue(row, ['spots_purchased', 'spotsPurchased', 'spots purchased']));
-    if (!Number.isFinite(capacityRaw) || !Number.isFinite(spotsPurchasedRaw)) {
+    const spotsPurchasedValue = getRowFieldValue(row, ['spots_purchased', 'spotsPurchased', 'spots purchased']);
+    const spotsPurchasedRaw = Number(spotsPurchasedValue);
+    if (!Number.isFinite(capacityRaw)) {
         return null;
     }
 
     const isUnlimited = isUnlimitedInventoryValue(capacityRaw);
     const normalizedCapacity = isUnlimited ? -1 : Math.max(0, Math.floor(capacityRaw));
-    const normalizedPurchased = Math.max(0, Math.floor(spotsPurchasedRaw));
+    const normalizedPurchasedBase = Number.isFinite(spotsPurchasedRaw) ? spotsPurchasedRaw : 0;
+    let normalizedPurchased = Math.max(0, Math.floor(normalizedPurchasedBase));
     if (!isUnlimited && normalizedPurchased > normalizedCapacity) {
-        return null;
+        normalizedPurchased = normalizedCapacity;
     }
 
     const remaining = isUnlimited
@@ -658,22 +660,43 @@ async function fetchEventCalendarAvailability(product) {
 
     const client = getSupabaseClient();
     const todayIso = getTodayIsoDate();
-    const { data, error } = await client
+    const { data: strictData, error: strictError } = await client
         .from(EVENTS_TABLE)
         .select('*')
-        .order('id', { ascending: true })
+        .eq('event_type', product.name)
+        .gte('event_date', todayIso)
+        .order('event_date', { ascending: true })
         .limit(5000);
 
-    if (error) {
-        throw new Error(`Could not load calendar availability for ${product.name}: ${error.message}`);
+    if (strictError) {
+        throw new Error(`Could not load calendar availability for ${product.name}: ${strictError.message}`);
+    }
+
+    let rows = Array.isArray(strictData) ? strictData : [];
+
+    if (!rows.length) {
+        const { data: fallbackData, error: fallbackError } = await client
+            .from(EVENTS_TABLE)
+            .select('*')
+            .gte('event_date', todayIso)
+            .order('event_date', { ascending: true })
+            .limit(5000);
+
+        if (fallbackError) {
+            throw new Error(`Could not load fallback calendar availability for ${product.name}: ${fallbackError.message}`);
+        }
+
+        const fallbackRows = Array.isArray(fallbackData) ? fallbackData : [];
+        rows = fallbackRows.filter((row) => {
+            const rowEventType = getRowFieldValue(row, ['event_type', 'eventType', 'event type', 'type']);
+            return matchesEventProduct(product, rowEventType);
+        });
     }
 
     const calendarMap = new Map();
-    const rows = Array.isArray(data) ? data : [];
     rows.forEach((row) => {
         const normalizedRow = normalizeEventAvailabilityRow(row);
         if (!normalizedRow || !normalizedRow.eventDate) return;
-        if (!matchesEventProduct(product, normalizedRow.eventType)) return;
         if (normalizedRow.eventDate < todayIso) return;
 
         const existingEntry = calendarMap.get(normalizedRow.eventDate) || null;
