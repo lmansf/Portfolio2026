@@ -1775,6 +1775,8 @@ async function applyOrderInventoryReduction() {
                 throw new Error(`Event data is invalid for ${product.name} on ${visitDate}.`);
             }
 
+            let expectedSpotsPurchasedValue = getRowFieldValue(currentEventRow, ['spots_purchased', 'spotsPurchased', 'spots purchased']);
+
             if (Number.isFinite(normalizedEvent.remaining) && normalizedEvent.remaining < quantity) {
                 throw new Error(`Not enough spots for ${product.name} on ${visitDate}. Available: ${normalizedEvent.remaining}.`);
             }
@@ -1787,17 +1789,29 @@ async function applyOrderInventoryReduction() {
                         throw new Error(`Not enough spots for ${product.name} on ${visitDate}. Available: ${normalizedEvent.remaining}.`);
                     }
 
+                    const priorSpotsPurchased = normalizedEvent.spotsPurchased;
                     const nextSpotsPurchased = normalizedEvent.spotsPurchased + quantity;
                     if (nextSpotsPurchased > normalizedEvent.capacity) {
                         throw new Error(`Requested quantity exceeds capacity for ${product.name} on ${visitDate}.`);
                     }
 
-                    const { data: updatedEventRows, error: updateEventError } = await client
+                    let updateQuery = client
                         .from(EVENTS_TABLE)
                         .update({ spots_purchased: nextSpotsPurchased })
-                        .eq('id', normalizedEvent.id)
-                        .eq('spots_purchased', normalizedEvent.spotsPurchased)
-                        .select('*');
+                        .eq('id', normalizedEvent.id);
+
+                    if (expectedSpotsPurchasedValue === null || typeof expectedSpotsPurchasedValue === 'undefined' || String(expectedSpotsPurchasedValue).trim() === '') {
+                        updateQuery = updateQuery.is('spots_purchased', null);
+                    } else {
+                        const expectedSpotsPurchasedNumber = Number(expectedSpotsPurchasedValue);
+                        if (Number.isFinite(expectedSpotsPurchasedNumber)) {
+                            updateQuery = updateQuery.eq('spots_purchased', expectedSpotsPurchasedNumber);
+                        } else {
+                            updateQuery = updateQuery.eq('spots_purchased', expectedSpotsPurchasedValue);
+                        }
+                    }
+
+                    const { data: updatedEventRows, error: updateEventError } = await updateQuery.select('*');
 
                     if (updateEventError) {
                         throw new Error(`Could not update event capacity for ${product.name}: ${updateEventError.message}`);
@@ -1830,7 +1844,12 @@ async function applyOrderInventoryReduction() {
                         throw new Error(`Event data changed for ${product.name} on ${visitDate}. Please reselect a date.`);
                     }
 
+                    if (refreshedEvent.spotsPurchased === priorSpotsPurchased && attempt === 1) {
+                        throw new Error(`Could not reserve spots for ${product.name} on ${visitDate}. Check events table update policy (RLS) for anon/authenticated users.`);
+                    }
+
                     normalizedEvent = refreshedEvent;
+                    expectedSpotsPurchasedValue = getRowFieldValue(refreshedEventRow, ['spots_purchased', 'spotsPurchased', 'spots purchased']);
                 }
 
                 if (!updatedAvailability) {
