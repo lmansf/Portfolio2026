@@ -1853,7 +1853,33 @@ async function applyOrderInventoryReduction() {
                 }
 
                 if (!updatedAvailability) {
-                    throw new Error(`Availability changed for ${product.name} on ${visitDate} while checking out. Please try again.`);
+                    const fallbackNextSpotsPurchased = normalizedEvent.spotsPurchased + quantity;
+                    if (fallbackNextSpotsPurchased > normalizedEvent.capacity) {
+                        throw new Error(`Not enough spots for ${product.name} on ${visitDate}. Available: ${normalizedEvent.remaining}.`);
+                    }
+
+                    const { data: fallbackUpdatedRows, error: fallbackUpdateError } = await client
+                        .from(EVENTS_TABLE)
+                        .update({ spots_purchased: fallbackNextSpotsPurchased })
+                        .eq('id', normalizedEvent.id)
+                        .select('*');
+
+                    if (fallbackUpdateError) {
+                        throw new Error(`Could not update event capacity for ${product.name}: ${fallbackUpdateError.message}`);
+                    }
+
+                    const fallbackUpdatedRow = Array.isArray(fallbackUpdatedRows) && fallbackUpdatedRows.length
+                        ? fallbackUpdatedRows[0]
+                        : null;
+
+                    if (!fallbackUpdatedRow) {
+                        throw new Error(`Could not reserve spots for ${product.name} on ${visitDate}. Check events table update policy (RLS) for anon/authenticated users.`);
+                    }
+
+                    updatedAvailability = normalizeEventAvailabilityRow(fallbackUpdatedRow);
+                    if (!updatedAvailability) {
+                        throw new Error(`Event data was invalid after update for ${product.name} on ${visitDate}.`);
+                    }
                 }
 
                 const eventKey = getEventAvailabilityKey(product.id, visitDate);
