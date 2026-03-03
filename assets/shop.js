@@ -358,6 +358,47 @@ function getSpotsLeftLabel(eventAvailability) {
     return `${eventAvailability.remaining} spots left`;
 }
 
+function normalizeText(value) {
+    return String(value || '').trim().toLowerCase();
+}
+
+function getRowFieldValue(row, fieldNames) {
+    if (!row || typeof row !== 'object') return undefined;
+    for (const fieldName of fieldNames) {
+        if (Object.prototype.hasOwnProperty.call(row, fieldName)) {
+            return row[fieldName];
+        }
+    }
+    return undefined;
+}
+
+function normalizeDateValueToIso(rawDateValue) {
+    const rawValue = String(rawDateValue || '').trim();
+    if (!rawValue) return '';
+
+    const directIsoMatch = rawValue.match(/^(\d{4}-\d{2}-\d{2})/);
+    if (directIsoMatch) {
+        return directIsoMatch[1];
+    }
+
+    const parsedDate = new Date(rawValue);
+    if (!Number.isFinite(parsedDate.getTime())) {
+        return '';
+    }
+
+    const year = parsedDate.getUTCFullYear();
+    const month = padDatePart(parsedDate.getUTCMonth() + 1);
+    const day = padDatePart(parsedDate.getUTCDate());
+    return `${year}-${month}-${day}`;
+}
+
+function matchesEventProduct(product, eventTypeValue) {
+    const normalizedEventType = normalizeText(eventTypeValue);
+    if (!normalizedEventType) return false;
+    return normalizedEventType === normalizeText(product.name)
+        || normalizedEventType === normalizeText(product.id);
+}
+
 function isTicketProduct(product) {
     if (!product) return false;
     const category = String(product.category || '').toLowerCase();
@@ -529,8 +570,17 @@ function getStoredEventAvailability(productId, eventDate) {
 function normalizeEventAvailabilityRow(row) {
     if (!row) return null;
 
-    const capacityRaw = Number(row.capacity);
-    const spotsPurchasedRaw = Number(row.spots_purchased);
+    const eventDateRaw = getRowFieldValue(row, ['event_date', 'eventDate', 'event date', 'date']);
+    const eventDateIso = normalizeDateValueToIso(eventDateRaw);
+    if (!eventDateIso) {
+        return null;
+    }
+
+    const eventTypeRaw = getRowFieldValue(row, ['event_type', 'eventType', 'event type', 'type']);
+    const eventType = String(eventTypeRaw || '').trim();
+
+    const capacityRaw = Number(getRowFieldValue(row, ['capacity']));
+    const spotsPurchasedRaw = Number(getRowFieldValue(row, ['spots_purchased', 'spotsPurchased', 'spots purchased']));
     if (!Number.isFinite(capacityRaw) || !Number.isFinite(spotsPurchasedRaw)) {
         return null;
     }
@@ -548,8 +598,8 @@ function normalizeEventAvailabilityRow(row) {
 
     return {
         id: String(row.id || '').trim(),
-        eventType: String(row.event_type || '').trim(),
-        eventDate: String(row.event_date || '').trim(),
+        eventType,
+        eventDate: eventDateIso,
         capacity: normalizedCapacity,
         spotsPurchased: normalizedPurchased,
         remaining,
@@ -560,20 +610,9 @@ function normalizeEventAvailabilityRow(row) {
 async function fetchEventAvailability(product, eventDate) {
     if (!product || !eventDate || !requiresVisitDate(product)) return null;
 
-    const client = getSupabaseClient();
-    const { data, error } = await client
-        .from(EVENTS_TABLE)
-        .select('id, event_type, event_date, capacity, spots_purchased')
-        .eq('event_type', product.name)
-        .eq('event_date', eventDate)
-        .limit(1)
-        .maybeSingle();
-
-    if (error) {
-        throw new Error(`Could not load event availability for ${product.name}: ${error.message}`);
-    }
-
-    if (!data) {
+    const calendarMap = await preloadEventCalendar(product, { force: true });
+    const selectedAvailability = calendarMap.get(eventDate) || null;
+    if (!selectedAvailability) {
         return {
             id: '',
             eventType: product.name,
@@ -585,12 +624,7 @@ async function fetchEventAvailability(product, eventDate) {
         };
     }
 
-    const normalizedEvent = normalizeEventAvailabilityRow(data);
-    if (!normalizedEvent) {
-        throw new Error(`Event data is invalid for ${product.name} on ${eventDate}.`);
-    }
-
-    return normalizedEvent;
+    return selectedAvailability;
 }
 
 async function refreshEventAvailability(product, { showErrors = false } = {}) {
@@ -620,11 +654,9 @@ async function fetchEventCalendarAvailability(product) {
     const todayIso = getTodayIsoDate();
     const { data, error } = await client
         .from(EVENTS_TABLE)
-        .select('id, event_type, event_date, capacity, spots_purchased')
-        .eq('event_type', product.name)
-        .gte('event_date', todayIso)
-        .order('event_date', { ascending: true })
-        .limit(730);
+        .select('*')
+        .order('id', { ascending: true })
+        .limit(5000);
 
     if (error) {
         throw new Error(`Could not load calendar availability for ${product.name}: ${error.message}`);
@@ -635,6 +667,8 @@ async function fetchEventCalendarAvailability(product) {
     rows.forEach((row) => {
         const normalizedRow = normalizeEventAvailabilityRow(row);
         if (!normalizedRow || !normalizedRow.eventDate) return;
+        if (!matchesEventProduct(product, normalizedRow.eventType)) return;
+        if (normalizedRow.eventDate < todayIso) return;
         calendarMap.set(normalizedRow.eventDate, normalizedRow);
         const eventKey = getEventAvailabilityKey(product.id, normalizedRow.eventDate);
         shopState.eventAvailability.set(eventKey, normalizedRow);
@@ -770,39 +804,108 @@ function createTicketCalendarGrid(product, monthKey, selectedDate, calendarMap, 
     return calendarGrid;
 }
 
-async function renderTicketDatePopupContent(product, popupRoot) {
-    if (!product || !popupRoot) return;
+function getTicketDateModalElements() {
+    const overlay = document.getElementById('shop-ticket-modal-overlay');
+    if (!overlay) return null;
 
-    const bodyContainer = popupRoot.querySelector('.shop-ticket-date-body');
-    const spotsMessage = popupRoot.querySelector('.shop-ticket-date-spots');
-    const summaryElement = popupRoot.querySelector('.shop-ticket-date-toggle');
-    if (!bodyContainer || !spotsMessage || !summaryElement) return;
+    return {
+        overlay,
+        panel: overlay.querySelector('.shop-ticket-modal-panel'),
+        title: overlay.querySelector('.shop-ticket-modal-title'),
+        summary: overlay.querySelector('.shop-ticket-modal-summary'),
+        body: overlay.querySelector('.shop-ticket-modal-body'),
+        closeButton: overlay.querySelector('.shop-ticket-modal-close')
+    };
+}
+
+function ensureTicketDateModal() {
+    const existingModal = getTicketDateModalElements();
+    if (existingModal) return existingModal;
+
+    const overlay = document.createElement('div');
+    overlay.id = 'shop-ticket-modal-overlay';
+    overlay.className = 'shop-ticket-modal-overlay';
+    overlay.hidden = true;
+
+    const panel = document.createElement('div');
+    panel.className = 'shop-ticket-modal-panel';
+    panel.setAttribute('role', 'dialog');
+    panel.setAttribute('aria-modal', 'true');
+
+    const header = document.createElement('div');
+    header.className = 'shop-ticket-modal-header';
+
+    const title = document.createElement('h4');
+    title.className = 'shop-ticket-modal-title';
+    title.textContent = 'Choose Visit Date';
+
+    const closeButton = document.createElement('button');
+    closeButton.type = 'button';
+    closeButton.className = 'shop-ticket-modal-close';
+    closeButton.textContent = 'Close';
+
+    const summary = document.createElement('p');
+    summary.className = 'shop-ticket-modal-summary';
+    summary.textContent = 'Select an available date.';
+
+    const body = document.createElement('div');
+    body.className = 'shop-ticket-modal-body';
+
+    header.append(title, closeButton);
+    panel.append(header, summary, body);
+    overlay.appendChild(panel);
+    document.body.appendChild(overlay);
+
+    overlay.addEventListener('click', (event) => {
+        if (event.target === overlay) {
+            closeTicketDateModal();
+        }
+    });
+
+    closeButton.addEventListener('click', () => {
+        closeTicketDateModal();
+    });
+
+    return getTicketDateModalElements();
+}
+
+function closeTicketDateModal() {
+    const modalElements = getTicketDateModalElements();
+    if (!modalElements) return;
+    modalElements.overlay.hidden = true;
+    delete modalElements.overlay.dataset.productId;
+    delete modalElements.overlay.dataset.monthKey;
+}
+
+async function renderTicketDateModal(product) {
+    const modalElements = ensureTicketDateModal();
+    if (!modalElements || !product) return;
 
     const selectedDate = getTicketDate(product.id);
     const todayMonth = getMonthKey(getTodayIsoDate());
     const selectedMonth = getMonthKey(selectedDate);
-    const requestedMonth = String(popupRoot.dataset.monthKey || '').trim();
-    let monthKey = requestedMonth || selectedMonth || todayMonth;
+    let monthKey = String(modalElements.overlay.dataset.monthKey || '').trim() || selectedMonth || todayMonth;
     if (monthKey < todayMonth) {
         monthKey = todayMonth;
     }
-    popupRoot.dataset.monthKey = monthKey;
+    modalElements.overlay.dataset.monthKey = monthKey;
 
-    bodyContainer.innerHTML = '<p class="shop-ticket-calendar-loading">Loading calendar...</p>';
+    modalElements.title.textContent = `${product.name} Calendar`;
+    modalElements.summary.textContent = 'Loading calendar...';
+    modalElements.body.innerHTML = '<p class="shop-ticket-calendar-loading">Loading calendar...</p>';
 
     let calendarMap;
     try {
         calendarMap = await preloadEventCalendar(product, { force: true });
     } catch (error) {
-        bodyContainer.innerHTML = '<p class="shop-ticket-calendar-loading">Could not load calendar.</p>';
-        spotsMessage.textContent = '';
-        summaryElement.textContent = selectedDate ? `Visit Date: ${selectedDate}` : 'Choose Visit Date';
+        modalElements.summary.textContent = error.message || 'Could not load dates right now.';
+        modalElements.body.innerHTML = '<p class="shop-ticket-calendar-loading">Could not load calendar.</p>';
         return;
     }
 
-    if (!popupRoot.isConnected) return;
+    if (!modalElements.overlay.isConnected || modalElements.overlay.hidden) return;
 
-    bodyContainer.innerHTML = '';
+    modalElements.body.innerHTML = '';
 
     const nav = document.createElement('div');
     nav.className = 'shop-ticket-calendar-nav';
@@ -813,8 +916,8 @@ async function renderTicketDatePopupContent(product, popupRoot) {
     prevButton.textContent = '‹';
     prevButton.disabled = monthKey <= todayMonth;
     prevButton.addEventListener('click', async () => {
-        popupRoot.dataset.monthKey = shiftMonthKey(monthKey, -1);
-        await renderTicketDatePopupContent(product, popupRoot);
+        modalElements.overlay.dataset.monthKey = shiftMonthKey(monthKey, -1);
+        await renderTicketDateModal(product);
     });
 
     const monthLabel = document.createElement('strong');
@@ -826,8 +929,8 @@ async function renderTicketDatePopupContent(product, popupRoot) {
     nextButton.className = 'shop-ticket-calendar-nav-btn';
     nextButton.textContent = '›';
     nextButton.addEventListener('click', async () => {
-        popupRoot.dataset.monthKey = shiftMonthKey(monthKey, 1);
-        await renderTicketDatePopupContent(product, popupRoot);
+        modalElements.overlay.dataset.monthKey = shiftMonthKey(monthKey, 1);
+        await renderTicketDateModal(product);
     });
 
     nav.append(prevButton, monthLabel, nextButton);
@@ -841,27 +944,34 @@ async function renderTicketDatePopupContent(product, popupRoot) {
 
         const selectedAvailability = selectionResult.availability;
         const spotsText = getSpotsLeftLabel(selectedAvailability);
+        modalElements.summary.textContent = `Selected ${isoDate} · ${spotsText}`;
         setFormMessage(selectionResult.adjusted ? selectionResult.message : `Visit date set to ${isoDate}.`, selectionResult.adjusted ? 'warning' : 'success');
-        if (selectedAvailability) {
-            spotsMessage.textContent = spotsText;
-        }
         renderCart();
+        await renderTicketDateModal(product);
     });
 
-    bodyContainer.append(nav, grid);
+    modalElements.body.append(nav, grid);
 
     const selectedAvailability = selectedDate ? (calendarMap.get(selectedDate) || getStoredEventAvailability(product.id, selectedDate)) : null;
     if (selectedDate && selectedAvailability && selectedAvailability.exists) {
-        const spotsLabel = getSpotsLeftLabel(selectedAvailability);
-        summaryElement.textContent = `Visit Date: ${selectedDate} · ${spotsLabel}`;
-        spotsMessage.textContent = spotsLabel;
+        modalElements.summary.textContent = `Selected ${selectedDate} · ${getSpotsLeftLabel(selectedAvailability)}`;
     } else if (selectedDate) {
-        summaryElement.textContent = `Visit Date: ${selectedDate}`;
-        spotsMessage.textContent = 'Unavailable date selected.';
+        modalElements.summary.textContent = `Selected ${selectedDate} · Unavailable`;
     } else {
-        summaryElement.textContent = 'Choose Visit Date';
-        spotsMessage.textContent = 'Select an available date to see spots left.';
+        modalElements.summary.textContent = 'Select an available date to see spots left.';
     }
+}
+
+async function openTicketDateModal(product) {
+    if (!product) return;
+
+    const modalElements = ensureTicketDateModal();
+    if (!modalElements) return;
+
+    modalElements.overlay.hidden = false;
+    modalElements.overlay.dataset.productId = String(product.id || '').trim();
+    modalElements.overlay.dataset.monthKey = getMonthKey(getTicketDate(product.id) || getTodayIsoDate());
+    await renderTicketDateModal(product);
 }
 
 function getCheckoutForm() {
@@ -1239,25 +1349,26 @@ function renderCart() {
             shopState.ticketDates.delete(product.id);
             clearEventAvailabilityForProduct(product.id);
             clearEventCalendarForProduct(product.id);
+            closeTicketDateModal();
             renderCart();
         });
 
         controls.append(quantityInput, lineTotalElement, removeButton);
 
         if (requiresVisitDate(product)) {
-            const datePopup = document.createElement('details');
-            datePopup.className = 'shop-ticket-date-popup';
-
             const selectedDate = getTicketDate(product.id);
-            const popupSummary = document.createElement('summary');
-            popupSummary.className = 'shop-ticket-date-toggle';
             const selectedAvailability = selectedDate ? getStoredEventAvailability(product.id, selectedDate) : null;
-            popupSummary.textContent = selectedDate && selectedAvailability && selectedAvailability.exists
-                ? `Visit Date: ${selectedDate} · ${getSpotsLeftLabel(selectedAvailability)}`
-                : (selectedDate ? `Visit Date: ${selectedDate}` : 'Choose Visit Date');
 
-            const dateBody = document.createElement('div');
-            dateBody.className = 'shop-ticket-date-body';
+            const dateRow = document.createElement('div');
+            dateRow.className = 'shop-ticket-date-row';
+
+            const dateButton = document.createElement('button');
+            dateButton.type = 'button';
+            dateButton.className = 'shop-ticket-date-toggle';
+            dateButton.textContent = selectedDate ? `Visit Date: ${selectedDate}` : 'Choose Visit Date';
+            dateButton.addEventListener('click', async () => {
+                await openTicketDateModal(product);
+            });
 
             const spotsMessage = document.createElement('p');
             spotsMessage.className = 'shop-ticket-date-spots';
@@ -1265,16 +1376,8 @@ function renderCart() {
                 ? getSpotsLeftLabel(selectedAvailability)
                 : 'Select an available date to see spots left.';
 
-            datePopup.addEventListener('toggle', async () => {
-                if (!datePopup.open) return;
-                if (!datePopup.dataset.monthKey) {
-                    datePopup.dataset.monthKey = getMonthKey(selectedDate || getTodayIsoDate());
-                }
-                await renderTicketDatePopupContent(product, datePopup);
-            });
-
-            datePopup.append(popupSummary, dateBody, spotsMessage);
-            details.appendChild(datePopup);
+            dateRow.append(dateButton, spotsMessage);
+            details.appendChild(dateRow);
         }
 
         row.append(details, controls);
@@ -1518,12 +1621,16 @@ async function applyOrderInventoryReduction() {
                 throw new Error(`Select a visit date for ${product.name}.`);
             }
 
+            const calendarMap = await preloadEventCalendar(product, { force: true });
+            const selectedEvent = calendarMap.get(visitDate) || null;
+            if (!selectedEvent || !selectedEvent.id) {
+                throw new Error(`No event is scheduled for ${product.name} on ${visitDate}.`);
+            }
+
             const { data: currentEventRow, error: readEventError } = await client
                 .from(EVENTS_TABLE)
-                .select('id, event_type, event_date, capacity, spots_purchased')
-                .eq('event_type', product.name)
-                .eq('event_date', visitDate)
-                .limit(1)
+                .select('*')
+                .eq('id', selectedEvent.id)
                 .maybeSingle();
 
             if (readEventError) {
@@ -1531,7 +1638,7 @@ async function applyOrderInventoryReduction() {
             }
 
             if (!currentEventRow) {
-                throw new Error(`No event is scheduled for ${product.name} on ${visitDate}.`);
+                throw new Error(`Event data changed for ${product.name} on ${visitDate}. Please reselect a date.`);
             }
 
             const normalizedEvent = normalizeEventAvailabilityRow(currentEventRow);
@@ -1554,7 +1661,7 @@ async function applyOrderInventoryReduction() {
                     .update({ spots_purchased: nextSpotsPurchased })
                     .eq('id', normalizedEvent.id)
                     .eq('spots_purchased', normalizedEvent.spotsPurchased)
-                    .select('id, event_type, event_date, capacity, spots_purchased')
+                    .select('*')
                     .maybeSingle();
 
                 if (updateEventError) {
@@ -1633,6 +1740,7 @@ function startNewOrder() {
     shopState.ticketDates.clear();
     shopState.eventAvailability.clear();
     shopState.eventCalendarByProduct.clear();
+    closeTicketDateModal();
     clearAppliedPromotion();
     const form = getCheckoutForm();
     if (form) {
@@ -1929,6 +2037,7 @@ async function initializeShopPage() {
     setPromoMessage('');
     setCheckoutInputsDisabled(false);
     updateCheckoutActionState();
+    ensureTicketDateModal();
 
     const cachedProducts = readCachedProducts();
     if (cachedProducts.length) {
