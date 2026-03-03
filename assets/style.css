@@ -963,8 +963,12 @@ footer {
     padding: 16px;
 }
 
+.shop-ticket-modal-overlay[hidden] {
+    display: none !important;
+}
+
 .shop-ticket-modal-panel {
-    width: min(440px, 96vw);
+    width: min(760px, 96vw);
     border: 1px solid var(--card-border);
     background: rgba(30, 30, 30, 0.96);
     padding: 14px;
@@ -998,7 +1002,56 @@ footer {
 
 .shop-ticket-modal-body {
     display: grid;
+    grid-template-columns: minmax(0, 1fr) 220px;
+    gap: 12px;
+}
+
+.shop-ticket-modal-calendar-pane,
+.shop-ticket-modal-side-pane {
+    border: 1px solid var(--card-border);
+    background: rgba(255, 210, 122, 0.04);
+    padding: 10px;
+}
+
+.shop-ticket-modal-side-pane {
+    display: grid;
+    align-content: start;
     gap: 10px;
+}
+
+.shop-ticket-modal-capacity {
+    color: var(--secondary-text);
+    font-size: 0.84rem;
+}
+
+.shop-ticket-modal-quantity-label {
+    display: grid;
+    gap: 6px;
+    color: var(--secondary-text);
+    font-size: 0.8rem;
+}
+
+.shop-ticket-modal-quantity {
+    width: 100%;
+    padding: 8px;
+    border: 1px solid var(--card-border);
+    background: rgba(30, 30, 30, 0.92);
+    color: var(--text-color);
+}
+
+.shop-ticket-modal-add {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid var(--card-border);
+    background: rgba(255, 210, 122, 0.14);
+    color: var(--text-color);
+    font-weight: 700;
+    cursor: pointer;
+}
+
+.shop-ticket-modal-add:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
 }
 
 .shop-ticket-calendar-loading {
@@ -1076,6 +1129,12 @@ footer {
     border-color: rgba(255, 210, 122, 0.8);
     box-shadow: 0 0 0 1px rgba(255, 210, 122, 0.35) inset;
     background: rgba(255, 210, 122, 0.2);
+}
+
+@media (max-width: 900px) {
+    .shop-ticket-modal-body {
+        grid-template-columns: 1fr;
+    }
 }
 
 .shop-ticket-date-input {

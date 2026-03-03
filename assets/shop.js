@@ -804,6 +804,19 @@ function createTicketCalendarGrid(product, monthKey, selectedDate, calendarMap, 
     return calendarGrid;
 }
 
+function getFirstAvailableEventDate(calendarMap) {
+    if (!(calendarMap instanceof Map)) return null;
+
+    for (const [eventDate, availability] of calendarMap.entries()) {
+        if (!availability || !availability.exists) continue;
+        if (!Number.isFinite(availability.remaining) || availability.remaining > 0) {
+            return eventDate;
+        }
+    }
+
+    return null;
+}
+
 function getTicketDateModalElements() {
     const overlay = document.getElementById('shop-ticket-modal-overlay');
     if (!overlay) return null;
@@ -814,6 +827,9 @@ function getTicketDateModalElements() {
         title: overlay.querySelector('.shop-ticket-modal-title'),
         summary: overlay.querySelector('.shop-ticket-modal-summary'),
         body: overlay.querySelector('.shop-ticket-modal-body'),
+        capacity: overlay.querySelector('.shop-ticket-modal-capacity'),
+        quantityInput: overlay.querySelector('.shop-ticket-modal-quantity'),
+        addButton: overlay.querySelector('.shop-ticket-modal-add'),
         closeButton: overlay.querySelector('.shop-ticket-modal-close')
     };
 }
@@ -851,6 +867,36 @@ function ensureTicketDateModal() {
     const body = document.createElement('div');
     body.className = 'shop-ticket-modal-body';
 
+    const calendarPane = document.createElement('section');
+    calendarPane.className = 'shop-ticket-modal-calendar-pane';
+
+    const sidePane = document.createElement('aside');
+    sidePane.className = 'shop-ticket-modal-side-pane';
+
+    const capacity = document.createElement('p');
+    capacity.className = 'shop-ticket-modal-capacity';
+    capacity.textContent = 'Capacity: Select a date';
+
+    const quantityLabel = document.createElement('label');
+    quantityLabel.className = 'shop-ticket-modal-quantity-label';
+    quantityLabel.textContent = 'Tickets';
+
+    const quantityInput = document.createElement('input');
+    quantityInput.type = 'number';
+    quantityInput.min = '1';
+    quantityInput.step = '1';
+    quantityInput.value = '1';
+    quantityInput.className = 'shop-ticket-modal-quantity';
+
+    const addButton = document.createElement('button');
+    addButton.type = 'button';
+    addButton.className = 'shop-ticket-modal-add';
+    addButton.textContent = 'Add to Cart';
+
+    quantityLabel.appendChild(quantityInput);
+    sidePane.append(capacity, quantityLabel, addButton);
+    body.append(calendarPane, sidePane);
+
     header.append(title, closeButton);
     panel.append(header, summary, body);
     overlay.appendChild(panel);
@@ -875,37 +921,54 @@ function closeTicketDateModal() {
     modalElements.overlay.hidden = true;
     delete modalElements.overlay.dataset.productId;
     delete modalElements.overlay.dataset.monthKey;
+    delete modalElements.overlay.dataset.selectedDate;
 }
 
 async function renderTicketDateModal(product) {
     const modalElements = ensureTicketDateModal();
     if (!modalElements || !product) return;
 
-    const selectedDate = getTicketDate(product.id);
+    const existingCartDate = getTicketDate(product.id);
+    const requestedSelectedDate = String(modalElements.overlay.dataset.selectedDate || '').trim() || existingCartDate;
     const todayMonth = getMonthKey(getTodayIsoDate());
-    const selectedMonth = getMonthKey(selectedDate);
+    const selectedMonth = getMonthKey(requestedSelectedDate);
     let monthKey = String(modalElements.overlay.dataset.monthKey || '').trim() || selectedMonth || todayMonth;
     if (monthKey < todayMonth) {
         monthKey = todayMonth;
     }
     modalElements.overlay.dataset.monthKey = monthKey;
 
-    modalElements.title.textContent = `${product.name} Calendar`;
+    modalElements.title.textContent = `${product.name}`;
     modalElements.summary.textContent = 'Loading calendar...';
-    modalElements.body.innerHTML = '<p class="shop-ticket-calendar-loading">Loading calendar...</p>';
+
+    const calendarPane = modalElements.body.querySelector('.shop-ticket-modal-calendar-pane');
+    const sidePane = modalElements.body.querySelector('.shop-ticket-modal-side-pane');
+    if (!calendarPane || !sidePane || !modalElements.capacity || !modalElements.quantityInput || !modalElements.addButton) {
+        return;
+    }
+
+    calendarPane.innerHTML = '<p class="shop-ticket-calendar-loading">Loading calendar...</p>';
 
     let calendarMap;
     try {
         calendarMap = await preloadEventCalendar(product, { force: true });
     } catch (error) {
         modalElements.summary.textContent = error.message || 'Could not load dates right now.';
-        modalElements.body.innerHTML = '<p class="shop-ticket-calendar-loading">Could not load calendar.</p>';
+        calendarPane.innerHTML = '<p class="shop-ticket-calendar-loading">Could not load calendar.</p>';
+        modalElements.capacity.textContent = 'Capacity: Unavailable';
+        modalElements.addButton.disabled = true;
         return;
     }
 
     if (!modalElements.overlay.isConnected || modalElements.overlay.hidden) return;
 
-    modalElements.body.innerHTML = '';
+    calendarPane.innerHTML = '';
+
+    let selectedDate = requestedSelectedDate;
+    if (!selectedDate || !calendarMap.has(selectedDate)) {
+        selectedDate = getFirstAvailableEventDate(calendarMap) || '';
+        modalElements.overlay.dataset.selectedDate = selectedDate;
+    }
 
     const nav = document.createElement('div');
     nav.className = 'shop-ticket-calendar-nav';
@@ -936,29 +999,115 @@ async function renderTicketDateModal(product) {
     nav.append(prevButton, monthLabel, nextButton);
 
     const grid = createTicketCalendarGrid(product, monthKey, selectedDate, calendarMap, async (isoDate) => {
-        const selectionResult = await applyTicketDateSelection(product, isoDate, { showErrors: true });
-        if (!selectionResult.ok) {
-            setFormMessage(selectionResult.reason || 'Unable to select this date.', 'warning');
-            return;
-        }
-
-        const selectedAvailability = selectionResult.availability;
-        const spotsText = getSpotsLeftLabel(selectedAvailability);
-        modalElements.summary.textContent = `Selected ${isoDate} · ${spotsText}`;
-        setFormMessage(selectionResult.adjusted ? selectionResult.message : `Visit date set to ${isoDate}.`, selectionResult.adjusted ? 'warning' : 'success');
-        renderCart();
+        modalElements.overlay.dataset.selectedDate = isoDate;
         await renderTicketDateModal(product);
     });
 
-    modalElements.body.append(nav, grid);
+    calendarPane.append(nav, grid);
 
     const selectedAvailability = selectedDate ? (calendarMap.get(selectedDate) || getStoredEventAvailability(product.id, selectedDate)) : null;
+    const selectedRemaining = selectedAvailability && selectedAvailability.exists
+        ? selectedAvailability.remaining
+        : 0;
+
+    const existingQuantity = shopState.cart.get(product.id) || 0;
+    const existingDate = getTicketDate(product.id);
+    const existingQuantityForSelectedDate = existingDate && existingDate === selectedDate ? existingQuantity : 0;
+    const maxQuantityForSelection = Number.isFinite(selectedRemaining)
+        ? Math.max(0, Math.floor(selectedRemaining - existingQuantityForSelectedDate))
+        : Number.POSITIVE_INFINITY;
+
+    if (selectedDate && selectedAvailability && selectedAvailability.exists) {
+        modalElements.capacity.textContent = `Capacity: ${getSpotsLeftLabel(selectedAvailability)}`;
+    } else {
+        modalElements.capacity.textContent = 'Capacity: Unavailable';
+    }
+
+    const quantityValueRaw = Number.parseInt(modalElements.quantityInput.value, 10);
+    let quantityValue = Number.isFinite(quantityValueRaw) && quantityValueRaw > 0 ? quantityValueRaw : 1;
+    if (Number.isFinite(maxQuantityForSelection)) {
+        quantityValue = Math.max(1, Math.min(quantityValue, maxQuantityForSelection || 1));
+        modalElements.quantityInput.max = String(maxQuantityForSelection || 1);
+    } else {
+        modalElements.quantityInput.removeAttribute('max');
+    }
+    modalElements.quantityInput.value = String(quantityValue);
+    modalElements.quantityInput.oninput = () => {
+        const nextRaw = Number.parseInt(modalElements.quantityInput.value, 10);
+        if (!Number.isFinite(nextRaw) || nextRaw < 1) {
+            modalElements.quantityInput.value = '1';
+            return;
+        }
+        if (Number.isFinite(maxQuantityForSelection) && nextRaw > maxQuantityForSelection) {
+            modalElements.quantityInput.value = String(maxQuantityForSelection || 1);
+        }
+    };
+
+    const canAdd = Boolean(selectedDate && selectedAvailability && selectedAvailability.exists
+        && (!Number.isFinite(maxQuantityForSelection) || maxQuantityForSelection > 0));
+
+    modalElements.addButton.disabled = !canAdd;
+    modalElements.addButton.onclick = async () => {
+        if (!canAdd) {
+            setFormMessage('Select an available date before adding tickets.', 'warning');
+            return;
+        }
+
+        const chosenDate = String(modalElements.overlay.dataset.selectedDate || '').trim();
+        const chosenQuantityRaw = Number.parseInt(modalElements.quantityInput.value, 10);
+        const chosenQuantity = Number.isFinite(chosenQuantityRaw) && chosenQuantityRaw > 0 ? chosenQuantityRaw : 1;
+
+        const selectionResult = await applyTicketDateSelection(product, chosenDate, { showErrors: true });
+        if (!selectionResult.ok) {
+            setFormMessage(selectionResult.reason || 'Unable to use this date.', 'warning');
+            return;
+        }
+
+        const latestAvailability = selectionResult.availability;
+        if (!latestAvailability || !latestAvailability.exists) {
+            setFormMessage('Selected date is not available.', 'warning');
+            return;
+        }
+
+        const currentCartQuantity = shopState.cart.get(product.id) || 0;
+        const currentCartDate = getTicketDate(product.id);
+        const baseQuantity = currentCartDate === chosenDate ? currentCartQuantity : 0;
+        const remainingForAdd = Number.isFinite(latestAvailability.remaining)
+            ? Math.max(0, Math.floor(latestAvailability.remaining - baseQuantity))
+            : Number.POSITIVE_INFINITY;
+
+        if (Number.isFinite(remainingForAdd) && remainingForAdd <= 0) {
+            setFormMessage(`No additional spots available for ${product.name} on ${chosenDate}.`, 'warning');
+            return;
+        }
+
+        const quantityToAdd = Number.isFinite(remainingForAdd)
+            ? Math.min(chosenQuantity, remainingForAdd)
+            : chosenQuantity;
+        const nextQuantity = baseQuantity + quantityToAdd;
+
+        shopState.ticketDates.set(product.id, chosenDate);
+        shopState.cart.set(product.id, nextQuantity);
+
+        const eventKey = getEventAvailabilityKey(product.id, chosenDate);
+        shopState.eventAvailability.set(eventKey, latestAvailability);
+
+        if (quantityToAdd < chosenQuantity) {
+            setFormMessage(`Added ${quantityToAdd} ticket(s) for ${product.name}. Availability limit reached.`, 'warning');
+        } else {
+            setFormMessage(`Added ${quantityToAdd} ticket(s) for ${product.name} on ${chosenDate}.`, 'success');
+        }
+
+        closeTicketDateModal();
+        renderCart();
+    };
+
     if (selectedDate && selectedAvailability && selectedAvailability.exists) {
         modalElements.summary.textContent = `Selected ${selectedDate} · ${getSpotsLeftLabel(selectedAvailability)}`;
     } else if (selectedDate) {
         modalElements.summary.textContent = `Selected ${selectedDate} · Unavailable`;
     } else {
-        modalElements.summary.textContent = 'Select an available date to see spots left.';
+        modalElements.summary.textContent = 'No available dates found for this ticket.';
     }
 }
 
@@ -971,6 +1120,7 @@ async function openTicketDateModal(product) {
     modalElements.overlay.hidden = false;
     modalElements.overlay.dataset.productId = String(product.id || '').trim();
     modalElements.overlay.dataset.monthKey = getMonthKey(getTicketDate(product.id) || getTodayIsoDate());
+    modalElements.overlay.dataset.selectedDate = getTicketDate(product.id) || '';
     await renderTicketDateModal(product);
 }
 
@@ -1355,31 +1505,6 @@ function renderCart() {
 
         controls.append(quantityInput, lineTotalElement, removeButton);
 
-        if (requiresVisitDate(product)) {
-            const selectedDate = getTicketDate(product.id);
-            const selectedAvailability = selectedDate ? getStoredEventAvailability(product.id, selectedDate) : null;
-
-            const dateRow = document.createElement('div');
-            dateRow.className = 'shop-ticket-date-row';
-
-            const dateButton = document.createElement('button');
-            dateButton.type = 'button';
-            dateButton.className = 'shop-ticket-date-toggle';
-            dateButton.textContent = selectedDate ? `Visit Date: ${selectedDate}` : 'Choose Visit Date';
-            dateButton.addEventListener('click', async () => {
-                await openTicketDateModal(product);
-            });
-
-            const spotsMessage = document.createElement('p');
-            spotsMessage.className = 'shop-ticket-date-spots';
-            spotsMessage.textContent = selectedDate && selectedAvailability && selectedAvailability.exists
-                ? getSpotsLeftLabel(selectedAvailability)
-                : 'Select an available date to see spots left.';
-
-            dateRow.append(dateButton, spotsMessage);
-            details.appendChild(dateRow);
-        }
-
         row.append(details, controls);
         cartContainer.appendChild(row);
     });
@@ -1398,6 +1523,11 @@ async function addToCart(productId) {
     if (!product) return;
     if (product.isHidden || isRoundingProductName(product.name)) return;
 
+    if (requiresVisitDate(product)) {
+        await openTicketDateModal(product);
+        return;
+    }
+
     const remainingQuantity = getRemainingQuantity(product);
     if (remainingQuantity <= 0) {
         setFormMessage(isTicketProduct(product) ? 'This ticket is fully booked.' : 'This item is out of stock.', 'warning');
@@ -1407,42 +1537,6 @@ async function addToCart(productId) {
 
     const existingQuantity = shopState.cart.get(productId) || 0;
     shopState.cart.set(productId, existingQuantity + 1);
-
-    if (requiresVisitDate(product) && !getTicketDate(product.id)) {
-        let calendarMap;
-        try {
-            calendarMap = await preloadEventCalendar(product, { force: true });
-        } catch (error) {
-            shopState.cart.delete(product.id);
-            clearEventAvailabilityForProduct(product.id);
-            clearEventCalendarForProduct(product.id);
-            setFormMessage(error.message || `Could not load available dates for ${product.name}.`, 'error');
-            renderCart();
-            return;
-        }
-
-        const firstAvailableEntry = Array.from(calendarMap.entries()).find(([, availability]) => {
-            if (!availability || !availability.exists) return false;
-            return !Number.isFinite(availability.remaining) || availability.remaining > 0;
-        }) || null;
-
-        if (!firstAvailableEntry) {
-            shopState.cart.delete(product.id);
-            clearEventAvailabilityForProduct(product.id);
-            clearEventCalendarForProduct(product.id);
-            setFormMessage(`No available event dates were found for ${product.name}.`, 'warning');
-            renderCart();
-            return;
-        }
-
-        const [defaultDate, defaultAvailability] = firstAvailableEntry;
-        setTicketDate(product.id, defaultDate);
-        const eventKey = getEventAvailabilityKey(product.id, defaultDate);
-        shopState.eventAvailability.set(eventKey, defaultAvailability);
-        setFormMessage(`Item added to cart. ${defaultDate} selected with ${getSpotsLeftLabel(defaultAvailability)}.`, 'success');
-        renderCart();
-        return;
-    }
 
     setFormMessage('Item added to cart.', 'success');
     renderCart();
