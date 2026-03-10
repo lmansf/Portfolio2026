@@ -1,4 +1,4 @@
-# Portfolio Website
+# Portfolio Website & Ecommerce Ecosystem
 
 The site is designed to be lightweight, fast, and easy to deploy, using plain HTML, CSS, and JavaScript.
 
