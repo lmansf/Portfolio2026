@@ -13,7 +13,7 @@ The website has three core views:
 
 # Featured Project: Agentic Webstore Ecosystem
 # Task 1: Create an E-Commerce Store
-Goal: Create a fully working E-Commerce webstore without contributing any direct 
+Goal: Create a fully working E-Commerce webstore integrated with the stock and pricing system used by the agents.
 ## Task 1a: Create the Database
 Responsibility: Data Engineer
 </br>Tools Used:
