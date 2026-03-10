@@ -38,11 +38,13 @@ About the Solution
 	The n8n workflow calls the products table and calendar to see what events are available. Based on prices, weather, and availability, a gpt-4o-mini agent selects how many tickets to purchase, and a second agent (also gpt4) selects the date. In the future I'd like to update the date selection to happen as part of the ticket selection, better simulating what typically happens in a ticket purchase.
 	
 	Scheduled to run 3 times an hour.
+![Dashboard Visual](PurchaseAgents.png)
 ## Task 2b: Creating a Warehouse Agent
 About the Solution
 	The n8n workflow calls the products table and checks how many tickets of each type are available. If any tickets fall below a preset threshold, an agent may decide to purchase stock from a warehouse to replenish our tickets.
 	
 	Scheduled to run once a week.
+![Dashboard Visual](WarehouseAgent.png)
 ## Task 2c: Creating a Dynamic Price Simulating Agent
 About the Solution
 	In this workflow I was experimenting with using kimi-k2 as the agent, as well as a secondary agent whose role was to challenge my first agents decision. The critique evaluated the results against the original inputs (products, visit count, date), and redistributes the original decision to better reflect the environment. This is a placeholder for the true dynamic pricing system to be developed in the Data Scientist Task that remains.
