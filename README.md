@@ -62,22 +62,30 @@ About the Solution
 ## Task 3b: Create the Machine Learning Pipeline (Coming Soon)
 About the Solution
 	Coming Soon!'
-# Task 4: Dynamic Pricing (Coming Soon)
+# Task 4: Analyst Dashboard
+Goal: To analyze the impact of rainfall and temperature on ticket sales.
+Responsibility: Data Analyst
+</br>Tools Used:
+- Power Bi
+About the Solution
+	Visualizes the potential impact of temperature and weather on ticket sales.
+![Dashboard Visual](whole_dashboard)
+# Task 5: Dynamic Pricing (Coming Soon)
 Goal: To develop a machine learning model based on actual transaction data to price tickets in realtime.
-## Task 4a: Model the Historical Data
+## Task 5a: Model the Historical Data
 Responsibility: Data Scientist
 </br>Tools Used:
 - Python
 - SQL
 About the Solution
 	Coming Soon
-## Task 4b: Train Dynamic Pricing Model
+## Task 5b: Train Dynamic Pricing Model
 Responsibility: Data Scientist
 </br>Tools Used:
 - Python
 About the Solution
 	Coming Soon
-## Task 4c: Implement Live Dynamic Pricing
+## Task 5c: Implement Live Dynamic Pricing
 Responsibility: Data Scientist
 </br>Tools Used:
 - TBD
