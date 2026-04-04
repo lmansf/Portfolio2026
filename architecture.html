@@ -57,6 +57,7 @@
         }
 
         .arch-frame {
+            --scale: 0.78;
             padding: 0;
             overflow: hidden;
             width: 100%;
@@ -85,17 +86,18 @@
         }
 
         .arch-frame-scaler {
-            --scale: 0.72;
-            width: calc(100% / var(--scale));
-            height: calc(80vh / var(--scale));
-            transform: scale(var(--scale));
-            transform-origin: top left;
-            margin-left: calc((100% - 100% / var(--scale)) / 2);
+            position: absolute;
+            top: 0;
+            left: 50%;
+            width: 1920px;
+            height: 1080px;
+            transform: translate(-50%, 0) scale(var(--scale));
+            transform-origin: top center;
         }
 
         .arch-frame-clip {
-            height: 80vh;
-            min-height: 580px;
+            position: relative;
+            height: calc(1080px * var(--scale));
             overflow: hidden;
         }
 
