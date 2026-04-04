@@ -11,6 +11,125 @@
         window.va = window.va || function () { (window.vaq = window.vaq || []).push(arguments); };
     </script>
     <script defer src="/_vercel/insights/script.js"></script>
+    <style>
+        .architecture-view {
+            width: min(1160px, 100%);
+            margin: 0 auto;
+            display: grid;
+            gap: 1rem;
+            padding-bottom: 1.5rem;
+        }
+
+        .architecture-view .content-panel {
+            padding: 1.2rem;
+        }
+
+        .arch-hero h1 {
+            font-size: clamp(1.8rem, 3.4vw, 2.8rem);
+            line-height: 1.1;
+            margin-bottom: 0.5rem;
+        }
+
+        .arch-hero p {
+            color: #e7d4aa;
+            max-width: 74ch;
+            line-height: 1.5;
+        }
+
+        .arch-kpis {
+            display: grid;
+            grid-template-columns: repeat(4, minmax(0, 1fr));
+            gap: 0.75rem;
+            margin-top: 1rem;
+        }
+
+        .arch-kpi {
+            border: 1px solid var(--card-border);
+            background: rgba(255, 210, 122, 0.07);
+            padding: 0.7rem 0.8rem;
+        }
+
+        .arch-kpi strong {
+            display: block;
+            font-size: 0.95rem;
+            margin-bottom: 0.2rem;
+        }
+
+        .arch-kpi span {
+            color: var(--secondary-text);
+            font-size: 0.86rem;
+            line-height: 1.3;
+        }
+
+        .arch-section h2 {
+            font-size: 1.45rem;
+            margin-bottom: 0.6rem;
+        }
+
+        .arch-list {
+            padding-left: 1.1rem;
+            color: #ead7ae;
+            line-height: 1.45;
+        }
+
+        .arch-list li + li {
+            margin-top: 0.35rem;
+        }
+
+        .phase-grid {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 0.75rem;
+        }
+
+        .phase-card {
+            border: 1px solid var(--card-border);
+            background: rgba(255, 210, 122, 0.05);
+            padding: 0.8rem 0.9rem;
+        }
+
+        .phase-card h3 {
+            font-size: 1rem;
+            margin-bottom: 0.35rem;
+        }
+
+        .phase-card p {
+            color: #e8d7b1;
+            line-height: 1.4;
+            font-size: 0.94rem;
+        }
+
+        .arch-results {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 0.75rem;
+        }
+
+        .arch-results .phase-card {
+            height: 100%;
+        }
+
+        .arch-frame {
+            padding: 0;
+            overflow: hidden;
+            min-height: 74vh;
+        }
+
+        .arch-frame iframe {
+            width: 100%;
+            min-height: 74vh;
+            border: 0;
+            display: block;
+        }
+
+        @media (max-width: 980px) {
+            .arch-kpis,
+            .phase-grid,
+            .arch-results {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
 </head>
 <body>
 
@@ -34,79 +153,90 @@
     </header>
 
     <main class="blog-view">
-        <div class="blog-intro">
-            <h1>Ecommerce Data Architecture</h1>
-            <p>From AI-driven data generation to BI reporting in a live mock webstore pipeline.</p>
+        <div class="architecture-view">
+            <section class="content-panel arch-hero">
+                <h1>Owl Park E-Commerce Pipeline</h1>
+                <p>
+                    A live mock webstore and agent workflows feed a real-time analytics pipeline that turns raw events into
+                    decision-ready BI models. The goal is simple: move from "we have data" to "we can act on it fast."
+                </p>
+                <div class="arch-kpis" aria-label="Pipeline highlights">
+                    <div class="arch-kpi">
+                        <strong>Ingest</strong>
+                        <span>4 scheduled n8n workflows plus live store actions.</span>
+                    </div>
+                    <div class="arch-kpi">
+                        <strong>Store</strong>
+                        <span>Supabase captures raw operational events in real time.</span>
+                    </div>
+                    <div class="arch-kpi">
+                        <strong>Model</strong>
+                        <span>Fabric Dataflow Gen2 builds STAR-oriented reporting tables.</span>
+                    </div>
+                    <div class="arch-kpi">
+                        <strong>Analyze</strong>
+                        <span>Power BI dashboards and MCP-assisted natural-language analysis.</span>
+                    </div>
+                </div>
+                <p class="section-note">
+                    Stack: Supabase, Fabric (Dataflow Gen2, M, Warehouse, Data Lake), n8n, Copilot/Claude + Power BI MCP, Power BI.
+                </p>
+            </section>
+
+            <section class="content-panel arch-section">
+                <h2>Why This Pipeline Exists</h2>
+                <ul class="arch-list">
+                    <li>Operational systems are fast for transactions, but hard to analyze at scale.</li>
+                    <li>Warehouse models simplify joins and improve query speed for business teams.</li>
+                    <li>Structured dimensional design makes BI more reliable, maintainable, and reusable.</li>
+                </ul>
+            </section>
+
+            <section class="content-panel arch-section">
+                <h2>Pipeline Flow</h2>
+                <div class="phase-grid">
+                    <article class="phase-card">
+                        <h3>Phase 1: Ingest</h3>
+                        <p>Agents handle pricing, consumer purchases, restocking, and sellout logging. Store purchases directly influence agent behavior.</p>
+                    </article>
+                    <article class="phase-card">
+                        <h3>Phase 2: Store</h3>
+                        <p>Supabase receives transactions, weather impact, events, products, visit dates, and warehouse/sellout activity as the raw source layer.</p>
+                    </article>
+                    <article class="phase-card">
+                        <h3>Phase 3: Transform, Model, Store</h3>
+                        <p>Fabric pulls data on a real-time schedule, transforms it into dimensional/fact models, and writes to Warehouse (live) plus Lake (daily backup).</p>
+                    </article>
+                    <article class="phase-card">
+                        <h3>Phase 4: Analyze and Act</h3>
+                        <p>Dashboards and AI-assisted analysis drive schedule optimization and pricing-agent tuning inside fairness boundaries.</p>
+                    </article>
+                </div>
+            </section>
+
+            <section class="content-panel arch-section">
+                <h2>Current Status</h2>
+                <div class="arch-results">
+                    <article class="phase-card">
+                        <h3>Working Now</h3>
+                        <p>Agent cadence is tuned to maximize monthly token utilization without hitting limits, with priority on consumer and sellout workflows.</p>
+                    </article>
+                    <article class="phase-card">
+                        <h3>Next Metric</h3>
+                        <p>Dynamic pricing impact reporting is in progress.</p>
+                    </article>
+                </div>
+                <p class="section-note">Infographic generated with Claude Opus 4.6.</p>
+            </section>
+
+            <section class="content-panel arch-frame">
+                <iframe
+                    title="Owl Park Data Architecture"
+                    src="owl-park-infographic.html"
+                    loading="lazy"
+                ></iframe>
+            </section>
         </div>
-
-        <section class="content-panel" style="margin-bottom: 1.25rem;">
-            <h2>Pipeline Summary</h2>
-            <p>
-                This project demonstrates why analytics pipelines matter: operational systems collect lots of data, but teams
-                need clean, reliable, analytics-ready tables to make decisions quickly. The pipeline turns raw transactional
-                activity into STAR-style reporting models that support business, marketing, accounting, and optimization workflows.
-            </p>
-            <p class="section-note">
-                Tech stack: Supabase, Microsoft Fabric (Dataflow Gen2, M, Data Lake, Warehouse), n8n,
-                Claude/Copilot + Power BI MCP, and Power BI.
-            </p>
-        </section>
-
-        <section class="content-panel" style="margin-bottom: 1.25rem;">
-            <h2>Architecture Flow</h2>
-            <h3>Phase 1: Ingest</h3>
-            <p>
-                Four scheduled n8n workflows and a live mock webstore generate the core activity stream.
-                Workflows cover dynamic pricing, consumer purchasing behavior, warehouse restocking, and sellout monitoring.
-            </p>
-
-            <h3>Phase 2: Store</h3>
-            <p>
-                Supabase serves as the raw event repository, receiving real-time writes from agents and store activity across
-                transactions, products, weather impact, events, visit dates, warehouse activity, and sellout logs.
-            </p>
-
-            <h3>Phase 3: Transform, Model, Store</h3>
-            <p>
-                Microsoft Fabric pulls from Supabase on a real-time schedule using Dataflow Gen2 and shapes data into
-                dimensional and fact layers organized by domain query groups.
-            </p>
-            <p>
-                Output storage is split by purpose: a real-time Data Warehouse for OLAP and a daily Data Lake backup
-                for historical recovery and archiving.
-            </p>
-
-            <h3>Phase 4: Analyze</h3>
-            <p>
-                Modeled datasets power live Power BI dashboards and natural-language analysis via Claude + Power BI MCP
-                for business goal tracking and n8n engine tuning.
-            </p>
-
-            <h3>Phase 5: Take Action</h3>
-            <p>
-                Insights are translated into operational changes: schedule optimization to maximize token usage per pay cycle
-                and pricing-agent tuning that pushes revenue while staying inside critic-enforced fairness bounds.
-            </p>
-        </section>
-
-        <section class="content-panel" style="margin-bottom: 1.25rem;">
-            <h2>Current Results</h2>
-            <p>Dynamic pricing impact metrics are in progress.</p>
-            <p>
-                Agent cadence is currently balanced to maximize monthly token utilization without exceeding limits,
-                prioritizing the consumer and sellout workflows, then dynamic pricing, then lower-frequency tasks.
-            </p>
-            <p class="section-note">Infographic generated with Claude Opus 4.6.</p>
-        </section>
-
-        <section class="content-panel" style="padding: 0; overflow: hidden; min-height: 78vh;">
-            <iframe
-                title="Owl Park Data Architecture"
-                src="owl-park-infographic.html"
-                style="width: 100%; min-height: 78vh; border: 0; display: block;"
-                loading="lazy"
-            ></iframe>
-        </section>
     </main>
 
     <footer>
