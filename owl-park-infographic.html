@@ -1,0 +1,624 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Owl Park — Data Architecture</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Playfair+Display:wght@700;800;900&display=swap');
+  *{margin:0;padding:0;box-sizing:border-box;}
+
+  :root{
+    --bg:#050913;
+    --bg-soft:#0d1a33;
+    --text:#eef4ff;
+    --muted:#9eacd0;
+    --line:#25355b;
+    --line-strong:#355083;
+    --red:#ff4b4b;
+    --orange:#ff9d2e;
+    --cyan:#3de0ff;
+    --pink:#ff66b0;
+    --glass:rgba(255,255,255,.05);
+  }
+
+  /* ═══════════════════════════════════
+     BASE
+     ═══════════════════════════════════ */
+  html,body{
+    width:100vw;height:100vh;overflow:hidden;
+    font-family:'Inter',sans-serif;
+    color:var(--text);
+    background:
+      radial-gradient(920px 540px at 12% -10%,rgba(255,75,75,.22),transparent 60%),
+      radial-gradient(760px 460px at 88% 112%,rgba(61,224,255,.19),transparent 62%),
+      linear-gradient(145deg,#03060f 0%,#071025 38%,#0b1833 100%);
+    background-color:var(--bg);
+  }
+
+  /* ═══════════════════════════════════
+     HEADER
+     ═══════════════════════════════════ */
+  .header{
+    display:flex;align-items:center;justify-content:center;gap:14px;
+    height:56px;
+    background:linear-gradient(90deg,rgba(255,75,75,.18),rgba(255,157,46,.13),rgba(61,224,255,.15));
+    border-bottom:1px solid rgba(157,186,243,.24);
+  }
+  .header .owl-logo{ width:30px;height:30px; }
+  .header h1{font-size:22px;font-weight:800;letter-spacing:.5px;font-family:'Playfair Display',serif;}
+  .header h1 span{color:var(--orange);}
+  .header .sep{color:rgba(255,255,255,.35);font-size:18px;}
+  .header .subtitle{font-size:10px;color:#c5cee3;letter-spacing:1.2px;text-transform:uppercase;font-weight:600;}
+
+  /* ═══════════════════════════════════
+     MAIN FLOW — horizontal flexbox band
+     ═══════════════════════════════════ */
+  .flow{
+    display:flex;align-items:center;justify-content:center;
+    height:calc(100vh - 52px);
+    padding:0 6px 2px;gap:0;
+    transform:scale(1.08);
+    transform-origin:center center;
+  }
+
+  /* ── SECTION WRAPPERS ── */
+  .col-src{flex:0 0 190px;display:flex;flex-direction:column;gap:8px;}
+  .col-arrow{flex:0 0 56px;display:flex;align-items:center;justify-content:center;}
+  .col-supa{flex:0 0 158px;display:flex;flex-direction:column;align-items:stretch;justify-content:center;gap:6px;}
+  .col-fabric{flex:1 1 0;max-width:620px;min-width:400px;}
+  .col-out{flex:0 0 210px;display:flex;flex-direction:column;gap:8px;}
+
+  /* ═══════════════════════════════════
+     PHASE TAGS — floating above each column
+     ═══════════════════════════════════ */
+  .phase-tag{
+    text-align:center;margin-bottom:8px;
+  }
+  .phase-tag span{
+    display:inline-block;
+    font-size:9px;font-weight:700;letter-spacing:1.2px;text-transform:uppercase;
+    color:#ffbf66;
+    background:rgba(255,157,46,.14);border:1px solid rgba(255,157,46,.42);
+    border-radius:4px;padding:3px 10px;
+  }
+
+  /* ═══════════════════════════════════
+     CARDS — glassmorphism base
+     ═══════════════════════════════════ */
+  .card{
+    background:var(--glass);
+    backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);
+    border:1px solid rgba(180,203,255,.16);
+    border-radius:10px;
+    padding:10px 14px;
+    transition:transform .15s,box-shadow .15s,border-color .15s;
+    position:relative;
+  }
+  .card:hover{transform:translateY(-2px);box-shadow:0 12px 34px rgba(2,7,18,.72);border-color:rgba(189,214,255,.42);}
+  .card .icon{display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+  .card .icon svg{width:22px;height:22px;}
+  .card .icon i{font-size:20px;}
+  .card .label{font-size:13px;font-weight:700;line-height:1.3;}
+  .card .sub{font-size:10px;color:var(--muted);margin-top:2px;line-height:1.3;}
+
+  /* ═══════════════════════════════════
+     SOURCE CARDS
+     ═══════════════════════════════════ */
+  .card.agent,.card.store{
+    display:flex;align-items:center;gap:12px;
+    padding:10px 14px;
+  }
+  .card.agent{
+    border-left:3px solid var(--red);
+    box-shadow:inset 0 0 18px rgba(255,75,75,.22);
+  }
+  .card.agent .icon svg,.card.agent .icon i{color:var(--red);}
+  .card.store{
+    border-left:3px solid var(--orange);
+    box-shadow:inset 0 0 18px rgba(255,157,46,.22);
+  }
+  .card.store .icon i{color:var(--orange);}
+  .card.agent .card-text,.card.store .card-text{text-align:left;}
+
+  /* ═══════════════════════════════════
+     CONNECTOR ARROWS — animated dashed line
+     ═══════════════════════════════════ */
+  .connector{
+    display:flex;flex-direction:column;align-items:center;justify-content:center;
+    gap:4px;position:relative;height:60px;
+  }
+  .connector .line{
+    position:absolute;top:50%;left:4px;right:4px;
+    border-top:2px dashed rgba(167,193,246,.36);
+  }
+  .connector .chev{
+    position:relative;z-index:1;
+    color:var(--red);font-size:16px;
+    animation:pulse-chev 2s ease-in-out infinite;
+  }
+  .connector .clabel{
+    position:relative;z-index:1;
+    font-size:9px;font-weight:600;color:#cad7f3;
+    text-transform:uppercase;letter-spacing:.6px;text-align:center;line-height:1.2;
+    background:transparent;padding:0;
+    text-shadow:0 1px 6px rgba(4,9,21,.9);
+  }
+  @keyframes pulse-chev{
+    0%,100%{opacity:.4;transform:translateX(0);}
+    50%{opacity:1;transform:translateX(3px);}
+  }
+
+  /* ═══════════════════════════════════
+     SUPABASE
+     ═══════════════════════════════════ */
+  .card.supabase{
+    text-align:center;padding:18px 16px;
+    border:1px solid rgba(255,157,46,.52);
+    background:linear-gradient(135deg,rgba(255,157,46,.24),rgba(255,75,75,.10));
+    box-shadow:0 0 30px rgba(255,157,46,.20);
+  }
+  .card.supabase .icon{justify-content:center;margin-bottom:6px;}
+  .card.supabase .icon svg{width:34px;height:34px;}
+
+  /* supabase table list */
+  .supa-table-list{
+    background:rgba(255,157,46,.07);
+    border:1px solid rgba(255,157,46,.28);
+    border-radius:10px;
+    padding:6px 0;
+    overflow:hidden;
+  }
+  .supa-table-list .st{
+    display:flex;align-items:center;gap:6px;
+    padding:3px 10px;
+    font-size:9.5px;color:#ccd4e8;
+    line-height:1.3;
+    white-space:nowrap;
+  }
+  .supa-table-list .st:hover{background:rgba(255,122,26,.18);color:#fff3e8;}
+  .supa-table-list .st i{font-size:8px;color:#ffc68d;flex-shrink:0;}
+  .supa-table-list .st .tname{flex:1;overflow:hidden;text-overflow:ellipsis;}
+  .supa-table-list .unrest{
+    font-size:7px;font-weight:700;letter-spacing:.5px;
+    color:#ffd5d5;border:1px solid rgba(255,42,42,.40);
+    background:rgba(255,42,42,.18);
+    border-radius:3px;padding:1px 4px;white-space:nowrap;flex-shrink:0;
+  }
+
+  /* ═══════════════════════════════════
+     FABRIC BOX — content-sized
+     ═══════════════════════════════════ */
+  .fabric-box{
+    background:rgba(11,18,36,.55);
+    border:1px solid rgba(61,224,255,.28);
+    border-radius:16px;padding:14px 18px;
+    box-shadow:0 0 50px rgba(61,224,255,.14);
+  }
+  .fabric-header{
+    display:flex;align-items:center;justify-content:center;gap:10px;
+    margin-bottom:8px;
+  }
+  .fabric-header .icon svg{width:18px;height:18px;}
+  .fabric-header .title{
+    font-size:13px;font-weight:700;color:#63e8ff;
+    letter-spacing:.6px;text-transform:uppercase;
+  }
+
+  /* ── GEN2 CONTAINER — wraps pill + tables ── */
+  .gen2-container{
+    border:1px solid rgba(61,224,255,.30);
+    border-radius:10px;
+    background:rgba(13,24,51,.58);
+    overflow:visible;
+  }
+  .gen2-pill{
+    display:flex;align-items:center;justify-content:center;gap:8px;
+    background:linear-gradient(90deg,rgba(61,224,255,.24),rgba(61,224,255,.10));
+    border-bottom:1px solid rgba(61,224,255,.32);
+    border-radius:10px 10px 0 0;padding:7px 16px;
+  }
+  .gen2-pill i{color:var(--cyan);font-size:13px;}
+  .gen2-pill .g-label{font-size:12px;font-weight:700;color:#eaf8ff;}
+  .gen2-pill .g-sub{font-size:10px;color:#a9bbe4;}
+
+  /* ── TABLE PANELS ── */
+  .tables-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;padding:8px;}
+  .tbl-panel{
+    background:rgba(255,255,255,.02);
+    border:1px solid rgba(180,203,255,.20);
+    border-radius:10px;padding:10px 12px;
+  }
+
+  /* ── FABRIC STORAGE ROW (DW + DL) ── */
+  .fabric-storage{
+    display:grid;grid-template-columns:1fr 1fr;gap:8px;
+    margin-top:10px;
+  }
+  .fabric-storage .fs-card{
+    display:flex;align-items:center;gap:10px;
+    background:rgba(255,255,255,.03);
+    border:1px solid rgba(180,203,255,.18);
+    border-radius:10px;padding:9px 12px;
+    position:relative;overflow:visible;
+  }
+  .fabric-storage .fs-card .icon i{font-size:18px;}
+  .fabric-storage .fs-card .card-text{text-align:left;}
+  .fabric-storage .fs-card .label{font-size:12px;font-weight:700;line-height:1.3;}
+  .fabric-storage .fs-card .sub{font-size:9px;color:var(--muted);margin-top:1px;line-height:1.25;}
+  .fabric-storage .fs-card .cadence{
+    position:absolute;top:-6px;right:8px;
+    font-size:7.5px;font-weight:700;letter-spacing:.5px;
+    padding:2px 7px;border-radius:3px;white-space:nowrap;
+  }
+  .fs-card.wh{border-left:3px solid var(--red);box-shadow:inset 0 0 14px rgba(255,42,42,.16);}
+  .fs-card.wh .icon i{color:var(--red);}
+  .fs-card.wh .cadence{background:rgba(255,42,42,.18);color:#ffdede;border:1px solid rgba(255,42,42,.35);}
+  .fs-card.dl{border-left:3px solid var(--cyan);box-shadow:inset 0 0 14px rgba(26,209,255,.16);}
+  .fs-card.dl .icon i{color:var(--cyan);}
+  .fs-card.dl .cadence{background:rgba(26,209,255,.16);color:#dff9ff;border:1px solid rgba(26,209,255,.34);}
+
+  .tbl-heading{
+    font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.7px;
+    margin-bottom:6px;display:flex;align-items:center;gap:5px;
+  }
+  .tbl-heading.dim{color:var(--cyan);}
+  .tbl-heading.fact{color:var(--red);}
+  .tbl-heading.qg{color:#b8c9ea;margin-top:10px;font-size:10px;}
+  .tbl-heading i{font-size:9px;}
+
+  .tbl-list .t{
+    display:block;font-size:10px;color:#c4d2ed;line-height:1.35;
+    padding-left:12px;position:relative;
+  }
+  .tbl-list .t::before{
+    content:'';position:absolute;left:0;top:5px;
+    width:4px;height:4px;border-radius:50%;
+  }
+  .dim-list .t::before{background:var(--cyan);opacity:.55;}
+  .fact-list .t::before{background:var(--red);opacity:.55;}
+
+  /* ═══════════════════════════════════
+     OUTPUT CARDS — badges integrated
+     ═══════════════════════════════════ */
+  .card.out{
+    display:flex;align-items:center;gap:12px;
+    padding:10px 14px;position:relative;
+    overflow:visible;
+  }
+  .card.out .icon i{font-size:20px;}
+  .card.out .icon svg{width:22px;height:22px;}
+  .card.out .card-text{text-align:left;flex:1;}
+
+  /* cadence badge — top-right corner */
+  .card.out .cadence{
+    position:absolute;top:-7px;right:10px;
+    font-size:8px;font-weight:700;letter-spacing:.6px;
+    padding:2px 8px;border-radius:4px;
+    white-space:nowrap;
+  }
+
+  .card.wh{border-left:3px solid var(--red);box-shadow:inset 0 0 12px rgba(255,42,42,.14);}
+  .card.wh .icon i{color:var(--red);}
+  .card.wh .cadence{background:rgba(255,42,42,.18);color:#ffe3e3;border:1px solid rgba(255,42,42,.35);}
+
+  .card.dl{border-left:3px solid var(--cyan);box-shadow:inset 0 0 12px rgba(26,209,255,.14);}
+  .card.dl .icon i{color:var(--cyan);}
+  .card.dl .cadence{background:rgba(26,209,255,.18);color:#e4faff;border:1px solid rgba(26,209,255,.35);}
+
+  .card.pbi{border-left:3px solid var(--orange);box-shadow:inset 0 0 12px rgba(255,122,26,.16);}
+  .card.pbi .icon svg{width:22px;height:22px;}
+  .card.pbi .cadence{background:rgba(255,122,26,.18);color:#fff0e3;border:1px solid rgba(255,122,26,.36);}
+
+  .card.claude{border-left:3px solid var(--pink);box-shadow:inset 0 0 12px rgba(255,77,141,.15);}
+  .card.claude .icon svg{width:22px;height:22px;}
+  .card.claude .cadence{background:rgba(255,77,141,.16);color:#ffe3ef;border:1px solid rgba(255,77,141,.36);}
+
+  /* ═══════════════════════════════════
+     OUTPUT CONNECTOR — single column
+     ═══════════════════════════════════ */
+  .out-connector{
+    flex:0 0 50px;display:flex;align-items:center;justify-content:center;
+    position:relative;
+  }
+  .out-connector .line{
+    position:absolute;top:50%;left:4px;right:4px;
+    border-top:2px dashed rgba(167,193,246,.32);
+  }
+  .out-connector .chev{
+    position:relative;z-index:1;
+    color:var(--red);font-size:16px;
+    animation:pulse-chev 2s ease-in-out infinite;
+  }
+
+  /* ═══════════════════════════════════
+     FOOTER
+     ═══════════════════════════════════ */
+  .footer{
+    position:fixed;bottom:8px;left:0;right:0;text-align:center;
+    font-size:8px;color:#7f92bd;letter-spacing:2px;text-transform:uppercase;
+  }
+
+  /* ═══════════════════════════════════
+     SVG ICON HELPERS
+     ═══════════════════════════════════ */
+  .svg-n8n{fill:var(--red);}
+  .svg-supa{fill:var(--orange);}
+  .svg-fabric{fill:var(--cyan);}
+  .svg-pbi{fill:var(--orange);}
+  .svg-claude{fill:var(--pink);}
+</style>
+</head>
+<body>
+
+<!-- ═══ HEADER ═══ -->
+<div class="header">
+  <!-- Owl icon -->
+  <svg class="owl-logo" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <circle cx="50" cy="50" r="46" fill="rgba(255,122,26,.16)" stroke="#ff7a1a" stroke-width="2"/>
+    <circle cx="36" cy="42" r="11" fill="#ff7a1a" opacity=".88"/><circle cx="36" cy="42" r="5" fill="#05070f"/>
+    <circle cx="64" cy="42" r="11" fill="#ff7a1a" opacity=".88"/><circle cx="64" cy="42" r="5" fill="#05070f"/>
+    <path d="M44 60 Q50 68 56 60" stroke="#ff2a2a" stroke-width="3" stroke-linecap="round" fill="none"/>
+    <path d="M50 18 L46 28 L54 28 Z" fill="#1ad1ff" opacity=".7"/>
+  </svg>
+  <h1><span>Owl Park</span> — Data Architecture</h1>
+  <span class="sep">|</span>
+  <span class="subtitle">Real-time Analytics Pipeline · Zoological Facility</span>
+</div>
+
+<!-- ═══ MAIN FLOW ═══ -->
+<div class="flow">
+
+  <!-- ───────── ① SOURCES ───────── -->
+  <div class="col-src">
+    <div class="phase-tag"><span>① Ingest</span></div>
+
+    <div class="card agent">
+      <div class="icon">
+        <!-- n8n logo — stylized workflow nodes -->
+        <svg viewBox="0 0 40 40" xmlns="http://www.w3.org/2000/svg">
+          <rect x="4" y="12" width="12" height="12" rx="3" class="svg-n8n" opacity=".9"/>
+          <rect x="24" y="4" width="12" height="12" rx="3" class="svg-n8n" opacity=".7"/>
+          <rect x="24" y="24" width="12" height="12" rx="3" class="svg-n8n" opacity=".7"/>
+          <line x1="16" y1="18" x2="24" y2="10" stroke="#ff2a2a" stroke-width="2"/>
+          <line x1="16" y1="18" x2="24" y2="30" stroke="#ff2a2a" stroke-width="2"/>
+        </svg>
+      </div>
+      <div class="card-text">
+        <div class="label">n8n Agent 1</div>
+        <div class="sub">Events &amp; Visits</div>
+      </div>
+    </div>
+
+    <div class="card agent">
+      <div class="icon">
+        <svg viewBox="0 0 40 40" xmlns="http://www.w3.org/2000/svg">
+          <rect x="4" y="12" width="12" height="12" rx="3" class="svg-n8n" opacity=".9"/>
+          <rect x="24" y="4" width="12" height="12" rx="3" class="svg-n8n" opacity=".7"/>
+          <rect x="24" y="24" width="12" height="12" rx="3" class="svg-n8n" opacity=".7"/>
+          <line x1="16" y1="18" x2="24" y2="10" stroke="#ff2a2a" stroke-width="2"/>
+          <line x1="16" y1="18" x2="24" y2="30" stroke="#ff2a2a" stroke-width="2"/>
+        </svg>
+      </div>
+      <div class="card-text">
+        <div class="label">n8n Agent 2</div>
+        <div class="sub">Products &amp; Sellouts</div>
+      </div>
+    </div>
+
+    <div class="card agent">
+      <div class="icon">
+        <svg viewBox="0 0 40 40" xmlns="http://www.w3.org/2000/svg">
+          <rect x="4" y="12" width="12" height="12" rx="3" class="svg-n8n" opacity=".9"/>
+          <rect x="24" y="4" width="12" height="12" rx="3" class="svg-n8n" opacity=".7"/>
+          <rect x="24" y="24" width="12" height="12" rx="3" class="svg-n8n" opacity=".7"/>
+          <line x1="16" y1="18" x2="24" y2="10" stroke="#ff2a2a" stroke-width="2"/>
+          <line x1="16" y1="18" x2="24" y2="30" stroke="#ff2a2a" stroke-width="2"/>
+        </svg>
+      </div>
+      <div class="card-text">
+        <div class="label">n8n Agent 3</div>
+        <div class="sub">Transactions &amp; Weather</div>
+      </div>
+    </div>
+
+    <div class="card store">
+      <div class="icon"><i class="fa-solid fa-store"></i></div>
+      <div class="card-text">
+        <div class="label">Owl Park Webstore</div>
+        <div class="sub">E-commerce &amp; Tickets</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ───────── ARROW → ───────── -->
+  <div class="col-arrow">
+    <div class="connector">
+      <span class="line"></span>
+      <span class="clabel">Stream</span>
+      <span class="chev"><i class="fa-solid fa-angles-right"></i></span>
+    </div>
+  </div>
+
+  <!-- ───────── ② SUPABASE ───────── -->
+  <div class="col-supa">
+    <div class="phase-tag"><span>② Store</span></div>
+    <div class="card supabase">
+      <div class="icon">
+        <!-- Supabase bolt logo -->
+        <svg viewBox="0 0 40 40" xmlns="http://www.w3.org/2000/svg">
+          <path d="M22.5 3 L8 22h11l-2 15 L31.5 18h-11z" class="svg-supa"/>
+        </svg>
+      </div>
+      <div class="label">Supabase</div>
+      <div class="sub">Raw Data Repository</div>
+    </div>
+    <div class="supa-table-list">
+      <div class="st"><i class="fa-solid fa-globe"></i><span class="tname">Analyst_Transactions</span></div>
+      <div class="st"><i class="fa-solid fa-globe"></i><span class="tname">Weather_Impact</span></div>
+      <div class="st"><i class="fa-solid fa-globe"></i><span class="tname">events</span></div>
+      <div class="st"><i class="fa-solid fa-globe"></i><span class="tname">issues</span></div>
+      <div class="st"><i class="fa-solid fa-globe"></i><span class="tname">products</span></div>
+      <div class="st"><i class="fa-solid fa-globe"></i><span class="tname">sales_summary</span></div>
+      <div class="st"><i class="fa-solid fa-globe"></i><span class="tname">sellout_counter</span></div>
+      <div class="st"><i class="fa-solid fa-globe"></i><span class="tname">transactions</span></div>
+      <div class="st"><i class="fa-solid fa-globe"></i><span class="tname">visit_dates</span></div>
+      <div class="st"><i class="fa-solid fa-globe"></i><span class="tname">wh_transactions</span></div>
+    </div>
+  </div>
+
+  <!-- ───────── ARROW → ───────── -->
+  <div class="col-arrow">
+    <div class="connector">
+      <span class="line"></span>
+      <span class="clabel">Real-time<br>Pull</span>
+      <span class="chev"><i class="fa-solid fa-angles-right"></i></span>
+    </div>
+  </div>
+
+  <!-- ───────── ③ MICROSOFT FABRIC ───────── -->
+  <div class="col-fabric">
+    <div class="phase-tag"><span>③ Transform · Model · Store</span></div>
+    <div class="fabric-box">
+      <div class="fabric-header">
+        <div class="icon">
+          <!-- Fabric diamond logo -->
+          <svg viewBox="0 0 36 36" xmlns="http://www.w3.org/2000/svg">
+            <path d="M18 4 L30 14 L18 32 L6 14 Z" fill="#1ad1ff" opacity=".85"/>
+            <path d="M18 4 L30 14 L18 18 L6 14 Z" fill="#9cebff" opacity=".72"/>
+          </svg>
+        </div>
+        <span class="title">Microsoft Fabric</span>
+      </div>
+
+      <div class="gen2-container">
+      <div class="gen2-pill">
+        <i class="fa-solid fa-arrows-spin"></i>
+        <span class="g-label">Gen2 Dataflow</span>
+        <span class="g-sub">· Real-time Schedule</span>
+      </div>
+
+      <div class="tables-grid">
+        <!-- Dimensions -->
+        <div class="tbl-panel">
+          <div class="tbl-heading dim">
+            <i class="fa-solid fa-cube"></i> Dimensions (19)
+          </div>
+          <div class="tbl-list dim-list">
+            <span class="t">dim_time</span>
+            <span class="t">dim_date</span>
+            <span class="t">dim_products_events</span>
+            <span class="t">dim_products_products</span>
+            <span class="t">dim_time_products</span>
+            <span class="t">dim_date_products</span>
+            <span class="t">dim_product_sellout</span>
+            <span class="t">dim_time_sellout</span>
+            <span class="t">dim_date_sellout</span>
+            <span class="t">dim_transactions_date_time</span>
+            <span class="t">dim_transactions_contacts</span>
+            <span class="t">dim_weather_dates</span>
+            <span class="t">dim_customer_warehouse</span>
+            <span class="t">dim_date_warehouse</span>
+            <span class="t">dim_time_warehouse</span>
+            <span class="t">dim_contact</span>
+            <span class="t">dim_date_VCalendar</span>
+            <span class="t">dim_date_VCalendar_created_at</span>
+            <span class="t">dim_time_VCalendar_visit_date</span>
+          </div>
+        </div>
+        <!-- Facts + Query Groups -->
+        <div class="tbl-panel">
+          <div class="tbl-heading fact">
+            <i class="fa-solid fa-chart-bar"></i> Facts &amp; Bridge (7)
+          </div>
+          <div class="tbl-list fact-list">
+            <span class="t">facts_events</span>
+            <span class="t">facts_products</span>
+            <span class="t">facts_sellout_counter</span>
+            <span class="t">facts_transactions</span>
+            <span class="t">facts_Weather_Impact</span>
+            <span class="t">facts_wh_transactions</span>
+            <span class="t">facts_visit_dates</span>
+          </div>
+          <div class="tbl-heading qg">
+            <i class="fa-solid fa-folder"></i> Query Groups — 26 Queries
+          </div>
+          <div class="tbl-list" style="padding-left:12px;">
+            <span class="t" style="color:#9fb3de;">Events (4) · Products (4) · Sellouts (4)</span>
+            <span class="t" style="color:#9fb3de;">Transactions (3) · VisitingCalendar (5)</span>
+            <span class="t" style="color:#9fb3de;">Warehouse (4) · Weather (2)</span>
+          </div>
+        </div>
+      </div>
+      </div><!-- /gen2-container -->
+
+      <!-- DW + DL inside Fabric -->
+      <div class="fabric-storage">
+        <div class="fs-card wh">
+          <span class="cadence">REAL-TIME</span>
+          <div class="icon"><i class="fa-solid fa-warehouse"></i></div>
+          <div class="card-text">
+            <div class="label">Data Warehouse</div>
+            <div class="sub">Real-time OLAP · Structured Queries</div>
+          </div>
+        </div>
+        <div class="fs-card dl">
+          <span class="cadence">EVERY 24H</span>
+          <div class="icon"><i class="fa-solid fa-hard-drive"></i></div>
+          <div class="card-text">
+            <div class="label">Data Lake</div>
+            <div class="sub">Daily Backup · Historical Archive</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ───────── ARROW → ───────── -->
+  <div class="out-connector">
+    <span class="line"></span>
+    <span class="chev"><i class="fa-solid fa-angles-right"></i></span>
+  </div>
+
+  <!-- ───────── ④ OUTPUTS ───────── -->
+  <div class="col-out">
+    <div class="phase-tag"><span>④ Analyze</span></div>
+
+    <div class="card out pbi">
+      <span class="cadence">LIVE</span>
+      <div class="icon">
+        <!-- Power BI logo -->
+        <svg viewBox="0 0 40 40" xmlns="http://www.w3.org/2000/svg">
+          <rect x="8" y="18" width="6" height="16" rx="1.5" fill="#ff7a1a" opacity=".65"/>
+          <rect x="17" y="12" width="6" height="22" rx="1.5" fill="#ff7a1a" opacity=".85"/>
+          <rect x="26" y="6" width="6" height="28" rx="1.5" fill="#ff7a1a"/>
+        </svg>
+      </div>
+      <div class="card-text">
+        <div class="label">Power BI Reports</div>
+        <div class="sub">BI Team Dashboards · Executive Analytics</div>
+      </div>
+    </div>
+
+    <div class="card out claude">
+      <span class="cadence">AI · MCP</span>
+      <div class="icon">
+        <!-- Claude sparkle icon -->
+        <svg viewBox="0 0 40 40" xmlns="http://www.w3.org/2000/svg">
+          <path d="M20 4 L22 16 L34 14 L24 20 L34 26 L22 24 L20 36 L18 24 L6 26 L16 20 L6 14 L18 16 Z" fill="#ff4d8d"/>
+        </svg>
+      </div>
+      <div class="card-text">
+        <div class="label">Claude + PBI MCP Server</div>
+        <div class="sub">AI-Assisted Analysis · Natural Language</div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<div class="footer">Owl Park · Data Architecture · 2026</div>
+
+</body>
+</html>

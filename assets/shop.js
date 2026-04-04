@@ -4,6 +4,7 @@ const SHOP_PRODUCTS_TABLE = 'products';
 const TRANSACTIONS_TABLE = 'transactions';
 const VISIT_DATES_TABLE = 'visit_dates';
 const EVENTS_TABLE = 'events';
+const RESERVE_EVENT_SPOTS_RPC = 'reserve_event_spots';
 const PROMOTIONS_TABLE = 'promotions';
 const SHOP_PRODUCTS_CACHE_KEY = 'portfolio_shop_products_cache_v2';
 const SHOP_PRODUCTS_CACHE_TIME_KEY = 'portfolio_shop_products_cache_time_v2';
@@ -1775,111 +1776,49 @@ async function applyOrderInventoryReduction() {
                 throw new Error(`Event data is invalid for ${product.name} on ${visitDate}.`);
             }
 
-            let expectedSpotsPurchasedValue = getRowFieldValue(currentEventRow, ['spots_purchased', 'spotsPurchased', 'spots purchased']);
-
             if (Number.isFinite(normalizedEvent.remaining) && normalizedEvent.remaining < quantity) {
                 throw new Error(`Not enough spots for ${product.name} on ${visitDate}. Available: ${normalizedEvent.remaining}.`);
             }
 
             if (!isUnlimitedInventoryValue(normalizedEvent.capacity)) {
-                let updatedAvailability = null;
+                const { data: reservationResult, error: reservationError } = await client
+                    .rpc(RESERVE_EVENT_SPOTS_RPC, {
+                        p_event_id: String(normalizedEvent.id),
+                        p_quantity: quantity
+                    });
 
-                for (let attempt = 0; attempt < 2; attempt += 1) {
-                    if (Number.isFinite(normalizedEvent.remaining) && normalizedEvent.remaining < quantity) {
+                if (reservationError) {
+                    const message = String(reservationError.message || '').toUpperCase();
+                    if (message.includes('INSUFFICIENT_CAPACITY')) {
                         throw new Error(`Not enough spots for ${product.name} on ${visitDate}. Available: ${normalizedEvent.remaining}.`);
                     }
-
-                    const priorSpotsPurchased = normalizedEvent.spotsPurchased;
-                    const nextSpotsPurchased = normalizedEvent.spotsPurchased + quantity;
-                    if (nextSpotsPurchased > normalizedEvent.capacity) {
-                        throw new Error(`Requested quantity exceeds capacity for ${product.name} on ${visitDate}.`);
+                    if (message.includes('EVENT_NOT_FOUND')) {
+                        throw new Error(`No event is scheduled for ${product.name} on ${visitDate}.`);
                     }
-
-                    let updateQuery = client
-                        .from(EVENTS_TABLE)
-                        .update({ spots_purchased: nextSpotsPurchased })
-                        .eq('id', normalizedEvent.id);
-
-                    if (expectedSpotsPurchasedValue === null || typeof expectedSpotsPurchasedValue === 'undefined' || String(expectedSpotsPurchasedValue).trim() === '') {
-                        updateQuery = updateQuery.is('spots_purchased', null);
-                    } else {
-                        const expectedSpotsPurchasedNumber = Number(expectedSpotsPurchasedValue);
-                        if (Number.isFinite(expectedSpotsPurchasedNumber)) {
-                            updateQuery = updateQuery.eq('spots_purchased', expectedSpotsPurchasedNumber);
-                        } else {
-                            updateQuery = updateQuery.eq('spots_purchased', expectedSpotsPurchasedValue);
-                        }
+                    if (message.includes('INVALID_QUANTITY')) {
+                        throw new Error(`Invalid quantity selected for ${product.name}.`);
                     }
-
-                    const { data: updatedEventRows, error: updateEventError } = await updateQuery.select('*');
-
-                    if (updateEventError) {
-                        throw new Error(`Could not update event capacity for ${product.name}: ${updateEventError.message}`);
-                    }
-
-                    const updatedEventRow = Array.isArray(updatedEventRows) && updatedEventRows.length
-                        ? updatedEventRows[0]
-                        : null;
-
-                    if (updatedEventRow) {
-                        updatedAvailability = normalizeEventAvailabilityRow(updatedEventRow);
-                        if (!updatedAvailability) {
-                            throw new Error(`Event data was invalid after update for ${product.name} on ${visitDate}.`);
-                        }
-                        break;
-                    }
-
-                    const { data: refreshedEventRow, error: refreshEventError } = await client
-                        .from(EVENTS_TABLE)
-                        .select('*')
-                        .eq('id', normalizedEvent.id)
-                        .maybeSingle();
-
-                    if (refreshEventError) {
-                        throw new Error(`Could not refresh event capacity for ${product.name}: ${refreshEventError.message}`);
-                    }
-
-                    const refreshedEvent = normalizeEventAvailabilityRow(refreshedEventRow);
-                    if (!refreshedEvent) {
-                        throw new Error(`Event data changed for ${product.name} on ${visitDate}. Please reselect a date.`);
-                    }
-
-                    if (refreshedEvent.spotsPurchased === priorSpotsPurchased && attempt === 1) {
-                        throw new Error(`Could not reserve spots for ${product.name} on ${visitDate}. Check events table update policy (RLS) for anon/authenticated users.`);
-                    }
-
-                    normalizedEvent = refreshedEvent;
-                    expectedSpotsPurchasedValue = getRowFieldValue(refreshedEventRow, ['spots_purchased', 'spotsPurchased', 'spots purchased']);
+                    throw new Error(`Could not reserve spots for ${product.name}: ${reservationError.message}`);
                 }
 
+                const reservationRow = Array.isArray(reservationResult) && reservationResult.length
+                    ? reservationResult[0]
+                    : reservationResult;
+
+                if (!reservationRow) {
+                    throw new Error(`Could not reserve spots for ${product.name} on ${visitDate}.`);
+                }
+
+                const updatedAvailability = normalizeEventAvailabilityRow({
+                    id: reservationRow.event_id || normalizedEvent.id,
+                    event_type: normalizedEvent.eventType || product.name,
+                    event_date: visitDate,
+                    capacity: reservationRow.capacity,
+                    spots_purchased: reservationRow.spots_purchased
+                });
+
                 if (!updatedAvailability) {
-                    const fallbackNextSpotsPurchased = normalizedEvent.spotsPurchased + quantity;
-                    if (fallbackNextSpotsPurchased > normalizedEvent.capacity) {
-                        throw new Error(`Not enough spots for ${product.name} on ${visitDate}. Available: ${normalizedEvent.remaining}.`);
-                    }
-
-                    const { data: fallbackUpdatedRows, error: fallbackUpdateError } = await client
-                        .from(EVENTS_TABLE)
-                        .update({ spots_purchased: fallbackNextSpotsPurchased })
-                        .eq('id', normalizedEvent.id)
-                        .select('*');
-
-                    if (fallbackUpdateError) {
-                        throw new Error(`Could not update event capacity for ${product.name}: ${fallbackUpdateError.message}`);
-                    }
-
-                    const fallbackUpdatedRow = Array.isArray(fallbackUpdatedRows) && fallbackUpdatedRows.length
-                        ? fallbackUpdatedRows[0]
-                        : null;
-
-                    if (!fallbackUpdatedRow) {
-                        throw new Error(`Could not reserve spots for ${product.name} on ${visitDate}. Check events table update policy (RLS) for anon/authenticated users.`);
-                    }
-
-                    updatedAvailability = normalizeEventAvailabilityRow(fallbackUpdatedRow);
-                    if (!updatedAvailability) {
-                        throw new Error(`Event data was invalid after update for ${product.name} on ${visitDate}.`);
-                    }
+                    throw new Error(`Event data was invalid after update for ${product.name} on ${visitDate}.`);
                 }
 
                 const eventKey = getEventAvailabilityKey(product.id, visitDate);
