@@ -5,13 +5,9 @@
     --secondary-text: #ceb787;
     --card-bg: rgba(255, 210, 122, 0.06);
     --card-border: rgba(255, 210, 122, 0.22);
-    display: grid;
-    grid-template-columns: minmax(320px, 430px) minmax(420px, 560px) minmax(220px, 320px);
-    grid-template-areas: "chatbot feature intro";
-    gap: clamp(24px, 3vw, 48px);
-    align-content: center;
-    justify-content: center;
-    padding: 2rem 3rem 110px;
+    --font-main: Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+}
+
 * {
     box-sizing: border-box;
     margin: 0;
@@ -22,56 +18,42 @@ body {
     background-color: var(--bg-color);
     color: var(--text-color);
     font-family: var(--font-main);
-    justify-self: end;
     min-height: 100vh;
-        display: grid;
-        grid-template-columns: minmax(320px, 430px) minmax(420px, 560px) minmax(220px, 320px);
-        grid-template-areas: "chatbot feature intro";
-        gap: clamp(24px, 3vw, 48px);
-        align-content: center;
-        justify-content: center;
-        padding: 2rem 3rem 110px;
-    align-self: center;
+    overflow-x: hidden;
+    display: flex;
+    flex-direction: column;
+}
+
+body::before,
+body::after {
     content: "";
     position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    grid-area: chatbot;
-    position: static;
-    width: min(100%, 430px);
-        justify-self: end;
-    min-width: 0;
+    inset: 0;
+    z-index: 0;
+    pointer-events: none;
 }
 
 body::before {
     background-image:
         repeating-linear-gradient(112deg, transparent 0 18px, rgba(255, 210, 122, 0.14) 18px 19px, transparent 19px 42px),
-        grid-area: intro;
-        width: min(100%, 300px);
+        repeating-linear-gradient(158deg, transparent 0 34px, rgba(255, 210, 122, 0.1) 34px 37px, transparent 37px 76px);
     opacity: 0.38;
 }
-        align-self: center;
-    align-self: center;
 
 body::after {
     background-image:
         repeating-linear-gradient(38deg, transparent 0 22px, rgba(255, 210, 122, 0.12) 22px 24px, transparent 24px 58px),
         repeating-linear-gradient(136deg, transparent 0 48px, rgba(255, 210, 122, 0.08) 48px 54px, transparent 54px 98px);
-        grid-area: chatbot;
-        position: static;
-        width: min(100%, 430px);
-        min-width: 0;
+    opacity: 0.24;
+}
 
 header {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 2rem 3rem;
+    padding: 1.5rem 2rem;
     position: relative;
     z-index: 10;
-        align-self: center;
     font-size: 0.9rem;
 }
 
@@ -82,7 +64,7 @@ header {
 
 .nav-links {
     display: flex;
-    gap: 2rem;
+    gap: 1.6rem;
 }
 
 .nav-toggle {
@@ -107,7 +89,7 @@ header {
 .nav-links a {
     color: var(--secondary-text);
     text-decoration: none;
-    transition: color 0.3s, text-shadow 0.2s;
+    transition: color 0.2s, text-shadow 0.2s;
 }
 
 .nav-links a:hover,
@@ -119,7 +101,6 @@ header {
 .nav-links a:focus-visible {
     outline: 2px solid var(--accent-color);
     outline-offset: 3px;
-    color: var(--text-color);
 }
 
 .nav-links a.blog-disabled,
@@ -172,120 +153,74 @@ main {
     position: relative;
     z-index: 5;
     display: grid;
-    grid-template-columns: minmax(0, 420px) minmax(0, 520px) minmax(0, 280px);
+    grid-template-columns: minmax(0, 420px) minmax(0, 520px) minmax(0, 300px);
     grid-template-areas: "chatbot feature intro";
-    gap: clamp(24px, 3vw, 48px);
-    align-content: center;
+    gap: clamp(18px, 2.4vw, 36px);
+    align-items: center;
     justify-content: center;
     width: min(100%, 1460px);
     margin: 0 auto;
-    padding: 2rem 3rem 110px;
+    padding: 1.5rem 2rem 86px;
 }
 
 .profile-card {
     grid-area: feature;
     width: 100%;
     max-width: 520px;
+    justify-self: end;
     background: var(--card-bg);
     backdrop-filter: blur(10px);
     border: 1px solid var(--card-border);
-    padding: 0;
     display: flex;
     flex-direction: column;
-    justify-self: end;
+    overflow: hidden;
 }
 
 .card-image-container {
     aspect-ratio: 16 / 9;
     overflow: hidden;
-    position: relative;
     background: #000;
 }
 
+.card-image-container iframe,
 .card-image-container img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    filter: grayscale(20%);
-    transition: filter 0.3s;
-}
-
-.card-image-container iframe {
     width: 100%;
     height: 100%;
     border: 0;
     display: block;
-}
-
-.card-image-container:hover img {
-    filter: grayscale(0%);
-}
-
-.status-badge {
-    position: absolute;
-    bottom: 20px;
-    left: 20px;
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    background: rgba(30, 30, 30, 0.78);
-    backdrop-filter: blur(4px);
-    padding: 8px 12px;
-}
-
-.status-bars {
-    display: flex;
-    gap: 3px;
-}
-
-.bar {
-    width: 2px;
-    height: 12px;
-    background-color: #7b6640;
-}
-
-.bar.a { height: 8px; }
-.bar.b { height: 14px; background-color: var(--accent-color); }
-.bar.c { height: 10px; }
-
-.status-text {
-    font-size: 0.8rem;
-    font-weight: 500;
-    color: #fff7e3;
-    line-height: 1.35;
-    letter-spacing: 0.2px;
+    object-fit: cover;
 }
 
 .card-details {
-    padding: 20px;
+    padding: 18px;
     border-top: 1px solid var(--card-border);
 }
 
 .card-name {
     font-size: 1.2rem;
     font-weight: 600;
-    margin-bottom: 5px;
+    margin-bottom: 4px;
 }
 
 .card-role {
     font-size: 0.9rem;
     color: var(--secondary-text);
-    margin-bottom: 20px;
+    margin-bottom: 16px;
 }
 
 .card-pricing {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding-top: 15px;
+    padding-top: 12px;
     border-top: 1px solid var(--card-border);
-    margin-bottom: 20px;
+    margin-bottom: 16px;
     font-size: 0.9rem;
 }
 
 .consult-btn {
     width: 100%;
-    padding: 15px;
+    padding: 14px;
     background: var(--accent-color);
     color: #1e1e1e;
     text-decoration: none;
@@ -306,32 +241,28 @@ main {
 .consult-btn:focus-visible {
     outline: 2px solid var(--accent-color);
     outline-offset: 3px;
-    box-shadow: 0 0 0 3px rgba(255, 210, 122, 0.2);
 }
 
 .intro-text {
     grid-area: intro;
     width: 100%;
-    max-width: 280px;
-    text-align: left;
-    z-index: 5;
-    align-self: center;
+    max-width: 300px;
+    justify-self: start;
 }
 
 .intro-text p {
     font-size: 1.1rem;
-    line-height: 1.4;
+    line-height: 1.42;
     color: #f0ddb3;
 }
 
 .section-note {
-    font-size: 0.9rem;
+    font-size: 1.1rem;
     color: var(--secondary-text);
 }
 
 .chatbot-panel {
     grid-area: chatbot;
-    position: static;
     width: 100%;
     max-width: 420px;
     min-width: 0;
@@ -342,32 +273,10 @@ main {
     display: flex;
     flex-direction: column;
     overflow: hidden;
-    z-index: 6;
-    align-self: center;
-}
-
-@media (max-width: 1500px) {
-    main {
-        grid-template-columns: minmax(320px, 420px) minmax(420px, 520px);
-        grid-template-areas:
-            "chatbot feature"
-            ". intro";
-        align-content: start;
-    }
-
-    .profile-card {
-        justify-self: end;
-    }
-
-    .intro-text {
-        max-width: 420px;
-        justify-self: end;
-        align-self: start;
-    }
 }
 
 .chatbot-panel-header {
-    padding: 16px 18px;
+    padding: 14px 16px;
     border-bottom: 1px solid var(--card-border);
 }
 
@@ -407,7 +316,6 @@ footer {
     display: flex;
     align-items: center;
     height: 60px;
-    padding: 0;
 }
 
 .marquee {
@@ -416,8 +324,8 @@ footer {
     display: flex;
     align-items: center;
     height: 100%;
-    mask-image: linear-gradient(to right, transparent, black 5%, black 95%, transparent);
-    -webkit-mask-image: linear-gradient(to right, transparent, black 5%, black 95%, transparent);
+    mask-image: linear-gradient(to right, transparent, #000 5%, #000 95%, transparent);
+    -webkit-mask-image: linear-gradient(to right, transparent, #000 5%, #000 95%, transparent);
 }
 
 .marquee-content {
@@ -436,17 +344,6 @@ footer {
     display: inline-block;
 }
 
-.marquee-snake-handle {
-    display: inline-block;
-    cursor: grab;
-    user-select: none;
-    touch-action: none;
-}
-
-.marquee-snake-handle.is-dragging {
-    cursor: grabbing;
-}
-
 .separator {
     margin: 0 1.5rem;
     color: #5a4a2b;
@@ -462,7 +359,6 @@ footer {
     gap: 20px;
     padding: 0 2rem;
     background: var(--bg-color);
-    z-index: 2;
     height: 100%;
     align-items: center;
     border-left: 1px solid var(--card-border);
@@ -484,7 +380,6 @@ footer {
 .footer-socials a:focus-visible {
     outline: 2px solid var(--accent-color);
     outline-offset: 3px;
-    color: var(--accent-color);
 }
 
 main,
@@ -497,29 +392,19 @@ body::after {
     opacity: 0;
 }
 
-.page-enter {
+.page-enter,
+.projects-load-enter,
+.page-initial-enter {
     animation: fadeIn 0.5s ease-out forwards;
-}
-
-.projects-load-enter {
-    animation: fadeIn 0.5s ease-out forwards;
-}
-
-@keyframes fadeIn {
-    from {
-        opacity: 0;
-    }
-    to {
-        opacity: 1;
-    }
 }
 
 .page-initial-state {
     opacity: 0;
 }
 
-.page-initial-enter {
-    animation: fadeIn 0.5s ease-out forwards;
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
 }
 
 ::-webkit-scrollbar { width: 8px; }
@@ -527,16 +412,24 @@ body::after {
 ::-webkit-scrollbar-thumb { background: #5a4a2b; border-radius: 4px; }
 ::-webkit-scrollbar-thumb:hover { background: #7b6640; }
 
-@media (max-width: 900px) {
-    header {
-        padding: 1rem;
+@media (max-width: 1450px) {
+    main {
+        grid-template-columns: minmax(300px, 420px) minmax(360px, 520px);
+        grid-template-areas:
+            "chatbot feature"
+            ". intro";
+        align-content: center;
     }
 
-    main {
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        padding: 1rem 1rem 2rem;
+    .intro-text {
+        max-width: 420px;
+        justify-self: end;
+    }
+}
+
+@media (max-width: 980px) {
+    header {
+        padding: 1rem;
     }
 
     .nav-toggle {
@@ -570,6 +463,13 @@ body::after {
         border-bottom: 0;
     }
 
+    main {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        padding: 1rem 1rem 2rem;
+    }
+
     .intro-text,
     .chatbot-panel,
     .footer-socials {
@@ -577,8 +477,9 @@ body::after {
     }
 
     .profile-card {
-        width: 90%;
-        max-width: 420px;
+        width: min(100%, 440px);
+        max-width: none;
+        justify-self: center;
     }
 
     footer {
