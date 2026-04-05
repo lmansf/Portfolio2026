@@ -172,17 +172,20 @@ main {
     position: relative;
     z-index: 5;
     display: grid;
-    grid-template-columns: minmax(320px, 430px) minmax(420px, 560px) minmax(220px, 320px);
+    grid-template-columns: minmax(0, 420px) minmax(0, 520px) minmax(0, 280px);
     grid-template-areas: "chatbot feature intro";
     gap: clamp(24px, 3vw, 48px);
     align-content: center;
     justify-content: center;
+    width: min(100%, 1460px);
+    margin: 0 auto;
     padding: 2rem 3rem 110px;
 }
 
 .profile-card {
     grid-area: feature;
-    width: clamp(380px, 32vw, 520px);
+    width: 100%;
+    max-width: 520px;
     background: var(--card-bg);
     backdrop-filter: blur(10px);
     border: 1px solid var(--card-border);
@@ -308,7 +311,8 @@ main {
 
 .intro-text {
     grid-area: intro;
-    width: min(100%, 300px);
+    width: 100%;
+    max-width: 280px;
     text-align: left;
     z-index: 5;
     align-self: center;
@@ -328,7 +332,8 @@ main {
 .chatbot-panel {
     grid-area: chatbot;
     position: static;
-    width: min(100%, 430px);
+    width: 100%;
+    max-width: 420px;
     min-width: 0;
     height: 560px;
     background: var(--card-bg);
@@ -341,21 +346,23 @@ main {
     align-self: center;
 }
 
-@media (max-width: 1280px) {
+@media (max-width: 1500px) {
     main {
-        grid-template-columns: minmax(320px, 430px) minmax(400px, 560px);
+        grid-template-columns: minmax(320px, 420px) minmax(420px, 520px);
         grid-template-areas:
             "chatbot feature"
-            "chatbot intro";
+            ". intro";
         align-content: start;
     }
 
     .profile-card {
-        justify-self: start;
+        justify-self: end;
     }
 
     .intro-text {
-        width: min(100%, 420px);
+        max-width: 420px;
+        justify-self: end;
+        align-self: start;
     }
 }
 
