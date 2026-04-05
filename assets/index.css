@@ -163,7 +163,7 @@ main {
 }
 
 .profile-card {
-    width: 380px;
+    width: clamp(380px, 32vw, 520px);
     background: var(--card-bg);
     backdrop-filter: blur(10px);
     border: 1px solid var(--card-border);
@@ -173,9 +173,10 @@ main {
 }
 
 .card-image-container {
-    height: 400px;
+    aspect-ratio: 16 / 9;
     overflow: hidden;
     position: relative;
+    background: #000;
 }
 
 .card-image-container img {
@@ -288,7 +289,7 @@ main {
 
 .intro-text {
     position: absolute;
-    bottom: 20%;
+    bottom: 22%;
     right: 15%;
     width: 300px;
     text-align: left;
@@ -527,7 +528,7 @@ body::after {
 
     .profile-card {
         width: 90%;
-        max-width: 350px;
+        max-width: 420px;
     }
 
     footer {
