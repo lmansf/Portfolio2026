@@ -1,3 +1,17 @@
+/* ─────────────────────────────────────────────────────────────
+ * transition.js — page transitions + shared interactions.
+ *
+ * 2026 overhaul:
+ * - Removed: snake easter egg, blog unlock state, blog hover popup.
+ * - Updated: pages allowlist (work.html / pipeline.html, no blog).
+ * - Kept:    page-swap logic, modal handling, mobile nav, shop prefetch.
+ * - Added:   shell hooks (tab-bar active state, Crowbot FAB toggle).
+ *
+ * View Transitions API integration is planned for Phase 5; for now this
+ * keeps the existing custom JS swap so the new shell can be wired in
+ * without changing the transition mechanism.
+ * ───────────────────────────────────────────────────────────── */
+
 function syncBodyElement(currentSelector, incomingDoc) {
     const currentElement = document.querySelector(currentSelector);
     const incomingElement = incomingDoc.querySelector(currentSelector);
@@ -44,7 +58,7 @@ function normalizeInternalPath(url) {
 }
 
 function isTransitionPage(path) {
-    return ['index.html', 'projects.html', 'shop.html', 'blog.html', 'resume.html', 'feedback.html'].includes(path);
+    return ['index.html', 'work.html', 'pipeline.html', 'shop.html', 'resume.html', 'feedback.html'].includes(path);
 }
 
 function isAtsResumeLink(link) {
@@ -124,6 +138,12 @@ async function syncManagedStylesheet(incomingDoc) {
     });
 }
 
+async function getIncomingDocumentForNavigation(url, normalizedTarget) {
+    const response = await fetch(url);
+    const html = await response.text();
+    return new DOMParser().parseFromString(html, 'text/html');
+}
+
 async function navigateTo(url, options = {}) {
     if (navigateTo.isNavigating) return;
     navigateTo.isNavigating = true;
@@ -131,104 +151,152 @@ async function navigateTo(url, options = {}) {
     const { updateHistory = true } = options;
     const main = document.querySelector('main');
     const normalizedTarget = normalizeInternalPath(url);
-    const isProjectsDestination = normalizedTarget === 'projects.html';
-    const exitTargets = [main, document.querySelector('.bg-layer')].filter(Boolean);
-    
-    exitTargets.forEach((element) => {
-        element.classList.add('page-exit');
-    });
-    
+    const isProjectsDestination = normalizedTarget === 'work.html';
+
     try {
-        // 2. Fetch new content
-        const doc = await getIncomingDocumentForNavigation(url, normalizedTarget);
+        // 1. Fetch the new page in parallel with any exit animation
+        const docPromise = getIncomingDocumentForNavigation(url, normalizedTarget);
+        const doc = await docPromise;
 
         await syncManagedStylesheet(doc);
         await syncPageScripts(doc);
-        
-        // Wait for exit animation
-        await new Promise(resolve => setTimeout(resolve, 500)); // Match CSS transition duration
-        
-        // 3. Swap Content
-        const newMain = doc.querySelector('main');
-        const newTitle = doc.querySelector('title').innerText;
-        const newHeader = doc.querySelector('header');
-        
-        if (main && newMain) {
-            main.innerHTML = newMain.innerHTML;
-            main.className = newMain.className; // Update class (e.g. blog-view)
-        }
-        
-        syncBodyElement('.bg-layer', doc);
 
-        if (newHeader) {
-            const header = document.querySelector('header');
-            if (header) header.innerHTML = newHeader.innerHTML;
-            closeMobileNav();
-        }
+        // 2. Define the swap. View Transitions API runs this inside a snapshot.
+        async function doSwap() {
+            const newMain = doc.querySelector('main');
+            const newTitle = doc.querySelector('title').innerText;
+            const newHeader = doc.querySelector('header');
 
-        // Handle Footer
-        const footer = document.querySelector('footer');
-        const newFooter = doc.querySelector('footer');
-        if (newFooter) {
-            if (footer) {
-                footer.outerHTML = newFooter.outerHTML;
-            } else {
-                document.body.insertBefore(newFooter, document.querySelector('script')); 
+            if (main && newMain) {
+                main.innerHTML = newMain.innerHTML;
+                main.className = newMain.className;
             }
-        } else if (footer) {
-            footer.remove();
+
+            syncBodyElement('.bg-layer', doc);
+
+            if (newHeader) {
+                const header = document.querySelector('header');
+                if (header) header.innerHTML = newHeader.innerHTML;
+                closeMobileNav();
+            }
+
+            const footer = document.querySelector('footer');
+            const newFooter = doc.querySelector('footer');
+            if (newFooter) {
+                if (footer) {
+                    footer.outerHTML = newFooter.outerHTML;
+                } else {
+                    document.body.insertBefore(newFooter, document.querySelector('script'));
+                }
+            } else if (footer) {
+                footer.remove();
+            }
+
+            // Bottom tab bar (sync if present)
+            syncBodyElement('.tabbar', doc);
+
+            // Modal/overlay containers outside <main>
+            syncBodyElement('.project-modal-overlay', doc);
+            activeProjectModal = null;
+
+            document.title = newTitle;
+
+            if (updateHistory) {
+                history.pushState({}, newTitle, url);
+            }
+
+            // Reset scroll
+            window.scrollTo({ top: 0, left: 0, behavior: 'instant' });
         }
 
-        // Handle overlays and modal containers outside <main>
-        syncBodyElement('#post-overlay', doc);
-        syncBodyElement('.project-modal-overlay', doc);
-        activeProjectModal = null;
-        
-        // Update document title
-        document.title = newTitle;
-        
-        // Update URL
-        if (updateHistory) {
-            history.pushState({}, newTitle, url);
-        }
-        
-        // 4. Re-initialize scripts
-        if (normalizedTarget === 'blog.html' && window.loadBlogs) {
-            window.loadBlogs();
+        // 3. Run the swap with View Transitions when supported.
+        const reduceMotion = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+        if (!reduceMotion && typeof document.startViewTransition === 'function') {
+            const vt = document.startViewTransition(() => doSwap());
+            try { await vt.finished; } catch { /* ignore — user may have navigated again */ }
+        } else {
+            // Legacy fade fallback
+            const exitTargets = [main, document.querySelector('.bg-layer')].filter(Boolean);
+            exitTargets.forEach((el) => el.classList.add('page-exit'));
+            await new Promise((resolve) => setTimeout(resolve, reduceMotion ? 0 : 300));
+            await doSwap();
+            const enterTargets = [document.querySelector('main'), document.querySelector('.bg-layer')].filter(Boolean);
+            enterTargets.forEach((el) => {
+                el.classList.remove('page-exit');
+                el.classList.add('page-enter');
+            });
+            setTimeout(() => {
+                enterTargets.forEach((el) => el.classList.remove('page-enter'));
+            }, reduceMotion ? 0 : 300);
         }
 
-        if (normalizedTarget === 'shop.html' && window.initializeShopPage) {
-            window.initializeShopPage();
+        // 4. Re-initialize page-specific scripts
+        if (normalizedTarget === 'shop.html' && window.initializeShopDemo) {
+            window.initializeShopDemo();
         }
-        
-        // 5. Enter animation
-        const enterTargets = [main, document.querySelector('.bg-layer')].filter(Boolean);
-        enterTargets.forEach((element) => {
-            element.classList.remove('page-exit');
-            element.classList.add('page-enter');
-        });
+        if (normalizedTarget === 'index.html' && window.initializeNowCard) {
+            window.initializeNowCard();
+        }
+        if (normalizedTarget === 'pipeline.html' && window.initializePipeline) {
+            window.initializePipeline();
+        }
+        if (normalizedTarget === 'resume.html' && window.initializeSkillBars) {
+            window.initializeSkillBars();
+        }
+        if (normalizedTarget === 'feedback.html' && window.initializeFeedbackChips) {
+            window.initializeFeedbackChips();
+        }
 
-        applyBlogUnlockState();
-        setupInteractiveSnake();
+        // Re-wire shell behavior on the new document
         wireShopPrefetchInteractions();
         scheduleShopProductsPrefetch();
+        wireUpnextPrefetch();
+        updateTabBarActiveState();
 
         if (isProjectsDestination) {
             animateProjectsLoadIn();
         }
-        
-        setTimeout(() => {
-            enterTargets.forEach((element) => {
-                element.classList.remove('page-enter');
-            });
-        }, 500);
-        
+
     } catch (err) {
         console.error('Navigation failed:', err);
-        window.location.href = url; // Fallback
+        window.location.href = url;
     } finally {
         navigateTo.isNavigating = false;
     }
+}
+
+/* ─── Up-next prefetch: prefetch each Up-next card's HTML when it enters viewport ─── */
+let upnextPrefetched = new Set();
+let upnextObserver = null;
+
+function prefetchUrl(url) {
+    if (!url) return;
+    const norm = normalizeInternalPath(url);
+    if (upnextPrefetched.has(norm)) return;
+    upnextPrefetched.add(norm);
+    fetch(url, { method: 'GET' }).catch(() => {});
+}
+
+function wireUpnextPrefetch() {
+    if (upnextObserver) {
+        upnextObserver.disconnect();
+        upnextObserver = null;
+    }
+    if (!('IntersectionObserver' in window)) return;
+    const cards = Array.from(document.querySelectorAll('.upnext__card[href]'));
+    if (!cards.length) return;
+    upnextObserver = new IntersectionObserver((entries) => {
+        entries.forEach((entry) => {
+            if (entry.isIntersecting) {
+                const href = entry.target.getAttribute('href') || '';
+                if (href && !href.startsWith('http') && !href.startsWith('#')) {
+                    prefetchUrl(href);
+                }
+                upnextObserver.unobserve(entry.target);
+            }
+        });
+    }, { rootMargin: '200px 0px' });
+    cards.forEach((card) => upnextObserver.observe(card));
 }
 
 let activeProjectModal = null;
@@ -250,388 +318,10 @@ function closeProjectModal(modal) {
     }
 }
 
-const BLOG_UNLOCK_KEY = 'portfolio_blog_unlocked';
-const BLOG_UNLOCK_LEGACY_KEY = 'portfolio_blog_unlocked';
-const TRANSITION_SHOP_PRODUCTS_CACHE_KEY = 'portfolio_shop_products_cache_v1';
-const TRANSITION_SHOP_PRODUCTS_CACHE_TIME_KEY = 'portfolio_shop_products_cache_time_v1';
-const TRANSITION_SHOP_PRODUCTS_CACHE_TTL_MS = 5 * 60 * 1000;
-const SHOP_PREFETCH_TIMEOUT_MS = 6000;
-const SHOP_PAGE_HTML_CACHE_TTL_MS = 5 * 60 * 1000;
-const SHOP_SUPABASE_URL = 'https://xcubnwvyvhjfyiixunfg.supabase.co';
-const SHOP_SUPABASE_ANON_KEY = 'sb_publishable_K5k9vLXtDUo8qoyWrwX3qg_qN_3xWfy';
-const SHOP_REST_PRODUCTS_URL = `${SHOP_SUPABASE_URL}/rest/v1/products?select=id,product_name,category,description,unit_price,stock,is_hidden&order=unit_price.asc,product_name.asc`;
-let shopProductsPrefetchPromise = null;
-let shopPageHtmlPrefetchPromise = null;
-let shopPageHtmlCache = null;
-let interactiveSnakeHandle = null;
-let isSnakeDragging = false;
-let snakePointerOffsetX = 0;
-let snakePointerOffsetY = 0;
-
-function getShopProductsCacheAgeMs() {
-    try {
-        const rawTimestamp = Number(sessionStorage.getItem(TRANSITION_SHOP_PRODUCTS_CACHE_TIME_KEY));
-        if (!Number.isFinite(rawTimestamp) || rawTimestamp <= 0) return Infinity;
-        return Date.now() - rawTimestamp;
-    } catch {
-        return Infinity;
-    }
-}
-
-function hasFreshShopProductsCache() {
-    return getShopProductsCacheAgeMs() <= TRANSITION_SHOP_PRODUCTS_CACHE_TTL_MS;
-}
-
-function hasFreshShopPageHtmlCache() {
-    if (!shopPageHtmlCache || !shopPageHtmlCache.text || !shopPageHtmlCache.timestamp) {
-        return false;
-    }
-
-    return Date.now() - shopPageHtmlCache.timestamp <= SHOP_PAGE_HTML_CACHE_TTL_MS;
-}
-
-async function prefetchShopPageHtmlIfNeeded() {
-    if (normalizeInternalPath(window.location.pathname) === 'shop.html') {
-        return;
-    }
-
-    if (hasFreshShopPageHtmlCache()) {
-        return;
-    }
-
-    if (shopPageHtmlPrefetchPromise) {
-        return shopPageHtmlPrefetchPromise;
-    }
-
-    shopPageHtmlPrefetchPromise = (async () => {
-        const controller = new AbortController();
-        const timeoutId = setTimeout(() => controller.abort(), SHOP_PREFETCH_TIMEOUT_MS);
-
-        try {
-            const response = await fetch('shop.html', {
-                method: 'GET',
-                signal: controller.signal
-            });
-
-            if (!response.ok) {
-                return;
-            }
-
-            const text = await response.text();
-            if (!text) {
-                return;
-            }
-
-            shopPageHtmlCache = {
-                text,
-                timestamp: Date.now()
-            };
-        } catch {
-            // ignore prefetch failures and continue normal behavior
-        } finally {
-            clearTimeout(timeoutId);
-            shopPageHtmlPrefetchPromise = null;
-        }
-    })();
-
-    return shopPageHtmlPrefetchPromise;
-}
-
-async function prefetchShopProductsIfNeeded() {
-    if (normalizeInternalPath(window.location.pathname) === 'shop.html') {
-        return;
-    }
-
-    if (hasFreshShopProductsCache()) {
-        return;
-    }
-
-    if (shopProductsPrefetchPromise) {
-        return shopProductsPrefetchPromise;
-    }
-
-    shopProductsPrefetchPromise = (async () => {
-        const controller = new AbortController();
-        const timeoutId = setTimeout(() => controller.abort(), SHOP_PREFETCH_TIMEOUT_MS);
-
-        try {
-            const response = await fetch(SHOP_REST_PRODUCTS_URL, {
-                method: 'GET',
-                headers: {
-                    apikey: SHOP_SUPABASE_ANON_KEY,
-                    Authorization: `Bearer ${SHOP_SUPABASE_ANON_KEY}`
-                },
-                signal: controller.signal
-            });
-
-            if (!response.ok) {
-                return;
-            }
-
-            const products = await response.json();
-            if (!Array.isArray(products)) {
-                return;
-            }
-
-            sessionStorage.setItem(TRANSITION_SHOP_PRODUCTS_CACHE_KEY, JSON.stringify(products));
-            sessionStorage.setItem(TRANSITION_SHOP_PRODUCTS_CACHE_TIME_KEY, String(Date.now()));
-        } catch {
-            // ignore prefetch failures and continue normal behavior
-        } finally {
-            clearTimeout(timeoutId);
-            shopProductsPrefetchPromise = null;
-        }
-    })();
-
-    return shopProductsPrefetchPromise;
-}
-
-function requestShopPrefetch() {
-    void prefetchShopProductsIfNeeded();
-    void prefetchShopPageHtmlIfNeeded();
-}
-
-function scheduleShopProductsPrefetch() {
-    if (normalizeInternalPath(window.location.pathname) === 'shop.html') return;
-
-    if (typeof window.requestIdleCallback === 'function') {
-        window.requestIdleCallback(() => {
-            requestShopPrefetch();
-        }, { timeout: 2500 });
-        return;
-    }
-
-    setTimeout(() => {
-        requestShopPrefetch();
-    }, 1000);
-}
-
-function wireShopPrefetchInteractions() {
-    const navLinks = Array.from(document.querySelectorAll('header .nav-links a[href]'));
-    const shopLinks = navLinks.filter((link) => normalizeInternalPath(link.getAttribute('href') || '') === 'shop.html');
-
-    shopLinks.forEach((link) => {
-        link.addEventListener('mouseenter', requestShopPrefetch, { passive: true });
-        link.addEventListener('focus', requestShopPrefetch, { passive: true });
-        link.addEventListener('touchstart', requestShopPrefetch, { passive: true });
-    });
-}
-
-function getStorageValue(key) {
-    try {
-        return sessionStorage.getItem(key);
-    } catch {
-        return null;
-    }
-}
-
-function setStorageValue(key, value) {
-    try {
-        sessionStorage.setItem(key, value);
-    } catch {
-        // no-op when storage is unavailable
-    }
-}
-
-function removeLegacyUnlockState() {
-    try {
-        localStorage.removeItem(BLOG_UNLOCK_LEGACY_KEY);
-    } catch {
-        // no-op when storage is unavailable
-    }
-}
-
-function getLockedBlogLinkFromEventTarget(target) {
-    if (!target || !(target instanceof Element)) return null;
-    const link = target.closest('a[href]');
-    if (!link) return null;
-    const isBlogTarget = normalizeInternalPath(link.getAttribute('href') || '') === 'blog.html' || link.textContent.trim().toLowerCase() === 'blog';
-    if (!isBlogTarget) return null;
-    return isBlogUnlocked() ? null : link;
-}
-
-function isBlogUnlocked() {
-    return getStorageValue(BLOG_UNLOCK_KEY) === 'true';
-}
-
-function setBlogUnlocked(unlocked) {
-    setStorageValue(BLOG_UNLOCK_KEY, unlocked ? 'true' : 'false');
-}
-
-function applyBlogUnlockState(root = document) {
-    const links = root.querySelectorAll('a[data-disabled-blog="true"], a.blog-disabled');
-    const unlocked = isBlogUnlocked();
-
-    links.forEach((link) => {
-        if (unlocked) {
-            link.classList.remove('blog-disabled', 'blog-shuddering');
-            link.removeAttribute('data-disabled-blog');
-            link.removeAttribute('aria-disabled');
-            link.setAttribute('href', 'blog.html');
-            return;
-        }
-
-        link.classList.add('blog-disabled');
-        link.setAttribute('data-disabled-blog', 'true');
-        link.setAttribute('aria-disabled', 'true');
-        if (normalizeInternalPath(window.location.pathname) !== 'blog.html') {
-            link.setAttribute('href', 'blog.html');
-        }
-    });
-
-    if (unlocked) {
-        hideBlogHoverPopup();
-    }
-}
-
-function isPointInsideRect(x, y, rect) {
-    return x >= rect.left && x <= rect.right && y >= rect.top && y <= rect.bottom;
-}
-
-function isDroppedOnBlogTarget(x, y) {
-    const blogTargets = Array.from(document.querySelectorAll('header .nav-links a')).filter((link) => {
-        const href = normalizeInternalPath(link.getAttribute('href') || '');
-        return href === 'blog.html' || link.textContent.trim().toLowerCase() === 'blog';
-    });
-
-    return blogTargets.some((target) => isPointInsideRect(x, y, target.getBoundingClientRect()));
-}
-
-function positionSnakeAtPoint(clientX, clientY) {
-    if (!interactiveSnakeHandle) return;
-    interactiveSnakeHandle.style.left = `${clientX - snakePointerOffsetX}px`;
-    interactiveSnakeHandle.style.top = `${clientY - snakePointerOffsetY}px`;
-}
-
-function moveSnakeDrag(e) {
-    if (!interactiveSnakeHandle || !isSnakeDragging) return;
-    positionSnakeAtPoint(e.clientX, e.clientY);
-}
-
-function stopSnakeDrag(e) {
-    if (!interactiveSnakeHandle || !isSnakeDragging) return;
-
-    isSnakeDragging = false;
-    interactiveSnakeHandle.classList.remove('is-dragging');
-    positionSnakeAtPoint(e.clientX, e.clientY);
-
-    document.removeEventListener('pointermove', moveSnakeDrag);
-    document.removeEventListener('pointerup', stopSnakeDrag);
-
-    if (isDroppedOnBlogTarget(e.clientX, e.clientY)) {
-        setBlogUnlocked(true);
-        applyBlogUnlockState();
-    }
-}
-
-function startSnakeDrag(e) {
-    if (!interactiveSnakeHandle || e.button !== 0) return;
-    e.preventDefault();
-
-    const rect = interactiveSnakeHandle.getBoundingClientRect();
-    snakePointerOffsetX = e.clientX - rect.left;
-    snakePointerOffsetY = e.clientY - rect.top;
-
-    interactiveSnakeHandle.style.position = 'fixed';
-    interactiveSnakeHandle.style.margin = '0';
-    interactiveSnakeHandle.style.zIndex = '10060';
-    positionSnakeAtPoint(e.clientX, e.clientY);
-    document.body.appendChild(interactiveSnakeHandle);
-
-    isSnakeDragging = true;
-    interactiveSnakeHandle.classList.add('is-dragging');
-
-    document.addEventListener('pointermove', moveSnakeDrag);
-    document.addEventListener('pointerup', stopSnakeDrag);
-}
-
-function setupInteractiveSnake() {
-    if (interactiveSnakeHandle) {
-        interactiveSnakeHandle.removeEventListener('pointerdown', startSnakeDrag);
-        if (!interactiveSnakeHandle.closest('.marquee-content')) {
-            interactiveSnakeHandle.remove();
-        }
-    }
-
-    const snakeSpans = Array.from(document.querySelectorAll('.marquee-content span')).filter((span) => {
-        return span.textContent.includes('🐍');
-    });
-
-    const secondSnakeSpan = snakeSpans[1];
-    if (!secondSnakeSpan) {
-        interactiveSnakeHandle = null;
-        return;
-    }
-
-    const snakeText = secondSnakeSpan.textContent || '';
-    const pythonText = snakeText.replace('🐍', '').trim();
-
-    secondSnakeSpan.textContent = '';
-
-    const snakeHandle = document.createElement('span');
-    snakeHandle.className = 'marquee-snake-handle';
-    snakeHandle.textContent = '🐍';
-    secondSnakeSpan.appendChild(snakeHandle);
-
-    if (pythonText) {
-        secondSnakeSpan.append(` ${pythonText}`);
-    }
-
-    interactiveSnakeHandle = snakeHandle;
-    interactiveSnakeHandle.addEventListener('pointerdown', startSnakeDrag);
-}
-
-function shudderDisabledBlog(link) {
-    if (!link) return;
-    link.classList.remove('blog-shuddering');
-    void link.offsetWidth;
-    link.classList.add('blog-shuddering');
-}
-
-let blogHoverPopup = null;
-let popupFrameRequested = false;
-let popupX = 0;
-let popupY = 0;
-
-function ensureBlogHoverPopup() {
-    if (blogHoverPopup && document.body.contains(blogHoverPopup)) return blogHoverPopup;
-    blogHoverPopup = document.createElement('div');
-    blogHoverPopup.className = 'blog-hover-popup';
-    blogHoverPopup.textContent = 'This page is under construction';
-    document.body.appendChild(blogHoverPopup);
-    return blogHoverPopup;
-}
-
-function moveBlogHoverPopup(e) {
-    if (!blogHoverPopup) return;
-    popupX = e.clientX + 12;
-    popupY = e.clientY + 12;
-
-    if (popupFrameRequested) return;
-    popupFrameRequested = true;
-
-    requestAnimationFrame(() => {
-        if (!blogHoverPopup) {
-            popupFrameRequested = false;
-            return;
-        }
-        blogHoverPopup.style.left = `${popupX}px`;
-        blogHoverPopup.style.top = `${popupY}px`;
-        popupFrameRequested = false;
-    });
-}
-
-function showBlogHoverPopup(e) {
-    const popup = ensureBlogHoverPopup();
-    moveBlogHoverPopup(e);
-    popup.classList.add('is-visible');
-}
-
-function hideBlogHoverPopup() {
-    if (!blogHoverPopup) return;
-    blogHoverPopup.classList.remove('is-visible');
-}
-
+/* ─── Shop prefetch (retired with the live shop) — kept as no-ops so existing call sites still work ─── */
+function scheduleShopProductsPrefetch() { /* no-op */ }
+function wireShopPrefetchInteractions() { /* no-op */ }
+/* ─── Mobile nav (legacy hamburger drawer — Phase 4 will replace) ─── */
 function setMobileNavExpanded(isExpanded) {
     const navToggle = document.querySelector('[data-nav-toggle]');
     if (!navToggle) return;
@@ -649,49 +339,120 @@ function toggleMobileNav() {
     setMobileNavExpanded(shouldOpen);
 }
 
+/* ─── New shell behavior: bottom tab bar active state + Crowbot FAB sheet ─── */
+function updateTabBarActiveState() {
+    const current = normalizeInternalPath(window.location.pathname);
+    document.querySelectorAll('.tabbar__item[data-route]').forEach((item) => {
+        const route = item.getAttribute('data-route');
+        if (route === current) {
+            item.classList.add('is-active');
+            item.setAttribute('aria-current', 'page');
+        } else {
+            item.classList.remove('is-active');
+            item.removeAttribute('aria-current');
+        }
+    });
+}
+
+const GRADIO_SCRIPT_SRC = 'https://gradio.s3-us-west-2.amazonaws.com/5.49.1/gradio.js';
+const GRADIO_APP_SRC = 'https://lmansf96-portfolio-conversation.hf.space';
+let crowbotInitialized = false;
+
+function lazyMountCrowbot() {
+    if (crowbotInitialized) return;
+    crowbotInitialized = true;
+
+    // 1. Inject the Gradio script if not already loaded.
+    if (!document.querySelector(`script[src="${GRADIO_SCRIPT_SRC}"]`)) {
+        const s = document.createElement('script');
+        s.type = 'module';
+        s.src = GRADIO_SCRIPT_SRC;
+        document.head.appendChild(s);
+    }
+
+    // 2. Mount a <gradio-app> inside the sheet body if not already there.
+    const body = document.querySelector('#crowbot-sheet .crowbot-sheet__body');
+    if (body && !body.querySelector('gradio-app')) {
+        const app = document.createElement('gradio-app');
+        app.setAttribute('src', GRADIO_APP_SRC);
+        body.appendChild(app);
+    }
+}
+
+function openCrowbotSheet() {
+    const sheet = document.getElementById('crowbot-sheet');
+    if (!sheet) return;
+    crowbotPriorFocus = document.activeElement;
+    lazyMountCrowbot();
+    sheet.classList.add('is-open');
+    sheet.setAttribute('aria-hidden', 'false');
+    document.body.classList.add('crowbot-sheet-open');
+    const fab = document.querySelector('[data-crowbot-fab]');
+    if (fab) fab.setAttribute('aria-expanded', 'true');
+    // Move keyboard focus into the sheet for screen-reader users
+    setTimeout(() => {
+        const closeBtn = sheet.querySelector('[data-crowbot-close].crowbot-sheet__close');
+        if (closeBtn) closeBtn.focus();
+    }, 80);
+}
+
+let crowbotPriorFocus = null;
+
+function closeCrowbotSheet() {
+    const sheet = document.getElementById('crowbot-sheet');
+    if (!sheet) return;
+    sheet.classList.remove('is-open');
+    sheet.setAttribute('aria-hidden', 'true');
+    document.body.classList.remove('crowbot-sheet-open');
+    const fab = document.querySelector('[data-crowbot-fab]');
+    if (fab) fab.setAttribute('aria-expanded', 'false');
+    // Restore focus to whatever opened the sheet (typically the FAB)
+    if (crowbotPriorFocus && typeof crowbotPriorFocus.focus === 'function') {
+        crowbotPriorFocus.focus();
+    }
+    crowbotPriorFocus = null;
+}
+
+function toggleCrowbotSheet() {
+    const sheet = document.getElementById('crowbot-sheet');
+    if (!sheet) return;
+    sheet.classList.contains('is-open') ? closeCrowbotSheet() : openCrowbotSheet();
+}
+
 document.addEventListener('DOMContentLoaded', () => {
-    // Check for file protocol
     if (window.location.protocol === 'file:') {
         console.warn('Page transitions require a local server (e.g. Live Server) due to CORS restrictions on file:// protocol.');
     }
 
     const currentPath = window.location.pathname.split('/').pop() || 'index.html';
-    if (currentPath === 'projects.html') {
+    if (currentPath === 'work.html') {
         animateProjectsLoadIn();
     }
 
     const initialTargets = [document.querySelector('main'), document.querySelector('.bg-layer')].filter(Boolean);
-    initialTargets.forEach((element) => {
-        element.classList.add('page-initial-state');
-    });
+    initialTargets.forEach((element) => element.classList.add('page-initial-state'));
     requestAnimationFrame(() => {
         initialTargets.forEach((element) => {
             element.classList.add('page-initial-enter');
             element.classList.remove('page-initial-state');
         });
-
         setTimeout(() => {
-            initialTargets.forEach((element) => {
-                element.classList.remove('page-initial-enter');
-            });
+            initialTargets.forEach((element) => element.classList.remove('page-initial-enter'));
         }, 500);
     });
 
     closeMobileNav();
-    setBlogUnlocked(false);
-    removeLegacyUnlockState();
-    applyBlogUnlockState();
-    setupInteractiveSnake();
     wireShopPrefetchInteractions();
     scheduleShopProductsPrefetch();
+    updateTabBarActiveState();
+    wireUpnextPrefetch();
 
     window.addEventListener('resize', () => {
-        if (window.innerWidth > 900) {
-            closeMobileNav();
-        }
+        if (window.innerWidth > 900) closeMobileNav();
     });
 
     document.body.addEventListener('click', (e) => {
+        // Hamburger (legacy)
         const navToggle = e.target.closest('[data-nav-toggle]');
         if (navToggle) {
             e.preventDefault();
@@ -703,14 +464,30 @@ document.addEventListener('DOMContentLoaded', () => {
             closeMobileNav();
         }
 
-        const disabledBlogLink = getLockedBlogLinkFromEventTarget(e.target);
-        if (disabledBlogLink) {
+        // Crowbot FAB
+        const fab = e.target.closest('[data-crowbot-fab]');
+        if (fab) {
             e.preventDefault();
-            hideBlogHoverPopup();
-            shudderDisabledBlog(disabledBlogLink);
+            toggleCrowbotSheet();
             return;
         }
 
+        // Crowbot sheet close
+        const fabClose = e.target.closest('[data-crowbot-close]');
+        if (fabClose) {
+            e.preventDefault();
+            closeCrowbotSheet();
+            return;
+        }
+
+        // Crowbot sheet backdrop
+        const sheetBackdrop = e.target.closest('.crowbot-sheet__backdrop');
+        if (sheetBackdrop) {
+            closeCrowbotSheet();
+            return;
+        }
+
+        // Project modal triggers
         const modalTrigger = e.target.closest('[data-project-modal-open]');
         if (modalTrigger) {
             e.preventDefault();
@@ -730,31 +507,22 @@ document.addEventListener('DOMContentLoaded', () => {
             return;
         }
 
+        // Internal nav link handling
         const link = e.target.closest('a');
         if (!link) return;
 
         if (isAtsResumeLink(link)) {
             const shouldLeave = window.confirm('You are leaving the portfolio site to open the ATS Resume. Select OK to continue or Cancel to stay on the portfolio.');
-            if (!shouldLeave) {
-                e.preventDefault();
-            }
+            if (!shouldLeave) e.preventDefault();
             closeMobileNav();
             return;
         }
-        
+
         const href = link.getAttribute('href');
-        // Check if internal link
         if (!href) return;
 
         const normalizedHref = normalizeInternalPath(href);
         const currentPath = normalizeInternalPath(window.location.pathname);
-
-        if (currentPath === 'shop.html' && normalizedHref === 'blog.html') {
-            e.preventDefault();
-            hideBlogHoverPopup();
-            shudderDisabledBlog(link);
-            return;
-        }
 
         if (href === '#') {
             e.preventDefault();
@@ -773,7 +541,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         if (normalizedHref === currentPath) {
-            e.preventDefault(); // Do nothing if same page
+            e.preventDefault();
             return;
         }
 
@@ -783,34 +551,14 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
-    document.body.addEventListener('mouseenter', (e) => {
-        const disabledBlogLink = getLockedBlogLinkFromEventTarget(e.target);
-        if (!disabledBlogLink) return;
-        showBlogHoverPopup(e);
-    }, true);
-
-    document.body.addEventListener('mousemove', (e) => {
-        const disabledBlogLink = getLockedBlogLinkFromEventTarget(e.target);
-        if (!disabledBlogLink) return;
-        showBlogHoverPopup(e);
-    }, { passive: true });
-
-    document.body.addEventListener('mouseleave', (e) => {
-        const disabledBlogLink = getLockedBlogLinkFromEventTarget(e.target);
-        if (!disabledBlogLink) return;
-        hideBlogHoverPopup();
-    }, true);
-
     document.addEventListener('keydown', (e) => {
-        if (e.key === 'Escape' && document.body.classList.contains('mobile-nav-open')) {
-            closeMobileNav();
-        }
-
-        if (e.key === 'Escape' && activeProjectModal) {
-            closeProjectModal(activeProjectModal);
+        if (e.key === 'Escape') {
+            if (document.body.classList.contains('mobile-nav-open')) closeMobileNav();
+            if (document.body.classList.contains('crowbot-sheet-open')) closeCrowbotSheet();
+            if (activeProjectModal) closeProjectModal(activeProjectModal);
         }
     });
-    
+
     window.addEventListener('popstate', async () => {
         const path = normalizeInternalPath(window.location.pathname);
         if (isTransitionPage(path)) {

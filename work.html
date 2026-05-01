@@ -1,0 +1,329 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Logan Mansfield · Work</title>
+    <link rel="icon" type="image/jpeg" href="mini.jpg">
+    <link rel="shortcut icon" href="mini.jpg">
+    <link rel="stylesheet" href="assets/tokens.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="assets/style.css">
+    <link rel="stylesheet" href="assets/shell.css">
+    <link rel="stylesheet" href="assets/pages.css">
+    <script>
+        window.va = window.va || function () { (window.vaq = window.vaq || []).push(arguments); };
+    </script>
+    <script defer src="/_vercel/insights/script.js"></script>
+    <!-- shell:migrated v1 -->
+</head>
+<body>
+    <a class="skip-link" href="#main-content">Skip to content</a>
+    <div class="shell-bg" aria-hidden="true"></div>
+
+    <header class="topbar">
+    <div class="topbar__brand">
+        <a href="index.html">
+            <span class="dot" aria-hidden="true"></span>
+            L. MANSFIELD
+        </a>
+    </div>
+    <div class="topbar__page">
+        <span>02</span> / <strong>Work</strong>
+    </div>
+</header>
+
+    <main id="main-content" class="page projects-view page-work">
+
+        <section class="hero" aria-labelledby="work-title">
+            <div class="hero__main">
+                <p class="hero__eyebrow">02 / Work</p>
+                <h1 class="hero__name" id="work-title">Builds<br>that ship.</h1>
+                <p class="hero__role">
+                    Featured below — a Power BI report I built to <em>measure real revenue impact</em>. Then the rest of the catalog: ML, certs, and pipelines.
+                </p>
+            </div>
+        </section>
+
+        <!-- Sticky filter chips -->
+        <nav class="work-filters" aria-label="Filter work by category" data-work-filters>
+            <button class="chip" type="button" data-filter="all" aria-pressed="true">All</button>
+            <button class="chip" type="button" data-filter="powerbi" aria-pressed="false">Power BI</button>
+            <button class="chip" type="button" data-filter="python" aria-pressed="false">Python</button>
+            <button class="chip" type="button" data-filter="ml" aria-pressed="false">ML</button>
+            <button class="chip" type="button" data-filter="sql" aria-pressed="false">SQL</button>
+            <button class="chip" type="button" data-filter="cert" aria-pressed="false">Cert</button>
+        </nav>
+
+        <!-- Featured (cinematic moment) -->
+        <a class="work-featured project-tile" href="#" data-project-modal-open="rfm-project-modal" aria-controls="rfm-project-modal" data-cats="powerbi">
+            <div class="work-featured__media">
+                <img src="assets/Screenshot 2026-02-25 090235.png" alt="Webstore Performance Monitor — Power BI dashboard preview" loading="lazy">
+            </div>
+            <div class="work-featured__body">
+                <span class="work-featured__label">Featured Build</span>
+                <h2 class="work-featured__title">Monitoring Webstore Performance</h2>
+                <p class="work-featured__desc">
+                    A Power BI report tracking the impact of webstore changes via two OKR-driven KPIs — basket size and average order value — to test whether an upsell integration moved the needle on items-per-customer and spend-per-customer.
+                </p>
+                <div class="work-featured__meta">
+                    <span class="work-featured__tag">Power BI</span>
+                    <span class="work-featured__tag">Data Analysis</span>
+                    <span>Focus · analytics with direct business impact</span>
+                    <span class="work-featured__open">Open →</span>
+                </div>
+            </div>
+        </a>
+
+        <!-- Section heading -->
+        <header class="section-head">
+            <h2 class="section-head__title">More work</h2>
+            <span class="section-head__hint" data-work-count></span>
+        </header>
+
+        <!-- Tile grid -->
+        <section class="work-grid" aria-label="Project tiles" data-work-grid>
+            <a class="work-tile" href="https://github.com/lmansf/Fraud-Detection" target="_blank" rel="noopener" data-cats="python ml">
+                <span class="work-tile__arrow">→</span>
+                <span class="work-tile__label">Latest build · ML</span>
+                <h3 class="work-tile__title">Automating Fraud Detection</h3>
+                <p class="work-tile__desc">Class-imbalance rebalancing on transaction data; final prediction accuracy 89.35%. Reactive by design — a real-time velocity-check successor would catch fraud before it lands.</p>
+                <div class="work-tile__meta">
+                    <span class="work-tile__tag">Python</span>
+                    <span class="work-tile__tag">ML</span>
+                    <span class="work-tile__tag">Data Cleaning</span>
+                </div>
+            </a>
+
+            <a class="work-tile" href="https://github.com/lmansf/Churn-Modeling/tree/main" target="_blank" rel="noopener" data-cats="python ml">
+                <span class="work-tile__arrow">→</span>
+                <span class="work-tile__label">Modeling · Ensemble</span>
+                <h3 class="work-tile__title">Modeling Churn</h3>
+                <p class="work-tile__desc">Ensemble learning predicts churn on validation data with 93% accuracy — viable for real-world business cases. Next steps: generalization tests and deployment strategy.</p>
+                <div class="work-tile__meta">
+                    <span class="work-tile__tag">Python</span>
+                    <span class="work-tile__tag">ML</span>
+                </div>
+            </a>
+
+            <a class="work-tile" href="#" data-cats="ml" aria-label="Transfer Learning &amp; Camera Trap Detection (in progress)">
+                <span class="work-tile__arrow">→</span>
+                <span class="work-tile__label">In progress · ML</span>
+                <h3 class="work-tile__title">Camera Trap Detection</h3>
+                <p class="work-tile__desc">Transfer-learning pipeline for wildlife camera-trap imagery. Exploring fine-tuning of pretrained vision models against a small, noisy field dataset.</p>
+                <div class="work-tile__meta">
+                    <span class="work-tile__tag">Transfer Learning</span>
+                    <span class="work-tile__tag">Vision</span>
+                </div>
+            </a>
+
+            <a class="work-tile" href="pipeline.html" data-cats="powerbi sql">
+                <span class="work-tile__arrow">→</span>
+                <span class="work-tile__label">Pipeline · Live</span>
+                <h3 class="work-tile__title">Owl Park · Medallion Pipelines</h3>
+                <p class="work-tile__desc">Exploring medallion architecture with Microsoft Fabric — bronze ingestion from Supabase, silver cleansing, gold dimensional models powering the Owl Park Power BI dashboards.</p>
+                <div class="work-tile__meta">
+                    <span class="work-tile__tag">Fabric</span>
+                    <span class="work-tile__tag">Power BI</span>
+                </div>
+            </a>
+
+            <a class="work-tile work-tile--cert" href="https://achieve.snowflake.com/4d97f4b0-8b75-4396-a270-afdc147ac86a#acc.9YbDuPN7" target="_blank" rel="noopener" data-cats="cert sql">
+                <span class="work-tile__arrow">↗</span>
+                <span class="work-tile__label">Certification</span>
+                <h3 class="work-tile__title">Snowflake Hands-On Essentials</h3>
+                <p class="work-tile__desc">Snowflake Data Warehousing Workshop — strengthening cloud warehouse modeling and SQL workflow patterns.</p>
+                <div class="work-tile__meta">
+                    <span class="work-tile__tag">Snowflake</span>
+                    <span class="work-tile__tag">SQL</span>
+                </div>
+            </a>
+
+            <a class="work-tile work-tile--cert" href="https://learnsql.com/files/course-certificate/lHtronwptbmIgCaeTSZUvUgNrSqKDuhCCxTzXlDt" target="_blank" rel="noopener" data-cats="cert sql">
+                <span class="work-tile__arrow">↗</span>
+                <span class="work-tile__label">Certification</span>
+                <h3 class="work-tile__title">SQL Professional Certificate</h3>
+                <p class="work-tile__desc">LearnSQL.com Professional Certificate of Competency, emphasizing query writing and analytical problem solving.</p>
+                <div class="work-tile__meta">
+                    <span class="work-tile__tag">SQL</span>
+                </div>
+            </a>
+
+            <a class="work-tile work-tile--cert" href="#" data-cats="cert powerbi">
+                <span class="work-tile__arrow">→</span>
+                <span class="work-tile__label">Workshop</span>
+                <h3 class="work-tile__title">Fabric in a Day</h3>
+                <p class="work-tile__desc">Hands-on Microsoft Fabric workshop covering OneLake, lakehouses, warehouses, and Real-Time Intelligence end-to-end.</p>
+                <div class="work-tile__meta">
+                    <span class="work-tile__tag">Fabric</span>
+                </div>
+            </a>
+
+            <a class="work-tile" href="shop.html" data-cats="powerbi">
+                <span class="work-tile__arrow">→</span>
+                <span class="work-tile__label">Site · E-commerce</span>
+                <h3 class="work-tile__title">Pet Services Mock Storefront</h3>
+                <p class="work-tile__desc">Owl Park ticket shop — Supabase-backed checkout with three live agents simulating pricing, restocking, and fair-buying market behavior.</p>
+                <div class="work-tile__meta">
+                    <span class="work-tile__tag">Supabase</span>
+                    <span class="work-tile__tag">Power BI</span>
+                </div>
+            </a>
+        </section>
+
+        <!-- Up next rail -->
+        <section class="upnext" aria-labelledby="work-upnext">
+            <header class="section-head">
+                <h2 class="section-head__title" id="work-upnext">Up next</h2>
+                <span class="section-head__hint">Swipe →</span>
+            </header>
+            <div class="upnext__rail">
+                <a class="upnext__card" href="pipeline.html">
+                    <span class="upnext__num">03 / Pipeline</span>
+                    <span class="upnext__name">Owl Park · Live Architecture</span>
+                    <span class="upnext__tease">From four n8n agents to Power BI — a real-time event pipeline through Supabase and Fabric.</span>
+                    <span class="upnext__arrow">Open →</span>
+                </a>
+                <a class="upnext__card" href="shop.html">
+                    <span class="upnext__num">04 / Shop</span>
+                    <span class="upnext__name">Mock Shop · Live Agents</span>
+                    <span class="upnext__tease">Pricing, restocking, and fair-buying agents responding to your purchases in real time.</span>
+                    <span class="upnext__arrow">Open →</span>
+                </a>
+                <a class="upnext__card" href="resume.html">
+                    <span class="upnext__num">05 / Resume</span>
+                    <span class="upnext__name">Resume + ATS</span>
+                    <span class="upnext__tease">PDF preview, downloadable copy, and an ATS-friendly plain-text version.</span>
+                    <span class="upnext__arrow">Open →</span>
+                </a>
+            </div>
+        </section>
+
+    </main>
+
+    <div class="project-modal-overlay" id="rfm-project-modal" aria-hidden="true">
+        <div class="project-modal" role="dialog" aria-modal="true" aria-labelledby="rfm-project-modal-title">
+            <button class="project-modal-close" type="button" data-project-modal-close aria-label="Close modal">×</button>
+            <div class="panel-label">Featured Build</div>
+            <h2 id="rfm-project-modal-title">Monitoring Webstore Performance</h2>
+            <p>The screenshot below contains an example of what the report looks like. Note that the data is substituted with sample data for demonstration purposes.</p>
+            <div class="project-modal-media" aria-label="Project placeholder image area">
+                <img
+                    class="project-modal-image"
+                    src="assets/Screenshot 2026-02-25 090235.png"
+                    alt="Placeholder preview image"
+                >
+            </div>
+            <div class="panel-meta">
+                <span class="project-tag">Power BI / Data Analysis</span>
+                <span>Focus: analytics with direct business impact</span>
+            </div>
+        </div>
+    </div>
+
+    <footer class="shell-footer">
+    <div class="ticker" aria-hidden="true">
+        <div class="ticker__track">
+            <span class="ticker__item"><span class="dot">●</span><strong>Power BI</strong></span>
+            <span class="ticker__item"><span class="dot">●</span><strong>Python</strong></span>
+            <span class="ticker__item"><span class="dot">●</span><strong>SQL</strong></span>
+            <span class="ticker__item"><span class="dot">●</span><strong>Microsoft Fabric</strong></span>
+            <span class="ticker__item"><span class="dot">●</span><strong>Snowflake</strong></span>
+            <span class="ticker__item"><span class="dot">●</span><strong>Machine Learning</strong></span>
+            <span class="ticker__item"><span class="dot">●</span><strong>Excel</strong></span>
+            <span class="ticker__item"><span class="dot">●</span><strong>Power BI</strong></span>
+            <span class="ticker__item"><span class="dot">●</span><strong>Python</strong></span>
+            <span class="ticker__item"><span class="dot">●</span><strong>SQL</strong></span>
+            <span class="ticker__item"><span class="dot">●</span><strong>Microsoft Fabric</strong></span>
+            <span class="ticker__item"><span class="dot">●</span><strong>Snowflake</strong></span>
+            <span class="ticker__item"><span class="dot">●</span><strong>Machine Learning</strong></span>
+            <span class="ticker__item"><span class="dot">●</span><strong>Excel</strong></span>
+        </div>
+    </div>
+    <div class="footer-socials">
+        <a href="https://x.com/StatBird" target="_blank" rel="noopener">Twitter</a>
+        <a href="https://github.com/lmansf" target="_blank" rel="noopener">Github</a>
+        <a href="https://www.linkedin.com/in/lmansf96/" target="_blank" rel="noopener">LinkedIn</a>
+        <a href="feedback.html">Feedback</a>
+    </div>
+</footer>
+
+        <nav class="tabbar" aria-label="Primary">
+    <a class="tabbar__item" data-route="index.html" href="index.html">
+        <svg class="tabbar__icon" viewBox="0 0 24 24"><path d="M3 11.5L12 4l9 7.5V20a1 1 0 01-1 1h-5v-6h-6v6H4a1 1 0 01-1-1v-8.5z"/></svg>
+        <span>Home</span>
+    </a>
+    <a class="tabbar__item" data-route="work.html" href="work.html">
+        <svg class="tabbar__icon" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M3 9h18"/><path d="M8 4v5"/></svg>
+        <span>Work</span>
+    </a>
+    <a class="tabbar__item" data-route="pipeline.html" href="pipeline.html">
+        <svg class="tabbar__icon" viewBox="0 0 24 24"><circle cx="6" cy="6" r="2"/><circle cx="18" cy="6" r="2"/><circle cx="6" cy="18" r="2"/><circle cx="18" cy="18" r="2"/><path d="M8 6h8M6 8v8M18 8v8M8 18h8"/></svg>
+        <span>Pipeline</span>
+    </a>
+    <a class="tabbar__item" data-route="shop.html" href="shop.html">
+        <svg class="tabbar__icon" viewBox="0 0 24 24"><path d="M3 6h2l2 11h11l2-8H7"/><circle cx="9" cy="20" r="1.4"/><circle cx="17" cy="20" r="1.4"/></svg>
+        <span>Shop</span>
+    </a>
+    <a class="tabbar__item" data-route="resume.html" href="resume.html">
+        <svg class="tabbar__icon" viewBox="0 0 24 24"><path d="M7 3h7l4 4v14a1 1 0 01-1 1H7a1 1 0 01-1-1V4a1 1 0 011-1z"/><path d="M14 3v4h4"/><path d="M9 13h6M9 17h4"/></svg>
+        <span>Resume</span>
+    </a>
+</nav>
+
+    <button class="crowbot-fab" type="button" data-crowbot-fab aria-label="Open Crowbot AI assistant" aria-controls="crowbot-sheet" aria-expanded="false" title="Chat with Crowbot">
+    🐦‍⬛
+</button>
+
+<aside class="crowbot-sheet" id="crowbot-sheet" aria-hidden="true" role="dialog" aria-labelledby="crowbot-sheet-title">
+    <div class="crowbot-sheet__backdrop" data-crowbot-close></div>
+    <div class="crowbot-sheet__panel">
+        <div class="crowbot-sheet__head">
+            <div>
+                <h2 id="crowbot-sheet-title">Crowbot 🐦‍⬛</h2>
+                <p>Ask Crowbot about my resume, projects, or hobbies. Drop your email and he&rsquo;ll bring it to me.</p>
+            </div>
+            <button class="crowbot-sheet__close" type="button" data-crowbot-close aria-label="Close Crowbot">×</button>
+        </div>
+        <div class="crowbot-sheet__body">
+            </div>
+    </div>
+</aside>
+
+    <script defer src="assets/transition.js"></script>
+    <script>
+    /* Work page: filter chips */
+    (function () {
+        const filters = document.querySelector('[data-work-filters]');
+        const grid = document.querySelector('[data-work-grid]');
+        const counter = document.querySelector('[data-work-count]');
+        if (!filters || !grid) return;
+        const tiles = Array.from(grid.querySelectorAll('.work-tile'));
+
+        function apply(filter) {
+            let visible = 0;
+            tiles.forEach((tile) => {
+                const cats = (tile.getAttribute('data-cats') || '').split(/\s+/);
+                const show = filter === 'all' || cats.includes(filter);
+                tile.hidden = !show;
+                if (show) visible++;
+            });
+            if (counter) counter.textContent = `${visible} shown`;
+            filters.querySelectorAll('.chip').forEach((c) => {
+                c.setAttribute('aria-pressed', c.getAttribute('data-filter') === filter ? 'true' : 'false');
+            });
+        }
+
+        filters.addEventListener('click', (e) => {
+            const chip = e.target.closest('.chip');
+            if (!chip) return;
+            apply(chip.getAttribute('data-filter') || 'all');
+        });
+
+        apply('all');
+    })();
+    </script>
+</body>
+</html>
