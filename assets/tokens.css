@@ -1,0 +1,71 @@
+/* ─────────────────────────────────────────────────────────────
+ * tokens.css — design tokens for the 2026 portfolio overhaul.
+ *
+ * v2 palette: warm "relaxed + energized" — cream paper surfaces,
+ * deep coffee ink, sunset coral as the energized primary accent,
+ * honey amber as the warm relaxed counterpoint, sage for success.
+ *
+ * Source of truth: REDESIGN_PLAN.md §2.1 (palette refreshed Phase 7).
+ * Every page imports this BEFORE any other stylesheet.
+ * ────────────────────────────────────────────────────────────── */
+
+:root {
+    /* ── Surfaces (relaxed) ── */
+    --bg:               #faf3e7;     /* warm cream paper */
+    --surface-1:        #fffbf3;     /* high-key warm white card */
+    --surface-2:        #f3e8d0;     /* sandy paper, deeper */
+    --surface-3:        #e7d4ad;     /* warm toast, hover state */
+
+    /* ── Ink (high contrast on cream) ── */
+    --ink-1:            #2c1f17;     /* deep coffee — primary text */
+    --ink-2:            #6e5947;     /* warm muted brown — secondary */
+    --ink-3:            #8a7456;     /* warm sand — tertiary / disabled */
+
+    /* ── Accents (energized) ── */
+    --accent:           #e85d2f;     /* sunset coral — primary accent */
+    --accent-2:         #e8a93a;     /* honey amber — relaxed counterpoint */
+    --accent-glow:      rgba(232, 93, 47, 0.18);
+    --success:          #5a8f5e;     /* warm sage */
+    --danger:           #c53d3d;     /* warm crimson */
+
+    /* ── Lines ── */
+    --hairline:         rgba(44, 31, 23, 0.10);
+    --hairline-strong:  rgba(44, 31, 23, 0.20);
+    --focus-ring:       #e85d2f;
+
+    /* ── Type ── */
+    --font-display: "Inter", system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+    --font-text:    "Inter", system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+    --font-mono:    "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
+
+    /* ── Radii ── */
+    --r-sm:  6px;
+    --r-md:  10px;
+    --r-lg:  16px;
+    --r-xl:  24px;
+
+    /* ── Motion ── */
+    --ease-out:    cubic-bezier(0.16, 1, 0.3, 1);
+    --ease-in-out: cubic-bezier(0.65, 0, 0.35, 1);
+    --dur-fast:    140ms;
+    --dur-base:    260ms;
+    --dur-slow:    520ms;
+
+    /* ── Layout ── */
+    --tab-bar-h:   64px;
+    --top-bar-h:   56px;
+    --gutter:      clamp(1rem, 4vw, 1.5rem);
+    --max-w:       1100px;
+
+    /* ── Legacy aliases ──
+     * Keep old token names mapped to new values during transition.
+     * Once all pages are fully redesigned, these aliases can be removed.
+     */
+    --bg-color:        var(--bg);
+    --text-color:      var(--ink-1);
+    --accent-color:    var(--accent);
+    --secondary-text:  var(--ink-2);
+    --card-bg:         var(--surface-1);
+    --card-border:     var(--hairline-strong);
+    --font-main:       var(--font-text);
+}

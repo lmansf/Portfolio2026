@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Logan Mansfield · Pipeline</title>
+    <link rel="icon" type="image/jpeg" href="mini.jpg">
+    <link rel="shortcut icon" href="mini.jpg">
+    <link rel="stylesheet" href="assets/tokens.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="assets/style.css">
+    <link rel="stylesheet" href="assets/shell.css">
+    <link rel="stylesheet" href="assets/pages.css">
+    <script>
+        window.va = window.va || function () { (window.vaq = window.vaq || []).push(arguments); };
+    </script>
+    <script defer src="/_vercel/insights/script.js"></script>
+    
+    <!-- shell:migrated v1 -->
+</head>
+<body>
+    <a class="skip-link" href="#main-content">Skip to content</a>
+    <div class="shell-bg" aria-hidden="true"></div>
+
+    <header class="topbar">
+    <div class="topbar__brand">
+        <a href="index.html">
+            <span class="dot" aria-hidden="true"></span>
+            L. MANSFIELD
+        </a>
+    </div>
+    <div class="topbar__page">
+        <span>03</span> / <strong>Pipeline</strong>
+    </div>
+</header>
+
+    <main id="main-content" class="page page-pipeline">
+
+        <section class="hero" aria-labelledby="pipeline-title">
+            <div class="hero__main">
+                <p class="hero__eyebrow">03 / Pipeline</p>
+                <h1 class="hero__name" id="pipeline-title">Owl Park.<br>Live data.</h1>
+                <p class="hero__role">
+                    Four n8n agents feed Supabase, Fabric models the data, and Power BI <em>turns events into decisions</em> — in real time.
+                </p>
+            </div>
+        </section>
+
+        <!-- Cinematic moment: scroll-driven pipeline diagram -->
+        <section class="pipeline-diagram" data-pipeline aria-labelledby="pipeline-flow-title">
+            <div class="pipeline-diagram__head">
+                <h2 id="pipeline-flow-title">Pipeline flow</h2>
+                <span class="meta">Ingest · Store · Transform · Analyze</span>
+            </div>
+            <div class="pipeline-flow">
+                <article class="phase" data-phase="1">
+                    <span class="phase__num">01 / Ingest</span>
+                    <h3 class="phase__title">n8n agents</h3>
+                    <p class="phase__desc">Four workflows handle dynamic pricing, consumer purchases, restocking, and sellout logging. Live store activity directly influences agent behavior.</p>
+                    <div class="phase__stack">
+                        <span class="phase__chip">n8n</span>
+                        <span class="phase__chip">Webhooks</span>
+                    </div>
+                    <span class="phase__connector" aria-hidden="true"></span>
+                </article>
+                <article class="phase" data-phase="2">
+                    <span class="phase__num">02 / Store</span>
+                    <h3 class="phase__title">Supabase source</h3>
+                    <p class="phase__desc">Captures transactions, weather impact, events, products, visit dates, and warehouse activity as the raw source-of-truth layer.</p>
+                    <div class="phase__stack">
+                        <span class="phase__chip">Supabase</span>
+                        <span class="phase__chip">Postgres</span>
+                    </div>
+                    <span class="phase__connector" aria-hidden="true"></span>
+                </article>
+                <article class="phase" data-phase="3">
+                    <span class="phase__num">03 / Transform</span>
+                    <h3 class="phase__title">Fabric medallion</h3>
+                    <p class="phase__desc">Fabric pulls on a real-time schedule, shapes data into dimensional and fact models, then writes to Warehouse (live) and Lake (daily backup).</p>
+                    <div class="phase__stack">
+                        <span class="phase__chip">Fabric</span>
+                        <span class="phase__chip">Lake / Warehouse</span>
+                    </div>
+                    <span class="phase__connector" aria-hidden="true"></span>
+                </article>
+                <article class="phase" data-phase="4">
+                    <span class="phase__num">04 / Analyze</span>
+                    <h3 class="phase__title">Power BI + AI</h3>
+                    <p class="phase__desc">Power BI dashboards drive schedule optimization. Claude + PBI MCP suggest pricing-agent tunings inside critic-enforced fairness boundaries.</p>
+                    <div class="phase__stack">
+                        <span class="phase__chip">Power BI</span>
+                        <span class="phase__chip">Claude</span>
+                        <span class="phase__chip">MCP</span>
+                    </div>
+                </article>
+            </div>
+        </section>
+
+        <!-- Link to the full infographic (kept as a real artifact) -->
+        <div class="pipeline-fullsize">
+            <p>Want the deep-dive? The full architecture infographic has every box and arrow.</p>
+            <a href="owl-park-infographic.html" target="_blank" rel="noopener noreferrer">Open full infographic ↗</a>
+        </div>
+
+        <!-- Phase detail cards -->
+        <section aria-labelledby="phase-detail">
+            <header class="section-head">
+                <h2 class="section-head__title" id="phase-detail">Notes per phase</h2>
+                <span class="section-head__hint">Why these choices</span>
+            </header>
+            <div class="phase-grid" style="margin-top: 1rem;">
+                <article class="phase-card">
+                    <h3>Why n8n for ingest?</h3>
+                    <p>n8n made it cheap to run four agents in parallel without orchestration overhead — webhooks in, webhooks out, every workflow self-contained.</p>
+                </article>
+                <article class="phase-card">
+                    <h3>Why Supabase as source?</h3>
+                    <p>Postgres-native means real SQL for downstream consumers. Free tier covers the demo; row-level security keeps it safe to show off.</p>
+                </article>
+                <article class="phase-card">
+                    <h3>Why Fabric for modeling?</h3>
+                    <p>OneLake + Warehouse gives a live serving layer (sub-minute) AND a Lake backup (daily) without copying data twice — Fabric handles the duplication semantically.</p>
+                </article>
+                <article class="phase-card">
+                    <h3>Why Claude + PBI MCP?</h3>
+                    <p>The MCP server lets Claude propose model tweaks against the Power BI semantic layer. A critic loop checks for fairness before any pricing-agent change ships.</p>
+                </article>
+            </div>
+        </section>
+
+        <!-- Up next rail -->
+        <section class="upnext" aria-labelledby="pipeline-upnext">
+            <header class="section-head">
+                <h2 class="section-head__title" id="pipeline-upnext">Up next</h2>
+                <span class="section-head__hint">Swipe →</span>
+            </header>
+            <div class="upnext__rail">
+                <a class="upnext__card" href="shop.html">
+                    <span class="upnext__num">04 / Shop</span>
+                    <span class="upnext__name">See the agents in action</span>
+                    <span class="upnext__tease">Watch pricing, restocking, and fair-buying agents respond to live purchases.</span>
+                    <span class="upnext__arrow">Open →</span>
+                </a>
+                <a class="upnext__card" href="resume.html">
+                    <span class="upnext__num">05 / Resume</span>
+                    <span class="upnext__name">Resume + ATS</span>
+                    <span class="upnext__tease">PDF, downloadable, plus an ATS plain-text version.</span>
+                    <span class="upnext__arrow">Open →</span>
+                </a>
+                <a class="upnext__card" href="work.html">
+                    <span class="upnext__num">02 / Work</span>
+                    <span class="upnext__name">Back to the catalog</span>
+                    <span class="upnext__tease">Featured Power BI build, fraud detection, churn modeling, and certs.</span>
+                    <span class="upnext__arrow">Open →</span>
+                </a>
+            </div>
+        </section>
+
+    </main>
+
+    <footer class="shell-footer">
+    <div class="ticker" aria-hidden="true">
+        <div class="ticker__track">
+            <span class="ticker__item"><span class="dot">●</span><strong>Power BI</strong></span>
+            <span class="ticker__item"><span class="dot">●</span><strong>Python</strong></span>
+            <span class="ticker__item"><span class="dot">●</span><strong>SQL</strong></span>
+            <span class="ticker__item"><span class="dot">●</span><strong>Microsoft Fabric</strong></span>
+            <span class="ticker__item"><span class="dot">●</span><strong>Snowflake</strong></span>
+            <span class="ticker__item"><span class="dot">●</span><strong>Machine Learning</strong></span>
+            <span class="ticker__item"><span class="dot">●</span><strong>Excel</strong></span>
+            <span class="ticker__item"><span class="dot">●</span><strong>Power BI</strong></span>
+            <span class="ticker__item"><span class="dot">●</span><strong>Python</strong></span>
+            <span class="ticker__item"><span class="dot">●</span><strong>SQL</strong></span>
+            <span class="ticker__item"><span class="dot">●</span><strong>Microsoft Fabric</strong></span>
+            <span class="ticker__item"><span class="dot">●</span><strong>Snowflake</strong></span>
+            <span class="ticker__item"><span class="dot">●</span><strong>Machine Learning</strong></span>
+            <span class="ticker__item"><span class="dot">●</span><strong>Excel</strong></span>
+        </div>
+    </div>
+    <div class="footer-socials">
+        <a href="https://x.com/StatBird" target="_blank" rel="noopener">Twitter</a>
+        <a href="https://github.com/lmansf" target="_blank" rel="noopener">Github</a>
+        <a href="https://www.linkedin.com/in/lmansf96/" target="_blank" rel="noopener">LinkedIn</a>
+        <a href="feedback.html">Feedback</a>
+    </div>
+</footer>
+
+        <nav class="tabbar" aria-label="Primary">
+    <a class="tabbar__item" data-route="index.html" href="index.html">
+        <svg class="tabbar__icon" viewBox="0 0 24 24"><path d="M3 11.5L12 4l9 7.5V20a1 1 0 01-1 1h-5v-6h-6v6H4a1 1 0 01-1-1v-8.5z"/></svg>
+        <span>Home</span>
+    </a>
+    <a class="tabbar__item" data-route="work.html" href="work.html">
+        <svg class="tabbar__icon" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M3 9h18"/><path d="M8 4v5"/></svg>
+        <span>Work</span>
+    </a>
+    <a class="tabbar__item" data-route="pipeline.html" href="pipeline.html">
+        <svg class="tabbar__icon" viewBox="0 0 24 24"><circle cx="6" cy="6" r="2"/><circle cx="18" cy="6" r="2"/><circle cx="6" cy="18" r="2"/><circle cx="18" cy="18" r="2"/><path d="M8 6h8M6 8v8M18 8v8M8 18h8"/></svg>
+        <span>Pipeline</span>
+    </a>
+    <a class="tabbar__item" data-route="shop.html" href="shop.html">
+        <svg class="tabbar__icon" viewBox="0 0 24 24"><path d="M3 6h2l2 11h11l2-8H7"/><circle cx="9" cy="20" r="1.4"/><circle cx="17" cy="20" r="1.4"/></svg>
+        <span>Shop</span>
+    </a>
+    <a class="tabbar__item" data-route="resume.html" href="resume.html">
+        <svg class="tabbar__icon" viewBox="0 0 24 24"><path d="M7 3h7l4 4v14a1 1 0 01-1 1H7a1 1 0 01-1-1V4a1 1 0 011-1z"/><path d="M14 3v4h4"/><path d="M9 13h6M9 17h4"/></svg>
+        <span>Resume</span>
+    </a>
+</nav>
+
+    <button class="crowbot-fab" type="button" data-crowbot-fab aria-label="Open Crowbot AI assistant" aria-controls="crowbot-sheet" aria-expanded="false" title="Chat with Crowbot">
+    🐦‍⬛
+</button>
+
+<aside class="crowbot-sheet" id="crowbot-sheet" aria-hidden="true" role="dialog" aria-labelledby="crowbot-sheet-title">
+    <div class="crowbot-sheet__backdrop" data-crowbot-close></div>
+    <div class="crowbot-sheet__panel">
+        <div class="crowbot-sheet__head">
+            <div>
+                <h2 id="crowbot-sheet-title">Crowbot 🐦‍⬛</h2>
+                <p>Ask Crowbot about my resume, projects, or hobbies. Drop your email and he&rsquo;ll bring it to me.</p>
+            </div>
+            <button class="crowbot-sheet__close" type="button" data-crowbot-close aria-label="Close Crowbot">×</button>
+        </div>
+        <div class="crowbot-sheet__body">
+            </div>
+    </div>
+</aside>
+
+    <script defer src="assets/pipeline-scroll.js"></script>
+    <script defer src="assets/transition.js"></script>
+</body>
+</html>

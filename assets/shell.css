@@ -1,0 +1,504 @@
+/* ─────────────────────────────────────────────────────────────
+ * shell.css — 2026 chrome: top app bar, bottom tab bar, ticker, Crowbot FAB.
+ *
+ * Loaded AFTER index.css / style.css so it overrides legacy header/footer
+ * styling. Page-specific content is unaffected — Phase 4 redesigns those.
+ *
+ * Mobile-first. Bottom tab bar is the primary nav < 768px; on ≥ 768px it
+ * morphs into a floating top-right pill.
+ * ───────────────────────────────────────────────────────────── */
+
+/* ─── ambient gradient mesh: replaces the heavy crosshatch ─── */
+body {
+    background: var(--bg) !important;
+    color: var(--ink-1) !important;
+    font-family: var(--font-text) !important;
+    /* stop the legacy `overflow: hidden` from style.css that broke scrolling */
+    overflow-x: hidden !important;
+    overflow-y: auto !important;
+    height: auto !important;
+    min-height: 100vh;
+    padding-bottom: calc(var(--tab-bar-h) + env(safe-area-inset-bottom, 0px));
+}
+
+body::before,
+body::after {
+    /* neutralize the legacy crosshatch overlays */
+    background: none !important;
+    opacity: 0 !important;
+}
+
+body {
+    position: relative;
+}
+
+/* New ambient mesh painted on a single fixed pseudo-layer */
+body > .shell-bg {
+    position: fixed;
+    inset: 0;
+    z-index: -1;
+    pointer-events: none;
+    background:
+        radial-gradient(1200px 600px at 80% -10%, rgba(232, 93, 47, 0.08), transparent 60%),
+        radial-gradient(900px 500px at -10% 110%, rgba(232, 169, 58, 0.05), transparent 60%);
+    animation: shell-drift 24s ease-in-out infinite alternate;
+}
+@keyframes shell-drift {
+    from { transform: translate3d(0, 0, 0); }
+    to   { transform: translate3d(-2%, 1%, 0); }
+}
+@media (prefers-reduced-motion: reduce) {
+    body > .shell-bg { animation: none; }
+}
+
+/* ─────────────────────────────────────────────────────────────
+ * Top app bar
+ * ───────────────────────────────────────────────────────────── */
+header.topbar {
+    position: sticky;
+    top: 0;
+    z-index: 50;
+    height: var(--top-bar-h);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 var(--gutter) !important;
+    background: color-mix(in srgb, var(--bg) 88%, transparent);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border-bottom: 1px solid var(--hairline);
+    font-size: 0.9rem;
+}
+header.topbar .topbar__brand {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    font-size: 0.78rem;
+    color: var(--ink-1);
+}
+header.topbar .topbar__brand a {
+    color: inherit;
+    text-decoration: none;
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+}
+header.topbar .topbar__brand .dot {
+    width: 8px; height: 8px; border-radius: 50%;
+    background: var(--accent);
+    box-shadow: 0 0 0 4px var(--accent-glow);
+}
+header.topbar .topbar__page {
+    font-family: var(--font-mono);
+    font-size: 0.72rem;
+    color: var(--ink-2);
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+}
+header.topbar .topbar__page strong { color: var(--ink-1); font-weight: 500; }
+
+/* legacy hamburger toggle is hidden — bottom tab bar replaces it */
+header.topbar [data-nav-toggle],
+header.topbar .nav-toggle,
+header.topbar .nav-links {
+    display: none !important;
+}
+
+/* ─────────────────────────────────────────────────────────────
+ * Bottom tab bar (mobile-first primary nav)
+ * ───────────────────────────────────────────────────────────── */
+.tabbar {
+    position: fixed;
+    bottom: 0; left: 0; right: 0;
+    z-index: 100;
+    height: calc(var(--tab-bar-h) + env(safe-area-inset-bottom, 0px));
+    padding-bottom: env(safe-area-inset-bottom, 0px);
+    background: color-mix(in srgb, var(--bg) 92%, transparent);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border-top: 1px solid var(--hairline-strong);
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+}
+.tabbar__item {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 0.2rem;
+    padding: 0.4rem 0.2rem;
+    color: var(--ink-3);
+    text-decoration: none;
+    font-size: 0.66rem;
+    letter-spacing: 0.04em;
+    transition: color var(--dur-fast) var(--ease-out);
+    min-height: 44px;
+    position: relative;
+    background: none;
+    border: none;
+    cursor: pointer;
+}
+.tabbar__item:hover { color: var(--ink-2); }
+.tabbar__item.is-active { color: var(--accent); }
+.tabbar__item.is-active .tabbar__icon { color: var(--accent); }
+.tabbar__icon {
+    width: 22px; height: 22px;
+    color: var(--ink-2);
+    stroke: currentColor;
+    fill: none;
+    stroke-width: 1.6;
+}
+.tabbar__item.is-active .tabbar__icon { color: var(--accent); }
+.tabbar__item.is-active::before {
+    content: "";
+    position: absolute;
+    top: 0; left: 50%;
+    transform: translateX(-50%);
+    width: 26px; height: 2px;
+    background: var(--accent);
+    border-radius: 2px;
+    box-shadow: 0 0 12px var(--accent-glow);
+}
+
+/* ─────────────────────────────────────────────────────────────
+ * Refined ticker (replaces the marquee)
+ * ───────────────────────────────────────────────────────────── */
+footer.shell-footer {
+    background: none !important;
+    border-top: 1px solid var(--hairline);
+    padding: 1rem var(--gutter) 1.25rem;
+    margin-top: 3rem;
+    display: grid;
+    gap: 1rem;
+    position: relative;
+    z-index: 1;
+}
+footer.shell-footer .ticker {
+    overflow: hidden;
+}
+footer.shell-footer .ticker__track {
+    display: flex;
+    gap: 2.5rem;
+    font-family: var(--font-mono);
+    font-size: 0.76rem;
+    color: var(--ink-2);
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    white-space: nowrap;
+    animation: shell-ticker 40s linear infinite;
+    width: max-content;
+}
+@keyframes shell-ticker {
+    from { transform: translateX(0); }
+    to   { transform: translateX(-50%); }
+}
+@media (prefers-reduced-motion: reduce) {
+    footer.shell-footer .ticker__track { animation: none; }
+}
+footer.shell-footer .ticker__item .dot {
+    color: var(--accent);
+    margin-right: 0.6rem;
+}
+footer.shell-footer .ticker__item strong {
+    color: var(--ink-1);
+    font-weight: 500;
+}
+footer.shell-footer .footer-socials {
+    display: flex;
+    gap: 1.5rem;
+    flex-wrap: wrap;
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+    letter-spacing: 0.08em;
+}
+footer.shell-footer .footer-socials a {
+    color: var(--ink-2);
+    text-decoration: none;
+    border-bottom: 1px solid transparent;
+    transition: color var(--dur-fast) var(--ease-out), border-color var(--dur-fast) var(--ease-out);
+}
+footer.shell-footer .footer-socials a:hover {
+    color: var(--accent);
+    border-bottom-color: var(--accent);
+}
+
+/* ─────────────────────────────────────────────────────────────
+ * Crowbot FAB + bottom sheet (site-wide)
+ * ───────────────────────────────────────────────────────────── */
+.crowbot-fab {
+    position: fixed;
+    left: var(--gutter);
+    bottom: calc(var(--tab-bar-h) + env(safe-area-inset-bottom, 0px) + 12px);
+    z-index: 90;
+    width: 56px; height: 56px;
+    border-radius: 50%;
+    border: 1px solid var(--hairline-strong);
+    background: var(--surface-1);
+    color: var(--accent);
+    font-size: 1.4rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.4), 0 0 0 4px var(--accent-glow);
+    transition: transform var(--dur-base) var(--ease-out);
+}
+.crowbot-fab:hover { transform: translateY(-2px) scale(1.04); }
+.crowbot-fab[aria-expanded="true"] {
+    background: var(--accent);
+    color: var(--ink-1);
+}
+
+.crowbot-sheet {
+    position: fixed;
+    inset: 0;
+    z-index: 200;
+    display: none;
+}
+.crowbot-sheet.is-open { display: block; }
+.crowbot-sheet__backdrop {
+    position: absolute;
+    inset: 0;
+    background: rgba(44, 31, 23, 0.55);
+    backdrop-filter: blur(4px);
+    -webkit-backdrop-filter: blur(4px);
+    animation: sheet-fade var(--dur-base) var(--ease-out);
+}
+.crowbot-sheet__panel {
+    position: absolute;
+    left: 0; right: 0; bottom: 0;
+    max-height: 88vh;
+    background: var(--surface-1);
+    border-top: 1px solid var(--hairline-strong);
+    border-radius: var(--r-xl) var(--r-xl) 0 0;
+    padding: 1rem;
+    padding-bottom: calc(1rem + env(safe-area-inset-bottom, 0px));
+    overflow-y: auto;
+    animation: sheet-up var(--dur-slow) var(--ease-out);
+    box-shadow: 0 -20px 60px rgba(0,0,0,0.5);
+}
+@keyframes sheet-up {
+    from { transform: translateY(100%); }
+    to   { transform: translateY(0); }
+}
+@keyframes sheet-fade {
+    from { opacity: 0; }
+    to   { opacity: 1; }
+}
+@media (prefers-reduced-motion: reduce) {
+    .crowbot-sheet__panel { animation: none; }
+    .crowbot-sheet__backdrop { animation: none; }
+}
+.crowbot-sheet__head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 0.75rem;
+}
+.crowbot-sheet__head h2 {
+    font-family: var(--font-display);
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: var(--ink-1);
+}
+.crowbot-sheet__head p {
+    font-size: 0.85rem;
+    color: var(--ink-2);
+    max-width: 56ch;
+    margin-top: 0.3rem;
+}
+.crowbot-sheet__close {
+    width: 36px; height: 36px;
+    border-radius: 50%;
+    border: 1px solid var(--hairline-strong);
+    background: var(--surface-2);
+    color: var(--ink-2);
+    cursor: pointer;
+    font-size: 1.1rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+.crowbot-sheet__close:hover { color: var(--ink-1); }
+.crowbot-sheet__body {
+    background: var(--surface-2);
+    border: 1px solid var(--hairline);
+    border-radius: var(--r-md);
+    min-height: 360px;
+    display: flex;
+    flex-direction: column;
+}
+.crowbot-sheet__body gradio-app {
+    flex: 1;
+    width: 100%;
+}
+
+/* ─────────────────────────────────────────────────────────────
+ * Desktop progressive enhancement
+ * ───────────────────────────────────────────────────────────── */
+@media (min-width: 768px) {
+    body { padding-bottom: 0; }
+
+    /* Bottom tab bar morphs into a floating top-right pill */
+    .tabbar {
+        position: fixed;
+        top: 12px;
+        bottom: auto;
+        left: auto;
+        right: var(--gutter);
+        height: auto;
+        padding: 0.4rem;
+        gap: 0.2rem;
+        background: color-mix(in srgb, var(--surface-1) 80%, transparent);
+        border: 1px solid var(--hairline-strong);
+        border-top: 1px solid var(--hairline-strong);
+        border-radius: 999px;
+        box-shadow: 0 8px 30px rgba(0, 0, 0, 0.35);
+        backdrop-filter: blur(16px);
+        -webkit-backdrop-filter: blur(16px);
+        width: max-content;
+    }
+    header.topbar { padding-right: clamp(360px, 40vw, 480px) !important; }
+    .tabbar__item {
+        flex: 0 0 auto;
+        flex-direction: row;
+        font-size: 0.82rem;
+        gap: 0.45rem;
+        padding: 0.5rem 0.9rem;
+        min-height: 0;
+        border-radius: 999px;
+    }
+    .tabbar__item .tabbar__icon { width: 16px; height: 16px; }
+    .tabbar__item.is-active {
+        background: var(--accent-glow);
+        color: var(--accent);
+    }
+    .tabbar__item.is-active::before { display: none; }
+
+    /* Crowbot FAB stays bottom-left on desktop too — no tab bar in the way */
+    .crowbot-fab { bottom: 24px; }
+}
+
+/* ─────────────────────────────────────────────────────────────
+ * Focus ring (global)
+ * ───────────────────────────────────────────────────────────── */
+a:focus-visible,
+button:focus-visible,
+.tabbar__item:focus-visible {
+    outline: 2px solid var(--focus-ring);
+    outline-offset: 3px;
+    border-radius: var(--r-sm);
+}
+
+/* ─────────────────────────────────────────────────────────────
+ * View Transitions API — shared element morphs across navigations.
+ * Browsers without support fall back to the legacy fade in transition.js.
+ * ───────────────────────────────────────────────────────────── */
+
+@supports (view-transition-name: a) {
+    /* Name the persistent shell elements so the browser tracks them across pages.
+     * The brand and tab bar are visually identical between pages — this makes them
+     * stay perfectly still while the rest of the page cross-fades. */
+    header.topbar .topbar__brand { view-transition-name: nav-brand; }
+    .topbar__page                { view-transition-name: nav-page; }
+    .tabbar                      { view-transition-name: nav-tabbar; }
+    .crowbot-fab                 { view-transition-name: fab-crowbot; }
+    main                         { view-transition-name: page-main; }
+    footer.shell-footer          { view-transition-name: page-footer; }
+
+    /* Default new/old animations: a quick crossfade is fine for most things,
+     * but main gets a subtle slide-up on entry to feel intentional. */
+    ::view-transition-old(page-main) {
+        animation: vt-fade-out var(--dur-base) var(--ease-out) both;
+    }
+    ::view-transition-new(page-main) {
+        animation: vt-fade-up var(--dur-slow) var(--ease-out) both;
+    }
+    ::view-transition-old(page-footer),
+    ::view-transition-new(page-footer) {
+        animation-duration: var(--dur-base);
+    }
+
+    /* The named persistent elements get no animation — they stay in place. */
+    ::view-transition-old(nav-brand),
+    ::view-transition-new(nav-brand),
+    ::view-transition-old(nav-tabbar),
+    ::view-transition-new(nav-tabbar),
+    ::view-transition-old(fab-crowbot),
+    ::view-transition-new(fab-crowbot) {
+        animation-duration: 0s;
+    }
+
+    /* The page indicator (01 / Now → 02 / Work) is the most visible piece of
+     * "where am I now" — give it a smooth swap. */
+    ::view-transition-old(nav-page) {
+        animation: vt-page-out var(--dur-base) var(--ease-out) both;
+    }
+    ::view-transition-new(nav-page) {
+        animation: vt-page-in var(--dur-base) var(--ease-out) both;
+    }
+
+    @keyframes vt-fade-out  { to { opacity: 0; } }
+    @keyframes vt-fade-up   { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+    @keyframes vt-page-out  { to { opacity: 0; transform: translateY(-4px); } }
+    @keyframes vt-page-in   { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: translateY(0); } }
+
+    @media (prefers-reduced-motion: reduce) {
+        ::view-transition-old(*),
+        ::view-transition-new(*) {
+            animation-duration: 0s !important;
+        }
+    }
+}
+
+/* ─────────────────────────────────────────────────────────────
+ * A11y utilities
+ * ───────────────────────────────────────────────────────────── */
+
+/* Skip-to-content link — visible on keyboard focus, hidden otherwise. */
+.skip-link {
+    position: fixed;
+    top: 8px;
+    left: 8px;
+    z-index: 1000;
+    background: var(--accent);
+    color: var(--ink-1);
+    padding: 0.5rem 0.85rem;
+    border-radius: var(--r-sm);
+    font-family: var(--font-mono);
+    font-size: 0.78rem;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    text-decoration: none;
+    transform: translateY(-200%);
+    transition: transform var(--dur-fast) var(--ease-out);
+}
+.skip-link:focus {
+    transform: translateY(0);
+    outline: 2px solid var(--bg);
+    outline-offset: 2px;
+}
+
+/* Generic visually-hidden utility for accessible labels */
+.visually-hidden,
+.sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    clip-path: inset(50%);
+    white-space: nowrap;
+    border: 0;
+}
+
+/* Body scroll lock when Crowbot sheet is open */
+body.crowbot-sheet-open {
+    overflow: hidden !important;
+}

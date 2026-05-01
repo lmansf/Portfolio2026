@@ -1,0 +1,11 @@
+{
+  "now": "Building Power BI reports with the PBI MCP server",
+  "latest": {
+    "label": "Pushed Owl Park pipeline",
+    "href": "pipeline.html",
+    "ago": "2h ago"
+  },
+  "stack": ["Fabric", "Supabase", "n8n", "PBI"],
+  "timezone": "America/New_York",
+  "tz_label": "EST"
+}

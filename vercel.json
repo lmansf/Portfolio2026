@@ -22,7 +22,7 @@
       ]
     },
     {
-      "source": "/(blog|projects|shop|resume|feedback)",
+      "source": "/(work|pipeline|shop|resume|feedback)",
       "headers": [
         {
           "key": "Cache-Control",
@@ -49,14 +49,62 @@
       ]
     }
   ],
+  "redirects": [
+    {
+      "source": "/blog",
+      "destination": "/",
+      "permanent": true
+    },
+    {
+      "source": "/blog.html",
+      "destination": "/",
+      "permanent": true
+    },
+    {
+      "source": "/projects",
+      "destination": "/work",
+      "permanent": true
+    },
+    {
+      "source": "/projects.html",
+      "destination": "/work.html",
+      "permanent": true
+    },
+    {
+      "source": "/architecture",
+      "destination": "/pipeline",
+      "permanent": true
+    },
+    {
+      "source": "/architecture.html",
+      "destination": "/pipeline.html",
+      "permanent": true
+    }
+  ],
   "rewrites": [
     {
       "source": "/",
       "destination": "/index.html"
     },
     {
-      "source": "/blog",
-      "destination": "/blog.html"
+      "source": "/work",
+      "destination": "/work.html"
+    },
+    {
+      "source": "/pipeline",
+      "destination": "/pipeline.html"
+    },
+    {
+      "source": "/shop",
+      "destination": "/shop.html"
+    },
+    {
+      "source": "/resume",
+      "destination": "/resume.html"
+    },
+    {
+      "source": "/feedback",
+      "destination": "/feedback.html"
     }
   ]
 }
