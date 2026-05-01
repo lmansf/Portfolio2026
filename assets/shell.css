@@ -362,7 +362,20 @@ footer.shell-footer .footer-socials a:hover {
         -webkit-backdrop-filter: blur(16px);
         width: max-content;
     }
-    header.topbar { padding-right: clamp(360px, 40vw, 480px) !important; }
+    /* Desktop: keep brand + page indicator together on the left, leaving right
+ * side completely clear for the floating tab-bar pill. */
+header.topbar {
+    padding-right: var(--gutter) !important;
+    justify-content: flex-start !important;
+    gap: 1.25rem;
+}
+header.topbar .topbar__brand { flex: 0 0 auto; }
+header.topbar .topbar__page  {
+    margin-left: 0;
+    border-left: 1px solid var(--hairline);
+    padding-left: 1.25rem;
+    align-self: center;
+}
     .tabbar__item {
         flex: 0 0 auto;
         flex-direction: row;
