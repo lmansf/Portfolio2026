@@ -52,9 +52,37 @@ function animateProjectsLoadIn() {
 }
 
 function normalizeInternalPath(url) {
-    const cleanedUrl = (url || '').split('#')[0].split('?')[0];
-    if (!cleanedUrl || cleanedUrl === '/' || cleanedUrl === './') return 'index.html';
-    return (cleanedUrl.split('/').pop() || 'index.html').toLowerCase();
+    const rawUrl = (url || '').trim();
+    if (!rawUrl || rawUrl === '/' || rawUrl === './') return 'index.html';
+
+    // Accept absolute URLs, relative URLs, and clean routes from rewrites.
+    const base = (typeof window !== 'undefined' && window.location && window.location.origin)
+        ? window.location.origin
+        : 'http://localhost';
+
+    let pathname = '';
+    try {
+        pathname = new URL(rawUrl, base).pathname || '';
+    } catch {
+        pathname = rawUrl.split('#')[0].split('?')[0];
+    }
+
+    const normalizedPathname = pathname.replace(/\/+$/, '') || '/';
+    const segment = (normalizedPathname.split('/').pop() || 'index').toLowerCase();
+    const routeAliases = {
+        '': 'index.html',
+        index: 'index.html',
+        work: 'work.html',
+        pipeline: 'pipeline.html',
+        shop: 'shop.html',
+        resume: 'resume.html',
+        feedback: 'feedback.html',
+        projects: 'work.html',
+        architecture: 'pipeline.html'
+    };
+
+    if (segment.endsWith('.html')) return segment;
+    return routeAliases[segment] || segment;
 }
 
 function isTransitionPage(path) {
@@ -192,11 +220,11 @@ async function navigateTo(url, options = {}) {
                 footer.remove();
             }
 
-            // Bottom tab bar (sync if present)
-            syncBodyElement('.tabbar', doc);
-            // Explicitly activate the correct tab based on the navigation target.
-            // This is more reliable than the incoming HTML's hardcoded is-active because
-            // history.pushState hasn't run yet, so window.location.pathname is still old.
+            // Update tabbar active state without replacing the element.
+            // Replacing via outerHTML resets the indicator's inline styles and can produce
+            // wrong getBoundingClientRect values inside a view-transition callback before
+            // the browser has re-laid-out the new node — causing the indicator to snap to
+            // the wrong position. Mutating only the class list avoids this entirely.
             document.querySelectorAll('.tabbar__item[data-route]').forEach((item) => {
                 const route = item.getAttribute('data-route');
                 if (route === normalizedTarget) {
