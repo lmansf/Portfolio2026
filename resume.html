@@ -204,8 +204,8 @@
                 const yearsEl = skill.querySelector('.skill__years');
                 const targetYears = parseInt(skill.getAttribute('data-years'), 10) || 0;
 
-                // Animate the bar
-                if (bar) bar.classList.add('is-filled');
+                // Animate the bar — rAF ensures element is painted before class is added
+                if (bar) requestAnimationFrame(() => bar.classList.add('is-filled'));
 
                 // Count-up
                 if (yearsEl) {
