@@ -164,11 +164,11 @@ body.site-nav-open .burger .burger__bar:nth-child(3) {
     inset: 0;
     background: transparent;
 }
-/* Dropdown panel anchored to top-right */
+/* Dropdown panel — top/right set by JS to align exactly under the burger button */
 .site-nav__panel {
     position: fixed;
-    top: calc(var(--top-bar-h, 56px) + 8px);
-    right: var(--gutter, 1.25rem);
+    top: calc(var(--top-bar-h, 56px) + 8px); /* fallback until JS runs */
+    right: var(--gutter, 1.25rem);            /* fallback until JS runs */
     min-width: 180px;
     background: var(--surface-1);
     border: 1px solid var(--hairline-strong);

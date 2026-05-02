@@ -349,9 +349,18 @@ function getSiteNav() {
 function openSiteNav() {
     const nav = getSiteNav();
     if (!nav) return;
+    // Pin the panel directly under the burger button using its actual bounding rect.
+    // This avoids the scrollbar-width mismatch between position:fixed (visual viewport)
+    // and the sticky header's layout-viewport-based padding.
+    const burger = document.querySelector('[data-burger]');
+    const panel = nav.querySelector('.site-nav__panel');
+    if (burger && panel) {
+        const r = burger.getBoundingClientRect();
+        panel.style.top   = Math.round(r.bottom + 8) + 'px';
+        panel.style.right = Math.round(window.innerWidth - r.right) + 'px';
+    }
     document.body.classList.add('site-nav-open');
     nav.setAttribute('aria-hidden', 'false');
-    const burger = document.querySelector('[data-burger]');
     if (burger) burger.setAttribute('aria-expanded', 'true');
     // Focus first link for keyboard / screen-reader users
     const firstLink = nav.querySelector('.site-nav__item');
