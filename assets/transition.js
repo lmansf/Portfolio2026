@@ -219,9 +219,8 @@ async function navigateTo(url, options = {}) {
                 footer.remove();
             }
 
-            // Update tabbar state without replacing the node, so the shared indicator
-            // keeps its geometry and transitions smoothly across page swaps.
-            setTabBarActiveRoute(normalizedTarget, true);
+            // Update nav active state without replacing the node.
+            updateNavActiveState();
 
             // Modal/overlay containers outside <main>
             syncBodyElement('.project-modal-overlay', doc);
@@ -279,7 +278,7 @@ async function navigateTo(url, options = {}) {
         wireShopPrefetchInteractions();
         scheduleShopProductsPrefetch();
         wireUpnextPrefetch();
-        updateTabBarActiveState(false);
+        updateNavActiveState();
 
     } catch (err) {
         console.error('Navigation failed:', err);
@@ -345,121 +344,52 @@ function closeProjectModal(modal) {
 /* ─── Shop prefetch (retired with the live shop) — kept as no-ops so existing call sites still work ─── */
 function scheduleShopProductsPrefetch() { /* no-op */ }
 function wireShopPrefetchInteractions() { /* no-op */ }
-/* ─── Mobile nav (legacy hamburger drawer — Phase 4 will replace) ─── */
-function setMobileNavExpanded(isExpanded) {
-    const navToggle = document.querySelector('[data-nav-toggle]');
-    if (!navToggle) return;
-    navToggle.setAttribute('aria-expanded', isExpanded ? 'true' : 'false');
+/* ─── Burger / site-nav ─── */
+
+function getSiteNav() {
+    return document.getElementById('site-nav');
 }
 
-function closeMobileNav() {
-    document.body.classList.remove('mobile-nav-open');
-    setMobileNavExpanded(false);
+function openSiteNav() {
+    const nav = getSiteNav();
+    if (!nav) return;
+    document.body.classList.add('site-nav-open');
+    nav.setAttribute('aria-hidden', 'false');
+    const burger = document.querySelector('[data-burger]');
+    if (burger) burger.setAttribute('aria-expanded', 'true');
+    // Focus first link for keyboard / screen-reader users
+    const firstLink = nav.querySelector('.site-nav__item');
+    if (firstLink) setTimeout(() => firstLink.focus(), 50);
 }
 
-function toggleMobileNav() {
-    const shouldOpen = !document.body.classList.contains('mobile-nav-open');
-    document.body.classList.toggle('mobile-nav-open', shouldOpen);
-    setMobileNavExpanded(shouldOpen);
+function closeSiteNav() {
+    const nav = getSiteNav();
+    if (!nav) return;
+    document.body.classList.remove('site-nav-open');
+    nav.setAttribute('aria-hidden', 'true');
+    const burger = document.querySelector('[data-burger]');
+    if (burger) burger.setAttribute('aria-expanded', 'false');
 }
 
-/* ─── New shell behavior: bottom tab bar active state + Crowbot FAB sheet ─── */
-
-const NAV_ROUTES = ['index.html', 'work.html', 'pipeline.html', 'shop.html', 'resume.html'];
-
-function getTabBar() {
-    return document.querySelector('.tabbar');
+function toggleSiteNav() {
+    document.body.classList.contains('site-nav-open') ? closeSiteNav() : openSiteNav();
 }
 
-function getTabItems(tabbar) {
-    if (!tabbar) return [];
-    return Array.from(tabbar.querySelectorAll('.tabbar__item[href]'));
-}
+// Alias so existing doSwap() call stays untouched
+const closeMobileNav = closeSiteNav;
 
-function getTabItemRoute(item) {
-    if (!item) return null;
-    const href = item.getAttribute('href') || '';
-    if (href) return normalizeInternalPath(href);
-    const explicitRoute = item.getAttribute('data-route') || '';
-    if (explicitRoute) return normalizeInternalPath(explicitRoute);
-    return null;
-}
-
-function positionTabIndicator(instant = false) {
-    const reduceMotion = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-    if (reduceMotion) instant = true;
-
-    const tabbar = getTabBar();
-    if (!tabbar) return;
-
-    const indicator = tabbar.querySelector('.tabbar__indicator');
-    if (!indicator) return;
-
-    const activeItem = tabbar.querySelector('.tabbar__item.is-active');
-    if (!activeItem) {
-        indicator.style.opacity = '0';
-        return;
-    }
-
-    const tabbarRect = tabbar.getBoundingClientRect();
-    const itemRect = activeItem.getBoundingClientRect();
-    const isDesktop = window.innerWidth >= 768;
-
-    const applyPosition = () => {
-        indicator.style.left = `${itemRect.left - tabbarRect.left}px`;
-        indicator.style.width = `${itemRect.width}px`;
-        indicator.style.opacity = '1';
-
-        if (isDesktop) {
-            indicator.style.top = `${itemRect.top - tabbarRect.top}px`;
-            indicator.style.height = `${itemRect.height}px`;
+function updateNavActiveState() {
+    const nav = getSiteNav();
+    if (!nav) return;
+    const currentRoute = normalizeInternalPath(window.location.pathname);
+    nav.querySelectorAll('.site-nav__item[href]').forEach((link) => {
+        const linkRoute = normalizeInternalPath(link.getAttribute('href') || '');
+        if (linkRoute === currentRoute) {
+            link.setAttribute('aria-current', 'page');
         } else {
-            indicator.style.top = '0';
-            indicator.style.height = '2px';
-        }
-    };
-
-    if (instant) {
-        indicator.style.transition = 'none';
-        applyPosition();
-        requestAnimationFrame(() => requestAnimationFrame(() => {
-            indicator.style.transition = '';
-        }));
-        return;
-    }
-
-    applyPosition();
-}
-
-function setTabBarActiveRoute(targetRoute, instant = false) {
-    const tabbar = getTabBar();
-    const items = getTabItems(tabbar);
-    if (!items.length) return;
-
-    const normalizedTarget = normalizeInternalPath(targetRoute);
-    const activeItem = items.find((item) => getTabItemRoute(item) === normalizedTarget) || null;
-
-    items.forEach((item) => {
-        if (item === activeItem) {
-            item.classList.add('is-active');
-            item.setAttribute('aria-current', 'page');
-        } else {
-            item.classList.remove('is-active');
-            item.removeAttribute('aria-current');
+            link.removeAttribute('aria-current');
         }
     });
-
-    positionTabIndicator(instant);
-}
-
-function updateTabBarActiveState(instant = false) {
-    const tabbar = getTabBar();
-    const items = getTabItems(tabbar);
-    if (!items.length) return;
-
-    const currentRoute = normalizeInternalPath(window.location.pathname);
-    const fallbackRoute = NAV_ROUTES.includes(currentRoute) ? currentRoute : 'index.html';
-    setTabBarActiveRoute(fallbackRoute, instant);
 }
 
 const GRADIO_SCRIPT_SRC = 'https://gradio.s3-us-west-2.amazonaws.com/5.49.1/gradio.js';
@@ -544,36 +474,30 @@ document.addEventListener('DOMContentLoaded', () => {
         }, 500);
     });
 
-    closeMobileNav();
+    closeSiteNav();
     wireShopPrefetchInteractions();
     scheduleShopProductsPrefetch();
-    updateTabBarActiveState(true);
+    updateNavActiveState();
     wireUpnextPrefetch();
 
-    let _resizeTimer;
     window.addEventListener('resize', () => {
-        if (window.innerWidth > 900) closeMobileNav();
-        clearTimeout(_resizeTimer);
-        _resizeTimer = setTimeout(() => positionTabIndicator(true), 120);
+        if (window.innerWidth >= 768) closeSiteNav();
     });
 
     document.body.addEventListener('click', (e) => {
-        // Immediate visual feedback when a tab bar item is clicked
-        const clickedTab = e.target.closest('.tabbar__item[href]');
-        if (clickedTab) {
-            setTabBarActiveRoute(getTabItemRoute(clickedTab), false);
-        }
-
-        // Hamburger (legacy)
-        const navToggle = e.target.closest('[data-nav-toggle]');
-        if (navToggle) {
+        // Burger toggle
+        const burger = e.target.closest('[data-burger]');
+        if (burger) {
             e.preventDefault();
-            toggleMobileNav();
+            toggleSiteNav();
             return;
         }
 
-        if (document.body.classList.contains('mobile-nav-open') && !e.target.closest('header')) {
-            closeMobileNav();
+        // Backdrop close
+        const navBackdrop = e.target.closest('[data-nav-close]');
+        if (navBackdrop) {
+            closeSiteNav();
+            return;
         }
 
         // Crowbot FAB
@@ -665,7 +589,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     document.addEventListener('keydown', (e) => {
         if (e.key === 'Escape') {
-            if (document.body.classList.contains('mobile-nav-open')) closeMobileNav();
+            if (document.body.classList.contains('site-nav-open')) closeSiteNav();
             if (document.body.classList.contains('crowbot-sheet-open')) closeCrowbotSheet();
             if (activeProjectModal) closeProjectModal(activeProjectModal);
         }
