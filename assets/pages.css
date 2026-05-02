@@ -322,6 +322,7 @@ main.page > * {
                 background var(--dur-fast) var(--ease-out),
                 border-color var(--dur-fast) var(--ease-out);
 }
+span.chip { cursor: default; pointer-events: none; }
 .chip:hover { color: var(--ink-1); border-color: var(--hairline-strong); }
 .chip[aria-pressed="true"] {
     background: var(--accent-glow);
