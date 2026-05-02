@@ -47,15 +47,19 @@
             </div>
         </section>
 
-        <!-- Sticky filter chips -->
-        <nav class="work-filters" aria-label="Filter work by category" data-work-filters>
-            <button class="chip" type="button" data-filter="all" aria-pressed="true">All</button>
-            <button class="chip" type="button" data-filter="powerbi" aria-pressed="false">Power BI</button>
-            <button class="chip" type="button" data-filter="python" aria-pressed="false">Python</button>
-            <button class="chip" type="button" data-filter="ml" aria-pressed="false">ML</button>
-            <button class="chip" type="button" data-filter="sql" aria-pressed="false">SQL</button>
-            <button class="chip" type="button" data-filter="cert" aria-pressed="false">Cert</button>
-        </nav>
+        <!-- Skills strip -->
+        <div class="work-filters" aria-label="Skills used in this work">
+            <span class="chip">Power BI</span>
+            <span class="chip">Python</span>
+            <span class="chip">SQL</span>
+            <span class="chip">Machine Learning</span>
+            <span class="chip">Microsoft Fabric</span>
+            <span class="chip">Snowflake</span>
+            <span class="chip">n8n</span>
+            <span class="chip">Supabase</span>
+            <span class="chip">Azure</span>
+            <span class="chip">Databricks</span>
+        </div>
 
         <!-- Featured (cinematic moment) -->
         <a class="work-featured project-tile" href="#" data-project-modal-open="rfm-project-modal" aria-controls="rfm-project-modal" data-cats="powerbi">
@@ -83,7 +87,7 @@
         <!-- Section heading -->
         <header class="section-head">
             <h2 class="section-head__title">More work</h2>
-            <span class="section-head__hint" data-work-count></span>
+            <span class="section-head__hint">8 projects</span>
         </header>
 
         <!-- Tile grid -->
@@ -297,37 +301,5 @@
 </aside>
 
     <script defer src="assets/transition.js"></script>
-    <script>
-    /* Work page: filter chips */
-    (function () {
-        const filters = document.querySelector('[data-work-filters]');
-        const grid = document.querySelector('[data-work-grid]');
-        const counter = document.querySelector('[data-work-count]');
-        if (!filters || !grid) return;
-        const tiles = Array.from(grid.querySelectorAll('.work-tile'));
-
-        function apply(filter) {
-            let visible = 0;
-            tiles.forEach((tile) => {
-                const cats = (tile.getAttribute('data-cats') || '').split(/\s+/);
-                const show = filter === 'all' || cats.includes(filter);
-                tile.hidden = !show;
-                if (show) visible++;
-            });
-            if (counter) counter.textContent = `${visible} shown`;
-            filters.querySelectorAll('.chip').forEach((c) => {
-                c.setAttribute('aria-pressed', c.getAttribute('data-filter') === filter ? 'true' : 'false');
-            });
-        }
-
-        filters.addEventListener('click', (e) => {
-            const chip = e.target.closest('.chip');
-            if (!chip) return;
-            apply(chip.getAttribute('data-filter') || 'all');
-        });
-
-        apply('all');
-    })();
-    </script>
 </body>
 </html>
