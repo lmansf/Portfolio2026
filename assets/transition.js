@@ -220,22 +220,9 @@ async function navigateTo(url, options = {}) {
                 footer.remove();
             }
 
-            // Update tabbar active state without replacing the element.
-            // Replacing via outerHTML resets the indicator's inline styles and can produce
-            // wrong getBoundingClientRect values inside a view-transition callback before
-            // the browser has re-laid-out the new node — causing the indicator to snap to
-            // the wrong position. Mutating only the class list avoids this entirely.
-            document.querySelectorAll('.tabbar__item[data-route]').forEach((item) => {
-                const route = item.getAttribute('data-route');
-                if (route === normalizedTarget) {
-                    item.classList.add('is-active');
-                    item.setAttribute('aria-current', 'page');
-                } else {
-                    item.classList.remove('is-active');
-                    item.removeAttribute('aria-current');
-                }
-            });
-            positionTabIndicator(true);
+            // Update tabbar state without replacing the node, so the shared indicator
+            // keeps its geometry and transitions smoothly across page swaps.
+            setTabBarActiveRoute(normalizedTarget, true);
 
             // Modal/overlay containers outside <main>
             syncBodyElement('.project-modal-overlay', doc);
@@ -383,14 +370,35 @@ function toggleMobileNav() {
 
 /* ─── New shell behavior: bottom tab bar active state + Crowbot FAB sheet ─── */
 
-function positionTabIndicator(instant) {
+const NAV_ROUTES = ['index.html', 'work.html', 'pipeline.html', 'shop.html', 'resume.html'];
+
+function getTabBar() {
+    return document.querySelector('.tabbar');
+}
+
+function getTabItems(tabbar) {
+    if (!tabbar) return [];
+    return Array.from(tabbar.querySelectorAll('.tabbar__item[href]'));
+}
+
+function getTabItemRoute(item) {
+    if (!item) return null;
+    const explicitRoute = item.getAttribute('data-route');
+    if (explicitRoute) return normalizeInternalPath(explicitRoute);
+    const href = item.getAttribute('href') || '';
+    return normalizeInternalPath(href);
+}
+
+function positionTabIndicator(instant = false) {
     const reduceMotion = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
     if (reduceMotion) instant = true;
 
-    const tabbar = document.querySelector('.tabbar');
+    const tabbar = getTabBar();
     if (!tabbar) return;
+
     const indicator = tabbar.querySelector('.tabbar__indicator');
     if (!indicator) return;
+
     const activeItem = tabbar.querySelector('.tabbar__item.is-active');
     if (!activeItem) {
         indicator.style.opacity = '0';
@@ -401,10 +409,11 @@ function positionTabIndicator(instant) {
     const itemRect = activeItem.getBoundingClientRect();
     const isDesktop = window.innerWidth >= 768;
 
-    function applyPosition() {
+    const applyPosition = () => {
         indicator.style.left = `${itemRect.left - tabbarRect.left}px`;
         indicator.style.width = `${itemRect.width}px`;
         indicator.style.opacity = '1';
+
         if (isDesktop) {
             indicator.style.top = `${itemRect.top - tabbarRect.top}px`;
             indicator.style.height = `${itemRect.height}px`;
@@ -412,7 +421,7 @@ function positionTabIndicator(instant) {
             indicator.style.top = '0';
             indicator.style.height = '2px';
         }
-    }
+    };
 
     if (instant) {
         indicator.style.transition = 'none';
@@ -420,16 +429,24 @@ function positionTabIndicator(instant) {
         requestAnimationFrame(() => requestAnimationFrame(() => {
             indicator.style.transition = '';
         }));
-    } else {
-        applyPosition();
+        return;
     }
+
+    applyPosition();
 }
 
-function updateTabBarActiveState(instant = false) {
-    const current = normalizeInternalPath(window.location.pathname);
-    document.querySelectorAll('.tabbar__item[data-route]').forEach((item) => {
-        const route = item.getAttribute('data-route');
-        if (route === current) {
+function setTabBarActiveRoute(targetRoute, instant = false) {
+    const tabbar = getTabBar();
+    const items = getTabItems(tabbar);
+    if (!items.length) return;
+
+    const normalizedTarget = normalizeInternalPath(targetRoute);
+    const activeItem = items.find((item) => getTabItemRoute(item) === normalizedTarget)
+        || items.find((item) => NAV_ROUTES.includes(getTabItemRoute(item)) && getTabItemRoute(item) === normalizeInternalPath(window.location.pathname))
+        || null;
+
+    items.forEach((item) => {
+        if (item === activeItem) {
             item.classList.add('is-active');
             item.setAttribute('aria-current', 'page');
         } else {
@@ -437,7 +454,12 @@ function updateTabBarActiveState(instant = false) {
             item.removeAttribute('aria-current');
         }
     });
+
     positionTabIndicator(instant);
+}
+
+function updateTabBarActiveState(instant = false) {
+    setTabBarActiveRoute(window.location.pathname, instant);
 }
 
 const GRADIO_SCRIPT_SRC = 'https://gradio.s3-us-west-2.amazonaws.com/5.49.1/gradio.js';
@@ -542,18 +564,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
     document.body.addEventListener('click', (e) => {
         // Immediate visual feedback when a tab bar item is clicked
-        const clickedTab = e.target.closest('.tabbar__item[data-route]');
+        const clickedTab = e.target.closest('.tabbar__item[href]');
         if (clickedTab) {
-            document.querySelectorAll('.tabbar__item[data-route]').forEach((item) => {
-                if (item === clickedTab) {
-                    item.classList.add('is-active');
-                    item.setAttribute('aria-current', 'page');
-                } else {
-                    item.classList.remove('is-active');
-                    item.removeAttribute('aria-current');
-                }
-            });
-            positionTabIndicator(false);
+            setTabBarActiveRoute(getTabItemRoute(clickedTab), false);
         }
 
         // Hamburger (legacy)
