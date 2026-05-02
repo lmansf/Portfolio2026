@@ -152,16 +152,25 @@ header.topbar .nav-links {
     fill: none;
     stroke-width: 1.6;
 }
-.tabbar__item.is-active .tabbar__icon { color: var(--accent); }
-.tabbar__item.is-active::before {
-    content: "";
+
+/* Shared sliding indicator — positioned by JS */
+.tabbar__indicator {
     position: absolute;
-    top: 0; left: 50%;
-    transform: translateX(-50%);
-    width: 26px; height: 2px;
+    pointer-events: none;
+    z-index: 0;
+    /* Mobile: 2px accent line along the top edge */
+    top: 0;
+    height: 2px;
+    left: 0;
+    width: 0;
     background: var(--accent);
     border-radius: 2px;
     box-shadow: 0 0 12px var(--accent-glow);
+    opacity: 0;
+    transition:
+        left var(--dur-base) var(--ease-out),
+        width var(--dur-base) var(--ease-out),
+        opacity var(--dur-fast) var(--ease-out);
 }
 
 /* ─────────────────────────────────────────────────────────────
@@ -386,11 +395,21 @@ header.topbar .topbar__page  {
         border-radius: 999px;
     }
     .tabbar__item .tabbar__icon { width: 16px; height: 16px; }
-    .tabbar__item.is-active {
+    .tabbar__item.is-active { color: var(--accent); }
+
+    /* Desktop: indicator becomes a full-height background pill */
+    .tabbar__indicator {
+        border-radius: 999px;
         background: var(--accent-glow);
-        color: var(--accent);
+        box-shadow: none;
+        height: 0; /* overridden by JS */
+        transition:
+            left var(--dur-base) var(--ease-out),
+            width var(--dur-base) var(--ease-out),
+            top var(--dur-base) var(--ease-out),
+            height var(--dur-base) var(--ease-out),
+            opacity var(--dur-fast) var(--ease-out);
     }
-    .tabbar__item.is-active::before { display: none; }
 
     /* Crowbot FAB stays bottom-left on desktop too — no tab bar in the way */
     .crowbot-fab { bottom: 24px; }

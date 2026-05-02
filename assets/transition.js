@@ -194,6 +194,9 @@ async function navigateTo(url, options = {}) {
 
             // Bottom tab bar (sync if present)
             syncBodyElement('.tabbar', doc);
+            // Instantly snap indicator to the active tab in the newly-swapped tabbar
+            // so it's in the right place before the view transition captures the new state.
+            positionTabIndicator(true);
 
             // Modal/overlay containers outside <main>
             syncBodyElement('.project-modal-overlay', doc);
@@ -251,7 +254,7 @@ async function navigateTo(url, options = {}) {
         wireShopPrefetchInteractions();
         scheduleShopProductsPrefetch();
         wireUpnextPrefetch();
-        updateTabBarActiveState();
+        updateTabBarActiveState(false);
 
         if (isProjectsDestination) {
             animateProjectsLoadIn();
@@ -340,7 +343,50 @@ function toggleMobileNav() {
 }
 
 /* ─── New shell behavior: bottom tab bar active state + Crowbot FAB sheet ─── */
-function updateTabBarActiveState() {
+
+function positionTabIndicator(instant) {
+    const reduceMotion = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    if (reduceMotion) instant = true;
+
+    const tabbar = document.querySelector('.tabbar');
+    if (!tabbar) return;
+    const indicator = tabbar.querySelector('.tabbar__indicator');
+    if (!indicator) return;
+    const activeItem = tabbar.querySelector('.tabbar__item.is-active');
+    if (!activeItem) {
+        indicator.style.opacity = '0';
+        return;
+    }
+
+    const tabbarRect = tabbar.getBoundingClientRect();
+    const itemRect = activeItem.getBoundingClientRect();
+    const isDesktop = window.innerWidth >= 768;
+
+    function applyPosition() {
+        indicator.style.left = `${itemRect.left - tabbarRect.left}px`;
+        indicator.style.width = `${itemRect.width}px`;
+        indicator.style.opacity = '1';
+        if (isDesktop) {
+            indicator.style.top = `${itemRect.top - tabbarRect.top}px`;
+            indicator.style.height = `${itemRect.height}px`;
+        } else {
+            indicator.style.top = '0';
+            indicator.style.height = '2px';
+        }
+    }
+
+    if (instant) {
+        indicator.style.transition = 'none';
+        applyPosition();
+        requestAnimationFrame(() => requestAnimationFrame(() => {
+            indicator.style.transition = '';
+        }));
+    } else {
+        applyPosition();
+    }
+}
+
+function updateTabBarActiveState(instant = false) {
     const current = normalizeInternalPath(window.location.pathname);
     document.querySelectorAll('.tabbar__item[data-route]').forEach((item) => {
         const route = item.getAttribute('data-route');
@@ -352,6 +398,7 @@ function updateTabBarActiveState() {
             item.removeAttribute('aria-current');
         }
     });
+    positionTabIndicator(instant);
 }
 
 const GRADIO_SCRIPT_SRC = 'https://gradio.s3-us-west-2.amazonaws.com/5.49.1/gradio.js';
@@ -444,14 +491,32 @@ document.addEventListener('DOMContentLoaded', () => {
     closeMobileNav();
     wireShopPrefetchInteractions();
     scheduleShopProductsPrefetch();
-    updateTabBarActiveState();
+    updateTabBarActiveState(true);
     wireUpnextPrefetch();
 
+    let _resizeTimer;
     window.addEventListener('resize', () => {
         if (window.innerWidth > 900) closeMobileNav();
+        clearTimeout(_resizeTimer);
+        _resizeTimer = setTimeout(() => positionTabIndicator(true), 120);
     });
 
     document.body.addEventListener('click', (e) => {
+        // Immediate visual feedback when a tab bar item is clicked
+        const clickedTab = e.target.closest('.tabbar__item[data-route]');
+        if (clickedTab) {
+            document.querySelectorAll('.tabbar__item[data-route]').forEach((item) => {
+                if (item === clickedTab) {
+                    item.classList.add('is-active');
+                    item.setAttribute('aria-current', 'page');
+                } else {
+                    item.classList.remove('is-active');
+                    item.removeAttribute('aria-current');
+                }
+            });
+            positionTabIndicator(false);
+        }
+
         // Hamburger (legacy)
         const navToggle = e.target.closest('[data-nav-toggle]');
         if (navToggle) {
