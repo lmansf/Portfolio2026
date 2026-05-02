@@ -69,7 +69,7 @@
             </div>
             <div class="pipeline-flow">
                 <article class="phase" data-phase="1">
-                    <span class="phase__num">01 / Ingest</span>
+                    <span class="phase__num">01 / Generate</span>
                     <h3 class="phase__title">n8n agents</h3>
                     <p class="phase__desc">Four workflows handle dynamic pricing, consumer purchases, restocking, and sellout logging. Live store activity directly influences agent behavior.</p>
                     <div class="phase__stack">
@@ -89,7 +89,7 @@
                     <span class="phase__connector" aria-hidden="true"></span>
                 </article>
                 <article class="phase" data-phase="3">
-                    <span class="phase__num">03 / Transform</span>
+                    <span class="phase__num">03 / ETL</span>
                     <h3 class="phase__title">Fabric medallion</h3>
                     <p class="phase__desc">Fabric pulls on a real-time schedule, shapes data into dimensional and fact models, then writes to Warehouse (live) and Lake (daily backup).</p>
                     <div class="phase__stack">

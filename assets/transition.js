@@ -481,7 +481,7 @@ document.addEventListener('DOMContentLoaded', () => {
     wireUpnextPrefetch();
 
     window.addEventListener('resize', () => {
-        if (window.innerWidth >= 768) closeSiteNav();
+        // nothing needed — burger drawer works the same at all widths
     });
 
     document.body.addEventListener('click', (e) => {

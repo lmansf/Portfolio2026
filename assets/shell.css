@@ -148,10 +148,7 @@ body.site-nav-open .burger .burger__bar:nth-child(3) {
     transform: translateY(-7px) rotate(-45deg);
 }
 
-/* On desktop, hide the burger and show nav links inline */
-@media (min-width: 768px) {
-    .burger { display: none; }
-}
+/* Burger is visible at all screen sizes */
 
 /* ─────────────────────────────────────────────────────────────
  * Site nav drawer (mobile) / inline (desktop)
@@ -225,51 +222,7 @@ body.site-nav-open .site-nav__panel {
     vertical-align: middle;
     box-shadow: 0 0 0 3px var(--accent-glow);
 }
-/* Desktop: drawer hidden, links shown inline in topbar */
-@media (min-width: 768px) {
-    .site-nav {
-        position: static;
-        pointer-events: auto;
-        display: contents;
-    }
-    .site-nav__backdrop { display: none; }
-    .site-nav__panel {
-        position: static;
-        width: auto;
-        height: auto;
-        background: none;
-        border: none;
-        padding: 0;
-        flex-direction: row;
-        gap: 0;
-        transform: none;
-        box-shadow: none;
-        overflow: visible;
-    }
-    .site-nav__item {
-        font-size: 0.78rem;
-        font-weight: 500;
-        letter-spacing: 0.04em;
-        color: var(--ink-2);
-        padding: 0.3rem 0.75rem;
-        border-bottom: none;
-        border-radius: var(--r-sm, 6px);
-        transition:
-            color var(--dur-fast) var(--ease-out),
-            background var(--dur-fast) var(--ease-out);
-    }
-    .site-nav__item:hover {
-        color: var(--ink-1);
-        background: var(--hairline);
-    }
-    .site-nav__item[aria-current="page"] {
-        color: var(--accent);
-        background: var(--accent-glow);
-    }
-    .site-nav__item[aria-current="page"]::after { display: none; }
-    body.site-nav-open .site-nav__backdrop { display: none; }
-    body.site-nav-open .site-nav__panel { transform: none; }
-}
+/* Desktop: drawer behaves the same as mobile — no overrides needed */
 
 /* ─────────────────────────────────────────────────────────────
  * Refined ticker (replaces the marquee)
