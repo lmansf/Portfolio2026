@@ -1004,10 +1004,19 @@ span.chip { cursor: default; pointer-events: none; }
     border-radius: inherit;
     transform: scaleX(0);
     transform-origin: left center;
-    transition: transform 1.4s var(--ease-out);
 }
 .skill__bar.is-filled::before {
-    transform: scaleX(1);
+    animation: skill-fill 1.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+@keyframes skill-fill {
+    from { transform: scaleX(0); }
+    to   { transform: scaleX(1); }
+}
+@media (prefers-reduced-motion: reduce) {
+    .skill__bar.is-filled::before {
+        animation: none;
+        transform: scaleX(1);
+    }
 }
 .skill__years {
     font-family: var(--font-mono);
