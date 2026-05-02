@@ -65,7 +65,7 @@
         <section class="pipeline-diagram" data-pipeline aria-labelledby="pipeline-flow-title">
             <div class="pipeline-diagram__head">
                 <h2 id="pipeline-flow-title">Pipeline flow</h2>
-                <span class="meta">Ingest · Store · Transform · Analyze</span>
+                <span class="meta">Generate · Store · ETL · Analyze</span>
             </div>
             <div class="pipeline-flow">
                 <article class="phase" data-phase="1">
@@ -89,7 +89,7 @@
                     <span class="phase__connector" aria-hidden="true"></span>
                 </article>
                 <article class="phase" data-phase="3">
-                    <span class="phase__num">03 / ETL</span>
+                    <span class="phase__num">03 / Extract Transform Load</span>
                     <h3 class="phase__title">Fabric medallion</h3>
                     <p class="phase__desc">Fabric pulls on a real-time schedule, shapes data into dimensional and fact models, then writes to Warehouse (live) and Lake (daily backup).</p>
                     <div class="phase__stack">
