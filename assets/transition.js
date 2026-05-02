@@ -219,9 +219,6 @@ async function navigateTo(url, options = {}) {
                 footer.remove();
             }
 
-            // Update nav active state without replacing the node.
-            updateNavActiveState();
-
             // Modal/overlay containers outside <main>
             syncBodyElement('.project-modal-overlay', doc);
             activeProjectModal = null;
@@ -278,7 +275,6 @@ async function navigateTo(url, options = {}) {
         wireShopPrefetchInteractions();
         scheduleShopProductsPrefetch();
         wireUpnextPrefetch();
-        updateNavActiveState();
 
     } catch (err) {
         console.error('Navigation failed:', err);
@@ -378,20 +374,6 @@ function toggleSiteNav() {
 // Alias so existing doSwap() call stays untouched
 const closeMobileNav = closeSiteNav;
 
-function updateNavActiveState() {
-    const nav = getSiteNav();
-    if (!nav) return;
-    const currentRoute = normalizeInternalPath(window.location.pathname);
-    nav.querySelectorAll('.site-nav__item[href]').forEach((link) => {
-        const linkRoute = normalizeInternalPath(link.getAttribute('href') || '');
-        if (linkRoute === currentRoute) {
-            link.setAttribute('aria-current', 'page');
-        } else {
-            link.removeAttribute('aria-current');
-        }
-    });
-}
-
 const GRADIO_SCRIPT_SRC = 'https://gradio.s3-us-west-2.amazonaws.com/5.49.1/gradio.js';
 const GRADIO_APP_SRC = 'https://lmansf96-portfolio-conversation.hf.space';
 let crowbotInitialized = false;
@@ -477,7 +459,6 @@ document.addEventListener('DOMContentLoaded', () => {
     closeSiteNav();
     wireShopPrefetchInteractions();
     scheduleShopProductsPrefetch();
-    updateNavActiveState();
     wireUpnextPrefetch();
 
     window.addEventListener('resize', () => {
