@@ -82,13 +82,13 @@
                 <span class="section-head__hint">Animates on view</span>
             </header>
             <div class="skills" style="margin-top: 1rem;">
-                <div class="skill" data-years="6"><span class="skill__name">Excel</span><span class="skill__bar" style="--skill-bar-target: 100%;"></span><span class="skill__years">10</span></div>
-                <div class="skill" data-years="4"><span class="skill__name">SQL</span><span class="skill__bar" style="--skill-bar-target: 80%;"></span><span class="skill__years">4</span></div>
-                <div class="skill" data-years="4"><span class="skill__name">Python</span><span class="skill__bar" style="--skill-bar-target: 75%;"></span><span class="skill__years">3</span></div>
-                <div class="skill" data-years="3"><span class="skill__name">Machine Learning</span><span class="skill__bar" style="--skill-bar-target: 70%;"></span><span class="skill__years">3</span></div>
-                <div class="skill" data-years="2"><span class="skill__name">Power BI</span><span class="skill__bar" style="--skill-bar-target: 50%;"></span><span class="skill__years">2</span></div>
-                <div class="skill" data-years="1"><span class="skill__name">Microsoft Fabric</span><span class="skill__bar" style="--skill-bar-target: 35%;"></span><span class="skill__years">1</span></div>
-                <div class="skill" data-years="1"><span class="skill__name">Databricks</span><span class="skill__bar" style="--skill-bar-target: 30%;"></span><span class="skill__years">1</span></div>
+                <div class="skill" data-years="10"><span class="skill__name">Excel</span><span class="skill__bar"></span><span class="skill__years">10</span></div>
+                <div class="skill" data-years="4"><span class="skill__name">SQL</span><span class="skill__bar"></span><span class="skill__years">4</span></div>
+                <div class="skill" data-years="3"><span class="skill__name">Python</span><span class="skill__bar"></span><span class="skill__years">3</span></div>
+                <div class="skill" data-years="3"><span class="skill__name">Machine Learning</span><span class="skill__bar"></span><span class="skill__years">3</span></div>
+                <div class="skill" data-years="2"><span class="skill__name">Power BI</span><span class="skill__bar"></span><span class="skill__years">2</span></div>
+                <div class="skill" data-years="1"><span class="skill__name">Microsoft Fabric</span><span class="skill__bar"></span><span class="skill__years">1</span></div>
+                <div class="skill" data-years="1"><span class="skill__name">Databricks</span><span class="skill__bar"></span><span class="skill__years">1</span></div>
             </div>
         </section>
 
@@ -199,13 +199,19 @@
 
             const reduceMotion = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
+            // Compute bar widths proportional to the max years in the set
+            const maxYears = Math.max(...skills.map((s) => parseInt(s.getAttribute('data-years'), 10) || 0));
+
             function animateSkill(skill) {
                 const bar = skill.querySelector('.skill__bar');
                 const yearsEl = skill.querySelector('.skill__years');
                 const targetYears = parseInt(skill.getAttribute('data-years'), 10) || 0;
 
-                // Animate the bar — rAF ensures element is painted before class is added
-                if (bar) requestAnimationFrame(() => bar.classList.add('is-filled'));
+                // Set proportional width, then animate
+                if (bar) {
+                    bar.style.setProperty('--skill-bar-target', (targetYears / maxYears * 100).toFixed(1) + '%');
+                    requestAnimationFrame(() => bar.classList.add('is-filled'));
+                }
 
                 // Count-up
                 if (yearsEl) {
