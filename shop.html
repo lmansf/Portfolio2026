@@ -136,7 +136,7 @@
         <article class="retro-section" aria-labelledby="why-title">
             <div class="retro-section__body">
                 <span class="retro-section__kicker">03 / What I learned</span>
-                <h2 class="retro-section__title">Three things I'm taking forward.</h2>
+                <h2 class="retro-section__title">Three things I uncovered.</h2>
                 <p>
                     Reading the data afterward in Power BI was the part I'd repeat first. Watching the agents in real time was fun, but the post-run dashboard — basket size, abandonment funnel, agent-driven price elasticity — is what made this project useful.
                 </p>
@@ -144,28 +144,28 @@
                     <div class="outcome">
                         <svg class="outcome__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 13l4 4L19 7"/></svg>
                         <div>
-                            <strong>Build the dashboard first, the agents second.</strong>
-                            <span>Without the data layer, the agents are theater. With it, the agents become a measurable hypothesis.</span>
+                            <strong>Agents Perform Better with Checks</strong>
+                            <span>The dynamic pricing workflow benefitted from having an agent that checked the fairness and range of the pricing. Without it the pricing was volatile and unbounded.</span>
                         </div>
                     </div>
                     <div class="outcome">
                         <svg class="outcome__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 13l4 4L19 7"/></svg>
                         <div>
-                            <strong>Fairness bounds are the contract.</strong>
-                            <span>The pricing agent could have run away into adversarial territory. A simple comp-vs-Owl-Park bound kept it honest, no critic loop needed.</span>
+                            <strong>n8n workflows can trigger each other.</strong>
+                            <span>One of the major improvements that was made during this project, was realizing the restocking agent couldn't keep up with demand on a schedule. By having it set to trigger anytime the consumer makes a purchase, it was able to monitor stock more closely without eating unnecessary n8n tokens.</span>
                         </div>
                     </div>
                     <div class="outcome">
                         <svg class="outcome__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 13l4 4L19 7"/></svg>
                         <div>
-                            <strong>UX signals beat agent signals.</strong>
-                            <span>The biggest behavioral lever wasn't a clever pricing model — it was where I put the promo-code field. Three months of agent tuning, beaten by a layout choice.</span>
+                            <strong>System Oriented Thinking</strong>
+                            <span>This was a complete system, from the user to an OLTP database in supabase, to the OLAP warehouse in Fabric, and finally to the analytics in Power BI.</span>
                         </div>
                     </div>
                 </div>
             </div>
             <aside class="retro-section__aside">
-                <h3>Final outcomes</h3>
+                <h3>Final status</h3>
                 <ul>
                     <li>Agents <span>retired</span></li>
                     <li>Backend <span>archived</span></li>
