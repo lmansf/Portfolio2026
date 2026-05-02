@@ -179,7 +179,6 @@ async function navigateTo(url, options = {}) {
     const { updateHistory = true } = options;
     const main = document.querySelector('main');
     const normalizedTarget = normalizeInternalPath(url);
-    const isProjectsDestination = normalizedTarget === 'work.html';
 
     try {
         // 1. Fetch the new page in parallel with any exit animation
@@ -281,10 +280,6 @@ async function navigateTo(url, options = {}) {
         scheduleShopProductsPrefetch();
         wireUpnextPrefetch();
         updateTabBarActiveState(false);
-
-        if (isProjectsDestination) {
-            animateProjectsLoadIn();
-        }
 
     } catch (err) {
         console.error('Navigation failed:', err);
@@ -530,11 +525,6 @@ function toggleCrowbotSheet() {
 document.addEventListener('DOMContentLoaded', () => {
     if (window.location.protocol === 'file:') {
         console.warn('Page transitions require a local server (e.g. Live Server) due to CORS restrictions on file:// protocol.');
-    }
-
-    const currentPath = window.location.pathname.split('/').pop() || 'index.html';
-    if (currentPath === 'work.html') {
-        animateProjectsLoadIn();
     }
 
     const initialTargets = [document.querySelector('main'), document.querySelector('.bg-layer')].filter(Boolean);
