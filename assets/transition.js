@@ -378,10 +378,11 @@ function getTabItems(tabbar) {
 
 function getTabItemRoute(item) {
     if (!item) return null;
-    const explicitRoute = item.getAttribute('data-route');
-    if (explicitRoute) return normalizeInternalPath(explicitRoute);
     const href = item.getAttribute('href') || '';
-    return normalizeInternalPath(href);
+    if (href) return normalizeInternalPath(href);
+    const explicitRoute = item.getAttribute('data-route') || '';
+    if (explicitRoute) return normalizeInternalPath(explicitRoute);
+    return null;
 }
 
 function positionTabIndicator(instant = false) {
@@ -436,9 +437,7 @@ function setTabBarActiveRoute(targetRoute, instant = false) {
     if (!items.length) return;
 
     const normalizedTarget = normalizeInternalPath(targetRoute);
-    const activeItem = items.find((item) => getTabItemRoute(item) === normalizedTarget)
-        || items.find((item) => NAV_ROUTES.includes(getTabItemRoute(item)) && getTabItemRoute(item) === normalizeInternalPath(window.location.pathname))
-        || null;
+    const activeItem = items.find((item) => getTabItemRoute(item) === normalizedTarget) || null;
 
     items.forEach((item) => {
         if (item === activeItem) {
@@ -454,7 +453,13 @@ function setTabBarActiveRoute(targetRoute, instant = false) {
 }
 
 function updateTabBarActiveState(instant = false) {
-    setTabBarActiveRoute(window.location.pathname, instant);
+    const tabbar = getTabBar();
+    const items = getTabItems(tabbar);
+    if (!items.length) return;
+
+    const currentRoute = normalizeInternalPath(window.location.pathname);
+    const fallbackRoute = NAV_ROUTES.includes(currentRoute) ? currentRoute : 'index.html';
+    setTabBarActiveRoute(fallbackRoute, instant);
 }
 
 const GRADIO_SCRIPT_SRC = 'https://gradio.s3-us-west-2.amazonaws.com/5.49.1/gradio.js';
