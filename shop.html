@@ -56,12 +56,12 @@
                 <span class="retro-stat__sub">pricing · restock · fair-buyer</span>
             </article>
             <article class="retro-stat">
-                <span class="retro-stat__value">8</span>
+                <span class="retro-stat__value">2</span>
                 <span class="retro-stat__label">Product categories</span>
                 <span class="retro-stat__sub">admissions · add-ons · concessions</span>
             </article>
             <article class="retro-stat">
-                <span class="retro-stat__value">14d</span>
+                <span class="retro-stat__value">60d</span>
                 <span class="retro-stat__label">Live run window</span>
                 <span class="retro-stat__sub">live agents responding to traffic</span>
             </article>
@@ -78,21 +78,21 @@
                 <span class="retro-section__kicker">01 / What it was</span>
                 <h2 class="retro-section__title">A reactive market in miniature.</h2>
                 <p>
-                    The Owl Park storefront was a <em>real working store</em> backed by Supabase. Real product rows, real prices, real inventory, real cart and checkout flow. Nothing about the front-end was faked.
+                    The Owl Park storefront was a <em>real working store</em> backed by Supabase. Real product rows, real prices, real inventory, real cart and checkout flow.
                 </p>
                 <p>
-                    Behind it sat three n8n agents pretending to be different parts of a live ticket market. A pricing agent watched demand and adjusted prices inside fairness bounds. A restock agent pulled units from a virtual warehouse when stock crossed a threshold. A fair-buyer agent compared prices to nearby comps (Owl Park itself) and bought when the market was favorable.
+                    Behind it sat three n8n agents specialized to be different parts of a live ticket market. A pricing agent watched demand and adjusted prices inside fairness bounds. A restock agent pulled units from a virtual warehouse when stock crossed a threshold. A fair-buyer agent compared prices to nearby comps and bought when the market was favorable.
                 </p>
                 <p>
-                    Every action a visitor took — adding to cart, completing a checkout, abandoning at promo entry — fed back into the agents' state. The storefront reacted to itself.
+                    Every action a visitor took — adding to cart, completing a checkout, abandoning at promo entry — fed back into the agents' state. In other words, your decisions directly influenced the agents and pricing!
                 </p>
             </div>
             <aside class="retro-section__aside">
                 <h3>Stack</h3>
                 <ul>
-                    <li>Frontend <span>Vanilla JS</span></li>
+                    <li>Frontend <span>Vanilla JS (AI Coded)</span></li>
                     <li>Backend <span>Supabase</span></li>
-                    <li>Agents <span>n8n × 3</span></li>
+                    <li>Agents <span>n8n</span></li>
                     <li>Modeling <span>Fabric</span></li>
                     <li>Dashboards <span>Power BI</span></li>
                 </ul>
@@ -104,11 +104,11 @@
             <aside class="retro-section__aside">
                 <h3>Behaviors observed</h3>
                 <ul>
-                    <li>Pricing volatility <span>±$1.40</span></li>
+                    <li>Pricing volatility <span>±13%</span></li>
                     <li>Avg drift / day <span>11.2%</span></li>
                     <li>Restock fires <span>4.2/day</span></li>
-                    <li>Fair-buys <span>17 total</span></li>
-                    <li>Cart abandon @ promo <span>32%</span></li>
+                    <li>Fair-buys <span>600 Max per Day</span></li>
+                    <li>Cart abandon @ promo <span>0%</span></li>
                 </ul>
             </aside>
             <div class="retro-section__body">
@@ -118,16 +118,16 @@
                     The pricing agent settled into a reasonable diurnal pattern within 48 hours — leaning prices up during morning peaks, easing down in the late afternoon as ride passes saturated. Without any explicit time-of-day rules — it just <em>noticed</em>.
                 </p>
                 <p>
-                    The restock agent was the boring one, in a good way. Threshold checks fired on schedule, replenishments completed cleanly, never a stockout during the run.
+                    The restock agent was the boring one, in a good way. Threshold checks fired on schedule, replenishments completed cleanly, never a stockout during the run. It was the bottleneck in the end, not restocking often enough to keep up with a high demand market.
                 </p>
 
                 <div class="pullquote">
-                    <p>The fair-buyer was the agent that surprised me. It bought into dips I didn't see coming, then sat patient for two days at a stretch.</p>
+                    <p>The fair-buyer was aggressive during this project. I found that I could manually set prices that slowed it down, but it appeared my pricing agent was aiming for higher volume over price per ticket.</p>
                     <cite>— Project notes, day 9</cite>
                 </div>
 
                 <p>
-                    Cart abandonment on the promo-code field stuck out: a third of carts dropped right when the promo input appeared. That's a UX signal, not an agent signal — the visible promo field made people feel they were missing out.
+                    Cart abandonment on the promo-code field might be interesting to explore in the future.
                 </p>
             </div>
         </article>
