@@ -194,8 +194,19 @@ async function navigateTo(url, options = {}) {
 
             // Bottom tab bar (sync if present)
             syncBodyElement('.tabbar', doc);
-            // Instantly snap indicator to the active tab in the newly-swapped tabbar
-            // so it's in the right place before the view transition captures the new state.
+            // Explicitly activate the correct tab based on the navigation target.
+            // This is more reliable than the incoming HTML's hardcoded is-active because
+            // history.pushState hasn't run yet, so window.location.pathname is still old.
+            document.querySelectorAll('.tabbar__item[data-route]').forEach((item) => {
+                const route = item.getAttribute('data-route');
+                if (route === normalizedTarget) {
+                    item.classList.add('is-active');
+                    item.setAttribute('aria-current', 'page');
+                } else {
+                    item.classList.remove('is-active');
+                    item.removeAttribute('aria-current');
+                }
+            });
             positionTabIndicator(true);
 
             // Modal/overlay containers outside <main>
