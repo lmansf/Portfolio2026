@@ -245,7 +245,7 @@
                 <p class="hero__eyebrow">Real-time ML · Fraud Monitor</p>
                 <h1 class="hero__name" id="fraud-title">Live fraud<br>detection.</h1>
                 <p class="hero__role">
-                    An Isolation Forest scores every incoming order against the full transaction population.
+                    A Histogram-Based Gradient Boosting classifier scores every incoming order on the probability it is fraudulent.
                     <em>Watch it catch fraud in real time.</em>
                 </p>
             </div>
@@ -259,11 +259,11 @@
                 <div class="now__rows">
                     <div class="now__row">
                         <span class="now__label">Model</span>
-                        <span class="now__value">Isolation Forest</span>
+                        <span class="now__value">Hist Gradient Boost</span>
                     </div>
                     <div class="now__row">
-                        <span class="now__label">Contamination</span>
-                        <span class="now__value">5 %</span>
+                        <span class="now__label">Type</span>
+                        <span class="now__value">Supervised</span>
                     </div>
                     <div class="now__row">
                         <span class="now__label">Last sync</span>
@@ -340,7 +340,7 @@
         <section aria-labelledby="table-heading">
             <header class="section-head">
                 <h2 class="section-head__title" id="table-heading">Recent flagged transactions</h2>
-                <span class="section-head__hint">Last 10 · Model-predicted fraud</span>
+                <span class="section-head__hint">Last 10 · Classifier-flagged fraud</span>
             </header>
 
             <div class="fraud-table-wrap">
@@ -348,7 +348,7 @@
                     <thead>
                         <tr>
                             <th scope="col">Order ID</th>
-                            <th scope="col">Anomaly Score</th>
+                            <th scope="col">Fraud Score</th>
                             <th scope="col">Scored At</th>
                             <th scope="col">Verdict</th>
                         </tr>
