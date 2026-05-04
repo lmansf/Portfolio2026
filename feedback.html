@@ -18,6 +18,88 @@
     </script>
     <script defer src="/_vercel/insights/script.js"></script>
     <!-- shell:migrated v1 -->
+
+    <style>
+        /* ── Feedback form · page-scoped styles ─────────────────────── */
+        .feedback-form {
+            display: grid;
+            gap: 1.1rem;
+            margin-top: 1.25rem;
+        }
+        .fb-field {
+            display: grid;
+            gap: 0.35rem;
+        }
+        .fb-field label {
+            font-family: var(--font-mono);
+            font-size: 0.68rem;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            color: var(--ink-3);
+        }
+        .fb-field input,
+        .fb-field textarea {
+            width: 100%;
+            background: var(--surface-2);
+            border: 1px solid var(--hairline-strong);
+            border-radius: var(--r-md);
+            padding: 0.65rem 0.85rem;
+            font-family: var(--font-text);
+            font-size: 0.95rem;
+            color: var(--ink-1);
+            transition: border-color var(--dur-fast) var(--ease-out),
+                        box-shadow var(--dur-fast) var(--ease-out);
+            appearance: none;
+            -webkit-appearance: none;
+        }
+        .fb-field input:focus,
+        .fb-field textarea:focus {
+            outline: none;
+            border-color: var(--accent);
+            box-shadow: 0 0 0 3px var(--accent-glow);
+        }
+        .fb-field textarea {
+            resize: vertical;
+            min-height: 120px;
+        }
+        .fb-submit {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.6rem;
+            padding: 0.75rem 1.25rem;
+            background: var(--accent);
+            color: #fff;
+            border: none;
+            border-radius: 999px;
+            font-family: var(--font-text);
+            font-size: 0.92rem;
+            font-weight: 600;
+            cursor: pointer;
+            width: fit-content;
+            transition: transform var(--dur-fast) var(--ease-out),
+                        opacity var(--dur-fast) var(--ease-out);
+        }
+        .fb-submit:hover:not(:disabled) { transform: translateY(-1px); }
+        .fb-submit:disabled { opacity: 0.5; cursor: not-allowed; }
+        .fb-status {
+            font-size: 0.88rem;
+            padding: 0.65rem 0.9rem;
+            border-radius: var(--r-md);
+            display: none;
+        }
+        .fb-status[data-state="success"] {
+            display: block;
+            background: rgba(90, 143, 94, 0.12);
+            color: var(--success);
+            border: 1px solid rgba(90, 143, 94, 0.28);
+        }
+        .fb-status[data-state="error"] {
+            display: block;
+            background: rgba(197, 61, 61, 0.10);
+            color: var(--danger);
+            border: 1px solid rgba(197, 61, 61, 0.24);
+        }
+    </style>
 </head>
 <body>
     <a class="skip-link" href="#main-content">Skip to content</a>
@@ -74,15 +156,31 @@
 
             <div class="feedback-reveal" data-revealed="false" aria-live="polite">
                 <p id="feedback-followup">Pick a chip above and the form will appear.</p>
-                <a
-                    href="https://naowl.app.n8n.cloud/form/68e8accf-66fc-4342-b0f3-70a3d96a8813"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    class="pitch__cta"
-                >
-                    Open feedback form <span class="arrow">↗</span>
-                </a>
-                <p class="hero__role" style="font-size: 0.86rem;">Opens in a new tab. Or — chat with Crowbot bottom-left and tell him directly.</p>
+
+                <form class="feedback-form" id="feedback-form" novalidate>
+                    <input type="hidden" id="fb-reason" name="reason" value="">
+
+                    <div class="fb-field">
+                        <label for="fb-name">Your name <span aria-hidden="true">(optional)</span></label>
+                        <input type="text" id="fb-name" name="name" placeholder="e.g. Alex" autocomplete="name" maxlength="120">
+                    </div>
+
+                    <div class="fb-field">
+                        <label for="fb-email">Email <span aria-hidden="true">(optional — only if you want a reply)</span></label>
+                        <input type="email" id="fb-email" name="email" placeholder="you@example.com" autocomplete="email" maxlength="254">
+                    </div>
+
+                    <div class="fb-field">
+                        <label for="fb-message">Message <span aria-hidden="true">*</span></label>
+                        <textarea id="fb-message" name="message" placeholder="Tell me anything…" maxlength="2000" required></textarea>
+                    </div>
+
+                    <div role="status" class="fb-status" id="fb-status" aria-live="polite"></div>
+
+                    <button class="fb-submit" type="submit" id="fb-submit">
+                        Send feedback <span aria-hidden="true">→</span>
+                    </button>
+                </form>
             </div>
         </article>
 
@@ -162,30 +260,101 @@
     </div>
 </aside>
 
+    <!-- Supabase JS v2 (CDN) -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
     <script defer src="assets/transition.js"></script>
     <script data-feedback-init>
     (function () {
+        /* ── Supabase ──────────────────────────────────────────────── */
+        const SUPABASE_URL = 'https://nxyitzzdnzfbdvkfbgcs.supabase.co';
+        const SUPABASE_KEY = 'sb_publishable_aOBNA_g5uQvnqygPsaYxqA_MxraaT0S';
+        const db = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+        /* ── HTML escape helper ─────────────────────────────────────── */
+        function esc(str) {
+            return String(str ?? '')
+                .replace(/&/g, '&amp;').replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+        }
+
+        /* ── Chip follow-up copy ────────────────────────────────────── */
         const FOLLOWUPS = {
             hire:     "Awesome — drop your role + the most-relevant capability and I'll prioritize replying.",
             learn:    "Tell me which project and I'll send a writeup or jump on a call.",
-            critique: "Be brutal. The form has a free-text field — I read every one.",
-            'say-hi': "Sweet. The form takes 30 seconds. Or just chat with Crowbot.",
-            other:    "Tell me anything. Form below — or LinkedIn DM works too."
+            critique: "Be brutal. Free-text below — I read every one.",
+            'say-hi': "Sweet. Takes 30 seconds. Or just chat with Crowbot.",
+            other:    "Tell me anything — form below."
         };
 
+        /* ── Init ───────────────────────────────────────────────────── */
         function initialize() {
-            const root = document.querySelector('[data-feedback]');
+            const root     = document.querySelector('[data-feedback]');
             if (!root) return;
-            const chips = Array.from(root.querySelectorAll('[data-feedback-pick]'));
-            const reveal = root.querySelector('.feedback-reveal');
+            const chips    = Array.from(root.querySelectorAll('[data-feedback-pick]'));
+            const reveal   = root.querySelector('.feedback-reveal');
             const followup = root.querySelector('#feedback-followup');
+            const reasonEl = document.getElementById('fb-reason');
 
             chips.forEach((chip) => {
                 chip.addEventListener('click', () => {
-                    chips.forEach((c) => c.setAttribute('aria-pressed', c === chip ? 'true' : 'false'));
+                    chips.forEach(c => c.setAttribute('aria-pressed', c === chip ? 'true' : 'false'));
                     reveal.setAttribute('data-revealed', 'true');
-                    if (followup) followup.textContent = FOLLOWUPS[chip.getAttribute('data-feedback-pick')] || '';
+                    const key = chip.getAttribute('data-feedback-pick');
+                    if (followup) followup.textContent = FOLLOWUPS[key] || '';
+                    if (reasonEl) reasonEl.value = key;
                 });
+            });
+
+            /* ── Form submit ────────────────────────────────────────── */
+            const form     = document.getElementById('feedback-form');
+            const statusEl = document.getElementById('fb-status');
+            const submitBtn = document.getElementById('fb-submit');
+
+            function setStatus(state, msg) {
+                statusEl.setAttribute('data-state', state);
+                statusEl.textContent = msg;
+            }
+            function clearStatus() {
+                statusEl.removeAttribute('data-state');
+                statusEl.textContent = '';
+            }
+
+            form.addEventListener('submit', async (e) => {
+                e.preventDefault();
+                clearStatus();
+
+                const message = document.getElementById('fb-message').value.trim();
+                if (!message) {
+                    setStatus('error', 'Please enter a message before sending.');
+                    document.getElementById('fb-message').focus();
+                    return;
+                }
+
+                submitBtn.disabled = true;
+                submitBtn.textContent = 'Sending…';
+
+                const payload = {
+                    reason:  document.getElementById('fb-reason').value  || null,
+                    name:    document.getElementById('fb-name').value.trim()  || null,
+                    email:   document.getElementById('fb-email').value.trim() || null,
+                    message: message,
+                };
+
+                try {
+                    const { error } = await db.from('feedback').insert(payload);
+                    if (error) throw error;
+
+                    setStatus('success', 'Thanks — message received! I\'ll reply if you left an email.');
+                    form.reset();
+                    if (reasonEl) reasonEl.value = chips.find(c => c.getAttribute('aria-pressed') === 'true')?.getAttribute('data-feedback-pick') || '';
+                } catch (err) {
+                    console.error('[Feedback]', err);
+                    setStatus('error', 'Something went wrong. Please try again or reach out on LinkedIn.');
+                } finally {
+                    submitBtn.disabled = false;
+                    submitBtn.innerHTML = 'Send feedback <span aria-hidden="true">→</span>';
+                }
             });
         }
 
