@@ -269,7 +269,16 @@
         /* ── Supabase ──────────────────────────────────────────────── */
         const SUPABASE_URL = 'https://nxyitzzdnzfbdvkfbgcs.supabase.co';
         const SUPABASE_KEY = 'sb_publishable_aOBNA_g5uQvnqygPsaYxqA_MxraaT0S';
-        const db = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+        // Lazy-init: only create the client when the form is first submitted.
+        // This prevents a CDN failure from crashing the chip UI.
+        let _db = null;
+        function getDb() {
+            if (!_db) {
+                if (typeof supabase === 'undefined') throw new Error('Supabase SDK not loaded');
+                _db = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+            }
+            return _db;
+        }
 
         /* ── HTML escape helper ─────────────────────────────────────── */
         function esc(str) {
@@ -342,7 +351,7 @@
                 };
 
                 try {
-                    const { error } = await db.from('feedback').insert(payload);
+                    const { error } = await getDb().from('feedback').insert(payload);
                     if (error) throw error;
 
                     setStatus('success', 'Thanks — message received! I\'ll reply if you left an email.');
