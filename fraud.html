@@ -560,17 +560,20 @@
                     fetchAll('orders',        'order_id,is_fraud,total_amount'),
                 ]);
 
-                /* Build lookup: order_id → order row */
-                const ordersMap = new Map(orders.map(o => [o.order_id, o]));
+                /* Build lookups */
+                const ordersMap  = new Map(orders.map(o => [o.order_id, o]));
+                // fraudMap: order_id → fraud_results row (model verdict)
+                const fraudMap   = new Map(fraudResults.map(r => [r.order_id, r]));
 
-                /* Compute confusion-matrix metrics by joining on order_id */
+                /* Compute confusion-matrix metrics by iterating every order.
+                 * Orders with no fraud_results row were never scored — the model
+                 * effectively let them through, so they count as FN when is_fraud=1. */
                 let fp = 0, tp = 0, fn = 0, blocked = 0, fpLost = 0;
-                for (const r of fraudResults) {
-                    const order = ordersMap.get(r.order_id);
-                    if (!order) continue;            /* unscored order — skip */
-
-                    const modelFraud  = r.is_fraud === true;
+                for (const order of orders) {
+                    const result      = fraudMap.get(order.order_id);
                     const actualFraud = order.is_fraud === 1 || order.is_fraud === true;
+                    // No result row → model never scored → treat as "not fraud" prediction
+                    const modelFraud  = result ? result.is_fraud === true : false;
 
                     if ( modelFraud && !actualFraud) { fp++; fpLost += parseFloat(order.total_amount) || 0; }
                     if ( modelFraud &&  actualFraud) { tp++; blocked += parseFloat(order.total_amount) || 0; }
