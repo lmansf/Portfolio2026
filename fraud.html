@@ -326,6 +326,13 @@
                     <span class="kpi-tile__value" id="kpi-total-sales">—</span>
                     <span class="kpi-tile__desc">Running total of all legitimate sales completed</span>
                 </article>
+
+                <!-- 7. Sales lost to false positives (red, full-width) -->
+                <article class="kpi-tile kpi-tile--red kpi-tile--sales kpi-tile--loading" aria-labelledby="kpi-fp-lost-label">
+                    <span class="kpi-tile__label" id="kpi-fp-lost-label">Sales lost to false flags</span>
+                    <span class="kpi-tile__value" id="kpi-fp-lost">—</span>
+                    <span class="kpi-tile__desc">Revenue lost by incorrectly blocking legitimate customers</span>
+                </article>
             </div>
         </section>
 
@@ -557,7 +564,7 @@
                 const ordersMap = new Map(orders.map(o => [o.order_id, o]));
 
                 /* Compute confusion-matrix metrics by joining on order_id */
-                let fp = 0, tp = 0, fn = 0, blocked = 0;
+                let fp = 0, tp = 0, fn = 0, blocked = 0, fpLost = 0;
                 for (const r of fraudResults) {
                     const order = ordersMap.get(r.order_id);
                     if (!order) continue;            /* unscored order — skip */
@@ -565,7 +572,7 @@
                     const modelFraud  = r.is_fraud === true;
                     const actualFraud = order.is_fraud === 1 || order.is_fraud === true;
 
-                    if ( modelFraud && !actualFraud) fp++;
+                    if ( modelFraud && !actualFraud) { fp++; fpLost += parseFloat(order.total_amount) || 0; }
                     if ( modelFraud &&  actualFraud) { tp++; blocked += parseFloat(order.total_amount) || 0; }
                     if (!modelFraud &&  actualFraud) fn++;
                 }
@@ -594,9 +601,10 @@
                 el('kpi-false-negatives').textContent = enoughData ? fmtInt.format(fn) : 'Coming Soon!';
                 el('kpi-blocked-spending').textContent = 'AED\u00a0' + fmtDec.format(blocked);
                 el('kpi-total-sales').textContent       = 'AED\u00a0' + fmtDec.format(totalSales);
+                el('kpi-fp-lost').textContent           = enoughData ? 'AED\u00a0' + fmtDec.format(fpLost) : 'Coming Soon!';
 
                 /* Toggle coming-soon styling on red tiles */
-                ['kpi-false-positives', 'kpi-false-negatives'].forEach(id => {
+                ['kpi-false-positives', 'kpi-false-negatives', 'kpi-fp-lost'].forEach(id => {
                     const tile = el(id).closest('.kpi-tile');
                     tile.classList.toggle('kpi-tile--coming-soon', !enoughData);
                 });
