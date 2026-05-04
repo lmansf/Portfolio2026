@@ -266,6 +266,10 @@
                         <span class="now__value">Supervised</span>
                     </div>
                     <div class="now__row">
+                        <span class="now__label">Since</span>
+                        <span class="now__value">May 4, 2026</span>
+                    </div>
+                    <div class="now__row">
                         <span class="now__label">Last sync</span>
                         <span class="now__value" id="last-sync">—</span>
                     </div>
@@ -289,7 +293,7 @@
                 <article class="kpi-tile kpi-tile--green kpi-tile--loading" aria-labelledby="kpi-total-label">
                     <span class="kpi-tile__label" id="kpi-total-label">Orders processed</span>
                     <span class="kpi-tile__value" id="kpi-total-orders">—</span>
-                    <span class="kpi-tile__desc">Total orders ingested into the system</span>
+                    <span class="kpi-tile__desc">Orders scored by the current model since May 4, 2026</span>
                 </article>
 
                 <!-- 2. False positives — legit customers flagged as fraud (red) -->
@@ -472,15 +476,17 @@
                 .replace(/'/g, '&#39;');
         }
 
-        /* ── Paginated full-table fetch ────────────────────────────── */
-        async function fetchAll(table, columns) {
+        /* ── Model cutoff — only include rows scored by the current model ── */
+        const MODEL_CUTOFF = '2026-05-04T00:00:00.000Z';
+
+        /* ── Paginated full-table fetch with optional server-side gte filter ── */
+        async function fetchAll(table, columns, gteCol, gteVal) {
             const PAGE = 1000;
             let rows = [], from = 0;
             while (true) {
-                const { data, error } = await db
-                    .from(table)
-                    .select(columns)
-                    .range(from, from + PAGE - 1);
+                let q = db.from(table).select(columns);
+                if (gteCol) q = q.gte(gteCol, gteVal);
+                const { data, error } = await q.range(from, from + PAGE - 1);
                 if (error) throw error;
                 if (!data || data.length === 0) break;
                 rows = rows.concat(data);
@@ -554,34 +560,34 @@
         async function refresh() {
             setStatus('loading');
             try {
-                /* Fetch both tables in parallel */
+                /* Fetch fraud_results filtered to the current model's window;
+                 * orders fetched in full for amount/label lookups. */
                 const [fraudResults, orders] = await Promise.all([
-                    fetchAll('fraud_results', 'order_id,is_fraud,anomaly_score,scored_at'),
+                    fetchAll('fraud_results', 'order_id,is_fraud,anomaly_score,scored_at', 'scored_at', MODEL_CUTOFF),
                     fetchAll('orders',        'order_id,is_fraud,total_amount'),
                 ]);
 
                 /* Build lookups */
-                const ordersMap  = new Map(orders.map(o => [o.order_id, o]));
-                // fraudMap: order_id → fraud_results row (model verdict)
-                const fraudMap   = new Map(fraudResults.map(r => [r.order_id, r]));
+                const ordersMap = new Map(orders.map(o => [o.order_id, o]));
 
-                /* Compute confusion-matrix metrics by iterating every order.
-                 * Orders with no fraud_results row were never scored — the model
-                 * effectively let them through, so they count as FN when is_fraud=1. */
+                /* Confusion-matrix metrics — iterate only rows the current model scored.
+                 * Every fraud_results row represents one model verdict (is_fraud true/false).
+                 * FN = model said not-fraud but ground-truth label is fraud. */
                 let fp = 0, tp = 0, fn = 0, blocked = 0, fpLost = 0;
-                for (const order of orders) {
-                    const result      = fraudMap.get(order.order_id);
-                    const actualFraud = order.is_fraud === 1 || order.is_fraud === true;
-                    // No result row → model never scored → treat as "not fraud" prediction
-                    const modelFraud  = result ? result.is_fraud === true : false;
+                for (const result of fraudResults) {
+                    const order       = ordersMap.get(result.order_id);
+                    const actualFraud = order != null && (order.is_fraud === 1 || order.is_fraud === true);
+                    const modelFraud  = result.is_fraud === true;
 
-                    if ( modelFraud && !actualFraud) { fp++; fpLost += parseFloat(order.total_amount) || 0; }
-                    if ( modelFraud &&  actualFraud) { tp++; blocked += parseFloat(order.total_amount) || 0; }
+                    if ( modelFraud && !actualFraud) { fp++; fpLost += parseFloat(order?.total_amount) || 0; }
+                    if ( modelFraud &&  actualFraud) { tp++; blocked += parseFloat(order?.total_amount) || 0; }
                     if (!modelFraud &&  actualFraud) fn++;
                 }
 
-                /* Total valid (non-fraud) sales — sum total_amount where is_fraud != 1 */
+                /* Total valid sales — only orders the current model scored */
+                const scoredOrderIds = new Set(fraudResults.map(r => r.order_id));
                 const totalSales = orders.reduce((sum, o) => {
+                    if (!scoredOrderIds.has(o.order_id)) return sum;
                     const isFraud = o.is_fraud === 1 || o.is_fraud === true;
                     return isFraud ? sum : sum + (parseFloat(o.total_amount) || 0);
                 }, 0);
@@ -593,12 +599,11 @@
                     .slice(0, 10);
 
                 /* Update KPI tiles */
-                // Red tiles require at least 1000 orders to show meaningful metrics.
-                // Below that threshold the model hasn't seen enough volume to be reliable.
+                // Red tiles require at least 1000 scored rows to show meaningful metrics.
                 const THRESHOLD = 1000;
-                const enoughData = orders.length >= THRESHOLD;
+                const enoughData = fraudResults.length >= THRESHOLD;
 
-                el('kpi-total-orders').textContent    = fmtInt.format(orders.length);
+                el('kpi-total-orders').textContent    = fmtInt.format(fraudResults.length);
                 el('kpi-false-positives').textContent = enoughData ? fmtInt.format(fp) : 'Coming Soon!';
                 el('kpi-true-positives').textContent  = fmtInt.format(tp);
                 el('kpi-false-negatives').textContent = enoughData ? fmtInt.format(fn) : 'Coming Soon!';
