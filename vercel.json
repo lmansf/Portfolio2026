@@ -22,7 +22,7 @@
       ]
     },
     {
-      "source": "/(work|pipeline|shop|resume|feedback)",
+      "source": "/(work|pipeline|fraud|shop|resume|feedback)",
       "headers": [
         {
           "key": "Cache-Control",
@@ -105,6 +105,10 @@
     {
       "source": "/feedback",
       "destination": "/feedback.html"
+    },
+    {
+      "source": "/fraud",
+      "destination": "/fraud.html"
     }
   ]
 }
