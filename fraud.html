@@ -1,0 +1,625 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Logan Mansfield · Fraud Monitor</title>
+    <link rel="icon" type="image/jpeg" href="mini.jpg">
+    <link rel="shortcut icon" href="mini.jpg">
+    <link rel="stylesheet" href="assets/tokens.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="assets/style.css">
+    <link rel="stylesheet" href="assets/shell.css">
+    <link rel="stylesheet" href="assets/pages.css">
+    <script>
+        window.va = window.va || function () { (window.vaq = window.vaq || []).push(arguments); };
+    </script>
+    <script defer src="/_vercel/insights/script.js"></script>
+    <!-- shell:migrated v1 -->
+
+    <style>
+        /* ── Fraud Monitor · page-scoped styles ─────────────────────── */
+
+        /* KPI tile grid */
+        .fraud-kpis {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 0.85rem;
+            margin-top: 1rem;
+        }
+        @media (min-width: 640px) {
+            .fraud-kpis { grid-template-columns: repeat(4, 1fr); }
+        }
+
+        .kpi-tile {
+            background: var(--surface-1);
+            border: 1px solid var(--hairline);
+            border-radius: var(--r-lg);
+            padding: clamp(0.85rem, 2vw, 1.2rem) clamp(0.9rem, 2.5vw, 1.35rem);
+            display: grid;
+            gap: 0.3rem;
+            align-content: start;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .kpi-tile--green {
+            border-color: rgba(90, 143, 94, 0.30);
+            background: linear-gradient(135deg, var(--surface-1) 55%, rgba(90, 143, 94, 0.08));
+        }
+        .kpi-tile--red {
+            border-color: rgba(197, 61, 61, 0.30);
+            background: linear-gradient(135deg, var(--surface-1) 55%, rgba(197, 61, 61, 0.08));
+        }
+        .kpi-tile--blocked {
+            grid-column: 1 / -1;
+            border-color: rgba(232, 169, 58, 0.32);
+            background: linear-gradient(135deg, var(--surface-1) 40%, rgba(232, 169, 58, 0.09));
+        }
+
+        .kpi-tile__label {
+            font-family: var(--font-mono);
+            font-size: 0.66rem;
+            letter-spacing: 0.12em;
+            text-transform: uppercase;
+            color: var(--ink-3);
+        }
+        .kpi-tile__value {
+            font-family: var(--font-display);
+            font-size: clamp(1.9rem, 4.5vw, 2.6rem);
+            font-weight: 700;
+            font-variant-numeric: tabular-nums;
+            line-height: 1.05;
+            letter-spacing: -0.025em;
+        }
+        .kpi-tile--green   .kpi-tile__value { color: var(--success); }
+        .kpi-tile--red     .kpi-tile__value { color: var(--danger); }
+        .kpi-tile--blocked .kpi-tile__value {
+            color: var(--accent-2);
+            font-size: clamp(1.5rem, 3.5vw, 2.2rem);
+        }
+        .kpi-tile__desc {
+            font-size: 0.79rem;
+            color: var(--ink-2);
+            margin-top: 0.15rem;
+        }
+
+        /* Shimmer on initial load */
+        .kpi-tile--loading .kpi-tile__value {
+            color: var(--ink-3);
+            animation: kpi-shimmer 1.5s ease-in-out infinite;
+        }
+        @keyframes kpi-shimmer {
+            0%, 100% { opacity: 1; }
+            50%       { opacity: 0.3; }
+        }
+        @media (prefers-reduced-motion: reduce) {
+            .kpi-tile--loading .kpi-tile__value { animation: none; }
+        }
+
+        /* Fraud table */
+        .fraud-table-wrap {
+            overflow-x: auto;
+            border: 1px solid var(--hairline);
+            border-radius: var(--r-lg);
+            background: var(--surface-1);
+            margin-top: 1rem;
+        }
+        .fraud-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.86rem;
+            min-width: 480px;
+        }
+        .fraud-table th {
+            text-align: left;
+            font-family: var(--font-mono);
+            font-size: 0.65rem;
+            color: var(--ink-3);
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            padding: 0.7rem 1rem;
+            border-bottom: 1px solid var(--hairline-strong);
+            white-space: nowrap;
+        }
+        .fraud-table td {
+            padding: 0.65rem 1rem;
+            border-bottom: 1px solid var(--hairline);
+            color: var(--ink-1);
+            vertical-align: middle;
+        }
+        .fraud-table tbody tr:last-child td { border-bottom: none; }
+        .fraud-table tbody tr:hover { background: var(--surface-2); transition: background var(--dur-fast) var(--ease-out); }
+
+        .fraud-table__id {
+            font-family: var(--font-mono);
+            font-size: 0.79rem;
+            color: var(--ink-2);
+            white-space: nowrap;
+        }
+        .fraud-table__score { font-family: var(--font-mono); font-variant-numeric: tabular-nums; }
+        .score-high { color: var(--danger); font-weight: 600; }
+        .score-med  { color: var(--accent-2); }
+        .score-low  { color: var(--ink-2); }
+
+        .fraud-table__time {
+            font-family: var(--font-mono);
+            font-size: 0.78rem;
+            color: var(--ink-2);
+            white-space: nowrap;
+        }
+        .fraud-table__empty,
+        .fraud-table__loading {
+            text-align: center;
+            color: var(--ink-3);
+            font-family: var(--font-mono);
+            font-size: 0.82rem;
+            padding: 2rem 1rem;
+        }
+
+        /* Verdict badges */
+        .badge {
+            display: inline-block;
+            border-radius: 999px;
+            padding: 0.18rem 0.6rem;
+            font-family: var(--font-mono);
+            font-size: 0.64rem;
+            letter-spacing: 0.06em;
+            text-transform: uppercase;
+            font-weight: 500;
+            white-space: nowrap;
+        }
+        .badge--tp {
+            background: rgba(90, 143, 94, 0.12);
+            color: var(--success);
+            border: 1px solid rgba(90, 143, 94, 0.28);
+        }
+        .badge--fp {
+            background: rgba(232, 169, 58, 0.12);
+            color: var(--accent-2);
+            border: 1px solid rgba(232, 169, 58, 0.28);
+        }
+        .badge--unknown {
+            background: var(--surface-2);
+            color: var(--ink-3);
+            border: 1px solid var(--hairline);
+        }
+
+        /* Coming-soon state on red tiles */
+        .kpi-tile--coming-soon .kpi-tile__value {
+            font-size: clamp(1rem, 2.5vw, 1.4rem);
+            color: var(--ink-3);
+            font-style: italic;
+            letter-spacing: 0;
+        }
+        .kpi-tile--coming-soon {
+            border-style: dashed;
+            opacity: 0.7;
+        }
+
+        /* Status pulse override when error/loading */
+        #live-pulse {
+            transition: background var(--dur-base) var(--ease-out),
+                        box-shadow var(--dur-base) var(--ease-out);
+        }
+    </style>
+</head>
+<body>
+    <a class="skip-link" href="#main-content">Skip to content</a>
+    <div class="shell-bg" aria-hidden="true"></div>
+
+    <header class="topbar">
+        <div class="topbar__brand">
+            <a href="/">
+                <span class="dot" aria-hidden="true"></span>
+                L. MANSFIELD
+            </a>
+        </div>
+        <button class="burger" type="button" aria-label="Open navigation" aria-expanded="false" aria-controls="site-nav" data-burger>
+            <span class="burger__bar"></span>
+            <span class="burger__bar"></span>
+            <span class="burger__bar"></span>
+        </button>
+    </header>
+
+    <nav class="site-nav" id="site-nav" aria-label="Primary navigation" aria-hidden="true">
+        <div class="site-nav__backdrop" data-nav-close aria-hidden="true"></div>
+        <div class="site-nav__panel">
+            <a class="site-nav__item" href="/">Home</a>
+            <a class="site-nav__item" href="/work">Work</a>
+            <a class="site-nav__item" href="/pipeline">Pipeline</a>
+            <a class="site-nav__item" href="/fraud" aria-current="page">Fraud Monitor</a>
+            <a class="site-nav__item" href="/shop">Shop</a>
+            <a class="site-nav__item" href="/resume">Resume</a>
+        </div>
+    </nav>
+
+    <main id="main-content" class="page page-fraud">
+
+        <!-- Hero -->
+        <section class="hero" aria-labelledby="fraud-title">
+            <div class="hero__main">
+                <p class="hero__eyebrow">Real-time ML · Fraud Monitor</p>
+                <h1 class="hero__name" id="fraud-title">Live fraud<br>detection.</h1>
+                <p class="hero__role">
+                    An Isolation Forest scores every incoming order against the full transaction population.
+                    <em>Watch it catch fraud in real time.</em>
+                </p>
+            </div>
+
+            <!-- Live status card -->
+            <div class="now" aria-live="polite" aria-label="Connection status">
+                <div class="now__head">
+                    <span class="now__pulse" id="live-pulse" aria-hidden="true"></span>
+                    LIVE · Supabase
+                </div>
+                <div class="now__rows">
+                    <div class="now__row">
+                        <span class="now__label">Model</span>
+                        <span class="now__value">Isolation Forest</span>
+                    </div>
+                    <div class="now__row">
+                        <span class="now__label">Contamination</span>
+                        <span class="now__value">5 %</span>
+                    </div>
+                    <div class="now__row">
+                        <span class="now__label">Last sync</span>
+                        <span class="now__value" id="last-sync">—</span>
+                    </div>
+                    <div class="now__row">
+                        <span class="now__label">Status</span>
+                        <span class="now__value" id="connection-status">Connecting…</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- KPI Tiles -->
+        <section aria-labelledby="kpi-heading">
+            <header class="section-head">
+                <h2 class="section-head__title" id="kpi-heading">Dashboard metrics</h2>
+                <span class="section-head__hint" id="kpi-hint" aria-live="polite">Loading…</span>
+            </header>
+
+            <div class="fraud-kpis">
+                <!-- 1. Total orders processed (green) -->
+                <article class="kpi-tile kpi-tile--green kpi-tile--loading" aria-labelledby="kpi-total-label">
+                    <span class="kpi-tile__label" id="kpi-total-label">Orders processed</span>
+                    <span class="kpi-tile__value" id="kpi-total-orders">—</span>
+                    <span class="kpi-tile__desc">Total orders ingested into the system</span>
+                </article>
+
+                <!-- 2. False positives — legit customers flagged as fraud (red) -->
+                <article class="kpi-tile kpi-tile--red kpi-tile--loading" aria-labelledby="kpi-fp-label">
+                    <span class="kpi-tile__label" id="kpi-fp-label">False positives</span>
+                    <span class="kpi-tile__value" id="kpi-false-positives">—</span>
+                    <span class="kpi-tile__desc">Legitimate customers wrongly flagged</span>
+                </article>
+
+                <!-- 3. True positives — fraud correctly caught (green) -->
+                <article class="kpi-tile kpi-tile--green kpi-tile--loading" aria-labelledby="kpi-tp-label">
+                    <span class="kpi-tile__label" id="kpi-tp-label">Fraud quarantined</span>
+                    <span class="kpi-tile__value" id="kpi-true-positives">—</span>
+                    <span class="kpi-tile__desc">Actual fraud attempts caught correctly</span>
+                </article>
+
+                <!-- 4. False negatives — fraud that passed through (red) -->
+                <article class="kpi-tile kpi-tile--red kpi-tile--loading" aria-labelledby="kpi-fn-label">
+                    <span class="kpi-tile__label" id="kpi-fn-label">Fraud passed</span>
+                    <span class="kpi-tile__value" id="kpi-false-negatives">—</span>
+                    <span class="kpi-tile__desc">Fraud attempts that slipped through undetected</span>
+                </article>
+
+                <!-- 5. Running total of blocked fraud spend (accent, full-width) -->
+                <article class="kpi-tile kpi-tile--blocked kpi-tile--loading" aria-labelledby="kpi-blocked-label">
+                    <span class="kpi-tile__label" id="kpi-blocked-label">Fraud spending blocked</span>
+                    <span class="kpi-tile__value" id="kpi-blocked-spending">—</span>
+                    <span class="kpi-tile__desc">Running total of attempted fraud spend successfully prevented</span>
+                </article>
+            </div>
+        </section>
+
+        <!-- Recent flagged transactions table -->
+        <section aria-labelledby="table-heading">
+            <header class="section-head">
+                <h2 class="section-head__title" id="table-heading">Recent flagged transactions</h2>
+                <span class="section-head__hint">Last 10 · Model-predicted fraud</span>
+            </header>
+
+            <div class="fraud-table-wrap">
+                <table class="fraud-table" aria-label="Last 10 transactions flagged as fraud by the model">
+                    <thead>
+                        <tr>
+                            <th scope="col">Order ID</th>
+                            <th scope="col">Anomaly Score</th>
+                            <th scope="col">Scored At</th>
+                            <th scope="col">Verdict</th>
+                        </tr>
+                    </thead>
+                    <tbody id="fraud-table-body">
+                        <tr>
+                            <td colspan="4" class="fraud-table__loading">Loading transactions…</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+        <!-- Up next rail -->
+        <section class="upnext" aria-labelledby="fraud-upnext">
+            <header class="section-head">
+                <h2 class="section-head__title" id="fraud-upnext">Up next</h2>
+                <span class="section-head__hint">Swipe →</span>
+            </header>
+            <div class="upnext__rail">
+                <a class="upnext__card" href="/pipeline">
+                    <span class="upnext__num">03 / Pipeline</span>
+                    <span class="upnext__name">The full data pipeline</span>
+                    <span class="upnext__tease">See how n8n, Supabase, Fabric, and Power BI wire together end-to-end.</span>
+                    <span class="upnext__arrow">Open →</span>
+                </a>
+                <a class="upnext__card" href="/work">
+                    <span class="upnext__num">02 / Work</span>
+                    <span class="upnext__name">Project catalog</span>
+                    <span class="upnext__tease">Power BI builds, fraud detection, churn modeling, and certifications.</span>
+                    <span class="upnext__arrow">Open →</span>
+                </a>
+                <a class="upnext__card" href="/shop">
+                    <span class="upnext__num">04 / Shop</span>
+                    <span class="upnext__name">See agents in action</span>
+                    <span class="upnext__tease">Watch pricing and restocking agents respond to live purchases.</span>
+                    <span class="upnext__arrow">Open →</span>
+                </a>
+            </div>
+        </section>
+
+    </main>
+
+    <footer class="shell-footer">
+        <div class="ticker" aria-hidden="true">
+            <div class="ticker__track">
+                <span class="ticker__item"><span class="dot">●</span><strong>Power BI</strong></span>
+                <span class="ticker__item"><span class="dot">●</span><strong>Python</strong></span>
+                <span class="ticker__item"><span class="dot">●</span><strong>SQL</strong></span>
+                <span class="ticker__item"><span class="dot">●</span><strong>Microsoft Fabric</strong></span>
+                <span class="ticker__item"><span class="dot">●</span><strong>Snowflake</strong></span>
+                <span class="ticker__item"><span class="dot">●</span><strong>Machine Learning</strong></span>
+                <span class="ticker__item"><span class="dot">●</span><strong>Excel</strong></span>
+                <span class="ticker__item"><span class="dot">●</span><strong>Power BI</strong></span>
+                <span class="ticker__item"><span class="dot">●</span><strong>Python</strong></span>
+                <span class="ticker__item"><span class="dot">●</span><strong>SQL</strong></span>
+                <span class="ticker__item"><span class="dot">●</span><strong>Microsoft Fabric</strong></span>
+                <span class="ticker__item"><span class="dot">●</span><strong>Snowflake</strong></span>
+                <span class="ticker__item"><span class="dot">●</span><strong>Machine Learning</strong></span>
+                <span class="ticker__item"><span class="dot">●</span><strong>Excel</strong></span>
+            </div>
+        </div>
+        <div class="footer-socials">
+            <a href="https://x.com/StatBird" target="_blank" rel="noopener">Twitter</a>
+            <a href="https://github.com/lmansf" target="_blank" rel="noopener">Github</a>
+            <a href="https://www.linkedin.com/in/lmansf96/" target="_blank" rel="noopener">LinkedIn</a>
+            <a href="/feedback">Feedback</a>
+        </div>
+    </footer>
+
+    <button class="crowbot-fab" type="button" data-crowbot-fab aria-label="Open Crowbot AI assistant" aria-controls="crowbot-sheet" aria-expanded="false" title="Chat with Crowbot">
+        🐦‍⬛
+    </button>
+
+    <aside class="crowbot-sheet" id="crowbot-sheet" aria-hidden="true" role="dialog" aria-labelledby="crowbot-sheet-title">
+        <div class="crowbot-sheet__backdrop" data-crowbot-close></div>
+        <div class="crowbot-sheet__panel">
+            <div class="crowbot-sheet__head">
+                <div>
+                    <h2 id="crowbot-sheet-title">Crowbot 🐦‍⬛</h2>
+                    <p>Ask Crowbot about my resume, projects, or hobbies. Drop your email and he&rsquo;ll bring it to me.</p>
+                </div>
+                <button class="crowbot-sheet__close" type="button" data-crowbot-close aria-label="Close Crowbot">×</button>
+            </div>
+            <div class="crowbot-sheet__body">
+            </div>
+        </div>
+    </aside>
+
+    <!-- Supabase JS v2 (CDN) -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+    <script>
+    (() => {
+        'use strict';
+
+        /* ── Config ────────────────────────────────────────────────── */
+        const SUPABASE_URL = 'https://nxyitzzdnzfbdvkfbgcs.supabase.co';
+        // Publishable (anon) key — read-only, safe for frontend use.
+        // If this key doesn't work, swap it for the JWT anon key from your
+        // Supabase dashboard → Project Settings → API → anon public.
+        const SUPABASE_KEY = 'sb_publishable_aOBNA_g5uQvnqygPsaYxqA_MxraaT0S';
+
+        const { createClient } = supabase;
+        const db = createClient(SUPABASE_URL, SUPABASE_KEY);
+
+        /* ── Formatters ────────────────────────────────────────────── */
+        const fmtInt = new Intl.NumberFormat('en-US');
+        const fmtDec = new Intl.NumberFormat('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+
+        /* ── DOM helper ────────────────────────────────────────────── */
+        function el(id) { return document.getElementById(id); }
+
+        /* ── HTML escape (XSS guard for any DB string rendered to DOM) */
+        function esc(str) {
+            return String(str ?? '')
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;')
+                .replace(/"/g, '&quot;')
+                .replace(/'/g, '&#39;');
+        }
+
+        /* ── Paginated full-table fetch ────────────────────────────── */
+        async function fetchAll(table, columns) {
+            const PAGE = 1000;
+            let rows = [], from = 0;
+            while (true) {
+                const { data, error } = await db
+                    .from(table)
+                    .select(columns)
+                    .range(from, from + PAGE - 1);
+                if (error) throw error;
+                if (!data || data.length === 0) break;
+                rows = rows.concat(data);
+                if (data.length < PAGE) break;
+                from += PAGE;
+            }
+            return rows;
+        }
+
+        /* ── Status indicator ──────────────────────────────────────── */
+        function setStatus(state) {
+            const pulse  = el('live-pulse');
+            const status = el('connection-status');
+            const colors = {
+                live:    { text: 'Connected',      bg: 'var(--success)' },
+                loading: { text: 'Syncing\u2026',  bg: 'var(--accent-2)' },
+                error:   { text: 'Connection error', bg: 'var(--danger)' },
+            };
+            const s = colors[state] || colors.error;
+            status.textContent = s.text;
+            pulse.style.background = s.bg;
+        }
+
+        /* ── Table renderer ────────────────────────────────────────── */
+        function renderTable(rows, ordersMap) {
+            const tbody = el('fraud-table-body');
+
+            if (!rows.length) {
+                tbody.innerHTML = '<tr><td colspan="4" class="fraud-table__empty">No flagged transactions yet.</td></tr>';
+                return;
+            }
+
+            tbody.innerHTML = rows.map(r => {
+                const scoreNum   = typeof r.anomaly_score === 'number' ? r.anomaly_score : null;
+                const scoreStr   = scoreNum !== null ? scoreNum.toFixed(4) : '—';
+                const scoreClass = scoreNum !== null
+                    ? (scoreNum < -0.15 ? 'score-high' : scoreNum < -0.05 ? 'score-med' : 'score-low')
+                    : '';
+
+                const order       = ordersMap.get(r.order_id);
+                const actualFraud = order != null && (order.is_fraud === 1 || order.is_fraud === true);
+                const badgeClass  = order == null ? 'badge--unknown'
+                                  : actualFraud   ? 'badge--tp'
+                                  :                 'badge--fp';
+                const badgeText   = order == null ? 'Unknown'
+                                  : actualFraud   ? 'Caught'
+                                  :                 'False +ve';
+
+                const dt      = r.scored_at ? new Date(r.scored_at) : null;
+                const timeStr = dt ? dt.toLocaleString(undefined, {
+                    month: 'short', day: 'numeric',
+                    hour: '2-digit', minute: '2-digit', second: '2-digit',
+                }) : '—';
+
+                return `<tr>
+                    <td class="fraud-table__id">${esc(r.order_id)}</td>
+                    <td class="fraud-table__score ${scoreClass}">${scoreStr}</td>
+                    <td class="fraud-table__time">${timeStr}</td>
+                    <td><span class="badge ${badgeClass}">${badgeText}</span></td>
+                </tr>`;
+            }).join('');
+        }
+
+        /* ── Remove loading shimmer from tiles ─────────────────────── */
+        function clearLoading() {
+            document.querySelectorAll('.kpi-tile--loading')
+                .forEach(t => t.classList.remove('kpi-tile--loading'));
+        }
+
+        /* ── Main refresh ──────────────────────────────────────────── */
+        async function refresh() {
+            setStatus('loading');
+            try {
+                /* Fetch both tables in parallel */
+                const [fraudResults, orders] = await Promise.all([
+                    fetchAll('fraud_results', 'order_id,is_fraud,anomaly_score,scored_at'),
+                    fetchAll('orders',        'order_id,is_fraud,total_amount'),
+                ]);
+
+                /* Build lookup: order_id → order row */
+                const ordersMap = new Map(orders.map(o => [o.order_id, o]));
+
+                /* Compute confusion-matrix metrics by joining on order_id */
+                let fp = 0, tp = 0, fn = 0, blocked = 0;
+                for (const r of fraudResults) {
+                    const order = ordersMap.get(r.order_id);
+                    if (!order) continue;            /* unscored order — skip */
+
+                    const modelFraud  = r.is_fraud === true;
+                    const actualFraud = order.is_fraud === 1 || order.is_fraud === true;
+
+                    if ( modelFraud && !actualFraud) fp++;
+                    if ( modelFraud &&  actualFraud) { tp++; blocked += parseFloat(order.total_amount) || 0; }
+                    if (!modelFraud &&  actualFraud) fn++;
+                }
+
+                /* Last 10 model-flagged transactions, newest first */
+                const recent = fraudResults
+                    .filter(r => r.is_fraud === true)
+                    .sort((a, b) => new Date(b.scored_at) - new Date(a.scored_at))
+                    .slice(0, 10);
+
+                /* Update KPI tiles */
+                // Red tiles require at least 1000 orders to show meaningful metrics.
+                // Below that threshold the model hasn't seen enough volume to be reliable.
+                const THRESHOLD = 1000;
+                const enoughData = orders.length >= THRESHOLD;
+
+                el('kpi-total-orders').textContent    = fmtInt.format(orders.length);
+                el('kpi-false-positives').textContent = enoughData ? fmtInt.format(fp) : 'Coming Soon!';
+                el('kpi-true-positives').textContent  = fmtInt.format(tp);
+                el('kpi-false-negatives').textContent = enoughData ? fmtInt.format(fn) : 'Coming Soon!';
+                el('kpi-blocked-spending').textContent = 'AED\u00a0' + fmtDec.format(blocked);
+
+                /* Toggle coming-soon styling on red tiles */
+                ['kpi-false-positives', 'kpi-false-negatives'].forEach(id => {
+                    const tile = el(id).closest('.kpi-tile');
+                    tile.classList.toggle('kpi-tile--coming-soon', !enoughData);
+                });
+
+                clearLoading();
+                renderTable(recent, ordersMap);
+
+                /* Timestamps */
+                const now = new Date();
+                const timeOpts = { hour: '2-digit', minute: '2-digit', second: '2-digit' };
+                el('last-sync').textContent = now.toLocaleTimeString(undefined, timeOpts);
+                el('kpi-hint').textContent  = 'Updated\u00a0' + now.toLocaleTimeString(undefined, { hour: '2-digit', minute: '2-digit' });
+
+                setStatus('live');
+            } catch (err) {
+                console.error('[FraudMonitor]', err);
+                setStatus('error');
+                el('kpi-hint').textContent = 'Update failed — retrying in 30 s';
+            }
+        }
+
+        /* ── Boot ──────────────────────────────────────────────────── */
+        refresh();
+
+        /* Supabase Realtime — re-run refresh on any INSERT to either table */
+        db.channel('fraud-monitor-rt')
+            .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'fraud_results' }, refresh)
+            .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'orders'        }, refresh)
+            .subscribe(status => {
+                if (status === 'SUBSCRIBED') setStatus('live');
+            });
+
+        /* Fallback poll every 30 seconds */
+        setInterval(refresh, 30_000);
+
+    })();
+    </script>
+
+    <script defer src="assets/transition.js"></script>
+</body>
+</html>
