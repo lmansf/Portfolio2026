@@ -53,7 +53,8 @@
             border-color: rgba(197, 61, 61, 0.30);
             background: linear-gradient(135deg, var(--surface-1) 55%, rgba(197, 61, 61, 0.08));
         }
-        .kpi-tile--blocked {
+        .kpi-tile--blocked,
+        .kpi-tile--sales {
             grid-column: 1 / -1;
             border-color: rgba(232, 169, 58, 0.32);
             background: linear-gradient(135deg, var(--surface-1) 40%, rgba(232, 169, 58, 0.09));
@@ -318,6 +319,13 @@
                     <span class="kpi-tile__value" id="kpi-blocked-spending">—</span>
                     <span class="kpi-tile__desc">Running total of attempted fraud spend successfully prevented</span>
                 </article>
+
+                <!-- 6. Total valid sales earned (green, full-width) -->
+                <article class="kpi-tile kpi-tile--green kpi-tile--sales kpi-tile--loading" aria-labelledby="kpi-sales-label">
+                    <span class="kpi-tile__label" id="kpi-sales-label">Total sales earned</span>
+                    <span class="kpi-tile__value" id="kpi-total-sales">—</span>
+                    <span class="kpi-tile__desc">Running total of all legitimate sales completed</span>
+                </article>
             </div>
         </section>
 
@@ -562,6 +570,12 @@
                     if (!modelFraud &&  actualFraud) fn++;
                 }
 
+                /* Total valid (non-fraud) sales — sum total_amount where is_fraud != 1 */
+                const totalSales = orders.reduce((sum, o) => {
+                    const isFraud = o.is_fraud === 1 || o.is_fraud === true;
+                    return isFraud ? sum : sum + (parseFloat(o.total_amount) || 0);
+                }, 0);
+
                 /* Last 10 model-flagged transactions, newest first */
                 const recent = fraudResults
                     .filter(r => r.is_fraud === true)
@@ -579,6 +593,7 @@
                 el('kpi-true-positives').textContent  = fmtInt.format(tp);
                 el('kpi-false-negatives').textContent = enoughData ? fmtInt.format(fn) : 'Coming Soon!';
                 el('kpi-blocked-spending').textContent = 'AED\u00a0' + fmtDec.format(blocked);
+                el('kpi-total-sales').textContent       = 'AED\u00a0' + fmtDec.format(totalSales);
 
                 /* Toggle coming-soon styling on red tiles */
                 ['kpi-false-positives', 'kpi-false-negatives'].forEach(id => {
