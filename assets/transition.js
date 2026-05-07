@@ -560,12 +560,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
         closeMobileNav();
 
-        if (normalizedHref === 'index.html' && currentPath !== 'index.html') {
-            e.preventDefault();
-            window.location.href = 'index.html';
-            return;
-        }
-
         if (normalizedHref === currentPath) {
             e.preventDefault();
             return;
