@@ -205,6 +205,58 @@
             transition: background var(--dur-base) var(--ease-out),
                         box-shadow var(--dur-base) var(--ease-out);
         }
+
+        /* DAG schedule tiles */
+        @media (min-width: 640px) {
+            .kpi-tile--dag { grid-column: span 2; }
+        }
+        .kpi-tile--dag-active {
+            border-color: rgba(90, 143, 94, 0.30);
+            background: linear-gradient(135deg, var(--surface-1) 55%, rgba(90, 143, 94, 0.08));
+        }
+        .kpi-tile--dag-active .kpi-tile__value { color: var(--success); }
+        .kpi-tile--dag-inactive {
+            border-style: dashed;
+            opacity: 0.52;
+        }
+        .kpi-tile--dag-inactive .kpi-tile__value { color: var(--ink-3); }
+        .kpi-tile__window {
+            font-family: var(--font-mono);
+            font-size: 0.68rem;
+            color: var(--ink-3);
+            margin-top: 0.1rem;
+            letter-spacing: 0.04em;
+        }
+        .kpi-tile__status {
+            display: flex;
+            align-items: center;
+            gap: 0.4rem;
+            font-family: var(--font-mono);
+            font-size: 0.7rem;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            margin-top: 0.2rem;
+            color: var(--ink-2);
+        }
+        .dag-dot {
+            width: 7px;
+            height: 7px;
+            border-radius: 50%;
+            flex-shrink: 0;
+        }
+        .dag-dot--running {
+            background: var(--success);
+            box-shadow: 0 0 0 2px rgba(90, 143, 94, 0.22);
+            animation: dag-pulse 2s ease-in-out infinite;
+        }
+        .dag-dot--idle { background: var(--ink-3); }
+        @keyframes dag-pulse {
+            0%, 100% { opacity: 1; }
+            50%       { opacity: 0.35; }
+        }
+        @media (prefers-reduced-motion: reduce) {
+            .dag-dot--running { animation: none; }
+        }
     </style>
 </head>
 <body>
@@ -336,6 +388,28 @@
                     <span class="kpi-tile__label" id="kpi-fp-lost-label">Sales lost to false flags</span>
                     <span class="kpi-tile__value" id="kpi-fp-lost">—</span>
                     <span class="kpi-tile__desc">Revenue lost by incorrectly blocking legitimate customers</span>
+                </article>
+
+                <!-- 8. Real Orders DAG schedule status -->
+                <article class="kpi-tile kpi-tile--dag" id="dag-real" aria-labelledby="dag-real-label">
+                    <span class="kpi-tile__label" id="dag-real-label">Real Orders DAG</span>
+                    <span class="kpi-tile__value" id="dag-real-value">—</span>
+                    <span class="kpi-tile__window">9:45 AM → 8:15 AM EST</span>
+                    <span class="kpi-tile__status" id="dag-real-status">
+                        <span class="dag-dot"></span>
+                        <span>Checking…</span>
+                    </span>
+                </article>
+
+                <!-- 9. Fraud Orders DAG schedule status -->
+                <article class="kpi-tile kpi-tile--dag" id="dag-fraud" aria-labelledby="dag-fraud-label">
+                    <span class="kpi-tile__label" id="dag-fraud-label">Fraud Orders DAG</span>
+                    <span class="kpi-tile__value" id="dag-fraud-value">—</span>
+                    <span class="kpi-tile__window">8:15 AM → 9:45 AM EST</span>
+                    <span class="kpi-tile__status" id="dag-fraud-status">
+                        <span class="dag-dot"></span>
+                        <span>Checking…</span>
+                    </span>
                 </article>
             </div>
         </section>
@@ -556,6 +630,44 @@
                 .forEach(t => t.classList.remove('kpi-tile--loading'));
         }
 
+        /* ── DAG schedule indicator ──────────────────────────────────── */
+        function updateDagStatus() {
+            const now = new Date();
+            // toLocaleString with America/New_York handles EST/EDT automatically
+            const estStr = now.toLocaleString('en-US', {
+                timeZone: 'America/New_York',
+                hour: 'numeric', minute: '2-digit', hour12: false,
+            });
+            const [h, m] = estStr.split(':').map(Number);
+            const totalMins = h * 60 + m;
+
+            // Fraud Orders DAG window: 8:15 AM (495 min) → 9:45 AM (585 min) EST
+            const inFraudWindow = totalMins >= (8 * 60 + 15) && totalMins < (9 * 60 + 45);
+
+            const dagReal     = el('dag-real');
+            const dagFraud    = el('dag-fraud');
+            const realStatus  = el('dag-real-status');
+            const fraudStatus = el('dag-fraud-status');
+            const realValue   = el('dag-real-value');
+            const fraudValue  = el('dag-fraud-value');
+
+            if (inFraudWindow) {
+                dagReal.className  = 'kpi-tile kpi-tile--dag kpi-tile--dag-inactive';
+                dagFraud.className = 'kpi-tile kpi-tile--dag kpi-tile--dag-active';
+                realValue.textContent  = 'Idle';
+                fraudValue.textContent = 'Running';
+                realStatus.innerHTML  = '<span class="dag-dot dag-dot--idle"></span><span>Idle</span>';
+                fraudStatus.innerHTML = '<span class="dag-dot dag-dot--running"></span><span>Running</span>';
+            } else {
+                dagReal.className  = 'kpi-tile kpi-tile--dag kpi-tile--dag-active';
+                dagFraud.className = 'kpi-tile kpi-tile--dag kpi-tile--dag-inactive';
+                realValue.textContent  = 'Running';
+                fraudValue.textContent = 'Idle';
+                realStatus.innerHTML  = '<span class="dag-dot dag-dot--running"></span><span>Running</span>';
+                fraudStatus.innerHTML = '<span class="dag-dot dag-dot--idle"></span><span>Idle</span>';
+            }
+        }
+
         /* ── Main refresh ──────────────────────────────────────────── */
         async function refresh() {
             setStatus('loading');
@@ -635,6 +747,8 @@
         }
 
         /* ── Boot ──────────────────────────────────────────────────── */
+        updateDagStatus();
+        setInterval(updateDagStatus, 60_000);
         refresh();
 
         /* Supabase Realtime — re-run refresh on any INSERT to either table */
