@@ -341,56 +341,7 @@
             </header>
 
             <div class="fraud-kpis">
-                <!-- 1. Total orders processed (green) -->
-                <article class="kpi-tile kpi-tile--green kpi-tile--loading" aria-labelledby="kpi-total-label">
-                    <span class="kpi-tile__label" id="kpi-total-label">Orders processed</span>
-                    <span class="kpi-tile__value" id="kpi-total-orders">—</span>
-                    <span class="kpi-tile__desc">Orders scored by the current model since May 4, 2026</span>
-                </article>
-
-                <!-- 2. False positives — legit customers flagged as fraud (red) -->
-                <article class="kpi-tile kpi-tile--red kpi-tile--loading" aria-labelledby="kpi-fp-label">
-                    <span class="kpi-tile__label" id="kpi-fp-label">False positives</span>
-                    <span class="kpi-tile__value" id="kpi-false-positives">—</span>
-                    <span class="kpi-tile__desc">Legitimate customers wrongly flagged</span>
-                </article>
-
-                <!-- 3. True positives — fraud correctly caught (green) -->
-                <article class="kpi-tile kpi-tile--green kpi-tile--loading" aria-labelledby="kpi-tp-label">
-                    <span class="kpi-tile__label" id="kpi-tp-label">Fraud quarantined</span>
-                    <span class="kpi-tile__value" id="kpi-true-positives">—</span>
-                    <span class="kpi-tile__desc">Actual fraud attempts caught correctly</span>
-                </article>
-
-                <!-- 4. False negatives — fraud that passed through (red) -->
-                <article class="kpi-tile kpi-tile--red kpi-tile--loading" aria-labelledby="kpi-fn-label">
-                    <span class="kpi-tile__label" id="kpi-fn-label">Fraud passed</span>
-                    <span class="kpi-tile__value" id="kpi-false-negatives">—</span>
-                    <span class="kpi-tile__desc">Fraud attempts that slipped through undetected</span>
-                </article>
-
-                <!-- 5. Running total of blocked fraud spend (accent, full-width) -->
-                <article class="kpi-tile kpi-tile--blocked kpi-tile--loading" aria-labelledby="kpi-blocked-label">
-                    <span class="kpi-tile__label" id="kpi-blocked-label">Fraud spending blocked</span>
-                    <span class="kpi-tile__value" id="kpi-blocked-spending">—</span>
-                    <span class="kpi-tile__desc">Running total of attempted fraud spend successfully prevented</span>
-                </article>
-
-                <!-- 6. Total valid sales earned (green, full-width) -->
-                <article class="kpi-tile kpi-tile--green kpi-tile--sales kpi-tile--loading" aria-labelledby="kpi-sales-label">
-                    <span class="kpi-tile__label" id="kpi-sales-label">Total sales earned</span>
-                    <span class="kpi-tile__value" id="kpi-total-sales">—</span>
-                    <span class="kpi-tile__desc">Running total of all legitimate sales completed</span>
-                </article>
-
-                <!-- 7. Sales lost to false positives (red, full-width) -->
-                <article class="kpi-tile kpi-tile--red kpi-tile--sales kpi-tile--loading" aria-labelledby="kpi-fp-lost-label">
-                    <span class="kpi-tile__label" id="kpi-fp-lost-label">Sales lost to false flags</span>
-                    <span class="kpi-tile__value" id="kpi-fp-lost">—</span>
-                    <span class="kpi-tile__desc">Revenue lost by incorrectly blocking legitimate customers</span>
-                </article>
-
-                <!-- 8. Real Orders DAG schedule status -->
+                <!-- 1. Real Orders DAG schedule status -->
                 <article class="kpi-tile kpi-tile--dag" id="dag-real" aria-labelledby="dag-real-label">
                     <span class="kpi-tile__label" id="dag-real-label">Real Orders DAG</span>
                     <span class="kpi-tile__value" id="dag-real-value">—</span>
@@ -401,7 +352,7 @@
                     </span>
                 </article>
 
-                <!-- 9. Fraud Orders DAG schedule status -->
+                <!-- 2. Fraud Orders DAG schedule status -->
                 <article class="kpi-tile kpi-tile--dag" id="dag-fraud" aria-labelledby="dag-fraud-label">
                     <span class="kpi-tile__label" id="dag-fraud-label">Fraud Orders DAG</span>
                     <span class="kpi-tile__value" id="dag-fraud-value">—</span>
@@ -410,6 +361,55 @@
                         <span class="dag-dot"></span>
                         <span>Checking…</span>
                     </span>
+                </article>
+
+                <!-- 3. Total orders processed (green) -->
+                <article class="kpi-tile kpi-tile--green kpi-tile--loading" aria-labelledby="kpi-total-label">
+                    <span class="kpi-tile__label" id="kpi-total-label">Orders processed</span>
+                    <span class="kpi-tile__value" id="kpi-total-orders">—</span>
+                    <span class="kpi-tile__desc">Orders scored by the current model since May 4, 2026</span>
+                </article>
+
+                <!-- 4. False positives — legit customers flagged as fraud (red) -->
+                <article class="kpi-tile kpi-tile--red kpi-tile--loading" aria-labelledby="kpi-fp-label">
+                    <span class="kpi-tile__label" id="kpi-fp-label">False positives</span>
+                    <span class="kpi-tile__value" id="kpi-false-positives">—</span>
+                    <span class="kpi-tile__desc">Legitimate customers wrongly flagged</span>
+                </article>
+
+                <!-- 5. True positives — fraud correctly caught (green) -->
+                <article class="kpi-tile kpi-tile--green kpi-tile--loading" aria-labelledby="kpi-tp-label">
+                    <span class="kpi-tile__label" id="kpi-tp-label">Fraud quarantined</span>
+                    <span class="kpi-tile__value" id="kpi-true-positives">—</span>
+                    <span class="kpi-tile__desc">Actual fraud attempts caught correctly</span>
+                </article>
+
+                <!-- 6. False negatives — fraud that passed through (red) -->
+                <article class="kpi-tile kpi-tile--red kpi-tile--loading" aria-labelledby="kpi-fn-label">
+                    <span class="kpi-tile__label" id="kpi-fn-label">Fraud passed</span>
+                    <span class="kpi-tile__value" id="kpi-false-negatives">—</span>
+                    <span class="kpi-tile__desc">Fraud attempts that slipped through undetected</span>
+                </article>
+
+                <!-- 7. Running total of blocked fraud spend (accent, full-width) -->
+                <article class="kpi-tile kpi-tile--blocked kpi-tile--loading" aria-labelledby="kpi-blocked-label">
+                    <span class="kpi-tile__label" id="kpi-blocked-label">Fraud spending blocked</span>
+                    <span class="kpi-tile__value" id="kpi-blocked-spending">—</span>
+                    <span class="kpi-tile__desc">Running total of attempted fraud spend successfully prevented</span>
+                </article>
+
+                <!-- 8. Total valid sales earned (green, full-width) -->
+                <article class="kpi-tile kpi-tile--green kpi-tile--sales kpi-tile--loading" aria-labelledby="kpi-sales-label">
+                    <span class="kpi-tile__label" id="kpi-sales-label">Total sales earned</span>
+                    <span class="kpi-tile__value" id="kpi-total-sales">—</span>
+                    <span class="kpi-tile__desc">Running total of all legitimate sales completed</span>
+                </article>
+
+                <!-- 9. Sales lost to false positives (red, full-width) -->
+                <article class="kpi-tile kpi-tile--red kpi-tile--sales kpi-tile--loading" aria-labelledby="kpi-fp-lost-label">
+                    <span class="kpi-tile__label" id="kpi-fp-lost-label">Sales lost to false flags</span>
+                    <span class="kpi-tile__value" id="kpi-fp-lost">—</span>
+                    <span class="kpi-tile__desc">Revenue lost by incorrectly blocking legitimate customers</span>
                 </article>
             </div>
         </section>
