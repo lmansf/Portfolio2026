@@ -588,12 +588,13 @@
         const MODEL_CUTOFF = '2026-05-04T00:00:00.000Z';
 
         /* ── Paginated full-table fetch with optional server-side gte filter ── */
-        async function fetchAll(table, columns, gteCol, gteVal) {
+        async function fetchAll(table, columns, gteCol, gteVal, orderCol) {
             const PAGE = 1000;
             let rows = [], from = 0;
             while (true) {
                 let q = db.from(table).select(columns);
                 if (gteCol) q = q.gte(gteCol, gteVal);
+                if (orderCol) q = q.order(orderCol, { ascending: true });
                 const { data, error } = await q.range(from, from + PAGE - 1);
                 if (error) throw error;
                 if (!data || data.length === 0) break;
@@ -709,8 +710,8 @@
                 /* Fetch fraud_results filtered to the current model's window;
                  * orders fetched in full for amount/label lookups. */
                 const [fraudResults, orders] = await Promise.all([
-                    fetchAll('fraud_results', 'order_id,is_fraud,anomaly_score,scored_at', 'scored_at', MODEL_CUTOFF),
-                    fetchAll('orders',        'order_id,is_fraud,total_amount'),
+                    fetchAll('fraud_results', 'order_id,is_fraud,anomaly_score,scored_at', 'scored_at', MODEL_CUTOFF, 'scored_at'),
+                    fetchAll('orders',        'order_id,is_fraud,total_amount', null, null, 'order_id'),
                 ]);
 
                 /* Build lookups */
