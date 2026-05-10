@@ -322,7 +322,6 @@
             <span class="status-banner__icon" aria-hidden="true">⏸</span>
             <p class="status-banner__text">
                 <strong>Project currently paused</strong> due to API rate limits.
-                <span>Most current performance below.</span>
             </p>
         </div>
 
@@ -786,15 +785,7 @@
         setInterval(updateDagStatus, 60_000);
         refresh();
 
-        /* Supabase Realtime — re-run refresh on any INSERT to either table */
-        db.channel('fraud-monitor-rt')
-            .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'fraud_results' }, refresh)
-            .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'orders'        }, refresh)
-            .subscribe(status => {
-                if (status === 'SUBSCRIBED') setStatus('live');
-            });
-
-        /* Fallback poll every 30 seconds */
+        /* Poll every 30 seconds */
         setInterval(refresh, 30_000);
 
     })();
