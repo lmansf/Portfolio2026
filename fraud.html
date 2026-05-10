@@ -200,6 +200,32 @@
             opacity: 0.7;
         }
 
+        /* Paused status banner */
+        .status-banner {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            background: linear-gradient(90deg, rgba(232, 169, 58, 0.10) 0%, rgba(232, 169, 58, 0.05) 100%);
+            border: 1px solid rgba(232, 169, 58, 0.35);
+            border-radius: var(--r-lg);
+            padding: 0.75rem 1.1rem;
+            margin-bottom: 1.75rem;
+            font-size: 0.84rem;
+            color: var(--ink-1);
+            line-height: 1.45;
+        }
+        .status-banner__icon {
+            font-size: 1.1rem;
+            flex-shrink: 0;
+        }
+        .status-banner__text strong {
+            color: var(--accent-2);
+            font-weight: 600;
+        }
+        .status-banner__text span {
+            color: var(--ink-2);
+        }
+
         /* Status pulse override when error/loading */
         #live-pulse {
             transition: background var(--dur-base) var(--ease-out),
@@ -290,6 +316,15 @@
     </nav>
 
     <main id="main-content" class="page page-fraud">
+
+        <!-- Paused status banner -->
+        <div class="status-banner" role="status" aria-live="polite">
+            <span class="status-banner__icon" aria-hidden="true">⏸</span>
+            <p class="status-banner__text">
+                <strong>Project currently paused</strong> due to API rate limits.
+                <span>Most current performance below.</span>
+            </p>
+        </div>
 
         <!-- Hero -->
         <section class="hero" aria-labelledby="fraud-title">
