@@ -720,24 +720,17 @@
                 /* Confusion-matrix metrics — iterate only rows the current model scored.
                  * Every fraud_results row represents one model verdict (is_fraud true/false).
                  * FN = model said not-fraud but ground-truth label is fraud. */
-                let fp = 0, tp = 0, fn = 0, blocked = 0, fpLost = 0;
+                let fp = 0, tp = 0, fn = 0, blocked = 0, fpLost = 0, totalSales = 0;
                 for (const result of fraudResults) {
                     const order       = ordersMap.get(result.order_id);
                     const actualFraud = order != null && (order.is_fraud === 1 || order.is_fraud === true);
                     const modelFraud  = result.is_fraud === true;
 
-                    if ( modelFraud && !actualFraud) { fp++; fpLost += parseFloat(order?.total_amount) || 0; }
-                    if ( modelFraud &&  actualFraud) { tp++; blocked += parseFloat(order?.total_amount) || 0; }
-                    if (!modelFraud &&  actualFraud) fn++;
+                    if ( modelFraud && !actualFraud) { fp++;  fpLost     += parseFloat(order?.total_amount) || 0; }
+                    if ( modelFraud &&  actualFraud) { tp++;  blocked    += parseFloat(order?.total_amount) || 0; }
+                    if (!modelFraud &&  actualFraud)   fn++;
+                    if (!modelFraud && !actualFraud)          totalSales += parseFloat(order?.total_amount) || 0;
                 }
-
-                /* Total valid sales — only orders the current model scored */
-                const scoredOrderIds = new Set(fraudResults.map(r => r.order_id));
-                const totalSales = orders.reduce((sum, o) => {
-                    if (!scoredOrderIds.has(o.order_id)) return sum;
-                    const isFraud = o.is_fraud === 1 || o.is_fraud === true;
-                    return isFraud ? sum : sum + (parseFloat(o.total_amount) || 0);
-                }, 0);
 
                 /* Last 10 model-flagged transactions, newest first */
                 const recent = fraudResults
