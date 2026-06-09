@@ -576,3 +576,9 @@ button:focus-visible,
 body.crowbot-sheet-open {
     overflow: hidden !important;
 }
+
+/* Temporarily hide Crowbot UI across the site */
+.crowbot-fab,
+.crowbot-sheet {
+    display: none !important;
+}
