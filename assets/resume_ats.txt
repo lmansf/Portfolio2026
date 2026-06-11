@@ -82,6 +82,9 @@ Portfolio + Blog Workflow
 
 CERTIFICATIONS
 
+Microsoft
+Microsoft Certified: Power BI Data Analyst Associate (PL-300)
+
 Snowflake
 Hands-On Essentials: Data Warehousing Workshop
 Issued Dec 2025
