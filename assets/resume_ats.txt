@@ -4,12 +4,12 @@ Email: lmansf96@gmail.com
 LinkedIn: www.linkedin.com/in/lmansf96
 
 TARGET ROLE
-Data Engineer
+Analytics Engineer
 
 PROFESSIONAL SUMMARY
-System Analyst with hands-on operational systems experience and a strong transition path into Data Engineering. Experienced in SQL, Snowflake, Python, Power BI, and JavaScript, with practical project work in customer segmentation, reporting, and automation. Focused on building reliable data workflows, improving data quality, and supporting analytics-ready datasets for business stakeholders.
+Systems Analyst with hands-on production data experience and a strong transition path into Analytics Engineering. Experienced in SQL, Snowflake, Python, and Power BI, with practical project work in customer segmentation (RFM), data modeling, reporting, and automation. Focused on building reliable data transformations, improving data quality, and delivering analytics-ready datasets and dashboards for business stakeholders.
 
-DATA ENGINEERING SKILLS
+ANALYTICS ENGINEERING SKILLS
 - SQL (query design, data validation, joins, aggregations)
 - Snowflake (data warehousing fundamentals)
 - Python (data analysis and scripting)
@@ -102,5 +102,5 @@ Associate's Degree, General Studies
 2014 - 2016
 
 ADDITIONAL INFORMATION
-- Open to Data Engineer roles and adjacent analytics engineering opportunities.
-- Interests include scalable analytics workflows, machine learning projects, and AI-focused systems work.
+- Open to Analytics Engineer roles and adjacent data engineering or BI engineering opportunities.
+- Interests include scalable analytics workflows, machine learning projects, and AI-assisted analytics tooling.

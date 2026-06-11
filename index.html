@@ -3,7 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Logan Mansfield</title>
+    <title>Logan Mansfield · Analytics Engineer</title>
+    <meta name="description" content="Logan Mansfield is an analytics engineer in Tampa, FL. SQL data modeling, Power BI dashboards, Snowflake, and Python — turning production point-of-sale data into trusted metrics and decisions.">
     <link rel="icon" type="image/jpeg" href="mini.jpg">
     <link rel="shortcut icon" href="mini.jpg">
     <link rel="stylesheet" href="assets/tokens.css">
@@ -46,6 +47,8 @@
         <a class="site-nav__item" href="/python">Python</a>
         <a class="site-nav__item" href="/bi">BI</a>
         <a class="site-nav__item" href="/ai-engineering">AI Engineering</a>
+        <a class="site-nav__item" href="/work">Work</a>
+        <a class="site-nav__item" href="/resume">Resume</a>
     </div>
 </nav>
 
@@ -55,22 +58,22 @@
         <!-- Hero + Now card (cinematic moment) -->
         <section class="hero" aria-labelledby="home-name">
             <div class="hero__main">
-                <p class="hero__eyebrow">Analytics Engineer · Power BI · SQL · Databricks</p>
+                <p class="hero__eyebrow">Analytics Engineer · SQL · Power BI · Snowflake · Python</p>
                 <h1 class="hero__name" id="home-name">Logan<br>Mansfield.</h1>
                 <p class="hero__role">
-                    I turn raw business data into <em>decision-ready</em> models, dashboards, and AI workflows.
+                    I model raw business data into <em>trusted, decision-ready</em> datasets and dashboards — from source system to stakeholder.
                 </p>
             </div>
 
-            <a class="fraud-ad" href="https://efrog-seven.vercel.app/" target="_blank" rel="noopener noreferrer" aria-label="View the Frog Detection project">
+            <a class="fraud-ad" href="/pipeline" aria-label="View the Owl Park end-to-end analytics pipeline">
                 <div class="fraud-ad__badge">
                     <span class="fraud-ad__pulse" aria-hidden="true"></span>
                     Live Project
                 </div>
                 <div class="fraud-ad__body">
                     <p class="fraud-ad__label">Featured Build</p>
-                    <h2 class="fraud-ad__title">Frog Detection</h2>
-                    <p class="fraud-ad__desc">Mel-spectrogram audio model for identifying Floridian frog species from sound.</p>
+                    <h2 class="fraud-ad__title">End-to-End Analytics Pipeline</h2>
+                    <p class="fraud-ad__desc">Postgres source → Fabric medallion models → Power BI dashboards, refreshed on a live schedule.</p>
                 </div>
                 <div class="fraud-ad__cta">
                     View the project <span aria-hidden="true">→</span>
@@ -80,11 +83,45 @@
 
         <!-- Pitch -->
         <section class="pitch" aria-labelledby="home-pitch">
-            <h2 id="home-pitch">Microsoft-certified Power BI analyst. Currently exploring realtime streaming pipelines.</h2>
-            <p>If you have messy data and a question you cannot answer fast enough, that is exactly what I solve. Jump straight into the work below.</p>
+            <h2 id="home-pitch">Systems analyst by day, analytics engineer by build. I work with production point-of-sale data at ZooTampa and model it into metrics the business acts on.</h2>
+            <p>Customer segmentation with RFM analysis, warehouse modeling in Snowflake and Fabric, SQL-certified, and dashboards stakeholders actually use. If you have messy data and a question you cannot answer fast enough, that is exactly what I solve.</p>
             <a class="pitch__cta" href="https://www.linkedin.com/in/lmansf96/" target="_blank" rel="noopener noreferrer">
                 Let&rsquo;s get in touch <span class="arrow">→</span>
             </a>
+        </section>
+
+        <!-- Experience proof -->
+        <section class="upnext" aria-labelledby="home-proof">
+            <header class="section-head">
+                <h2 class="section-head__title" id="home-proof">Proof, not promises</h2>
+                <span class="section-head__hint">From the resume</span>
+            </header>
+            <div class="upnext__rail">
+                <a class="upnext__card" href="/resume">
+                    <span class="upnext__num">Experience</span>
+                    <span class="upnext__name">IT Point of Sale Analyst · ZooTampa</span>
+                    <span class="upnext__tease">Supporting and analyzing production POS systems — troubleshooting, data workflows, and reliability across business and technical teams.</span>
+                    <span class="upnext__arrow">Resume →</span>
+                </a>
+                <a class="upnext__card" href="/bi">
+                    <span class="upnext__num">Project</span>
+                    <span class="upnext__name">RFM Customer Segmentation</span>
+                    <span class="upnext__tease">Recency-Frequency-Monetary segmentation on real guest transactions, surfaced in Power BI for targeted decision-making.</span>
+                    <span class="upnext__arrow">See BI work →</span>
+                </a>
+                <a class="upnext__card" href="/sql">
+                    <span class="upnext__num">Credentials</span>
+                    <span class="upnext__name">Snowflake + SQL Certified</span>
+                    <span class="upnext__tease">Snowflake Data Warehousing Workshop and LearnSQL Professional Certificate of Competency.</span>
+                    <span class="upnext__arrow">See SQL work →</span>
+                </a>
+                <a class="upnext__card" href="/resume">
+                    <span class="upnext__num">Background</span>
+                    <span class="upnext__name">4+ Years as a Data Analyst</span>
+                    <span class="upnext__tease">Analysis and reporting for professional esports teams across three leagues — repeatable outputs under real deadlines.</span>
+                    <span class="upnext__arrow">Resume →</span>
+                </a>
+            </div>
         </section>
 
         <!-- Up next rail -->
@@ -96,26 +133,26 @@
             <div class="upnext__rail">
                 <a class="upnext__card" href="/sql">
                     <span class="upnext__num">02 / SQL</span>
-                    <span class="upnext__name">Data Modeling and Query Engineering</span>
-                    <span class="upnext__tease">Warehouse-ready transformations, tuned queries, and reliable KPI foundations.</span>
-                    <span class="upnext__arrow">Open →</span>
-                </a>
-                <a class="upnext__card" href="/python">
-                    <span class="upnext__num">03 / Python</span>
-                    <span class="upnext__name">Automation and ML Workflows</span>
-                    <span class="upnext__tease">Streaming support, modeling pipelines, and reproducible analytics code.</span>
+                    <span class="upnext__name">Data Modeling and Transformation</span>
+                    <span class="upnext__tease">Dimensional models, warehouse-ready transformations, and KPI foundations the business can trust.</span>
                     <span class="upnext__arrow">Open →</span>
                 </a>
                 <a class="upnext__card" href="/bi">
-                    <span class="upnext__num">04 / BI</span>
+                    <span class="upnext__num">03 / BI</span>
                     <span class="upnext__name">Decision-Ready Dashboards</span>
-                    <span class="upnext__tease">Power BI reporting that turns live system behavior into stakeholder decisions.</span>
+                    <span class="upnext__tease">Power BI semantic models and reporting that turn live system behavior into stakeholder decisions.</span>
+                    <span class="upnext__arrow">Open →</span>
+                </a>
+                <a class="upnext__card" href="/python">
+                    <span class="upnext__num">04 / Python</span>
+                    <span class="upnext__name">Automation and Data Workflows</span>
+                    <span class="upnext__tease">Data preparation, pipeline automation, and reproducible analytics code from notebook to production.</span>
                     <span class="upnext__arrow">Open →</span>
                 </a>
                 <a class="upnext__card" href="/ai-engineering">
                     <span class="upnext__num">05 / AI Engineering</span>
-                    <span class="upnext__name">Applied Agentic Systems</span>
-                    <span class="upnext__tease">n8n-driven LLM workflows connected to real data and measurable outcomes.</span>
+                    <span class="upnext__name">AI-Assisted Analytics</span>
+                    <span class="upnext__tease">LLM workflows wired into real data models — the automation layer on top of analytics engineering.</span>
                     <span class="upnext__arrow">Open →</span>
                 </a>
             </div>
@@ -131,14 +168,14 @@
             <span class="ticker__item"><span class="dot">●</span><strong>Python</strong></span>
             <span class="ticker__item"><span class="dot">●</span><strong>SQL</strong></span>
             <span class="ticker__item"><span class="dot">●</span><strong>Microsoft Fabric</strong></span>
-            <span class="ticker__item"><span class="dot">●</span><strong>Databricks</strong></span>
+            <span class="ticker__item"><span class="dot">●</span><strong>Snowflake</strong></span>
             <span class="ticker__item"><span class="dot">●</span><strong>Machine Learning</strong></span>
             <span class="ticker__item"><span class="dot">●</span><strong>Excel</strong></span>
             <span class="ticker__item"><span class="dot">●</span><strong>Power BI</strong></span>
             <span class="ticker__item"><span class="dot">●</span><strong>Python</strong></span>
             <span class="ticker__item"><span class="dot">●</span><strong>SQL</strong></span>
             <span class="ticker__item"><span class="dot">●</span><strong>Microsoft Fabric</strong></span>
-            <span class="ticker__item"><span class="dot">●</span><strong>Databricks</strong></span>
+            <span class="ticker__item"><span class="dot">●</span><strong>Snowflake</strong></span>
             <span class="ticker__item"><span class="dot">●</span><strong>Machine Learning</strong></span>
             <span class="ticker__item"><span class="dot">●</span><strong>Excel</strong></span>
         </div>

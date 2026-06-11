@@ -3,7 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Logan Mansfield · SQL</title>
+    <title>Logan Mansfield · SQL &amp; Data Modeling</title>
+    <meta name="description" content="SQL and data modeling work by Logan Mansfield, analytics engineer: dimensional modeling, warehouse transformations in Snowflake and Fabric, data quality checks, and certified SQL skills.">
     <link rel="icon" type="image/jpeg" href="mini.jpg">
     <link rel="shortcut icon" href="mini.jpg">
     <link rel="stylesheet" href="assets/tokens.css">
@@ -44,6 +45,8 @@
             <a class="site-nav__item" href="/python">Python</a>
             <a class="site-nav__item" href="/bi">BI</a>
             <a class="site-nav__item" href="/ai-engineering">AI Engineering</a>
+            <a class="site-nav__item" href="/work">Work</a>
+            <a class="site-nav__item" href="/resume">Resume</a>
         </div>
     </nav>
 
@@ -60,7 +63,7 @@
             <header class="section-head">
                 <h2 class="section-head__title" id="sql-about">About</h2>
             </header>
-            <p>I use SQL as the foundation for analytics engineering: dimensional modeling, transformation logic, and quality checks. My focus is readable queries, maintainable warehouse structure, and fast stakeholder-ready datasets.</p>
+            <p>SQL is the core of my analytics engineering work: dimensional modeling, transformation logic, and data quality checks. I use it daily supporting point-of-sale systems at ZooTampa and in warehouse projects on Snowflake, Supabase Postgres, and Microsoft Fabric. My focus is readable queries, maintainable warehouse structure, and stakeholder-ready datasets.</p>
         </section>
 
         <section aria-labelledby="sql-impact">
@@ -68,8 +71,9 @@
                 <h2 class="section-head__title" id="sql-impact">Impact Highlights</h2>
             </header>
             <ul>
-                <li>Built medallion-style transformation paths for Owl Park that support reusable BI reporting.</li>
-                <li>Created analytical SQL logic for fraud and pricing systems where low-latency interpretation matters.</li>
+                <li>Segmented real guest transactions at ZooTampa with RFM analysis, producing business-ready customer groupings for targeted decision-making.</li>
+                <li>Built medallion-style transformation paths for Owl Park — bronze ingestion, silver cleansing, gold dimensional models — that support reusable BI reporting.</li>
+                <li>Validate and troubleshoot production point-of-sale data daily, keeping reporting workflows stable for business operations.</li>
                 <li>Strengthened KPI consistency by anchoring dashboards to modeled facts and dimensions.</li>
             </ul>
         </section>
@@ -79,7 +83,16 @@
                 <h2 class="section-head__title" id="sql-projects">Projects</h2>
             </header>
             <article class="work-tile">
-                <span class="work-tile__label">Featured</span>
+                <span class="work-tile__label">Featured · Real business data</span>
+                <h3 class="work-tile__title">RFM Customer Segmentation · ZooTampa</h3>
+                <p class="work-tile__desc">Built Recency-Frequency-Monetary segmentation over guest transaction data, turning raw purchases into business-relevant customer groupings surfaced in Power BI.</p>
+                <div class="work-tile__meta">
+                    <span class="work-tile__tag">SQL</span>
+                    <span class="work-tile__tag">Power BI</span>
+                    <span class="work-tile__tag">Segmentation</span>
+                </div>
+            </article>
+            <article class="work-tile">
                 <h3 class="work-tile__title">Owl Park Medallion Pipelines</h3>
                 <p class="work-tile__desc">Designed SQL-centric transformation flow from operational Supabase tables into analytics-ready layers powering Power BI.</p>
                 <div class="work-tile__meta">
@@ -179,7 +192,7 @@
         </section>
 
         <section class="pitch" aria-labelledby="sql-cta">
-            <h2 id="sql-cta">Open to Analytics Engineer and Data Engineer roles where data modeling and KPI trust are core deliverables.</h2>
+            <h2 id="sql-cta">Looking for an Analytics Engineer role where data modeling and KPI trust are core deliverables.</h2>
             <a class="pitch__cta" href="https://www.linkedin.com/in/lmansf96/" target="_blank" rel="noopener noreferrer">Connect on LinkedIn <span class="arrow">→</span></a>
         </section>
     </main>
