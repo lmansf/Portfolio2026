@@ -372,23 +372,23 @@ main.page > * {
 }
 
 .page-sql {
-    --skill-accent: #6ee7ff;
-    --skill-glow: rgba(110, 231, 255, 0.2);
+    --skill-accent: #42b8d6;
+    --skill-glow: rgba(66, 184, 214, 0.18);
 }
 
 .page-python {
-    --skill-accent: #79f2be;
-    --skill-glow: rgba(121, 242, 190, 0.2);
+    --skill-accent: #49b889;
+    --skill-glow: rgba(73, 184, 137, 0.18);
 }
 
 .page-bi {
-    --skill-accent: #ffb86b;
-    --skill-glow: rgba(255, 184, 107, 0.2);
+    --skill-accent: #cc8a44;
+    --skill-glow: rgba(204, 138, 68, 0.18);
 }
 
 .page-ai {
-    --skill-accent: #ff8cab;
-    --skill-glow: rgba(255, 140, 171, 0.2);
+    --skill-accent: #c06784;
+    --skill-glow: rgba(192, 103, 132, 0.18);
 }
 
 /* ──────────────────── Up next rail ──────────────────── */
