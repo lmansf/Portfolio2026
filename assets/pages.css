@@ -316,6 +316,81 @@ main.page > * {
 }
 .section-head__hint { color: var(--ink-3); }
 
+/* ──────────────────── Skill page polish ──────────────────── */
+.page-skill {
+    --skill-accent: var(--accent);
+    --skill-glow: var(--accent-glow);
+}
+
+.page-skill .hero {
+    position: relative;
+    border: 1px solid var(--hairline);
+    border-radius: var(--r-xl);
+    padding: clamp(1rem, 3vw, 1.8rem);
+    background:
+        radial-gradient(520px 180px at 90% 5%, var(--skill-glow), transparent 70%),
+        linear-gradient(180deg, color-mix(in srgb, var(--surface-1) 88%, var(--skill-accent) 12%), var(--surface-1));
+}
+
+.page-skill .hero__eyebrow {
+    color: var(--skill-accent);
+}
+
+.page-skill .hero__role em {
+    border-bottom-color: var(--skill-accent);
+}
+
+.page-skill section:not(.hero):not(.pitch) {
+    background: color-mix(in srgb, var(--surface-1) 84%, transparent);
+    border: 1px solid var(--hairline);
+    border-radius: var(--r-lg);
+    padding: clamp(0.95rem, 2.4vw, 1.3rem);
+}
+
+.page-skill section ul,
+.page-skill section ol {
+    margin: 0;
+    padding-left: 1.15rem;
+    color: var(--ink-2);
+    line-height: 1.65;
+    display: grid;
+    gap: 0.42rem;
+}
+
+.page-skill .work-tile:first-of-type {
+    border-color: color-mix(in srgb, var(--skill-accent) 60%, var(--hairline-strong));
+    box-shadow: 0 0 0 1px color-mix(in srgb, var(--skill-accent) 24%, transparent);
+}
+
+.page-skill .work-tile__label,
+.page-skill .upnext__num {
+    color: var(--skill-accent);
+}
+
+.page-skill .pitch__cta {
+    background: color-mix(in srgb, var(--skill-accent) 85%, #ffffff 15%);
+}
+
+.page-sql {
+    --skill-accent: #6ee7ff;
+    --skill-glow: rgba(110, 231, 255, 0.2);
+}
+
+.page-python {
+    --skill-accent: #79f2be;
+    --skill-glow: rgba(121, 242, 190, 0.2);
+}
+
+.page-bi {
+    --skill-accent: #ffb86b;
+    --skill-glow: rgba(255, 184, 107, 0.2);
+}
+
+.page-ai {
+    --skill-accent: #ff8cab;
+    --skill-glow: rgba(255, 140, 171, 0.2);
+}
+
 /* ──────────────────── Up next rail ──────────────────── */
 .upnext {
     display: grid;
