@@ -69,3 +69,59 @@
     --card-border:     var(--hairline-strong);
     --font-main:       var(--font-text);
 }
+
+/* ─── Base reset + page chrome ───
+ * Moved here from the legacy index.css / style.css so pages no longer
+ * need those files. Keep identical to the legacy reset: shell.css and
+ * pages.css were built assuming it.
+ */
+*,
+*::before,
+*::after {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    background: var(--bg);
+    color: var(--ink-1);
+    font-family: var(--font-text);
+}
+
+/* Page transitions (classes toggled by transition.js) */
+main {
+    transition: opacity 0.5s ease-in-out;
+}
+
+.page-exit {
+    opacity: 0;
+}
+
+.page-initial-state {
+    opacity: 0;
+}
+
+.page-enter,
+.page-initial-enter,
+.projects-load-enter {
+    animation: page-fade-in 0.5s ease-out forwards;
+}
+
+@keyframes page-fade-in {
+    from { opacity: 0; }
+    to   { opacity: 1; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    main { transition: none; }
+    .page-enter,
+    .page-initial-enter,
+    .projects-load-enter { animation-duration: 1ms; }
+}
+
+/* Scrollbar on-palette (was dark-theme gray/gold) */
+::-webkit-scrollbar { width: 8px; }
+::-webkit-scrollbar-track { background: var(--surface-2); }
+::-webkit-scrollbar-thumb { background: var(--ink-3); border-radius: 4px; }
+::-webkit-scrollbar-thumb:hover { background: var(--ink-2); }

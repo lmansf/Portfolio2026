@@ -15,7 +15,7 @@ main.page {
     max-width: var(--max-w);
     width: auto !important;          /* reset legacy main width */
     margin: 0 auto;
-    padding: clamp(1.5rem, 4vw, 2.5rem) var(--gutter) 0 !important;
+    padding: clamp(1.5rem, 4vw, 2.5rem) var(--gutter) clamp(2.5rem, 6vw, 4rem) !important;
     display: grid !important;
     /* explicitly clear the legacy "chatbot feature / . intro" areas at >= 1200px */
     grid-template-columns: minmax(0, 1fr) !important;
@@ -166,8 +166,8 @@ main.page > * {
     display: flex;
     flex-direction: column;
     gap: 1rem;
-    background: linear-gradient(160deg, #1a0a0a 0%, #2c0e0e 100%);
-    border: 1px solid rgba(197, 61, 61, 0.35);
+    background: linear-gradient(160deg, #2c1f17 0%, #46301f 100%);
+    border: 1px solid rgba(232, 93, 47, 0.35);
     border-radius: var(--r-lg);
     padding: clamp(1rem, 3vw, 1.5rem);
     text-decoration: none;
@@ -183,16 +183,16 @@ main.page > * {
     content: "";
     position: absolute; inset: -1px;
     border-radius: inherit;
-    background: linear-gradient(135deg, transparent 50%, rgba(197, 61, 61, 0.18));
+    background: linear-gradient(135deg, transparent 50%, rgba(232, 93, 47, 0.18));
     pointer-events: none;
 }
 .fraud-ad:hover {
-    border-color: rgba(197, 61, 61, 0.7);
-    box-shadow: 0 0 28px rgba(197, 61, 61, 0.22);
+    border-color: rgba(232, 93, 47, 0.7);
+    box-shadow: 0 0 28px rgba(232, 93, 47, 0.22);
     transform: translateY(-2px);
 }
 .fraud-ad:focus-visible {
-    outline: 2px solid var(--danger);
+    outline: 2px solid var(--accent);
     outline-offset: 3px;
 }
 .fraud-ad__badge {
@@ -201,21 +201,21 @@ main.page > * {
     gap: 0.6rem;
     font-family: var(--font-mono);
     font-size: 0.7rem;
-    color: rgba(197, 61, 61, 0.9);
+    color: var(--accent-2);
     letter-spacing: 0.12em;
     text-transform: uppercase;
 }
 .fraud-ad__pulse {
     width: 8px; height: 8px; border-radius: 50%;
-    background: var(--danger);
-    box-shadow: 0 0 0 0 rgba(197, 61, 61, 0.6);
+    background: var(--accent);
+    box-shadow: 0 0 0 0 rgba(232, 93, 47, 0.6);
     animation: fraud-pulse 2.4s cubic-bezier(0.4, 0, 0.6, 1) infinite;
     flex-shrink: 0;
 }
 @keyframes fraud-pulse {
-    0%   { box-shadow: 0 0 0 0 rgba(197, 61, 61, 0.6); }
-    70%  { box-shadow: 0 0 0 10px rgba(197, 61, 61, 0); }
-    100% { box-shadow: 0 0 0 0 rgba(197, 61, 61, 0); }
+    0%   { box-shadow: 0 0 0 0 rgba(232, 93, 47, 0.6); }
+    70%  { box-shadow: 0 0 0 10px rgba(232, 93, 47, 0); }
+    100% { box-shadow: 0 0 0 0 rgba(232, 93, 47, 0); }
 }
 @media (prefers-reduced-motion: reduce) {
     .fraud-ad__pulse { animation: none; }
@@ -228,7 +228,7 @@ main.page > * {
 .fraud-ad__label {
     font-family: var(--font-mono);
     font-size: 0.7rem;
-    color: rgba(197, 61, 61, 0.7);
+    color: rgba(232, 169, 58, 0.8);
     letter-spacing: 0.1em;
     text-transform: uppercase;
     margin: 0;
@@ -239,12 +239,12 @@ main.page > * {
     font-weight: 700;
     line-height: 1.1;
     letter-spacing: -0.02em;
-    color: #f5c5c5;
+    color: #fffbf3;
     margin: 0;
 }
 .fraud-ad__desc {
     font-size: 0.92rem;
-    color: rgba(245, 197, 197, 0.7);
+    color: rgba(243, 232, 208, 0.75);
     line-height: 1.5;
     max-width: 30ch;
     margin: 0;
@@ -254,11 +254,11 @@ main.page > * {
     align-items: center;
     justify-content: space-between;
     padding-top: 1rem;
-    border-top: 1px solid rgba(197, 61, 61, 0.25);
+    border-top: 1px solid rgba(232, 93, 47, 0.3);
     font-family: var(--font-mono);
     font-size: 0.82rem;
     font-weight: 600;
-    color: var(--danger);
+    color: var(--accent-2);
     letter-spacing: 0.05em;
 }
 
@@ -372,13 +372,13 @@ main.page > * {
 }
 
 .page-sql {
-    --skill-accent: #42b8d6;
-    --skill-glow: rgba(66, 184, 214, 0.18);
+    --skill-accent: #3e8fa8;
+    --skill-glow: rgba(62, 143, 168, 0.16);
 }
 
 .page-python {
-    --skill-accent: #49b889;
-    --skill-glow: rgba(73, 184, 137, 0.18);
+    --skill-accent: #5a8f5e;
+    --skill-glow: rgba(90, 143, 94, 0.16);
 }
 
 .page-bi {
@@ -387,8 +387,8 @@ main.page > * {
 }
 
 .page-ai {
-    --skill-accent: #c06784;
-    --skill-glow: rgba(192, 103, 132, 0.18);
+    --skill-accent: #a8627e;
+    --skill-glow: rgba(168, 98, 126, 0.16);
 }
 
 /* ──────────────────── Up next rail ──────────────────── */
