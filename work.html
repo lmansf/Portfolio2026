@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Logan Mansfield · Work</title>
+    <meta name="description" content="Analytics engineering portfolio of Logan Mansfield: RFM customer segmentation, end-to-end data pipelines, Power BI dashboards, churn modeling, and Snowflake and SQL certifications.">
     <link rel="icon" type="image/jpeg" href="mini.jpg">
     <link rel="shortcut icon" href="mini.jpg">
     <link rel="stylesheet" href="assets/tokens.css">
@@ -45,6 +46,8 @@
         <a class="site-nav__item" href="/python">Python</a>
         <a class="site-nav__item" href="/bi">BI</a>
         <a class="site-nav__item" href="/ai-engineering">AI Engineering</a>
+        <a class="site-nav__item" href="/work">Work</a>
+        <a class="site-nav__item" href="/resume">Resume</a>
     </div>
 </nav>
 
@@ -55,7 +58,7 @@
                 <p class="hero__eyebrow">02 / Work</p>
                 <h1 class="hero__name" id="work-title">Builds<br>that ship.</h1>
                 <p class="hero__role">
-                    Featured below — My current hobby project, <em>Realtime Fraud Detection</em>. Then the rest of the catalog includes: past projects, certs, and pipelines.
+                    The analytics engineering catalog: <em>real business segmentation work</em>, end-to-end pipelines, dashboards, ML projects, and certifications.
                 </p>
             </div>
         </section>
@@ -75,7 +78,7 @@
         </div>
 
         <!-- Featured (cinematic moment) -->
-        <a class="work-featured project-tile" href="#" data-project-modal-open="rfm-project-modal" aria-controls="rfm-project-modal" data-cats="powerbi">
+        <a class="work-featured project-tile" href="/fraud" data-cats="powerbi">
             <div class="work-featured__media">
             </div>
             <div class="work-featured__body">
@@ -99,11 +102,23 @@
         <!-- Section heading -->
         <header class="section-head">
             <h2 class="section-head__title">More work</h2>
-            <span class="section-head__hint">8 projects</span>
+            <span class="section-head__hint">9 projects</span>
         </header>
 
         <!-- Tile grid -->
         <section class="work-grid" aria-label="Project tiles" data-work-grid>
+            <a class="work-tile" href="/bi" data-cats="powerbi sql">
+                <span class="work-tile__arrow">→</span>
+                <span class="work-tile__label">Real Business Data · ZooTampa</span>
+                <h3 class="work-tile__title">RFM Customer Segmentation</h3>
+                <p class="work-tile__desc">Recency-Frequency-Monetary segmentation built on real guest transaction data, producing customer groupings the business can target — delivered in Power BI.</p>
+                <div class="work-tile__meta">
+                    <span class="work-tile__tag">Power BI</span>
+                    <span class="work-tile__tag">SQL</span>
+                    <span class="work-tile__tag">Segmentation</span>
+                </div>
+            </a>
+
             <a class="work-tile" href="https://portfolio2-main-phi.vercel.app/shop.html" target="_blank" rel="noopener" data-cats="python ml">
                 <span class="work-tile__arrow">→</span>
                 <span class="work-tile__label">Most Recently Completed Project · AI</span>
@@ -221,19 +236,6 @@
         </section>
 
     </main>
-
-    <div class="project-modal-overlay" id="rfm-project-modal" aria-hidden="true">
-        <div class="project-modal" role="dialog" aria-modal="true" aria-labelledby="rfm-project-modal-title">
-            <button class="project-modal-close" type="button" data-project-modal-close aria-label="Close modal">×</button>
-            <div class="panel-label">Featured Build</div>
-            <h2 id="rfm-project-modal-title">Monitoring Webstore Performance</h2>
-            <p>This project showcases a realtime performance monitoring workflow with sample data for demonstration purposes.</p>
-            <div class="panel-meta">
-                <span class="project-tag">Power BI / Data Analysis</span>
-                <span>Focus: analytics with direct business impact</span>
-            </div>
-        </div>
-    </div>
 
     <footer class="shell-footer">
     <div class="ticker" aria-hidden="true">
