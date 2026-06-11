@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Logan Mansfield · SQL</title>
+    <link rel="icon" type="image/jpeg" href="mini.jpg">
+    <link rel="shortcut icon" href="mini.jpg">
+    <link rel="stylesheet" href="assets/tokens.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="assets/style.css">
+    <link rel="stylesheet" href="assets/shell.css">
+    <link rel="stylesheet" href="assets/pages.css">
+    <script>
+        window.va = window.va || function () { (window.vaq = window.vaq || []).push(arguments); };
+    </script>
+    <script defer src="/_vercel/insights/script.js"></script>
+</head>
+<body>
+    <a class="skip-link" href="#main-content">Skip to content</a>
+    <div class="shell-bg" aria-hidden="true"></div>
+
+    <header class="topbar">
+        <div class="topbar__brand">
+            <a href="/">
+                <span class="dot" aria-hidden="true"></span>
+                L. MANSFIELD
+            </a>
+        </div>
+        <button class="burger" type="button" aria-label="Open navigation" aria-expanded="false" aria-controls="site-nav" data-burger>
+            <span class="burger__bar"></span>
+            <span class="burger__bar"></span>
+            <span class="burger__bar"></span>
+        </button>
+    </header>
+
+    <nav class="site-nav" id="site-nav" aria-label="Primary navigation" aria-hidden="true">
+        <div class="site-nav__backdrop" data-nav-close aria-hidden="true"></div>
+        <div class="site-nav__panel">
+            <a class="site-nav__item" href="/">Home</a>
+            <a class="site-nav__item" href="/sql">SQL</a>
+            <a class="site-nav__item" href="/python">Python</a>
+            <a class="site-nav__item" href="/bi">BI</a>
+            <a class="site-nav__item" href="/ai-engineering">AI Engineering</a>
+        </div>
+    </nav>
+
+    <main id="main-content" class="page page-work">
+        <section class="hero" aria-labelledby="sql-title">
+            <div class="hero__main">
+                <p class="hero__eyebrow">02 / Skill · SQL</p>
+                <h1 class="hero__name" id="sql-title">SQL.</h1>
+                <p class="hero__role">I design reliable data models and write production-grade SQL that turns messy operations into trusted business metrics.</p>
+            </div>
+        </section>
+
+        <section aria-labelledby="sql-about">
+            <header class="section-head">
+                <h2 class="section-head__title" id="sql-about">About</h2>
+            </header>
+            <p>I use SQL as the foundation for analytics engineering: dimensional modeling, transformation logic, and quality checks. My focus is readable queries, maintainable warehouse structure, and fast stakeholder-ready datasets.</p>
+        </section>
+
+        <section aria-labelledby="sql-impact">
+            <header class="section-head">
+                <h2 class="section-head__title" id="sql-impact">Impact Highlights</h2>
+            </header>
+            <ul>
+                <li>Built medallion-style transformation paths for Owl Park that support reusable BI reporting.</li>
+                <li>Created analytical SQL logic for fraud and pricing systems where low-latency interpretation matters.</li>
+                <li>Strengthened KPI consistency by anchoring dashboards to modeled facts and dimensions.</li>
+            </ul>
+        </section>
+
+        <section aria-labelledby="sql-projects">
+            <header class="section-head">
+                <h2 class="section-head__title" id="sql-projects">Projects</h2>
+            </header>
+            <article class="work-tile">
+                <span class="work-tile__label">Featured</span>
+                <h3 class="work-tile__title">Owl Park Medallion Pipelines</h3>
+                <p class="work-tile__desc">Designed SQL-centric transformation flow from operational Supabase tables into analytics-ready layers powering Power BI.</p>
+                <div class="work-tile__meta">
+                    <span class="work-tile__tag">SQL</span>
+                    <span class="work-tile__tag">Supabase</span>
+                    <span class="work-tile__tag">Microsoft Fabric</span>
+                </div>
+            </article>
+            <article class="work-tile" data-cats="sql python">
+                <h3 class="work-tile__title">Realtime Fraud Detection Data Layer</h3>
+                <p class="work-tile__desc">Shaped transaction and feature tables to support high-speed fraud scoring and downstream monitoring.</p>
+                <div class="work-tile__meta">
+                    <span class="work-tile__tag">SQL</span>
+                    <span class="work-tile__tag">Databricks</span>
+                    <span class="work-tile__tag">Streaming</span>
+                </div>
+            </article>
+            <article class="work-tile" data-cats="sql ai">
+                <h3 class="work-tile__title">Dynamic Pricing Simulator Backbone</h3>
+                <p class="work-tile__desc">Built the aggregate and historical context layer supporting agent pricing and inventory decisions.</p>
+                <div class="work-tile__meta">
+                    <span class="work-tile__tag">SQL</span>
+                    <span class="work-tile__tag">n8n</span>
+                    <span class="work-tile__tag">Supabase</span>
+                </div>
+            </article>
+        </section>
+
+        <section aria-labelledby="sql-tools">
+            <header class="section-head">
+                <h2 class="section-head__title" id="sql-tools">Tools</h2>
+            </header>
+            <div class="work-filters">
+                <span class="chip">PostgreSQL</span>
+                <span class="chip">Supabase</span>
+                <span class="chip">Snowflake</span>
+                <span class="chip">Microsoft Fabric SQL</span>
+                <span class="chip">Window Functions</span>
+                <span class="chip">Query Tuning</span>
+                <span class="chip">CTEs</span>
+                <span class="chip">Dimensional Modeling</span>
+            </div>
+        </section>
+
+        <section aria-labelledby="sql-process">
+            <header class="section-head">
+                <h2 class="section-head__title" id="sql-process">Process</h2>
+            </header>
+            <ol>
+                <li>Start from business questions and define target metrics.</li>
+                <li>Model entities and relationships for stable downstream use.</li>
+                <li>Build transformations in audited, testable SQL steps.</li>
+                <li>Validate outputs against source totals and edge cases.</li>
+                <li>Document assumptions so BI and ML layers stay aligned.</li>
+            </ol>
+        </section>
+
+        <section aria-labelledby="sql-proof">
+            <header class="section-head">
+                <h2 class="section-head__title" id="sql-proof">Proof</h2>
+            </header>
+            <div class="upnext__rail">
+                <a class="upnext__card" href="https://learnsql.com/files/course-certificate/lHtronwptbmIgCaeTSZUvUgNrSqKDuhCCxTzXlDt" target="_blank" rel="noopener">
+                    <span class="upnext__num">Credential</span>
+                    <span class="upnext__name">SQL Professional Certificate</span>
+                    <span class="upnext__tease">Professional competency with analytical query writing and SQL problem solving.</span>
+                    <span class="upnext__arrow">Open ↗</span>
+                </a>
+                <a class="upnext__card" href="https://achieve.snowflake.com/4d97f4b0-8b75-4396-a270-afdc147ac86a#acc.9YbDuPN7" target="_blank" rel="noopener">
+                    <span class="upnext__num">Credential</span>
+                    <span class="upnext__name">Snowflake Hands-On Essentials</span>
+                    <span class="upnext__tease">Warehouse-focused SQL and cloud data modeling practice.</span>
+                    <span class="upnext__arrow">Open ↗</span>
+                </a>
+            </div>
+        </section>
+
+        <section aria-labelledby="sql-related">
+            <header class="section-head">
+                <h2 class="section-head__title" id="sql-related">Related Work</h2>
+                <span class="section-head__hint">Secondary-skill links</span>
+            </header>
+            <div class="upnext__rail">
+                <a class="upnext__card" href="/bi">
+                    <span class="upnext__num">BI</span>
+                    <span class="upnext__name">Webstore Performance Monitor</span>
+                    <span class="upnext__tease">Dashboard delivery built on SQL-backed KPI modeling.</span>
+                    <span class="upnext__arrow">View in BI →</span>
+                </a>
+                <a class="upnext__card" href="/ai-engineering">
+                    <span class="upnext__num">AI Engineering</span>
+                    <span class="upnext__name">Agentic Dynamic Pricing</span>
+                    <span class="upnext__tease">Agent loops operating on SQL context and aggregate state.</span>
+                    <span class="upnext__arrow">View in AI Engineering →</span>
+                </a>
+            </div>
+        </section>
+
+        <section class="pitch" aria-labelledby="sql-cta">
+            <h2 id="sql-cta">Open to Analytics Engineer and Data Engineer roles where data modeling and KPI trust are core deliverables.</h2>
+            <a class="pitch__cta" href="https://www.linkedin.com/in/lmansf96/" target="_blank" rel="noopener noreferrer">Connect on LinkedIn <span class="arrow">→</span></a>
+        </section>
+    </main>
+
+    <footer class="shell-footer">
+        <div class="ticker" aria-hidden="true">
+            <div class="ticker__track">
+                <span class="ticker__item"><span class="dot">●</span><strong>Power BI</strong></span>
+                <span class="ticker__item"><span class="dot">●</span><strong>Python</strong></span>
+                <span class="ticker__item"><span class="dot">●</span><strong>SQL</strong></span>
+                <span class="ticker__item"><span class="dot">●</span><strong>Microsoft Fabric</strong></span>
+                <span class="ticker__item"><span class="dot">●</span><strong>Machine Learning</strong></span>
+            </div>
+        </div>
+        <div class="footer-socials">
+            <a href="https://x.com/StatBird" target="_blank" rel="noopener">Twitter</a>
+            <a href="https://github.com/lmansf" target="_blank" rel="noopener">Github</a>
+            <a href="https://www.linkedin.com/in/lmansf96/" target="_blank" rel="noopener">LinkedIn</a>
+            <a href="/feedback">Feedback</a>
+        </div>
+    </footer>
+
+    <button class="crowbot-fab" type="button" data-crowbot-fab aria-label="Open Crowbot AI assistant" aria-controls="crowbot-sheet" aria-expanded="false" title="Chat with Crowbot">🐦‍⬛</button>
+
+    <aside class="crowbot-sheet" id="crowbot-sheet" aria-hidden="true" role="dialog" aria-labelledby="crowbot-sheet-title">
+        <div class="crowbot-sheet__backdrop" data-crowbot-close></div>
+        <div class="crowbot-sheet__panel">
+            <div class="crowbot-sheet__head">
+                <div>
+                    <h2 id="crowbot-sheet-title">Crowbot 🐦‍⬛</h2>
+                    <p>Ask Crowbot about my resume, projects, or hobbies. Drop your email and he&rsquo;ll bring it to me.</p>
+                </div>
+                <button class="crowbot-sheet__close" type="button" data-crowbot-close aria-label="Close Crowbot">×</button>
+            </div>
+            <div class="crowbot-sheet__body"></div>
+        </div>
+    </aside>
+
+    <script defer src="assets/transition.js"></script>
+</body>
+</html>

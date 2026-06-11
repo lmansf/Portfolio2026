@@ -22,7 +22,7 @@
       ]
     },
     {
-      "source": "/(work|pipeline|fraud|shop|resume|feedback)",
+      "source": "/(work|pipeline|fraud|shop|resume|feedback|sql|python|bi|ai-engineering)",
       "headers": [
         {
           "key": "Cache-Control",
@@ -105,6 +105,22 @@
     {
       "source": "/feedback",
       "destination": "/feedback.html"
+    },
+    {
+      "source": "/sql",
+      "destination": "/sql.html"
+    },
+    {
+      "source": "/python",
+      "destination": "/python.html"
+    },
+    {
+      "source": "/bi",
+      "destination": "/bi.html"
+    },
+    {
+      "source": "/ai-engineering",
+      "destination": "/ai-engineering.html"
     },
     {
       "source": "/fraud",
