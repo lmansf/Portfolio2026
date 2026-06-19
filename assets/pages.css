@@ -1747,3 +1747,31 @@ span.chip { cursor: default; pointer-events: none; }
     border-top: 1px dashed var(--hairline);
     margin-top: 0.4rem;
 }
+
+/* Pitch: embedded walkthrough video */
+.pitch__video {
+    margin: 1.5rem 0 0;
+    max-width: 720px;
+}
+.pitch__video-frame {
+    position: relative;
+    width: 100%;
+    aspect-ratio: 16 / 9;
+    border-radius: var(--r-lg);
+    overflow: hidden;
+    border: 1px solid var(--card-border);
+    background: var(--ink-1);
+}
+.pitch__video-frame iframe {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    border: 0;
+}
+.pitch__video figcaption {
+    margin-top: 0.65rem;
+    font-size: 0.9rem;
+    color: var(--ink-3);
+    font-style: italic;
+}
