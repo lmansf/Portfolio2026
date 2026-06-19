@@ -280,6 +280,8 @@ async function navigateTo(url, options = {}) {
         scheduleShopProductsPrefetch();
         wireUpnextPrefetch();
 
+        if (typeof window.questUpdate === 'function') window.questUpdate();
+
     } catch (err) {
         console.error('Navigation failed:', err);
         window.location.href = url;
