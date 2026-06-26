@@ -46,7 +46,7 @@ main.page > * {
 .hero__eyebrow {
     font-family: var(--font-mono);
     font-size: 0.72rem;
-    color: var(--accent);
+    color: var(--accent-ink);
     letter-spacing: 0.12em;
     text-transform: uppercase;
 }
@@ -101,12 +101,12 @@ main.page > * {
     .hero__availability-dot { animation: none; }
 }
 .hero__availability a {
-    color: var(--accent);
+    color: var(--accent-ink);
     text-decoration: none;
     border-bottom: 1px solid transparent;
     transition: border-color var(--dur-fast) var(--ease-out);
 }
-.hero__availability a:hover { border-bottom-color: var(--accent); }
+.hero__availability a:hover { border-bottom-color: var(--accent-ink); }
 
 @media (min-width: 768px) {
     .hero {
@@ -183,12 +183,12 @@ main.page > * {
 }
 .now__value { color: var(--ink-1); }
 .now__value a {
-    color: var(--accent);
+    color: var(--accent-ink);
     text-decoration: none;
     border-bottom: 1px solid transparent;
     transition: border-color var(--dur-fast) var(--ease-out);
 }
-.now__value a:hover { border-bottom-color: var(--accent); }
+.now__value a:hover { border-bottom-color: var(--accent-ink); }
 
 /* ──────────────────── Fraud Ad Tile ──────────────────── */
 .fraud-ad {
@@ -464,13 +464,13 @@ main.page > * {
     transition: border-color var(--dur-base) var(--ease-out), transform var(--dur-base) var(--ease-out);
 }
 .upnext__card:hover {
-    border-color: var(--accent);
+    border-color: var(--accent-ink);
     transform: translateY(-2px);
 }
 .upnext__num {
     font-family: var(--font-mono);
     font-size: 0.7rem;
-    color: var(--accent);
+    color: var(--accent-ink);
     letter-spacing: 0.1em;
 }
 .upnext__name {
@@ -543,8 +543,8 @@ span.chip { cursor: default; pointer-events: none; }
 .chip:hover { color: var(--ink-1); border-color: var(--hairline-strong); }
 .chip[aria-pressed="true"] {
     background: var(--accent-glow);
-    color: var(--accent);
-    border-color: var(--accent);
+    color: var(--accent-ink);
+    border-color: var(--accent-ink);
 }
 
 /* Featured project — full-bleed cinematic card */
@@ -560,7 +560,7 @@ span.chip { cursor: default; pointer-events: none; }
     transition: transform var(--dur-base) var(--ease-out), border-color var(--dur-base) var(--ease-out);
 }
 .work-featured:hover {
-    border-color: var(--accent);
+    border-color: var(--accent-ink);
     transform: translateY(-2px);
 }
 .work-featured__media {
@@ -589,7 +589,7 @@ span.chip { cursor: default; pointer-events: none; }
 .work-featured__label {
     font-family: var(--font-mono);
     font-size: 0.7rem;
-    color: var(--accent);
+    color: var(--accent-ink);
     letter-spacing: 0.12em;
     text-transform: uppercase;
 }
@@ -626,7 +626,7 @@ span.chip { cursor: default; pointer-events: none; }
     text-transform: uppercase;
 }
 .work-featured__open {
-    color: var(--accent);
+    color: var(--accent-ink);
     text-transform: uppercase;
     margin-left: auto;
 }
@@ -656,7 +656,7 @@ span.chip { cursor: default; pointer-events: none; }
     overflow: hidden;
 }
 .work-tile:hover {
-    border-color: var(--accent);
+    border-color: var(--accent-ink);
     transform: translateY(-2px);
 }
 .work-tile[hidden] { display: none; }
@@ -706,7 +706,7 @@ span.chip { cursor: default; pointer-events: none; }
     transition: color var(--dur-fast) var(--ease-out), transform var(--dur-base) var(--ease-out);
 }
 .work-tile:hover .work-tile__arrow {
-    color: var(--accent);
+    color: var(--accent-ink);
     transform: translate(2px, -2px);
 }
 
@@ -774,12 +774,12 @@ span.chip { cursor: default; pointer-events: none; }
                 transform var(--dur-base) var(--ease-out);
 }
 .phase[data-active="true"] {
-    border-color: var(--accent);
+    border-color: var(--accent-ink);
     box-shadow: 0 0 0 4px var(--accent-glow), 0 8px 30px rgba(0,0,0,0.35);
     transform: translateY(-2px);
 }
 .phase[data-active="true"] .phase__num {
-    color: var(--accent);
+    color: var(--accent-ink);
 }
 
 .phase__num {
@@ -901,7 +901,7 @@ span.chip { cursor: default; pointer-events: none; }
     letter-spacing: 0.04em;
 }
 .pipeline-fullsize a {
-    color: var(--accent);
+    color: var(--accent-ink);
     font-family: var(--font-mono);
     font-size: 0.78rem;
     letter-spacing: 0.04em;
@@ -981,7 +981,7 @@ span.chip { cursor: default; pointer-events: none; }
 }
 .shop-hero-tile .tags code {
     background: var(--accent-glow);
-    color: var(--accent);
+    color: var(--accent-ink);
     padding: 0.05rem 0.35rem;
     border-radius: 4px;
     font-size: 0.78rem;
@@ -1169,7 +1169,7 @@ span.chip { cursor: default; pointer-events: none; }
     gap: 0.3rem;
     transition: border-color var(--dur-base) var(--ease-out), transform var(--dur-base) var(--ease-out);
 }
-.resume-cta a:hover { border-color: var(--accent); transform: translateY(-2px); }
+.resume-cta a:hover { border-color: var(--accent-ink); transform: translateY(-2px); }
 .resume-cta a strong {
     font-family: var(--font-display);
     font-size: 1.05rem;
@@ -1182,7 +1182,7 @@ span.chip { cursor: default; pointer-events: none; }
     letter-spacing: 0.06em;
     text-transform: uppercase;
 }
-.resume-cta a.is-primary { background: var(--accent); color: var(--ink-1); border-color: var(--accent); }
+.resume-cta a.is-primary { background: var(--accent); color: var(--ink-1); border-color: var(--accent-ink); }
 .resume-cta a.is-primary span { color: var(--ink-1); opacity: 0.7; }
 
 .skills {
@@ -1238,7 +1238,7 @@ span.chip { cursor: default; pointer-events: none; }
 .skill__years {
     font-family: var(--font-mono);
     font-size: 0.86rem;
-    color: var(--accent);
+    color: var(--accent-ink);
     text-align: right;
     font-variant-numeric: tabular-nums;
 }
@@ -1274,7 +1274,7 @@ span.chip { cursor: default; pointer-events: none; }
 .resume-preview[data-expanded="true"] .frame-wrap { display: block; }
 .resume-preview .toggle {
     background: none;
-    color: var(--accent);
+    color: var(--accent-ink);
     border: 1px solid var(--accent);
     border-radius: 999px;
     padding: 0.45rem 0.85rem;
@@ -1342,8 +1342,8 @@ span.chip { cursor: default; pointer-events: none; }
 .feedback-chip:hover { border-color: var(--hairline-strong); }
 .feedback-chip[aria-pressed="true"] {
     background: var(--accent-glow);
-    color: var(--accent);
-    border-color: var(--accent);
+    color: var(--accent-ink);
+    border-color: var(--accent-ink);
 }
 .feedback-reveal {
     margin-top: 0.5rem;
@@ -1410,7 +1410,7 @@ span.chip { cursor: default; pointer-events: none; }
     gap: 0.6rem;
 }
 .demo-banner strong {
-    color: var(--accent);
+    color: var(--accent-ink);
     font-family: var(--font-mono);
     font-size: 0.74rem;
     letter-spacing: 0.1em;
@@ -1483,7 +1483,7 @@ span.chip { cursor: default; pointer-events: none; }
 .retro-section__kicker {
     font-family: var(--font-mono);
     font-size: 0.72rem;
-    color: var(--accent);
+    color: var(--accent-ink);
     letter-spacing: 0.14em;
     text-transform: uppercase;
     margin-bottom: 0.5rem;
@@ -1508,7 +1508,7 @@ span.chip { cursor: default; pointer-events: none; }
     margin-top: 0.85rem;
 }
 .retro-section__body em {
-    color: var(--accent);
+    color: var(--accent-ink);
     font-style: normal;
     font-weight: 500;
 }
@@ -1556,7 +1556,7 @@ span.chip { cursor: default; pointer-events: none; }
 .retro-section__aside li span {
     font-family: var(--font-mono);
     font-size: 0.84rem;
-    color: var(--accent);
+    color: var(--accent-ink);
     font-variant-numeric: tabular-nums;
 }
 
@@ -1604,7 +1604,7 @@ span.chip { cursor: default; pointer-events: none; }
 }
 .outcome__icon {
     width: 24px; height: 24px;
-    color: var(--accent);
+    color: var(--accent-ink);
     flex-shrink: 0;
 }
 .outcome strong {
@@ -1660,7 +1660,7 @@ span.chip { cursor: default; pointer-events: none; }
     transition: border-color var(--dur-base) var(--ease-out), transform var(--dur-base) var(--ease-out);
 }
 .shop-product-card:hover {
-    border-color: var(--accent);
+    border-color: var(--accent-ink);
     transform: translateY(-2px);
 }
 .shop-product-card__head {
@@ -1678,7 +1678,7 @@ span.chip { cursor: default; pointer-events: none; }
 .shop-product-card__price {
     font-family: var(--font-mono);
     font-size: 0.95rem;
-    color: var(--accent);
+    color: var(--accent-ink);
     font-weight: 600;
     font-variant-numeric: tabular-nums;
 }
@@ -1734,7 +1734,7 @@ span.chip { cursor: default; pointer-events: none; }
 }
 .shop-cart-row__price {
     font-family: var(--font-mono);
-    color: var(--accent);
+    color: var(--accent-ink);
     font-variant-numeric: tabular-nums;
 }
 .shop-cart-row__controls {
@@ -1754,7 +1754,7 @@ span.chip { cursor: default; pointer-events: none; }
     cursor: pointer;
     min-width: 28px;
 }
-.shop-cart-row__controls button:hover { border-color: var(--accent); color: var(--accent); }
+.shop-cart-row__controls button:hover { border-color: var(--accent-ink); color: var(--accent-ink); }
 .shop-cart-row__controls .shop-cart-row__remove {
     margin-left: auto;
     color: var(--danger);
@@ -1917,7 +1917,7 @@ span.chip { cursor: default; pointer-events: none; }
     border-radius: 999px;
     transition: color var(--dur-fast) var(--ease-out), border-color var(--dur-fast) var(--ease-out);
 }
-.back-to-top:hover { color: var(--ink-1); border-color: var(--accent); }
+.back-to-top:hover { color: var(--ink-1); border-color: var(--accent-ink); }
 
 /* Clickable media slot (e.g. links to the Owl Park infographic) */
 .media-slot--link {
@@ -1929,8 +1929,73 @@ span.chip { cursor: default; pointer-events: none; }
 }
 .media-slot--link:hover {
     border-style: solid;
-    border-color: var(--accent);
+    border-color: var(--accent-ink);
     transform: translateY(-2px);
     box-shadow: 0 8px 24px rgba(44, 31, 23, 0.12);
 }
 .media-slot--link:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }
+
+/* ──────────────── About (homepage) ──────────────── */
+.about__grid {
+    display: grid;
+    gap: 1.5rem;
+    margin-top: 1.25rem;
+}
+.about__photo { max-width: 280px; }
+.about__body { display: grid; gap: 0.9rem; align-content: start; }
+.about__body p { color: var(--ink-2); line-height: 1.6; max-width: 60ch; }
+.about__body em { color: var(--ink-3); font-style: italic; }
+@media (min-width: 768px) {
+    .about__grid { grid-template-columns: 280px 1fr; gap: 2.5rem; align-items: start; }
+}
+
+/* ──────────────── Connect / socials ──────────────── */
+.socials {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 0.85rem;
+    margin-top: 1.25rem;
+}
+.social {
+    display: flex;
+    align-items: center;
+    gap: 0.85rem;
+    padding: 0.9rem 1.1rem;
+    background: var(--surface-1);
+    border: 1px solid var(--hairline-strong);
+    border-radius: var(--r-lg);
+    text-decoration: none;
+    color: var(--ink-1);
+    transition: border-color var(--dur-fast) var(--ease-out),
+                transform var(--dur-fast) var(--ease-out),
+                box-shadow var(--dur-fast) var(--ease-out);
+}
+.social:hover {
+    border-color: var(--accent);
+    transform: translateY(-2px);
+    box-shadow: 0 8px 24px rgba(44, 31, 23, 0.12);
+}
+.social:focus-visible { outline: 2px solid var(--focus-ring); outline-offset: 3px; }
+.social__icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
+    flex-shrink: 0;
+    border-radius: 50%;
+    background: var(--surface-2);
+    color: var(--ink-1);
+}
+.social:hover .social__icon { background: var(--accent); color: #fffbf3; }
+.social__icon svg { width: 20px; height: 20px; }
+.social__text { display: grid; gap: 0.1rem; min-width: 0; }
+.social__label { font-weight: 600; font-size: 0.95rem; }
+.social__sub {
+    font-family: var(--font-mono);
+    font-size: 0.74rem;
+    color: var(--ink-3);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
