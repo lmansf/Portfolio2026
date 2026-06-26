@@ -297,6 +297,18 @@ main.page > * {
 }
 .pitch__cta:hover { transform: translateY(-1px); }
 .pitch__cta .arrow { font-family: var(--font-mono); }
+.pitch__actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+    align-items: center;
+}
+.pitch__cta--ghost {
+    background: transparent;
+    color: var(--ink-1);
+    border: 1px solid var(--card-border);
+}
+.pitch__cta--ghost:hover { background: var(--surface-1); }
 
 /* ──────────────────── Section heading ──────────────────── */
 .section-head {
