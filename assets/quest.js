@@ -15,6 +15,7 @@
     ];
     var KEY = 'lm-quest-visited';
     var DONE_KEY = 'lm-quest-celebrated';
+    var DISMISS_KEY = 'lm-quest-dismissed';
     var LINKEDIN = 'https://www.linkedin.com/in/lmansf96/';
     var reduceMotion = window.matchMedia &&
         window.matchMedia('(prefers-reduced-motion: reduce)').matches;
@@ -46,6 +47,9 @@
         'padding:.9rem;border:1px solid var(--hairline-strong);border-radius:var(--r-lg);',
         'background:var(--surface-1);box-shadow:0 10px 30px rgba(44,31,23,.18);display:none}',
         '.quest-panel.is-open{display:block}',
+        '.quest-hide{position:absolute;top:.45rem;right:.5rem;border:0;background:transparent;cursor:pointer;',
+        'font:400 1.05rem/1 var(--font-text);color:var(--ink-3);padding:.1rem .25rem;border-radius:var(--r-sm)}',
+        '.quest-hide:hover{color:var(--ink-1);background:var(--surface-2)}',
         '.quest-panel h3{margin:0 0 .15rem;font:600 .85rem var(--font-display);color:var(--ink-1)}',
         '.quest-panel p{margin:0 0 .6rem;font:400 .72rem/1.4 var(--font-text);color:var(--ink-2)}',
         '.quest-panel ul{list-style:none;margin:0;padding:0}',
@@ -77,47 +81,68 @@
     }
     var done = visited.length >= STOPS.length;
 
-    var pill = document.createElement('button');
-    pill.type = 'button';
-    pill.className = 'quest-pill' + (done ? ' is-done' : '');
-    pill.setAttribute('aria-expanded', 'false');
-    pill.setAttribute('aria-controls', 'quest-panel');
-    pill.setAttribute('aria-label', 'Site tour progress: ' + visited.length + ' of ' + STOPS.length + ' pages explored');
-    pill.innerHTML = (done ? '🏆' : '🗺️') + ' <span>' + visited.length + '/' + STOPS.length + '</span>';
+    var pill = null;
+    var panel = null;
 
-    var panel = document.createElement('div');
-    panel.id = 'quest-panel';
-    panel.className = 'quest-panel';
-    panel.setAttribute('role', 'dialog');
-    panel.setAttribute('aria-label', 'Site tour');
-    panel.innerHTML =
-        '<h3>' + (done ? 'Tour complete! 🎉' : 'Explore the portfolio') + '</h3>' +
-        '<p>' + (done
-            ? 'You have seen the whole tour — the logical next step is a conversation.'
-            : 'Visit every stop to complete the tour. No prize, just well-modeled data.') + '</p>' +
-        '<ul>' + STOPS.map(function (s) {
-            var seen = visited.indexOf(s.path) !== -1;
-            return '<li class="' + (seen ? 'is-visited' : '') + '">' +
-                '<a href="' + s.path + '">' + s.label +
-                ' <span class="quest-mark">' + (seen ? '✓' : '○') + '</span></a></li>';
-        }).join('') + '</ul>' +
-        (done ? '<a class="quest-cta" href="' + LINKEDIN + '" target="_blank" rel="noopener noreferrer">Let’s talk on LinkedIn ↗</a>' : '');
+    function buildTracker() {
+        pill = document.createElement('button');
+        pill.type = 'button';
+        pill.className = 'quest-pill' + (done ? ' is-done' : '');
+        pill.setAttribute('aria-expanded', 'false');
+        pill.setAttribute('aria-controls', 'quest-panel');
+        pill.setAttribute('aria-label', 'Site tour progress: ' + visited.length + ' of ' + STOPS.length + ' pages explored');
+        pill.innerHTML = (done ? '🏆' : '🗺️') + ' <span>' + visited.length + '/' + STOPS.length + '</span>';
 
-    document.body.appendChild(pill);
-    document.body.appendChild(panel);
+        panel = document.createElement('div');
+        panel.id = 'quest-panel';
+        panel.className = 'quest-panel';
+        panel.setAttribute('role', 'dialog');
+        panel.setAttribute('aria-label', 'Site tour');
+        panel.innerHTML =
+            '<button type="button" class="quest-hide" aria-label="Hide the tour tracker">×</button>' +
+            '<h3>' + (done ? 'Tour complete! 🎉' : 'Explore the portfolio') + '</h3>' +
+            '<p>' + (done
+                ? 'You have seen the whole tour — the logical next step is a conversation.'
+                : 'Visit every stop to complete the tour. No prize, just well-modeled data.') + '</p>' +
+            '<ul>' + STOPS.map(function (s) {
+                var seen = visited.indexOf(s.path) !== -1;
+                return '<li class="' + (seen ? 'is-visited' : '') + '">' +
+                    '<a href="' + s.path + '">' + s.label +
+                    ' <span class="quest-mark">' + (seen ? '✓' : '○') + '</span></a></li>';
+            }).join('') + '</ul>' +
+            (done ? '<a class="quest-cta" href="' + LINKEDIN + '" target="_blank" rel="noopener noreferrer">Let’s talk on LinkedIn ↗</a>' : '');
 
-    pill.addEventListener('click', function () {
-        var open = panel.classList.toggle('is-open');
-        pill.setAttribute('aria-expanded', String(open));
-    });
-    document.addEventListener('click', function (e) {
-        if (!panel.contains(e.target) && e.target !== pill && !pill.contains(e.target)) {
-            panel.classList.remove('is-open');
-            pill.setAttribute('aria-expanded', 'false');
+        document.body.appendChild(pill);
+        document.body.appendChild(panel);
+
+        pill.addEventListener('click', function () {
+            var open = panel.classList.toggle('is-open');
+            pill.setAttribute('aria-expanded', String(open));
+        });
+        document.addEventListener('click', function (e) {
+            if (!panel || !pill) return;
+            if (!panel.contains(e.target) && e.target !== pill && !pill.contains(e.target)) {
+                panel.classList.remove('is-open');
+                pill.setAttribute('aria-expanded', 'false');
+            }
+        });
+        panel.querySelector('.quest-hide').addEventListener('click', function (e) {
+            e.stopPropagation();
+            try { localStorage.setItem(DISMISS_KEY, '1'); } catch (er) { /* ignore */ }
+            if (pill) { pill.remove(); pill = null; }
+            if (panel) { panel.remove(); panel = null; }
+        });
+
+        /* ── Completion celebration (once) ── */
+        if (done && !localStorage.getItem(DONE_KEY)) {
+            try { localStorage.setItem(DONE_KEY, '1'); } catch (e) { /* ignore */ }
+            burst(['🎉', '✨', '🐦‍⬛'], 18);
+            panel.classList.add('is-open');
+            pill.setAttribute('aria-expanded', 'true');
         }
-    });
+    }
 
-    /* ── Completion celebration (once) ── */
+    /* ── Completion celebration helper ── */
     function burst(emojis, count) {
         if (reduceMotion) return;
         for (var i = 0; i < count; i++) {
@@ -131,12 +156,11 @@
             setTimeout(function (n) { return function () { n.remove(); }; }(node), 2400);
         }
     }
-    if (done && !localStorage.getItem(DONE_KEY)) {
-        try { localStorage.setItem(DONE_KEY, '1'); } catch (e) { /* ignore */ }
-        burst(['🎉', '✨', '🐦‍⬛'], 18);
-        panel.classList.add('is-open');
-        pill.setAttribute('aria-expanded', 'true');
-    }
+
+    // Show the tracker unless the visitor has dismissed it before.
+    var dismissed = false;
+    try { dismissed = localStorage.getItem(DISMISS_KEY) === '1'; } catch (e) { dismissed = false; }
+    if (!dismissed) buildTracker();
 
     /* ── Easter egg: Konami code releases the flock ── */
     var KONAMI = ['ArrowUp', 'ArrowUp', 'ArrowDown', 'ArrowDown',
@@ -153,7 +177,7 @@
 
     function releaseTheCrows() {
         if (reduceMotion) {
-            pill.innerHTML = '🐦‍⬛ <span>Caw!</span>';
+            if (pill) pill.innerHTML = '🐦‍⬛ <span>Caw!</span>';
             return;
         }
         for (var i = 0; i < 12; i++) {

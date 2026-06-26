@@ -235,6 +235,13 @@ async function navigateTo(url, options = {}) {
 
             // Reset scroll
             window.scrollTo({ top: 0, left: 0, behavior: 'instant' });
+
+            // Move focus to the top of the new content for keyboard/screen-reader users
+            const focusTarget = document.getElementById('main-content') || main;
+            if (focusTarget) {
+                focusTarget.setAttribute('tabindex', '-1');
+                focusTarget.focus({ preventScroll: true });
+            }
         }
 
         // 3. Run the swap with View Transitions when supported.
@@ -406,9 +413,28 @@ function lazyMountCrowbot() {
     // 2. Mount a <gradio-app> inside the sheet body if not already there.
     const body = document.querySelector('#crowbot-sheet .crowbot-sheet__body');
     if (body && !body.querySelector('gradio-app')) {
+        // Loading + fallback state: Crowbot runs on a Hugging Face Space that can
+        // cold-start (~30s). Set expectations and always offer an email fallback.
+        const loading = document.createElement('div');
+        loading.className = 'crowbot-loading';
+        loading.innerHTML =
+            '<span class="crowbot-loading__spinner" aria-hidden="true"></span>' +
+            '<p class="crowbot-loading__msg">Waking Crowbot up — first load can take ~30 seconds.</p>' +
+            '<p class="crowbot-loading__fallback">Prefer not to wait? Email me at ' +
+            '<a href="mailto:lmansf96@gmail.com">lmansf96@gmail.com</a>.</p>';
+        body.appendChild(loading);
+
         const app = document.createElement('gradio-app');
         app.setAttribute('src', GRADIO_APP_SRC);
         body.appendChild(app);
+
+        // Hide the loading note once the Gradio app reports it has rendered.
+        // (gradio dispatches 'render' on the <gradio-app> element when ready.)
+        const dismissLoading = () => loading.classList.add('is-hidden');
+        app.addEventListener('render', dismissLoading, { once: true });
+        // Safety net: if the Space is slow/unreachable, keep the fallback visible
+        // but stop the spinner after 45s so it doesn't spin forever.
+        setTimeout(() => loading.classList.add('is-stalled'), 45000);
     }
 }
 
