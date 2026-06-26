@@ -633,6 +633,10 @@ body.crowbot-sheet-open {
 .topnav { display: none; }
 @media (min-width: 768px) {
     .burger { display: none; }
+    /* The .topnav replaces the burger dropdown on desktop. Remove the closed
+       .site-nav entirely so its (only opacity-hidden) links don't linger in the
+       tab order as phantom focus stops or register as a duplicate nav landmark. */
+    .site-nav { display: none; }
     .topnav {
         display: flex;
         align-items: center;
