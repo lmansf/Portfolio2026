@@ -7,11 +7,10 @@ TARGET ROLE
 Analytics Engineer
 
 PROFESSIONAL SUMMARY
-Systems Analyst with hands-on production data experience and a strong transition path into Analytics Engineering. Experienced in SQL, Snowflake, Python, and Power BI, with practical project work in customer segmentation (RFM), data modeling, reporting, and automation. Focused on building reliable data transformations, improving data quality, and delivering analytics-ready datasets and dashboards for business stakeholders.
+Systems Analyst with hands-on production data experience and a strong transition path into Analytics Engineering. Experienced in SQL, Python, and Power BI, with practical project work in customer segmentation (RFM), data modeling, reporting, and automation. Focused on building reliable data transformations, improving data quality, and delivering analytics-ready datasets and dashboards for business stakeholders.
 
 ANALYTICS ENGINEERING SKILLS
 - SQL (query design, data validation, joins, aggregations)
-- Snowflake (data warehousing fundamentals)
 - Python (data analysis and scripting)
 - Data Warehousing concepts
 - Data Quality checks and validation workflows
@@ -20,7 +19,7 @@ ANALYTICS ENGINEERING SKILLS
 - JavaScript, HTML, CSS
 
 TOOLS AND TECHNOLOGIES
-SQL | Snowflake | Python | Microsoft Power BI | Microsoft Fabric | JavaScript | CSS | Excel
+SQL | Python | Microsoft Power BI | Microsoft Fabric | JavaScript | CSS | Excel
 
 PROFESSIONAL EXPERIENCE
 
@@ -84,11 +83,6 @@ CERTIFICATIONS
 
 Microsoft
 Microsoft Certified: Power BI Data Analyst Associate (PL-300)
-
-Snowflake
-Hands-On Essentials: Data Warehousing Workshop
-Issued Dec 2025
-Credential ID: 170260271
 
 LearnSQL.com
 SQL Professional: Certificate of Competency

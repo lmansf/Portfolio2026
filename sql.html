@@ -4,9 +4,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Logan Mansfield · SQL &amp; Data Modeling</title>
-    <meta name="description" content="SQL and data modeling work by Logan Mansfield, analytics engineer: dimensional modeling, warehouse transformations in Snowflake and Fabric, data quality checks, and certified SQL skills.">
+    <meta name="description" content="SQL and data modeling work by Logan Mansfield, analytics engineer: dimensional modeling, warehouse transformations in Microsoft Fabric, data quality checks, and certified SQL skills.">
     <meta property="og:title" content="Logan Mansfield · SQL &amp; Data Modeling">
-    <meta property="og:description" content="SQL and data modeling work by Logan Mansfield, analytics engineer: dimensional modeling, warehouse transformations in Snowflake and Fabric, data quality checks, and certified SQL skills.">
+    <meta property="og:description" content="SQL and data modeling work by Logan Mansfield, analytics engineer: dimensional modeling, warehouse transformations in Microsoft Fabric, data quality checks, and certified SQL skills.">
     <meta property="og:type" content="website">
     <meta property="og:url" content="https://portfolio2-main-phi.vercel.app/sql">
     <meta property="og:image" content="https://portfolio2-main-phi.vercel.app/mini.jpg">
@@ -50,6 +50,7 @@
             <a class="site-nav__item" href="/python">Python</a>
             <a class="site-nav__item" href="/bi">BI</a>
             <a class="site-nav__item" href="/ai-engineering">AI Engineering</a>
+            <a class="site-nav__item" href="https://project-hub-dev.vercel.app" target="_blank" rel="noopener">Projects ↗</a>
         </div>
     </nav>
 
@@ -66,7 +67,7 @@
             <header class="section-head">
                 <h2 class="section-head__title" id="sql-about">About</h2>
             </header>
-            <p>SQL is the core of my analytics engineering work: Regardless of project there's typically an element of SQL whether it's for use at work to follow the webstore's performance, explore churn or customer segmentation, or on my projects outside of work like using Supabase SQL to set up, monitor, and explore the results from my simulated e-commerce store.</p>
+            <p>SQL is the core of my analytics engineering work: dimensional modeling, transformation logic, and data quality checks. I use it daily supporting point-of-sale systems at ZooTampa and in warehouse projects on Supabase Postgres and Microsoft Fabric. My focus is readable queries, maintainable warehouse structure, and stakeholder-ready datasets.</p>
         </section>
 
         <section aria-labelledby="sql-impact">
@@ -85,10 +86,32 @@
             <header class="section-head">
                 <h2 class="section-head__title" id="sql-projects">Projects</h2>
             </header>
-            <article class="work-tile" data-cats="sql python">
-                <span class="work-tile__label">Featured</span>
-                <h3 class="work-tile__title">Realtime Fraud Detection Data Layer</h3>
-                <p class="work-tile__desc">Shaped transaction and feature tables to support high-speed fraud scoring and downstream monitoring.</p>
+            <div class="media-grid">
+                <figure class="media-slot media-slot--banner" role="img" aria-label="Placeholder for a data model / ERD diagram">
+                    <span class="media-slot__tag">Preview soon</span>
+                    <span class="media-slot__icon" aria-hidden="true">🗺️</span>
+                    <span class="media-slot__label">Medallion ERD</span>
+                    <span class="media-slot__hint">Bronze → silver → gold model diagram for Owl Park.</span>
+                </figure>
+            </div>
+            <div class="media-grid media-grid--feature">
+                <figure class="media-slot media-slot--wide" role="img" aria-label="Placeholder for a SQL query screenshot">
+                    <span class="media-slot__tag">Preview soon</span>
+                    <span class="media-slot__icon" aria-hidden="true">💾</span>
+                    <span class="media-slot__label">Query in action</span>
+                    <span class="media-slot__hint">A representative transformation query with results.</span>
+                </figure>
+                <figure class="media-slot media-slot--square" role="img" aria-label="Placeholder for a query results table">
+                    <span class="media-slot__tag">Preview soon</span>
+                    <span class="media-slot__icon" aria-hidden="true">📋</span>
+                    <span class="media-slot__label">Result set</span>
+                    <span class="media-slot__hint">Output / validation snapshot.</span>
+                </figure>
+            </div>
+            <article class="work-tile">
+                <span class="work-tile__label">Featured · Real business data</span>
+                <h3 class="work-tile__title">RFM Customer Segmentation · ZooTampa</h3>
+                <p class="work-tile__desc">Built Recency-Frequency-Monetary segmentation over guest transaction data, turning raw purchases into business-relevant customer groupings surfaced in Power BI.</p>
                 <div class="work-tile__meta">
                     <span class="work-tile__tag">SQL</span>
                     <span class="work-tile__tag">Databricks</span>
@@ -128,6 +151,8 @@
                 <h2 class="section-head__title" id="sql-tools">Tools</h2>
             </header>
             <div class="work-filters">
+                <span class="chip">PostgreSQL</span>
+                <span class="chip">Supabase</span>
                 <span class="chip">Microsoft Fabric SQL</span>
                 <span class="chip">Databricks SQL</span>
                 <span class="chip">Supabase SQL</span>
@@ -158,12 +183,6 @@
                     <span class="upnext__num">Credential</span>
                     <span class="upnext__name">SQL Professional Certificate</span>
                     <span class="upnext__tease">Professional competency with analytical query writing and SQL problem solving.</span>
-                    <span class="upnext__arrow">Open ↗</span>
-                </a>
-                <a class="upnext__card" href="https://achieve.snowflake.com/4d97f4b0-8b75-4396-a270-afdc147ac86a#acc.9YbDuPN7" target="_blank" rel="noopener">
-                    <span class="upnext__num">Credential</span>
-                    <span class="upnext__name">Snowflake Hands-On Essentials</span>
-                    <span class="upnext__tease">Warehouse-focused SQL and cloud data modeling practice.</span>
                     <span class="upnext__arrow">Open ↗</span>
                 </a>
             </div>
@@ -210,6 +229,8 @@
             <a href="https://x.com/StatBird" target="_blank" rel="noopener">Twitter</a>
             <a href="https://github.com/lmansf" target="_blank" rel="noopener">Github</a>
             <a href="https://www.linkedin.com/in/lmansf96/" target="_blank" rel="noopener">LinkedIn</a>
+            <a href="mailto:lmansf96@gmail.com">Email</a>
+            <a href="/assets/resume_current.pdf" download="Logan-Mansfield-Resume.pdf">Résumé</a>
             <a href="/feedback">Feedback</a>
         </div>
     </footer>
