@@ -1918,3 +1918,19 @@ span.chip { cursor: default; pointer-events: none; }
     transition: color var(--dur-fast) var(--ease-out), border-color var(--dur-fast) var(--ease-out);
 }
 .back-to-top:hover { color: var(--ink-1); border-color: var(--accent); }
+
+/* Clickable media slot (e.g. links to the Owl Park infographic) */
+.media-slot--link {
+    text-decoration: none;
+    cursor: pointer;
+    transition: border-color var(--dur-fast) var(--ease-out),
+                transform var(--dur-fast) var(--ease-out),
+                box-shadow var(--dur-fast) var(--ease-out);
+}
+.media-slot--link:hover {
+    border-style: solid;
+    border-color: var(--accent);
+    transform: translateY(-2px);
+    box-shadow: 0 8px 24px rgba(44, 31, 23, 0.12);
+}
+.media-slot--link:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }

@@ -22,7 +22,7 @@
       ]
     },
     {
-      "source": "/(work|pipeline|fraud|shop|resume|feedback|sql|python|bi|ai-engineering)",
+      "source": "/(work|pipeline|fraud|shop|resume|feedback|sql|python|bi|ai-engineering|owl-park)",
       "headers": [
         {
           "key": "Cache-Control",
@@ -125,6 +125,10 @@
     {
       "source": "/fraud",
       "destination": "/fraud.html"
+    },
+    {
+      "source": "/owl-park",
+      "destination": "/owl-park-infographic.html"
     }
   ]
 }

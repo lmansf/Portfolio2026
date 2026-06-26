@@ -8,9 +8,12 @@
     <meta property="og:title" content="Owl Park — Data Architecture">
     <meta property="og:description" content="Full architecture infographic of the Owl Park data ecosystem: n8n agents, Supabase Postgres, Microsoft Fabric medallion models, and Power BI dashboards.">
     <meta property="og:type" content="website">
-    <meta property="og:url" content="https://portfolio2-main-phi.vercel.app/owl-park-infographic.html">
+    <meta property="og:url" content="https://portfolio2-main-phi.vercel.app/owl-park">
     <meta property="og:image" content="https://portfolio2-main-phi.vercel.app/mini.jpg">
     <meta name="twitter:card" content="summary">
+    <link rel="icon" type="image/svg+xml" href="/assets/favicon.svg">
+    <link rel="alternate icon" type="image/jpeg" href="/mini.jpg">
+    <link rel="apple-touch-icon" href="/mini.jpg">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
 <style>
   @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Playfair+Display:wght@700;800;900&display=swap');
@@ -355,9 +358,45 @@
   .svg-fabric{fill:var(--cyan);}
   .svg-pbi{fill:var(--orange);}
   .svg-claude{fill:var(--pink);}
+
+  /* ═══════════════════════════════════
+     BACK TO PORTFOLIO — keeps the poster part of the site
+     ═══════════════════════════════════ */
+  .back-home{
+    position:fixed;top:14px;left:16px;z-index:10;
+    display:inline-flex;align-items:center;gap:7px;
+    font-size:11px;font-weight:600;letter-spacing:.4px;
+    color:#cdd9f5;text-decoration:none;
+    background:rgba(255,255,255,.06);border:1px solid rgba(180,203,255,.22);
+    border-radius:999px;padding:5px 12px;
+    backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);
+    transition:color .15s,border-color .15s,background .15s;
+  }
+  .back-home:hover{color:#fff;border-color:rgba(189,214,255,.5);background:rgba(255,255,255,.1);}
+
+  /* ═══════════════════════════════════
+     MOBILE — stack the flow vertically so it never clips
+     ═══════════════════════════════════ */
+  @media (max-width:900px){
+    html,body{height:auto;min-height:100vh;overflow-x:hidden;overflow-y:auto;}
+    .flow{flex-direction:column;align-items:stretch;justify-content:flex-start;
+      height:auto;transform:none;padding:14px 14px 48px;gap:14px;}
+    .col-src,.col-supa,.col-fabric,.col-out{
+      flex:none;width:100%;max-width:520px;min-width:0;margin:0 auto;}
+    .col-arrow,.out-connector{flex:none;width:100%;height:38px;}
+    .connector{height:38px;flex-direction:row;}
+    .connector .chev{transform:rotate(90deg);}
+    @keyframes pulse-chev{0%,100%{opacity:.4;transform:rotate(90deg) translateX(0);}
+      50%{opacity:1;transform:rotate(90deg) translateX(3px);}}
+    .header{height:auto;padding:10px 12px;flex-wrap:wrap;}
+    .header h1{font-size:18px;}
+    .footer{position:static;margin-top:18px;}
+  }
 </style>
 </head>
 <body>
+
+<a class="back-home" href="/pipeline"><i class="fa-solid fa-arrow-left"></i> Back to portfolio</a>
 
 <!-- ═══ HEADER ═══ -->
 <div class="header">
