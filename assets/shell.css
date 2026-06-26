@@ -610,3 +610,17 @@ body.crowbot-sheet-open {
 .crowbot-sheet {
     display: none !important;
 }
+
+/* ──────────────── Site-wide construction banner ──────────────── */
+.site-banner {
+    position: relative;
+    z-index: 51;
+    background: var(--accent-2);
+    color: #2c1f17;
+    font-family: var(--font-mono);
+    font-size: 0.72rem;
+    line-height: 1.45;
+    letter-spacing: 0.01em;
+    text-align: center;
+    padding: 0.5rem 1rem;
+}

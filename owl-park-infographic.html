@@ -20,16 +20,16 @@
   *{margin:0;padding:0;box-sizing:border-box;}
 
   :root{
-    --bg:#050913;
-    --bg-soft:#0d1a33;
-    --text:#eef4ff;
-    --muted:#9eacd0;
-    --line:#25355b;
-    --line-strong:#355083;
-    --red:#ff4b4b;
-    --orange:#ff9d2e;
-    --cyan:#3de0ff;
-    --pink:#ff66b0;
+    --bg:#241a13;
+    --bg-soft:#2c1f17;
+    --text:#fbf3e7;
+    --muted:#c9b79f;
+    --line:#5a4636;
+    --line-strong:#7a5e44;
+    --red:#f0673c;
+    --orange:#eaa63f;
+    --cyan:#6fb3a8;
+    --pink:#dd8a86;
     --glass:rgba(255,255,255,.05);
   }
 
@@ -41,9 +41,9 @@
     font-family:'Inter',sans-serif;
     color:var(--text);
     background:
-      radial-gradient(920px 540px at 12% -10%,rgba(255,75,75,.22),transparent 60%),
-      radial-gradient(760px 460px at 88% 112%,rgba(61,224,255,.19),transparent 62%),
-      linear-gradient(145deg,#03060f 0%,#071025 38%,#0b1833 100%);
+      radial-gradient(920px 540px at 12% -10%,rgba(240,103,60,.22),transparent 60%),
+      radial-gradient(760px 460px at 88% 112%,rgba(111,179,168,.19),transparent 62%),
+      linear-gradient(145deg,#1c140e 0%,#2a1d14 38%,#3a2718 100%);
     background-color:var(--bg);
   }
 
@@ -53,14 +53,14 @@
   .header{
     display:flex;align-items:center;justify-content:center;gap:14px;
     height:56px;
-    background:linear-gradient(90deg,rgba(255,75,75,.18),rgba(255,157,46,.13),rgba(61,224,255,.15));
-    border-bottom:1px solid rgba(157,186,243,.24);
+    background:linear-gradient(90deg,rgba(240,103,60,.18),rgba(234,166,63,.13),rgba(111,179,168,.15));
+    border-bottom:1px solid rgba(201,183,159,.24);
   }
   .header .owl-logo{ width:30px;height:30px; }
   .header h1{font-size:22px;font-weight:800;letter-spacing:.5px;font-family:'Playfair Display',serif;}
   .header h1 span{color:var(--orange);}
   .header .sep{color:rgba(255,255,255,.35);font-size:18px;}
-  .header .subtitle{font-size:10px;color:#c5cee3;letter-spacing:1.2px;text-transform:uppercase;font-weight:600;}
+  .header .subtitle{font-size:10px;color:#d9c7af;letter-spacing:1.2px;text-transform:uppercase;font-weight:600;}
 
   /* ═══════════════════════════════════
      MAIN FLOW — horizontal flexbox band
@@ -89,8 +89,8 @@
   .phase-tag span{
     display:inline-block;
     font-size:9px;font-weight:700;letter-spacing:1.2px;text-transform:uppercase;
-    color:#ffbf66;
-    background:rgba(255,157,46,.14);border:1px solid rgba(255,157,46,.42);
+    color:#f3c277;
+    background:rgba(234,166,63,.14);border:1px solid rgba(234,166,63,.42);
     border-radius:4px;padding:3px 10px;
   }
 
@@ -100,13 +100,13 @@
   .card{
     background:var(--glass);
     backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);
-    border:1px solid rgba(180,203,255,.16);
+    border:1px solid rgba(201,183,159,.16);
     border-radius:10px;
     padding:10px 14px;
     transition:transform .15s,box-shadow .15s,border-color .15s;
     position:relative;
   }
-  .card:hover{transform:translateY(-2px);box-shadow:0 12px 34px rgba(2,7,18,.72);border-color:rgba(189,214,255,.42);}
+  .card:hover{transform:translateY(-2px);box-shadow:0 12px 34px rgba(20,14,9,.72);border-color:rgba(234,166,63,.42);}
   .card .icon{display:flex;align-items:center;justify-content:center;flex-shrink:0;}
   .card .icon svg{width:22px;height:22px;}
   .card .icon i{font-size:20px;}
@@ -122,12 +122,12 @@
   }
   .card.agent{
     border-left:3px solid var(--red);
-    box-shadow:inset 0 0 18px rgba(255,75,75,.22);
+    box-shadow:inset 0 0 18px rgba(240,103,60,.22);
   }
   .card.agent .icon svg,.card.agent .icon i{color:var(--red);}
   .card.store{
     border-left:3px solid var(--orange);
-    box-shadow:inset 0 0 18px rgba(255,157,46,.22);
+    box-shadow:inset 0 0 18px rgba(234,166,63,.22);
   }
   .card.store .icon i{color:var(--orange);}
   .card.agent .card-text,.card.store .card-text{text-align:left;}
@@ -141,7 +141,7 @@
   }
   .connector .line{
     position:absolute;top:50%;left:4px;right:4px;
-    border-top:2px dashed rgba(167,193,246,.36);
+    border-top:2px dashed rgba(201,183,159,.36);
   }
   .connector .chev{
     position:relative;z-index:1;
@@ -150,10 +150,10 @@
   }
   .connector .clabel{
     position:relative;z-index:1;
-    font-size:9px;font-weight:600;color:#cad7f3;
+    font-size:9px;font-weight:600;color:#d9c7af;
     text-transform:uppercase;letter-spacing:.6px;text-align:center;line-height:1.2;
     background:transparent;padding:0;
-    text-shadow:0 1px 6px rgba(4,9,21,.9);
+    text-shadow:0 1px 6px rgba(20,14,9,.9);
   }
   @keyframes pulse-chev{
     0%,100%{opacity:.4;transform:translateX(0);}
@@ -165,17 +165,17 @@
      ═══════════════════════════════════ */
   .card.supabase{
     text-align:center;padding:18px 16px;
-    border:1px solid rgba(255,157,46,.52);
-    background:linear-gradient(135deg,rgba(255,157,46,.24),rgba(255,75,75,.10));
-    box-shadow:0 0 30px rgba(255,157,46,.20);
+    border:1px solid rgba(234,166,63,.52);
+    background:linear-gradient(135deg,rgba(234,166,63,.24),rgba(240,103,60,.10));
+    box-shadow:0 0 30px rgba(234,166,63,.20);
   }
   .card.supabase .icon{justify-content:center;margin-bottom:6px;}
   .card.supabase .icon svg{width:34px;height:34px;}
 
   /* supabase table list */
   .supa-table-list{
-    background:rgba(255,157,46,.07);
-    border:1px solid rgba(255,157,46,.28);
+    background:rgba(234,166,63,.07);
+    border:1px solid rgba(234,166,63,.28);
     border-radius:10px;
     padding:6px 0;
     overflow:hidden;
@@ -183,17 +183,17 @@
   .supa-table-list .st{
     display:flex;align-items:center;gap:6px;
     padding:3px 10px;
-    font-size:9.5px;color:#ccd4e8;
+    font-size:9.5px;color:#d9c7af;
     line-height:1.3;
     white-space:nowrap;
   }
-  .supa-table-list .st:hover{background:rgba(255,122,26,.18);color:#fff3e8;}
-  .supa-table-list .st i{font-size:8px;color:#ffc68d;flex-shrink:0;}
+  .supa-table-list .st:hover{background:rgba(234,166,63,.18);color:#fff6ea;}
+  .supa-table-list .st i{font-size:8px;color:#f3c277;flex-shrink:0;}
   .supa-table-list .st .tname{flex:1;overflow:hidden;text-overflow:ellipsis;}
   .supa-table-list .unrest{
     font-size:7px;font-weight:700;letter-spacing:.5px;
-    color:#ffd5d5;border:1px solid rgba(255,42,42,.40);
-    background:rgba(255,42,42,.18);
+    color:#fff6ea;border:1px solid rgba(240,103,60,.40);
+    background:rgba(240,103,60,.18);
     border-radius:3px;padding:1px 4px;white-space:nowrap;flex-shrink:0;
   }
 
@@ -201,10 +201,10 @@
      FABRIC BOX — content-sized
      ═══════════════════════════════════ */
   .fabric-box{
-    background:rgba(11,18,36,.55);
-    border:1px solid rgba(61,224,255,.28);
+    background:rgba(36,26,19,.55);
+    border:1px solid rgba(111,179,168,.28);
     border-radius:16px;padding:14px 18px;
-    box-shadow:0 0 50px rgba(61,224,255,.14);
+    box-shadow:0 0 50px rgba(111,179,168,.14);
   }
   .fabric-header{
     display:flex;align-items:center;justify-content:center;gap:10px;
@@ -212,32 +212,32 @@
   }
   .fabric-header .icon svg{width:18px;height:18px;}
   .fabric-header .title{
-    font-size:13px;font-weight:700;color:#63e8ff;
+    font-size:13px;font-weight:700;color:#7fc2b6;
     letter-spacing:.6px;text-transform:uppercase;
   }
 
   /* ── GEN2 CONTAINER — wraps pill + tables ── */
   .gen2-container{
-    border:1px solid rgba(61,224,255,.30);
+    border:1px solid rgba(111,179,168,.30);
     border-radius:10px;
-    background:rgba(13,24,51,.58);
+    background:rgba(44,31,23,.58);
     overflow:visible;
   }
   .gen2-pill{
     display:flex;align-items:center;justify-content:center;gap:8px;
-    background:linear-gradient(90deg,rgba(61,224,255,.24),rgba(61,224,255,.10));
-    border-bottom:1px solid rgba(61,224,255,.32);
+    background:linear-gradient(90deg,rgba(111,179,168,.24),rgba(111,179,168,.10));
+    border-bottom:1px solid rgba(111,179,168,.32);
     border-radius:10px 10px 0 0;padding:7px 16px;
   }
   .gen2-pill i{color:var(--cyan);font-size:13px;}
-  .gen2-pill .g-label{font-size:12px;font-weight:700;color:#eaf8ff;}
-  .gen2-pill .g-sub{font-size:10px;color:#a9bbe4;}
+  .gen2-pill .g-label{font-size:12px;font-weight:700;color:#fff6ea;}
+  .gen2-pill .g-sub{font-size:10px;color:#c9b79f;}
 
   /* ── TABLE PANELS ── */
   .tables-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;padding:8px;}
   .tbl-panel{
     background:rgba(255,255,255,.02);
-    border:1px solid rgba(180,203,255,.20);
+    border:1px solid rgba(201,183,159,.20);
     border-radius:10px;padding:10px 12px;
   }
 
@@ -249,7 +249,7 @@
   .fabric-storage .fs-card{
     display:flex;align-items:center;gap:10px;
     background:rgba(255,255,255,.03);
-    border:1px solid rgba(180,203,255,.18);
+    border:1px solid rgba(201,183,159,.18);
     border-radius:10px;padding:9px 12px;
     position:relative;overflow:visible;
   }
@@ -262,12 +262,12 @@
     font-size:7.5px;font-weight:700;letter-spacing:.5px;
     padding:2px 7px;border-radius:3px;white-space:nowrap;
   }
-  .fs-card.wh{border-left:3px solid var(--red);box-shadow:inset 0 0 14px rgba(255,42,42,.16);}
+  .fs-card.wh{border-left:3px solid var(--red);box-shadow:inset 0 0 14px rgba(240,103,60,.16);}
   .fs-card.wh .icon i{color:var(--red);}
-  .fs-card.wh .cadence{background:rgba(255,42,42,.18);color:#ffdede;border:1px solid rgba(255,42,42,.35);}
-  .fs-card.dl{border-left:3px solid var(--cyan);box-shadow:inset 0 0 14px rgba(26,209,255,.16);}
+  .fs-card.wh .cadence{background:rgba(240,103,60,.18);color:#fff6ea;border:1px solid rgba(240,103,60,.35);}
+  .fs-card.dl{border-left:3px solid var(--cyan);box-shadow:inset 0 0 14px rgba(111,179,168,.16);}
   .fs-card.dl .icon i{color:var(--cyan);}
-  .fs-card.dl .cadence{background:rgba(26,209,255,.16);color:#dff9ff;border:1px solid rgba(26,209,255,.34);}
+  .fs-card.dl .cadence{background:rgba(111,179,168,.16);color:#fff6ea;border:1px solid rgba(111,179,168,.34);}
 
   .tbl-heading{
     font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.7px;
@@ -275,11 +275,11 @@
   }
   .tbl-heading.dim{color:var(--cyan);}
   .tbl-heading.fact{color:var(--red);}
-  .tbl-heading.qg{color:#b8c9ea;margin-top:10px;font-size:10px;}
+  .tbl-heading.qg{color:#c9b79f;margin-top:10px;font-size:10px;}
   .tbl-heading i{font-size:9px;}
 
   .tbl-list .t{
-    display:block;font-size:10px;color:#c4d2ed;line-height:1.35;
+    display:block;font-size:10px;color:#d9c7af;line-height:1.35;
     padding-left:12px;position:relative;
   }
   .tbl-list .t::before{
@@ -309,21 +309,21 @@
     white-space:nowrap;
   }
 
-  .card.wh{border-left:3px solid var(--red);box-shadow:inset 0 0 12px rgba(255,42,42,.14);}
+  .card.wh{border-left:3px solid var(--red);box-shadow:inset 0 0 12px rgba(240,103,60,.14);}
   .card.wh .icon i{color:var(--red);}
-  .card.wh .cadence{background:rgba(255,42,42,.18);color:#ffe3e3;border:1px solid rgba(255,42,42,.35);}
+  .card.wh .cadence{background:rgba(240,103,60,.18);color:#fff6ea;border:1px solid rgba(240,103,60,.35);}
 
-  .card.dl{border-left:3px solid var(--cyan);box-shadow:inset 0 0 12px rgba(26,209,255,.14);}
+  .card.dl{border-left:3px solid var(--cyan);box-shadow:inset 0 0 12px rgba(111,179,168,.14);}
   .card.dl .icon i{color:var(--cyan);}
-  .card.dl .cadence{background:rgba(26,209,255,.18);color:#e4faff;border:1px solid rgba(26,209,255,.35);}
+  .card.dl .cadence{background:rgba(111,179,168,.18);color:#fff6ea;border:1px solid rgba(111,179,168,.35);}
 
-  .card.pbi{border-left:3px solid var(--orange);box-shadow:inset 0 0 12px rgba(255,122,26,.16);}
+  .card.pbi{border-left:3px solid var(--orange);box-shadow:inset 0 0 12px rgba(234,166,63,.16);}
   .card.pbi .icon svg{width:22px;height:22px;}
-  .card.pbi .cadence{background:rgba(255,122,26,.18);color:#fff0e3;border:1px solid rgba(255,122,26,.36);}
+  .card.pbi .cadence{background:rgba(234,166,63,.18);color:#fff6ea;border:1px solid rgba(234,166,63,.36);}
 
-  .card.claude{border-left:3px solid var(--pink);box-shadow:inset 0 0 12px rgba(255,77,141,.15);}
+  .card.claude{border-left:3px solid var(--pink);box-shadow:inset 0 0 12px rgba(221,138,134,.15);}
   .card.claude .icon svg{width:22px;height:22px;}
-  .card.claude .cadence{background:rgba(255,77,141,.16);color:#ffe3ef;border:1px solid rgba(255,77,141,.36);}
+  .card.claude .cadence{background:rgba(221,138,134,.16);color:#fff6ea;border:1px solid rgba(221,138,134,.36);}
 
   /* ═══════════════════════════════════
      OUTPUT CONNECTOR — single column
@@ -334,7 +334,7 @@
   }
   .out-connector .line{
     position:absolute;top:50%;left:4px;right:4px;
-    border-top:2px dashed rgba(167,193,246,.32);
+    border-top:2px dashed rgba(201,183,159,.32);
   }
   .out-connector .chev{
     position:relative;z-index:1;
@@ -346,8 +346,9 @@
      FOOTER
      ═══════════════════════════════════ */
   .footer{
-    position:fixed;bottom:8px;left:0;right:0;text-align:center;
-    font-size:8px;color:#7f92bd;letter-spacing:2px;text-transform:uppercase;
+    position:fixed;bottom:6px;left:0;right:0;text-align:center;
+    font-size:9px;color:#c9b79f;letter-spacing:1px;text-transform:uppercase;
+    padding:0 12px;
   }
 
   /* ═══════════════════════════════════
@@ -366,13 +367,13 @@
     position:fixed;top:14px;left:16px;z-index:10;
     display:inline-flex;align-items:center;gap:7px;
     font-size:11px;font-weight:600;letter-spacing:.4px;
-    color:#cdd9f5;text-decoration:none;
-    background:rgba(255,255,255,.06);border:1px solid rgba(180,203,255,.22);
+    color:#e7d8c0;text-decoration:none;
+    background:rgba(255,255,255,.06);border:1px solid rgba(201,183,159,.22);
     border-radius:999px;padding:5px 12px;
     backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);
     transition:color .15s,border-color .15s,background .15s;
   }
-  .back-home:hover{color:#fff;border-color:rgba(189,214,255,.5);background:rgba(255,255,255,.1);}
+  .back-home:hover{color:#fff;border-color:rgba(234,166,63,.5);background:rgba(255,255,255,.1);}
 
   /* ═══════════════════════════════════
      MOBILE — stack the flow vertically so it never clips
@@ -402,11 +403,11 @@
 <div class="header">
   <!-- Owl icon -->
   <svg class="owl-logo" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
-    <circle cx="50" cy="50" r="46" fill="rgba(255,122,26,.16)" stroke="#ff7a1a" stroke-width="2"/>
-    <circle cx="36" cy="42" r="11" fill="#ff7a1a" opacity=".88"/><circle cx="36" cy="42" r="5" fill="#05070f"/>
-    <circle cx="64" cy="42" r="11" fill="#ff7a1a" opacity=".88"/><circle cx="64" cy="42" r="5" fill="#05070f"/>
-    <path d="M44 60 Q50 68 56 60" stroke="#ff2a2a" stroke-width="3" stroke-linecap="round" fill="none"/>
-    <path d="M50 18 L46 28 L54 28 Z" fill="#1ad1ff" opacity=".7"/>
+    <circle cx="50" cy="50" r="46" fill="rgba(234,166,63,.16)" stroke="#eaa63f" stroke-width="2"/>
+    <circle cx="36" cy="42" r="11" fill="#eaa63f" opacity=".88"/><circle cx="36" cy="42" r="5" fill="#1c140e"/>
+    <circle cx="64" cy="42" r="11" fill="#eaa63f" opacity=".88"/><circle cx="64" cy="42" r="5" fill="#1c140e"/>
+    <path d="M44 60 Q50 68 56 60" stroke="#f0673c" stroke-width="3" stroke-linecap="round" fill="none"/>
+    <path d="M50 18 L46 28 L54 28 Z" fill="#6fb3a8" opacity=".7"/>
   </svg>
   <h1><span>Owl Park</span> — Data Architecture</h1>
   <span class="sep">|</span>
@@ -427,8 +428,8 @@
           <rect x="4" y="12" width="12" height="12" rx="3" class="svg-n8n" opacity=".9"/>
           <rect x="24" y="4" width="12" height="12" rx="3" class="svg-n8n" opacity=".7"/>
           <rect x="24" y="24" width="12" height="12" rx="3" class="svg-n8n" opacity=".7"/>
-          <line x1="16" y1="18" x2="24" y2="10" stroke="#ff2a2a" stroke-width="2"/>
-          <line x1="16" y1="18" x2="24" y2="30" stroke="#ff2a2a" stroke-width="2"/>
+          <line x1="16" y1="18" x2="24" y2="10" stroke="#f0673c" stroke-width="2"/>
+          <line x1="16" y1="18" x2="24" y2="30" stroke="#f0673c" stroke-width="2"/>
         </svg>
       </div>
       <div class="card-text">
@@ -443,8 +444,8 @@
           <rect x="4" y="12" width="12" height="12" rx="3" class="svg-n8n" opacity=".9"/>
           <rect x="24" y="4" width="12" height="12" rx="3" class="svg-n8n" opacity=".7"/>
           <rect x="24" y="24" width="12" height="12" rx="3" class="svg-n8n" opacity=".7"/>
-          <line x1="16" y1="18" x2="24" y2="10" stroke="#ff2a2a" stroke-width="2"/>
-          <line x1="16" y1="18" x2="24" y2="30" stroke="#ff2a2a" stroke-width="2"/>
+          <line x1="16" y1="18" x2="24" y2="10" stroke="#f0673c" stroke-width="2"/>
+          <line x1="16" y1="18" x2="24" y2="30" stroke="#f0673c" stroke-width="2"/>
         </svg>
       </div>
       <div class="card-text">
@@ -459,8 +460,8 @@
           <rect x="4" y="12" width="12" height="12" rx="3" class="svg-n8n" opacity=".9"/>
           <rect x="24" y="4" width="12" height="12" rx="3" class="svg-n8n" opacity=".7"/>
           <rect x="24" y="24" width="12" height="12" rx="3" class="svg-n8n" opacity=".7"/>
-          <line x1="16" y1="18" x2="24" y2="10" stroke="#ff2a2a" stroke-width="2"/>
-          <line x1="16" y1="18" x2="24" y2="30" stroke="#ff2a2a" stroke-width="2"/>
+          <line x1="16" y1="18" x2="24" y2="10" stroke="#f0673c" stroke-width="2"/>
+          <line x1="16" y1="18" x2="24" y2="30" stroke="#f0673c" stroke-width="2"/>
         </svg>
       </div>
       <div class="card-text">
@@ -531,8 +532,8 @@
         <div class="icon">
           <!-- Fabric diamond logo -->
           <svg viewBox="0 0 36 36" xmlns="http://www.w3.org/2000/svg">
-            <path d="M18 4 L30 14 L18 32 L6 14 Z" fill="#1ad1ff" opacity=".85"/>
-            <path d="M18 4 L30 14 L18 18 L6 14 Z" fill="#9cebff" opacity=".72"/>
+            <path d="M18 4 L30 14 L18 32 L6 14 Z" fill="#6fb3a8" opacity=".85"/>
+            <path d="M18 4 L30 14 L18 18 L6 14 Z" fill="#a7d2c9" opacity=".72"/>
           </svg>
         </div>
         <span class="title">Microsoft Fabric</span>
@@ -591,9 +592,9 @@
             <i class="fa-solid fa-folder"></i> Query Groups — 26 Queries
           </div>
           <div class="tbl-list" style="padding-left:12px;">
-            <span class="t" style="color:#9fb3de;">Events (4) · Products (4) · Sellouts (4)</span>
-            <span class="t" style="color:#9fb3de;">Transactions (3) · VisitingCalendar (5)</span>
-            <span class="t" style="color:#9fb3de;">Warehouse (4) · Weather (2)</span>
+            <span class="t" style="color:#c9b79f;">Events (4) · Products (4) · Sellouts (4)</span>
+            <span class="t" style="color:#c9b79f;">Transactions (3) · VisitingCalendar (5)</span>
+            <span class="t" style="color:#c9b79f;">Warehouse (4) · Weather (2)</span>
           </div>
         </div>
       </div>
@@ -636,9 +637,9 @@
       <div class="icon">
         <!-- Power BI logo -->
         <svg viewBox="0 0 40 40" xmlns="http://www.w3.org/2000/svg">
-          <rect x="8" y="18" width="6" height="16" rx="1.5" fill="#ff7a1a" opacity=".65"/>
-          <rect x="17" y="12" width="6" height="22" rx="1.5" fill="#ff7a1a" opacity=".85"/>
-          <rect x="26" y="6" width="6" height="28" rx="1.5" fill="#ff7a1a"/>
+          <rect x="8" y="18" width="6" height="16" rx="1.5" fill="#eaa63f" opacity=".65"/>
+          <rect x="17" y="12" width="6" height="22" rx="1.5" fill="#eaa63f" opacity=".85"/>
+          <rect x="26" y="6" width="6" height="28" rx="1.5" fill="#eaa63f"/>
         </svg>
       </div>
       <div class="card-text">
@@ -652,7 +653,7 @@
       <div class="icon">
         <!-- Claude sparkle icon -->
         <svg viewBox="0 0 40 40" xmlns="http://www.w3.org/2000/svg">
-          <path d="M20 4 L22 16 L34 14 L24 20 L34 26 L22 24 L20 36 L18 24 L6 26 L16 20 L6 14 L18 16 Z" fill="#ff4d8d"/>
+          <path d="M20 4 L22 16 L34 14 L24 20 L34 26 L22 24 L20 36 L18 24 L6 26 L16 20 L6 14 L18 16 Z" fill="#dd8a86"/>
         </svg>
       </div>
       <div class="card-text">
@@ -664,7 +665,7 @@
 
 </div>
 
-<div class="footer">Owl Park · Data Architecture · 2026</div>
+<div class="footer">Under construction — may contain inaccurate boilerplate written by AI · Owl Park Data Architecture</div>
 
 </body>
 </html>
