@@ -1787,3 +1787,73 @@ span.chip { cursor: default; pointer-events: none; }
     color: var(--ink-3);
     font-style: italic;
 }
+
+/* ──────────────── Media placeholder slots ("preview soon") ──────────────── */
+.media-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 1rem;
+    margin-top: 1.25rem;
+}
+.media-grid--feature { grid-template-columns: 2fr 1fr; }
+@media (max-width: 680px) {
+    .media-grid--feature { grid-template-columns: 1fr; }
+}
+.media-slot {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 0.45rem;
+    width: 100%;
+    border-radius: var(--r-lg);
+    border: 1.5px dashed var(--card-border);
+    background:
+        repeating-linear-gradient(45deg, transparent, transparent 11px,
+            color-mix(in srgb, var(--accent) 6%, transparent) 11px,
+            color-mix(in srgb, var(--accent) 6%, transparent) 12px),
+        var(--surface-1);
+    color: var(--ink-3);
+    text-align: center;
+    padding: 1.25rem;
+    overflow: hidden;
+}
+.media-slot__icon { font-size: 1.7rem; opacity: 0.65; line-height: 1; }
+.media-slot__label {
+    font-family: var(--font-mono);
+    font-size: 0.7rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--ink-2);
+}
+.media-slot__hint { font-size: 0.82rem; color: var(--ink-3); max-width: 34ch; }
+.media-slot__tag {
+    position: absolute;
+    top: 0.7rem;
+    right: 0.7rem;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    font-family: var(--font-mono);
+    font-size: 0.6rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    padding: 0.25rem 0.55rem;
+    border-radius: 999px;
+    background: color-mix(in srgb, var(--accent) 90%, #000 0%);
+    color: #fff;
+}
+.media-slot__tag::before {
+    content: "";
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: #fff;
+    opacity: 0.9;
+}
+.media-slot--banner   { aspect-ratio: 21 / 9; }
+.media-slot--wide     { aspect-ratio: 16 / 9; }
+.media-slot--square   { aspect-ratio: 1 / 1; }
+.media-slot--portrait { aspect-ratio: 3 / 4; }
+.media-slot--tall     { aspect-ratio: 4 / 5; }
