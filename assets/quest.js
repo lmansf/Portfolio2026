@@ -15,6 +15,7 @@
     ];
     var KEY = 'lm-quest-visited';
     var DONE_KEY = 'lm-quest-celebrated';
+    var DISMISS_KEY = 'lm-quest-dismissed';
     var LINKEDIN = 'https://www.linkedin.com/in/lmansf96/';
     var reduceMotion = window.matchMedia &&
         window.matchMedia('(prefers-reduced-motion: reduce)').matches;
@@ -34,136 +35,146 @@
         try { localStorage.setItem(KEY, JSON.stringify(list)); } catch (e) { /* private mode */ }
     }
 
-    var style = document.createElement(‘style’);
+    var style = document.createElement('style');
     style.textContent = [
-        ‘.quest-pill{position:fixed;left:1rem;bottom:1rem;z-index:60;display:flex;align-items:center;gap:.45rem;’,
-        ‘padding:.5rem .85rem;border:1px solid var(--hairline-strong);border-radius:999px;cursor:pointer;’,
-        ‘background:var(--surface-1);color:var(--ink-1);font:500 .8rem/1 var(--font-mono);’,
-        ‘box-shadow:0 4px 14px rgba(44,31,23,.12);transition:transform var(--dur-fast) var(--ease-out)}’,
-        ‘.quest-pill:hover{transform:translateY(-2px)}’,
-        ‘.quest-pill.is-done{border-color:var(--accent-2);background:var(--surface-2)}’,
-        ‘.quest-panel{position:fixed;left:1rem;bottom:3.6rem;z-index:61;width:min(15.5rem,calc(100vw - 2rem));’,
-        ‘padding:.9rem;border:1px solid var(--hairline-strong);border-radius:var(--r-lg);’,
-        ‘background:var(--surface-1);box-shadow:0 10px 30px rgba(44,31,23,.18);display:none}’,
-        ‘.quest-panel.is-open{display:block}’,
-        ‘.quest-panel h3{margin:0 0 .15rem;font:600 .85rem var(--font-display);color:var(--ink-1)}’,
-        ‘.quest-panel p{margin:0 0 .6rem;font:400 .72rem/1.4 var(--font-text);color:var(--ink-2)}’,
-        ‘.quest-panel ul{list-style:none;margin:0;padding:0}’,
-        ‘.quest-panel li a{display:flex;justify-content:space-between;gap:.5rem;padding:.34rem .4rem;’,
-        ‘border-radius:var(--r-sm);font:500 .78rem var(--font-text);color:var(--ink-1);text-decoration:none}’,
-        ‘.quest-panel li a:hover{background:var(--surface-2)}’,
-        ‘.quest-panel li a .quest-mark{color:var(--ink-3)}’,
-        ‘.quest-panel li.is-visited a .quest-mark{color:var(--success)}’,
-        ‘.quest-cta{display:block;margin-top:.6rem;padding:.5rem .6rem;border-radius:var(--r-md);text-align:center;’,
-        ‘background:var(--accent);color:#fffbf3;font:600 .78rem var(--font-text);text-decoration:none}’,
-        ‘.quest-cta:hover{filter:brightness(1.06)}’,
-        ‘.quest-burst{position:fixed;z-index:80;pointer-events:none;font-size:1.3rem;’,
-        ‘animation:quest-fall 1.6s var(--ease-out) forwards}’,
-        ‘@keyframes quest-fall{from{transform:translateY(0) rotate(0);opacity:1}’,
-        ‘to{transform:translateY(45vh) rotate(60deg);opacity:0}}’,
-        ‘.quest-crow{position:fixed;z-index:80;left:-3rem;pointer-events:none;font-size:1.6rem;’,
-        ‘animation:quest-fly var(--quest-dur,3s) linear forwards}’,
-        ‘@keyframes quest-fly{to{transform:translateX(calc(100vw + 6rem))}}’,
-        ‘@media (prefers-reduced-motion:reduce){.quest-burst,.quest-crow{animation:none;display:none}}’
-    ].join(‘’);
+        '.quest-pill{position:fixed;left:1rem;bottom:1rem;z-index:60;display:flex;align-items:center;gap:.45rem;',
+        'padding:.5rem .85rem;border:1px solid var(--hairline-strong);border-radius:999px;cursor:pointer;',
+        'background:var(--surface-1);color:var(--ink-1);font:500 .8rem/1 var(--font-mono);',
+        'box-shadow:0 4px 14px rgba(44,31,23,.12);transition:transform var(--dur-fast) var(--ease-out)}',
+        '.quest-pill:hover{transform:translateY(-2px)}',
+        '.quest-pill.is-done{border-color:var(--accent-2);background:var(--surface-2)}',
+        '.quest-panel{position:fixed;left:1rem;bottom:3.6rem;z-index:61;width:min(15.5rem,calc(100vw - 2rem));',
+        'padding:.9rem;border:1px solid var(--hairline-strong);border-radius:var(--r-lg);',
+        'background:var(--surface-1);box-shadow:0 10px 30px rgba(44,31,23,.18);display:none}',
+        '.quest-panel.is-open{display:block}',
+        '.quest-hide{position:absolute;top:.45rem;right:.5rem;border:0;background:transparent;cursor:pointer;',
+        'font:400 1.05rem/1 var(--font-text);color:var(--ink-3);padding:.1rem .25rem;border-radius:var(--r-sm)}',
+        '.quest-hide:hover{color:var(--ink-1);background:var(--surface-2)}',
+        '.quest-panel h3{margin:0 0 .15rem;font:600 .85rem var(--font-display);color:var(--ink-1)}',
+        '.quest-panel p{margin:0 0 .6rem;font:400 .72rem/1.4 var(--font-text);color:var(--ink-2)}',
+        '.quest-panel ul{list-style:none;margin:0;padding:0}',
+        '.quest-panel li a{display:flex;justify-content:space-between;gap:.5rem;padding:.34rem .4rem;',
+        'border-radius:var(--r-sm);font:500 .78rem var(--font-text);color:var(--ink-1);text-decoration:none}',
+        '.quest-panel li a:hover{background:var(--surface-2)}',
+        '.quest-panel li a .quest-mark{color:var(--ink-3)}',
+        '.quest-panel li.is-visited a .quest-mark{color:var(--success)}',
+        '.quest-cta{display:block;margin-top:.6rem;padding:.5rem .6rem;border-radius:var(--r-md);text-align:center;',
+        'background:var(--accent);color:#fffbf3;font:600 .78rem var(--font-text);text-decoration:none}',
+        '.quest-cta:hover{filter:brightness(1.06)}',
+        '.quest-burst{position:fixed;z-index:80;pointer-events:none;font-size:1.3rem;',
+        'animation:quest-fall 1.6s var(--ease-out) forwards}',
+        '@keyframes quest-fall{from{transform:translateY(0) rotate(0);opacity:1}',
+        'to{transform:translateY(45vh) rotate(60deg);opacity:0}}',
+        '.quest-crow{position:fixed;z-index:80;left:-3rem;pointer-events:none;font-size:1.6rem;',
+        'animation:quest-fly var(--quest-dur,3s) linear forwards}',
+        '@keyframes quest-fly{to{transform:translateX(calc(100vw + 6rem))}}',
+        '@media (prefers-reduced-motion:reduce){.quest-burst,.quest-crow{animation:none;display:none}}'
+    ].join('');
     document.head.appendChild(style);
 
     /* ── Progress tracking ── */
     var visited = getVisited();
-    var done = false;
+    var here = currentPath();
+    if (STOPS.some(function (s) { return s.path === here; }) && visited.indexOf(here) === -1) {
+        visited.push(here);
+        setVisited(visited);
+    }
+    var done = visited.length >= STOPS.length;
 
-    function trackCurrentPage() {
+    var pill = null;
+    var panel = null;
+
+    function buildTracker() {
+        pill = document.createElement('button');
+        pill.type = 'button';
+        pill.className = 'quest-pill' + (done ? ' is-done' : '');
+        pill.setAttribute('aria-expanded', 'false');
+        pill.setAttribute('aria-controls', 'quest-panel');
+        pill.setAttribute('aria-label', 'Site tour progress: ' + visited.length + ' of ' + STOPS.length + ' pages explored');
+        pill.innerHTML = (done ? '🏆' : '🗺️') + ' <span>' + visited.length + '/' + STOPS.length + '</span>';
+
+        panel = document.createElement('div');
+        panel.id = 'quest-panel';
+        panel.className = 'quest-panel';
+        panel.setAttribute('role', 'dialog');
+        panel.setAttribute('aria-label', 'Site tour');
+        panel.innerHTML =
+            '<button type="button" class="quest-hide" aria-label="Hide the tour tracker">×</button>' +
+            '<h3>' + (done ? 'Tour complete! 🎉' : 'Explore the portfolio') + '</h3>' +
+            '<p>' + (done
+                ? 'You have seen the whole tour — the logical next step is a conversation.'
+                : 'Visit every stop to complete the tour. No prize, just well-modeled data.') + '</p>' +
+            '<ul>' + STOPS.map(function (s) {
+                var seen = visited.indexOf(s.path) !== -1;
+                return '<li class="' + (seen ? 'is-visited' : '') + '">' +
+                    '<a href="' + s.path + '">' + s.label +
+                    ' <span class="quest-mark">' + (seen ? '✓' : '○') + '</span></a></li>';
+            }).join('') + '</ul>' +
+            (done ? '<a class="quest-cta" href="' + LINKEDIN + '" target="_blank" rel="noopener noreferrer">Let’s talk on LinkedIn ↗</a>' : '');
+
+        document.body.appendChild(pill);
+        document.body.appendChild(panel);
+
+        pill.addEventListener('click', function () {
+            var open = panel.classList.toggle('is-open');
+            pill.setAttribute('aria-expanded', String(open));
+        });
+        document.addEventListener('click', function (e) {
+            if (!panel || !pill) return;
+            if (!panel.contains(e.target) && e.target !== pill && !pill.contains(e.target)) {
+                panel.classList.remove('is-open');
+                pill.setAttribute('aria-expanded', 'false');
+            }
+        });
+        panel.querySelector('.quest-hide').addEventListener('click', function (e) {
+            e.stopPropagation();
+            try { localStorage.setItem(DISMISS_KEY, '1'); } catch (er) { /* ignore */ }
+            if (pill) { pill.remove(); pill = null; }
+            if (panel) { panel.remove(); panel = null; }
+        });
+
+        /* ── Completion celebration (once) ── */
+        if (done && !localStorage.getItem(DONE_KEY)) {
+            try { localStorage.setItem(DONE_KEY, '1'); } catch (e) { /* ignore */ }
+            burst(['🎉', '✨', '🐦‍⬛'], 18);
+            panel.classList.add('is-open');
+            pill.setAttribute('aria-expanded', 'true');
+        }
+    }
+
+    /* ── Completion celebration helper ── */
+    function burst(emojis, count) {
+        if (reduceMotion) return;
+        for (var i = 0; i < count; i++) {
+            var node = document.createElement('span');
+            node.className = 'quest-burst';
+            node.textContent = emojis[i % emojis.length];
+            node.style.left = (8 + Math.random() * 84) + 'vw';
+            node.style.top = (5 + Math.random() * 25) + 'vh';
+            node.style.animationDelay = (Math.random() * 0.5) + 's';
+            document.body.appendChild(node);
+            setTimeout(function (n) { return function () { n.remove(); }; }(node), 2400);
+        }
+    }
+
+    // Show the tracker unless the visitor has dismissed it before.
+    var dismissed = false;
+    try { dismissed = localStorage.getItem(DISMISS_KEY) === '1'; } catch (e) { dismissed = false; }
+    if (!dismissed) buildTracker();
+
+    // Re-track + refresh the pill when the SPA swaps pages (called by transition.js).
+    window.questUpdate = function () {
         var here = currentPath();
         if (STOPS.some(function (s) { return s.path === here; }) && visited.indexOf(here) === -1) {
             visited.push(here);
             setVisited(visited);
         }
         done = visited.length >= STOPS.length;
-    }
-
-    function renderPill() {
-        pill.className = ‘quest-pill’ + (done ? ‘ is-done’ : ‘’);
-        pill.setAttribute(‘aria-label’, ‘Site tour progress: ‘ + visited.length + ‘ of ‘ + STOPS.length + ‘ pages explored’);
-        pill.innerHTML = (done ? ‘🏆’ : ‘🗺️’) + ‘ <span>’ + visited.length + ‘/’ + STOPS.length + ‘</span>’;
-    }
-
-    function renderPanel() {
-        panel.innerHTML =
-            ‘<h3>’ + (done ? ‘Tour complete! 🎉’ : ‘Explore the portfolio’) + ‘</h3>’ +
-            ‘<p>’ + (done
-                ? ‘You have seen the whole tour — the logical next step is a conversation.’
-                : ‘Visit every stop to complete the tour. No prize, just well-modeled data.’) + ‘</p>’ +
-            ‘<ul>’ + STOPS.map(function (s) {
-                var seen = visited.indexOf(s.path) !== -1;
-                return ‘<li class="’ + (seen ? ‘is-visited’ : ‘’) + ‘">’ +
-                    ‘<a href="’ + s.path + ‘">’ + s.label +
-                    ‘ <span class="quest-mark">’ + (seen ? ‘✓’ : ‘○’) + ‘</span></a></li>’;
-            }).join(‘’) + ‘</ul>’ +
-            (done ? ‘<a class="quest-cta" href="’ + LINKEDIN + ‘" target="_blank" rel="noopener noreferrer">Let’s talk on LinkedIn ↗</a>’ : ‘’);
-    }
-
-    trackCurrentPage();
-
-    var pill = document.createElement(‘button’);
-    pill.type = ‘button’;
-    pill.setAttribute(‘aria-expanded’, ‘false’);
-    pill.setAttribute(‘aria-controls’, ‘quest-panel’);
-
-    var panel = document.createElement(‘div’);
-    panel.id = ‘quest-panel’;
-    panel.className = ‘quest-panel’;
-    panel.setAttribute(‘role’, ‘dialog’);
-    panel.setAttribute(‘aria-label’, ‘Site tour’);
-
-    renderPill();
-    renderPanel();
-
-    document.body.appendChild(pill);
-    document.body.appendChild(panel);
-
-    pill.addEventListener(‘click’, function () {
-        var open = panel.classList.toggle(‘is-open’);
-        pill.setAttribute(‘aria-expanded’, String(open));
-    });
-    document.addEventListener(‘click’, function (e) {
-        if (!panel.contains(e.target) && e.target !== pill && !pill.contains(e.target)) {
-            panel.classList.remove(‘is-open’);
-            pill.setAttribute(‘aria-expanded’, ‘false’);
+        if (pill) {
+            pill.className = 'quest-pill' + (done ? ' is-done' : '');
+            pill.setAttribute('aria-label', 'Site tour progress: ' + visited.length + ' of ' + STOPS.length + ' pages explored');
+            pill.innerHTML = (done ? '🏆' : '🗺️') + ' <span>' + visited.length + '/' + STOPS.length + '</span>';
         }
-    });
-
-    /* ── Completion celebration (once) ── */
-    function burst(emojis, count) {
-        if (reduceMotion) return;
-        for (var i = 0; i < count; i++) {
-            var node = document.createElement(‘span’);
-            node.className = ‘quest-burst’;
-            node.textContent = emojis[i % emojis.length];
-            node.style.left = (8 + Math.random() * 84) + ‘vw’;
-            node.style.top = (5 + Math.random() * 25) + ‘vh’;
-            node.style.animationDelay = (Math.random() * 0.5) + ‘s’;
-            document.body.appendChild(node);
-            setTimeout(function (n) { return function () { n.remove(); }; }(node), 2400);
-        }
-    }
-
-    function celebrateIfDone() {
-        if (done && !localStorage.getItem(DONE_KEY)) {
-            try { localStorage.setItem(DONE_KEY, ‘1’); } catch (e) { /* ignore */ }
-            burst([‘🎉’, ‘✨’, ‘🐦‍⬛’], 18);
-            panel.classList.add(‘is-open’);
-            pill.setAttribute(‘aria-expanded’, ‘true’);
-        }
-    }
-
-    celebrateIfDone();
-
-    /* ── Called by transition.js after each client-side navigation ── */
-    window.questUpdate = function () {
-        trackCurrentPage();
-        renderPill();
-        renderPanel();
-        celebrateIfDone();
     };
 
     /* ── Easter egg: Konami code releases the flock ── */
@@ -181,7 +192,7 @@
 
     function releaseTheCrows() {
         if (reduceMotion) {
-            pill.innerHTML = '🐦‍⬛ <span>Caw!</span>';
+            if (pill) pill.innerHTML = '🐦‍⬛ <span>Caw!</span>';
             return;
         }
         for (var i = 0; i < 12; i++) {
