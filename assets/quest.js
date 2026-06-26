@@ -162,6 +162,21 @@
     try { dismissed = localStorage.getItem(DISMISS_KEY) === '1'; } catch (e) { dismissed = false; }
     if (!dismissed) buildTracker();
 
+    // Re-track + refresh the pill when the SPA swaps pages (called by transition.js).
+    window.questUpdate = function () {
+        var here = currentPath();
+        if (STOPS.some(function (s) { return s.path === here; }) && visited.indexOf(here) === -1) {
+            visited.push(here);
+            setVisited(visited);
+        }
+        done = visited.length >= STOPS.length;
+        if (pill) {
+            pill.className = 'quest-pill' + (done ? ' is-done' : '');
+            pill.setAttribute('aria-label', 'Site tour progress: ' + visited.length + ' of ' + STOPS.length + ' pages explored');
+            pill.innerHTML = (done ? '🏆' : '🗺️') + ' <span>' + visited.length + '/' + STOPS.length + '</span>';
+        }
+    };
+
     /* ── Easter egg: Konami code releases the flock ── */
     var KONAMI = ['ArrowUp', 'ArrowUp', 'ArrowDown', 'ArrowDown',
         'ArrowLeft', 'ArrowRight', 'ArrowLeft', 'ArrowRight', 'b', 'a'];

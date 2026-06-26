@@ -4,9 +4,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Logan Mansfield · AI Engineering</title>
-    <meta name="description" content="AI engineering work by Logan Mansfield, analytics engineer: LLM agent workflows in n8n wired to real data models, with guardrails, critique loops, and BI-monitored outcomes.">
+    <meta name="description" content="How Logan Mansfield uses AI: HuggingFace chatbots, n8n agent workflows, and AI-assisted frontend development.">
     <meta property="og:title" content="Logan Mansfield · AI Engineering">
-    <meta property="og:description" content="AI engineering work by Logan Mansfield, analytics engineer: LLM agent workflows in n8n wired to real data models, with guardrails, critique loops, and BI-monitored outcomes.">
+    <meta property="og:description" content="How Logan Mansfield uses AI: HuggingFace chatbots, n8n agent workflows, and AI-assisted frontend development.">
     <meta property="og:type" content="website">
     <meta property="og:url" content="https://portfolio2-main-phi.vercel.app/ai-engineering">
     <meta property="og:image" content="https://portfolio2-main-phi.vercel.app/mini.jpg">
@@ -61,7 +61,7 @@
             <div class="hero__main">
                 <p class="hero__eyebrow">05 / Skill · AI Engineering</p>
                 <h1 class="hero__name" id="ai-title">AI Engineering.</h1>
-                <p class="hero__role">I design practical agentic systems that connect LLM decisions to data infrastructure, controls, and measurable business outcomes.</p>
+                <p class="hero__role">I use AI practically — to ship faster and wire agents into real workflows.</p>
             </div>
         </section>
 
@@ -69,18 +69,16 @@
             <header class="section-head">
                 <h2 class="section-head__title" id="ai-about">About</h2>
             </header>
-            <p>This is the layer I build on top of analytics engineering: orchestration, guardrails, critiques, and monitoring. Agents are only useful when they run against well-modeled data — so every workflow here sits on the same SQL models and BI evaluation loops as the rest of my work.</p>
+            <p>I'm not an AI researcher, and I won't pretend to be. What I do is treat AI as a tool: I use LLM assistants to move faster on frontend work, and I've built a couple of small but real things — an agent workflow inside a mock e-commerce store, and a chatbot that lives on this site from time to time. Both are functional, neither is vaporware.</p>
         </section>
 
-        <section aria-labelledby="ai-impact">
+        <section aria-labelledby="ai-learning">
             <header class="section-head">
-                <h2 class="section-head__title" id="ai-impact">Impact Highlights</h2>
+                <h2 class="section-head__title" id="ai-learning">Using AI for Learning</h2>
             </header>
-            <ul>
-                <li>Built multi-agent workflows that coordinate pricing, restocking, and purchasing behavior.</li>
-                <li>Used critique loops to improve decision quality and reduce volatility in autonomous pricing.</li>
-                <li>Connected agent output to BI analysis for continuous tuning and system-level learning.</li>
-            </ul>
+            <p>One of my favorite uses of AI has nothing to do with shipping — it's studying. I can describe a concept I want to understand, ask for analogies, worked examples, or even visualizations, and get a personalized explanation faster than any textbook. That matters a lot to me because I want to understand the data engineering pipeline inside and out, which means ML and AI are things I need to actually know, not just gesture at.</p>
+            <p>A recent example: I was listening to <em>AI Engineering: Building Applications with Foundation Models</em> and came across sequence-to-sequence (S2S) models — the architecture Google used to dramatically improve their translation systems, and the direct predecessor to the transformer models modern LLMs run on. S2S models use recurrent neural networks (RNNs) as encoders and decoders, and I found the concept genuinely interesting. So I asked Claude Opus to write me a practical guide to building one from scratch, tailored to a use case I was already working on (see <a href="https://github.com/lmansf" target="_blank" rel="noopener">eFrog on my GitHub</a>).</p>
+            <p>It did. Now I'm working through it — writing RNNs and attention mechanisms by hand in Python, step by step. The immediate goal is a learning exercise; the longer-term possibility is a model that improves accuracy in one of my apps. But the broader point is that I can hand AI a subject, get a structured curriculum with examples and context built around my actual work, and learn it quickly. That's the workflow I care about.</p>
         </section>
 
         <section aria-labelledby="ai-projects">
@@ -89,8 +87,8 @@
             </header>
             <a class="work-tile" href="https://portfolio2-main-phi.vercel.app/shop.html" target="_blank" rel="noopener">
                 <span class="work-tile__label">Featured</span>
-                <h3 class="work-tile__title">Agentic Dynamic Pricing Simulator and E-Commerce Store</h3>
-                <p class="work-tile__desc">Built a live sandbox where pricing, restocking, and buyer agents react to user behavior and each other in near real time.</p>
+                <h3 class="work-tile__title">Agentic Mock E-Commerce Store</h3>
+                <p class="work-tile__desc">Built a mock storefront with n8n-powered agents handling dynamic pricing and restocking logic. Agents react to simulated buyer behavior and adjust inventory thresholds in near real time — wired to a Supabase backend.</p>
                 <div class="work-tile__meta">
                     <span class="work-tile__tag">n8n</span>
                     <span class="work-tile__tag">LLM Agents</span>
@@ -98,21 +96,21 @@
                 </div>
             </a>
             <article class="work-tile">
-                <h3 class="work-tile__title">Warehouse Restock Agent</h3>
-                <p class="work-tile__desc">Implemented threshold and purchase-trigger logic to maintain stock health while reducing unnecessary automation calls.</p>
+                <h3 class="work-tile__title">Crowbot — Portfolio Chatbot</h3>
+                <p class="work-tile__desc">Built and deployed a conversational chatbot (Crowbot) using a HuggingFace model, embedded directly into this portfolio. You can chat with it right now — hit the icon in the corner. It answers questions about my background, projects, and hobbies.</p>
                 <div class="work-tile__meta">
-                    <span class="work-tile__tag">n8n</span>
-                    <span class="work-tile__tag">Inventory Logic</span>
-                    <span class="work-tile__tag">Automation Reliability</span>
+                    <span class="work-tile__tag">HuggingFace</span>
+                    <span class="work-tile__tag">Chatbot</span>
+                    <span class="work-tile__tag">JavaScript</span>
                 </div>
             </article>
             <article class="work-tile">
-                <h3 class="work-tile__title">Pricing Critique Agent Workflow</h3>
-                <p class="work-tile__desc">Added a reviewer-style agent to challenge initial pricing decisions and keep outcomes within fairness constraints.</p>
+                <h3 class="work-tile__title">AI-Assisted Frontend Development</h3>
+                <p class="work-tile__desc">This entire portfolio — design, layout, animations — was built with heavy use of LLM pair-programming. I use AI tools to iterate quickly on interfaces I couldn't build as fast solo. The result is production-deployed and fully mine to maintain.</p>
                 <div class="work-tile__meta">
-                    <span class="work-tile__tag">Agent Critique</span>
-                    <span class="work-tile__tag">Guardrails</span>
-                    <span class="work-tile__tag">n8n</span>
+                    <span class="work-tile__tag">Claude</span>
+                    <span class="work-tile__tag">HTML / CSS / JS</span>
+                    <span class="work-tile__tag">Vercel</span>
                 </div>
             </article>
             <div class="media-grid media-grid--feature">
@@ -138,45 +136,11 @@
             </header>
             <div class="work-filters">
                 <span class="chip">n8n</span>
-                <span class="chip">LLM Orchestration</span>
-                <span class="chip">Critique Patterns</span>
+                <span class="chip">HuggingFace</span>
+                <span class="chip">Claude</span>
                 <span class="chip">Supabase</span>
-                <span class="chip">SQL Context Retrieval</span>
-                <span class="chip">Workflow Scheduling</span>
-                <span class="chip">Power BI Evaluation Layer</span>
-            </div>
-        </section>
-
-        <section aria-labelledby="ai-process">
-            <header class="section-head">
-                <h2 class="section-head__title" id="ai-process">Process</h2>
-            </header>
-            <ol>
-                <li>Define objective, constraints, and unacceptable outcomes.</li>
-                <li>Start with narrow agent responsibilities and explicit interfaces.</li>
-                <li>Add critique and fairness checks before scaling autonomy.</li>
-                <li>Observe behavior in dashboards and compare against policy bounds.</li>
-                <li>Tune prompts, schedules, and trigger logic iteratively.</li>
-            </ol>
-        </section>
-
-        <section aria-labelledby="ai-proof">
-            <header class="section-head">
-                <h2 class="section-head__title" id="ai-proof">Proof</h2>
-            </header>
-            <div class="upnext__rail">
-                <a class="upnext__card" href="/shop">
-                    <span class="upnext__num">Project Archive</span>
-                    <span class="upnext__name">Shop Retrospective</span>
-                    <span class="upnext__tease">Architecture notes, outcomes, and lessons from the live multi-agent ecosystem.</span>
-                    <span class="upnext__arrow">Open →</span>
-                </a>
-                <a class="upnext__card" href="/pipeline">
-                    <span class="upnext__num">Data Backbone</span>
-                    <span class="upnext__name">Pipeline Architecture</span>
-                    <span class="upnext__tease">How agent outputs travel into modeled and analyzed data layers.</span>
-                    <span class="upnext__arrow">Open →</span>
-                </a>
+                <span class="chip">JavaScript</span>
+                <span class="chip">Workflow Automation</span>
             </div>
         </section>
 
@@ -189,20 +153,20 @@
                 <a class="upnext__card" href="/sql">
                     <span class="upnext__num">SQL</span>
                     <span class="upnext__name">Dynamic Pricing Data Backbone</span>
-                    <span class="upnext__tease">Aggregates and historical context used in agent decisions.</span>
+                    <span class="upnext__tease">The data models the shop agents query against.</span>
                     <span class="upnext__arrow">View in SQL →</span>
                 </a>
                 <a class="upnext__card" href="/python">
                     <span class="upnext__num">Python</span>
                     <span class="upnext__name">Camera Trap Detection</span>
-                    <span class="upnext__tease">Applied ML workflows that complement AI engineering delivery patterns.</span>
+                    <span class="upnext__tease">Applied ML on wildlife image data — a different but complementary flavor of model-in-the-loop thinking.</span>
                     <span class="upnext__arrow">View in Python →</span>
                 </a>
             </div>
         </section>
 
         <section class="pitch" aria-labelledby="ai-cta">
-            <h2 id="ai-cta">Looking for an Analytics Engineer role — and I bring working AI automation skills with me, with clear controls and measurable business value.</h2>
+            <h2 id="ai-cta">Looking for an Analytics Engineer role. I use AI tools fluently and bring real, deployed work to show for it.</h2>
             <a class="pitch__cta" href="https://www.linkedin.com/in/lmansf96/" target="_blank" rel="noopener noreferrer">Connect on LinkedIn <span class="arrow">→</span></a>
         </section>
         <a class="back-to-top" href="#main-content">Back to top <span aria-hidden="true">↑</span></a>

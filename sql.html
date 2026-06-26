@@ -77,7 +77,7 @@
                 <h2 class="section-head__title" id="sql-impact">Impact Highlights</h2>
             </header>
             <ul>
-                <li>Segmented real guest transactions at ZooTampa with RFM analysis, producing business-ready customer groupings for targeted decision-making.</li>
+                <li>Segmented simulated guest transactions with RFM analysis, producing business-ready customer groupings for targeted decision-making.</li>
                 <li>Built medallion-style transformation paths for Owl Park — bronze ingestion, silver cleansing, gold dimensional models — that support reusable BI reporting.</li>
                 <li>Validate and troubleshoot production point-of-sale data daily, keeping reporting workflows stable for business operations.</li>
                 <li>Strengthened KPI consistency by anchoring dashboards to modeled facts and dimensions.</li>
@@ -94,8 +94,16 @@
                 <p class="work-tile__desc">Built Recency-Frequency-Monetary segmentation over guest transaction data, turning raw purchases into business-relevant customer groupings surfaced in Power BI.</p>
                 <div class="work-tile__meta">
                     <span class="work-tile__tag">SQL</span>
-                    <span class="work-tile__tag">Power BI</span>
-                    <span class="work-tile__tag">Segmentation</span>
+                    <span class="work-tile__tag">Databricks</span>
+                    <span class="work-tile__tag">Streaming</span>
+                </div>
+            </article>
+            <article class="work-tile" data-cats="sql">
+                <h3 class="work-tile__title">Simulated RFM Customer Segmentation</h3>
+                <p class="work-tile__desc">RFM-based customer segmentation built on simulated transaction data, identifying high-value and at-risk cohorts from transaction history.</p>
+                <div class="work-tile__meta">
+                    <span class="work-tile__tag">SQL</span>
+                    <span class="work-tile__tag">Supabase</span>
                 </div>
             </article>
             <article class="work-tile">
@@ -107,17 +115,8 @@
                     <span class="work-tile__tag">Microsoft Fabric</span>
                 </div>
             </article>
-            <article class="work-tile" data-cats="sql python">
-                <h3 class="work-tile__title">Realtime Fraud Detection Data Layer</h3>
-                <p class="work-tile__desc">Shaped transaction and feature tables to support high-speed fraud scoring and downstream monitoring.</p>
-                <div class="work-tile__meta">
-                    <span class="work-tile__tag">SQL</span>
-                    <span class="work-tile__tag">Databricks</span>
-                    <span class="work-tile__tag">Streaming</span>
-                </div>
-            </article>
             <article class="work-tile" data-cats="sql ai">
-                <h3 class="work-tile__title">Dynamic Pricing Simulator Backbone</h3>
+                <h3 class="work-tile__title">Dynamic Pricing Simulator Monitoring</h3>
                 <p class="work-tile__desc">Built the aggregate and historical context layer supporting agent pricing and inventory decisions.</p>
                 <div class="work-tile__meta">
                     <span class="work-tile__tag">SQL</span>
@@ -159,10 +158,10 @@
                 <span class="chip">PostgreSQL</span>
                 <span class="chip">Supabase</span>
                 <span class="chip">Microsoft Fabric SQL</span>
-                <span class="chip">Window Functions</span>
-                <span class="chip">Query Tuning</span>
-                <span class="chip">CTEs</span>
-                <span class="chip">Dimensional Modeling</span>
+                <span class="chip">Databricks SQL</span>
+                <span class="chip">Supabase SQL</span>
+                <span class="chip">MSSQL for Dynamics CRM</span>
+                <span class="chip">DuckDB</span>
             </div>
         </section>
 
@@ -171,7 +170,7 @@
                 <h2 class="section-head__title" id="sql-process">Process</h2>
             </header>
             <ol>
-                <li>Start from business questions and define target metrics.</li>
+                <li>Identify business requirements and define target metrics (OKR, KPIs, supporting metrics).</li>
                 <li>Model entities and relationships for stable downstream use.</li>
                 <li>Build transformations in audited, testable SQL steps.</li>
                 <li>Validate outputs against source totals and edge cases.</li>
