@@ -157,10 +157,18 @@
         }
     }
 
-    // Show the tracker unless the visitor has dismissed it before.
+    // Keep the first impression to a single floating control (Crowbot). The tour
+    // pill only appears once the visitor is actually exploring (>= 2 stops seen),
+    // and never after they've dismissed it.
     var dismissed = false;
     try { dismissed = localStorage.getItem(DISMISS_KEY) === '1'; } catch (e) { dismissed = false; }
-    if (!dismissed) buildTracker();
+    var MIN_STOPS_TO_SHOW = 2;
+
+    function showTrackerIfEarned() {
+        if (dismissed || pill) return;
+        if (visited.length >= MIN_STOPS_TO_SHOW) buildTracker();
+    }
+    showTrackerIfEarned();
 
     // Re-track + refresh the pill when the SPA swaps pages (called by transition.js).
     window.questUpdate = function () {
@@ -170,6 +178,7 @@
             setVisited(visited);
         }
         done = visited.length >= STOPS.length;
+        showTrackerIfEarned();
         if (pill) {
             pill.className = 'quest-pill' + (done ? ' is-done' : '');
             pill.setAttribute('aria-label', 'Site tour progress: ' + visited.length + ' of ' + STOPS.length + ' pages explored');
