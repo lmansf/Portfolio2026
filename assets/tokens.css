@@ -19,10 +19,11 @@
     /* ── Ink (high contrast on cream) ── */
     --ink-1:            #2c1f17;     /* deep coffee — primary text */
     --ink-2:            #6e5947;     /* warm muted brown — secondary */
-    --ink-3:            #8a7456;     /* warm sand — tertiary / disabled */
+    --ink-3:            #776147;     /* warm sand — tertiary / disabled (AA on cream) */
 
     /* ── Accents (energized) ── */
-    --accent:           #e85d2f;     /* sunset coral — primary accent */
+    --accent:           #e85d2f;     /* sunset coral — primary accent (fills, borders, icons) */
+    --accent-ink:       #c0461a;     /* deeper coral for small text/links on light (WCAG AA) */
     --accent-2:         #e8a93a;     /* honey amber — relaxed counterpoint */
     --accent-glow:      rgba(232, 93, 47, 0.18);
     --success:          #5a8f5e;     /* warm sage */

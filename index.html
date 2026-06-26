@@ -78,7 +78,14 @@
             L. MANSFIELD
         </a>
     </div>
-    <button class="burger" type="button" aria-label="Open navigation" aria-expanded="false" aria-controls="site-nav" data-burger>
+        <nav class="topnav" aria-label="Primary">
+            <a href="/">Home</a>
+            <a href="/sql">SQL</a>
+            <a href="/python">Python</a>
+            <a href="/bi">BI</a>
+            <a href="/ai-engineering">AI Engineering</a>
+            <a href="https://project-hub-dev.vercel.app" target="_blank" rel="noopener">Projects ↗</a>
+        </nav><button class="burger" type="button" aria-label="Open navigation" aria-expanded="false" aria-controls="site-nav" data-burger>
         <span class="burger__bar"></span>
         <span class="burger__bar"></span>
         <span class="burger__bar"></span>
@@ -147,6 +154,27 @@
                 <a class="pitch__cta pitch__cta--ghost" href="assets/resume_current.pdf" download="Logan-Mansfield-Resume.pdf">
                     Download résumé <span class="arrow">↓</span>
                 </a>
+            </div>
+        </section>
+
+        <!-- About -->
+        <section class="about" aria-labelledby="home-about">
+            <header class="section-head">
+                <h2 class="section-head__title" id="home-about">About</h2>
+                <span class="section-head__hint">Who you&rsquo;d be hiring</span>
+            </header>
+            <div class="about__grid">
+                <figure class="media-slot media-slot--portrait about__photo" role="img" aria-label="Placeholder for a professional headshot">
+                    <span class="media-slot__tag">Photo soon</span>
+                    <span class="media-slot__icon" aria-hidden="true">📷</span>
+                    <span class="media-slot__label">Headshot</span>
+                    <span class="media-slot__hint">A professional photo goes here.</span>
+                </figure>
+                <div class="about__body">
+                    <p>I&rsquo;m Logan Mansfield, an analytics engineer based in Tampa, FL. By day I keep production point-of-sale systems and their data running at ZooTampa; the rest of the time I&rsquo;m modeling that kind of messy operational data into metrics a business can actually act on.</p>
+                    <p>I came to data engineering through analysis &mdash; years of turning numbers into decisions for esports teams, then earning my Microsoft PL-300 and SQL certifications and building end-to-end pipelines from source system to Power BI dashboard. I care about data people trust: clear models, honest metrics, and reporting a non-technical stakeholder can read at a glance.</p>
+                    <p><em>This bio is placeholder copy &mdash; swap in your own voice when you&rsquo;re ready.</em></p>
+                </div>
             </div>
         </section>
 
@@ -248,6 +276,40 @@
                     <span class="upnext__name">AI-Assisted Analytics</span>
                     <span class="upnext__tease">LLM workflows wired into real data models — the automation layer on top of analytics engineering.</span>
                     <span class="upnext__arrow">Open →</span>
+                </a>
+            </div>
+        </section>
+
+        <!-- Connect / socials -->
+        <section class="connect" aria-labelledby="home-connect">
+            <header class="section-head">
+                <h2 class="section-head__title" id="home-connect">Connect</h2>
+                <span class="section-head__hint">The fastest ways to reach me</span>
+            </header>
+            <div class="socials">
+                <a class="social" href="https://www.linkedin.com/in/lmansf96/" target="_blank" rel="noopener noreferrer">
+                    <span class="social__icon" aria-hidden="true">
+                        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M20.45 20.45h-3.56v-5.57c0-1.33-.02-3.04-1.85-3.04-1.85 0-2.14 1.45-2.14 2.94v5.67H9.34V9h3.42v1.56h.05c.48-.9 1.64-1.85 3.37-1.85 3.6 0 4.27 2.37 4.27 5.46v6.28zM5.34 7.43a2.07 2.07 0 1 1 0-4.14 2.07 2.07 0 0 1 0 4.14zM7.12 20.45H3.55V9h3.57v11.45zM22.22 0H1.77C.79 0 0 .77 0 1.73v20.54C0 23.23.79 24 1.77 24h20.45c.98 0 1.78-.77 1.78-1.73V1.73C24 .77 23.2 0 22.22 0z"/></svg>
+                    </span>
+                    <span class="social__text"><span class="social__label">LinkedIn</span><span class="social__sub">in/lmansf96</span></span>
+                </a>
+                <a class="social" href="https://github.com/lmansf" target="_blank" rel="noopener noreferrer">
+                    <span class="social__icon" aria-hidden="true">
+                        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 .5C5.37.5 0 5.87 0 12.5c0 5.3 3.44 9.8 8.21 11.39.6.11.82-.26.82-.58v-2.03c-3.34.73-4.04-1.61-4.04-1.61-.55-1.39-1.34-1.76-1.34-1.76-1.09-.75.08-.73.08-.73 1.2.08 1.84 1.24 1.84 1.24 1.07 1.83 2.81 1.3 3.5.99.11-.78.42-1.3.76-1.6-2.67-.3-5.47-1.34-5.47-5.96 0-1.32.47-2.39 1.24-3.23-.12-.31-.54-1.53.12-3.18 0 0 1.01-.32 3.3 1.23a11.5 11.5 0 0 1 6.01 0c2.29-1.55 3.3-1.23 3.3-1.23.66 1.65.24 2.87.12 3.18.77.84 1.23 1.91 1.23 3.23 0 4.63-2.81 5.65-5.49 5.95.43.37.81 1.1.81 2.22v3.29c0 .32.22.7.83.58A12 12 0 0 0 24 12.5C24 5.87 18.63.5 12 .5z"/></svg>
+                    </span>
+                    <span class="social__text"><span class="social__label">GitHub</span><span class="social__sub">@lmansf</span></span>
+                </a>
+                <a class="social" href="https://x.com/StatBird" target="_blank" rel="noopener noreferrer">
+                    <span class="social__icon" aria-hidden="true">
+                        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M18.24 2.25h3.31l-7.23 8.26L22.5 21.75h-6.59l-5.16-6.75-5.9 6.75H1.54l7.73-8.84L1.5 2.25h6.76l4.66 6.16 5.32-6.16zm-1.16 17.52h1.83L7.01 4.13H5.05l12.03 15.64z"/></svg>
+                    </span>
+                    <span class="social__text"><span class="social__label">X / Twitter</span><span class="social__sub">@StatBird</span></span>
+                </a>
+                <a class="social" href="mailto:lmansf96@gmail.com">
+                    <span class="social__icon" aria-hidden="true">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2.5" y="4.5" width="19" height="15" rx="2"/><path d="m3 6 9 7 9-7"/></svg>
+                    </span>
+                    <span class="social__text"><span class="social__label">Email</span><span class="social__sub">lmansf96@gmail.com</span></span>
                 </a>
             </div>
         </section>

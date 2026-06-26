@@ -251,7 +251,7 @@ footer.shell-footer .ticker__track {
     footer.shell-footer .ticker__track { animation: none; }
 }
 footer.shell-footer .ticker__item .dot {
-    color: var(--accent);
+    color: var(--accent-ink);
     margin-right: 0.6rem;
 }
 footer.shell-footer .ticker__item strong {
@@ -273,8 +273,8 @@ footer.shell-footer .footer-socials a {
     transition: color var(--dur-fast) var(--ease-out), border-color var(--dur-fast) var(--ease-out);
 }
 footer.shell-footer .footer-socials a:hover {
-    color: var(--accent);
-    border-bottom-color: var(--accent);
+    color: var(--accent-ink);
+    border-bottom-color: var(--accent-ink);
 }
 
 /* ─────────────────────────────────────────────────────────────
@@ -289,7 +289,7 @@ footer.shell-footer .footer-socials a:hover {
     border-radius: 50%;
     border: 1px solid var(--hairline-strong);
     background: var(--surface-1);
-    color: var(--accent);
+    color: var(--accent-ink);
     font-size: 1.4rem;
     display: flex;
     align-items: center;
@@ -403,7 +403,7 @@ footer.shell-footer .footer-socials a:hover {
     width: 22px;
     height: 22px;
     border: 2px solid var(--hairline-strong);
-    border-top-color: var(--accent);
+    border-top-color: var(--accent-ink);
     border-radius: 50%;
     animation: crowbot-spin 0.8s linear infinite;
 }
@@ -414,7 +414,7 @@ footer.shell-footer .footer-socials a:hover {
 }
 .crowbot-loading__msg { margin: 0; font-size: 0.85rem; color: var(--ink-1); }
 .crowbot-loading__fallback { margin: 0; font-size: 0.78rem; }
-.crowbot-loading__fallback a { color: var(--accent); }
+.crowbot-loading__fallback a { color: var(--accent-ink); }
 
 /* ─────────────────────────────────────────────────────────────
  * Desktop progressive enhancement
@@ -465,7 +465,7 @@ header.topbar .topbar__page  {
         border-radius: 999px;
     }
     .tabbar__item .tabbar__icon { width: 16px; height: 16px; }
-    .tabbar__item.is-active { color: var(--accent); }
+    .tabbar__item.is-active { color: var(--accent-ink); }
 
     /* Desktop: indicator becomes a full-height background pill */
     .tabbar__indicator {
@@ -623,4 +623,35 @@ body.crowbot-sheet-open {
     letter-spacing: 0.01em;
     text-align: center;
     padding: 0.5rem 1rem;
+}
+
+/* ──────────────── Desktop: inline top nav (≥768px) ──────────────── */
+/* A separate static nav that lives inside the header. On desktop it shows
+   inline and the burger is hidden; on mobile it is hidden and the existing
+   burger + dropdown take over. Keeping them separate avoids fixed-position /
+   backdrop-filter containing-block issues with the mobile dropdown. */
+.topnav { display: none; }
+@media (min-width: 768px) {
+    .burger { display: none; }
+    /* The .topnav replaces the burger dropdown on desktop. Remove the closed
+       .site-nav entirely so its (only opacity-hidden) links don't linger in the
+       tab order as phantom focus stops or register as a duplicate nav landmark. */
+    .site-nav { display: none; }
+    .topnav {
+        display: flex;
+        align-items: center;
+        gap: 0.1rem;
+        margin-left: auto;
+    }
+    .topnav a {
+        padding: 0.4rem 0.7rem;
+        font-size: 0.82rem;
+        font-weight: 500;
+        color: var(--ink-2);
+        text-decoration: none;
+        border-radius: 8px;
+        transition: color var(--dur-fast) var(--ease-out),
+                    background var(--dur-fast) var(--ease-out);
+    }
+    .topnav a:hover { color: var(--accent-ink); background: var(--surface-2); }
 }
