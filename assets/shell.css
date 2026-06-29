@@ -39,8 +39,8 @@ body > .shell-bg {
     z-index: -1;
     pointer-events: none;
     background:
-        radial-gradient(1200px 600px at 80% -10%, rgba(232, 93, 47, 0.08), transparent 60%),
-        radial-gradient(900px 500px at -10% 110%, rgba(232, 169, 58, 0.05), transparent 60%);
+        radial-gradient(1200px 600px at 80% -10%, rgba(34, 211, 238, 0.10), transparent 60%),
+        radial-gradient(900px 500px at -10% 110%, rgba(125, 211, 252, 0.06), transparent 60%);
     animation: shell-drift 24s ease-in-out infinite alternate;
 }
 @keyframes shell-drift {
@@ -176,7 +176,7 @@ body.site-nav-open .burger .burger__bar:nth-child(3) {
     padding: 0.4rem;
     display: flex;
     flex-direction: column;
-    box-shadow: 0 8px 32px rgba(44, 31, 23, 0.18);
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.18);
     transform-origin: top right;
     transform: scale(0.88) translateY(-6px);
     opacity: 0;
@@ -314,7 +314,7 @@ footer.shell-footer .footer-socials a:hover {
 .crowbot-sheet__backdrop {
     position: absolute;
     inset: 0;
-    background: rgba(44, 31, 23, 0.55);
+    background: rgba(0, 0, 0, 0.55);
     backdrop-filter: blur(4px);
     -webkit-backdrop-filter: blur(4px);
     animation: sheet-fade var(--dur-base) var(--ease-out);
@@ -655,3 +655,5 @@ body.crowbot-sheet-open {
     }
     .topnav a:hover { color: var(--accent-ink); background: var(--surface-2); }
 }
+
+.skip-link { color: var(--on-accent); }

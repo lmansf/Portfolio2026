@@ -80,7 +80,7 @@ main.page > * {
 .hero__role {
     font-size: clamp(1.05rem, 2.4vw, 1.25rem);
     color: var(--ink-2);
-    max-width: 38ch;
+    max-width: none;
 }
 .hero__role em {
     color: var(--ink-1);
@@ -1108,7 +1108,7 @@ span.chip { cursor: default; pointer-events: none; }
 .cart-sheet__backdrop {
     position: absolute;
     inset: 0;
-    background: rgba(44, 31, 23,0.55);
+    background: rgba(0, 0, 0,0.55);
     backdrop-filter: blur(4px);
     -webkit-backdrop-filter: blur(4px);
 }
@@ -1941,7 +1941,7 @@ span.chip { cursor: default; pointer-events: none; }
     border-style: solid;
     border-color: var(--accent-ink);
     transform: translateY(-2px);
-    box-shadow: 0 8px 24px rgba(44, 31, 23, 0.12);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
 }
 .media-slot--link:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }
 
@@ -1983,7 +1983,7 @@ span.chip { cursor: default; pointer-events: none; }
 .social:hover {
     border-color: var(--accent);
     transform: translateY(-2px);
-    box-shadow: 0 8px 24px rgba(44, 31, 23, 0.12);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
 }
 .social:focus-visible { outline: 2px solid var(--focus-ring); outline-offset: 3px; }
 .social__icon {
@@ -1997,7 +1997,7 @@ span.chip { cursor: default; pointer-events: none; }
     background: var(--surface-2);
     color: var(--ink-1);
 }
-.social:hover .social__icon { background: var(--accent); color: #fffbf3; }
+.social:hover .social__icon { background: var(--accent); color: var(--on-accent); }
 .social__icon svg { width: 20px; height: 20px; }
 .social__text { display: grid; gap: 0.1rem; min-width: 0; }
 .social__label { font-weight: 600; font-size: 0.95rem; }
@@ -2036,8 +2036,8 @@ span.chip { cursor: default; pointer-events: none; }
     transition: border-color var(--dur-fast) var(--ease-out), color var(--dur-fast) var(--ease-out);
 }
 .contact-row__link:hover { border-color: var(--accent); color: var(--accent-ink); }
-.contact-row__link--cta { background: var(--accent); color: var(--ink-1); border-color: var(--accent); }
-.contact-row__link--cta:hover { color: var(--ink-1); filter: brightness(1.04); }
+.contact-row__link--cta { background: var(--accent); color: var(--on-accent); border-color: var(--accent); }
+.contact-row__link--cta:hover { color: var(--on-accent); filter: brightness(1.06); }
 
 a.section-head__link { text-decoration: none; color: var(--accent-ink); }
 a.section-head__link:hover { text-decoration: underline; }
@@ -2077,7 +2077,7 @@ a.section-head__link:hover { text-decoration: underline; }
                 transform var(--dur-fast) var(--ease-out),
                 box-shadow var(--dur-fast) var(--ease-out);
 }
-.project:hover { border-color: var(--accent); transform: translateY(-2px); box-shadow: 0 10px 30px rgba(44, 31, 23, 0.10); }
+.project:hover { border-color: var(--accent); transform: translateY(-2px); box-shadow: 0 10px 30px rgba(0, 0, 0, 0.10); }
 .project--featured { margin-top: 1.25rem; }
 .project__body { display: flex; flex-direction: column; gap: 0.55rem; padding: clamp(1rem, 2.5vw, 1.4rem); flex: 1; }
 .project__eyebrow { font-family: var(--font-mono); font-size: 0.68rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--accent-ink); }
@@ -2089,9 +2089,11 @@ a.section-head__link:hover { text-decoration: underline; }
 .project__link { margin-top: auto; font-weight: 600; font-size: 0.9rem; color: var(--accent-ink); text-decoration: none; }
 .project__link:hover { text-decoration: underline; }
 .project__link--disabled { color: var(--ink-3); font-weight: 500; }
-.project__badge { font-family: var(--font-mono); font-size: 0.6rem; letter-spacing: 0.08em; text-transform: uppercase; color: var(--ink-1); background: var(--accent-2); border-radius: 999px; padding: 0.2rem 0.5rem; }
+.project__badge { font-family: var(--font-mono); font-size: 0.6rem; letter-spacing: 0.08em; text-transform: uppercase; color: var(--accent); background: color-mix(in srgb, var(--accent) 16%, transparent); border-radius: 999px; padding: 0.2rem 0.5rem; }
 .projects-more { margin-top: 1.5rem; font-family: var(--font-mono); font-size: 0.85rem; color: var(--ink-2); }
 .projects-more a { color: var(--accent-ink); text-decoration: none; font-weight: 600; }
 .projects-more a:hover { text-decoration: underline; }
 
 .project__badge--muted { background: var(--surface-2); color: var(--ink-2); }
+
+.pitch__cta { color: var(--on-accent); }
