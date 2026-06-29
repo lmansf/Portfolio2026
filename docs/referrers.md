@@ -35,6 +35,9 @@ Each theme has three values:
 | Stripe   | `https://<site>/?ink=stripe`         |
 | Amazon   | `https://<site>/?ink=amazon`         |
 | Spotify  | `https://<site>/?ink=spotify`        |
+| LinkedIn | `https://<site>/?ink=linkedin`       |
+| Anthropic| `https://<site>/?ink=anthropic`      |
+| Claude   | `https://<site>/?ink=claude`         |
 
 (Keys are case-insensitive. Works on any page, e.g. `/projects?ink=meta`.)
 
@@ -47,6 +50,9 @@ Each theme has three values:
 | stripe   | `#635bff`      | `#6f68ff`  | `#ffffff`      | Stripe "blurple"               |
 | amazon   | `#ff9900`      | `#ff9900`  | `#06141a`      | Amazon Orange (already AA)     |
 | spotify  | `#1ed760`      | `#1ed760`  | `#06141a`      | Spotify Green (already AA)     |
+| linkedin | `#0a66c2`      | `#3682cd`  | `#ffffff`      | LinkedIn Blue                  |
+| anthropic| `#d97757`      | `#d97757`  | `#06141a`      | Claude coral (already AA)      |
+| claude   | `#d97757`      | `#d97757`  | `#06141a`      | alias of `anthropic`           |
 
 ## Add a company
 Edit the `THEMES` object in `assets/theme.js`, then regenerate the minified file:

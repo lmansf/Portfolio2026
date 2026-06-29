@@ -17,7 +17,10 @@
         google:  { accent: '#4285f4', ink: '#4285f4', on: '#06141a' },
         stripe:  { accent: '#635bff', ink: '#6f68ff', on: '#ffffff' },
         amazon:  { accent: '#ff9900', ink: '#ff9900', on: '#06141a' },
-        spotify: { accent: '#1ed760', ink: '#1ed760', on: '#06141a' }
+        spotify: { accent: '#1ed760', ink: '#1ed760', on: '#06141a' },
+        linkedin:  { accent: '#0a66c2', ink: '#3682cd', on: '#ffffff' },
+        anthropic: { accent: '#d97757', ink: '#d97757', on: '#06141a' },
+        claude:    { accent: '#d97757', ink: '#d97757', on: '#06141a' }
     };
     try {
         var key = new URLSearchParams(window.location.search).get('ink');
