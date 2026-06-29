@@ -347,8 +347,6 @@ main.page > * {
     display: flex;
     align-items: baseline;
     justify-content: space-between;
-    border-top: 1px solid var(--hairline);
-    padding-top: 1.5rem;
 }
 .section-head__title,
 .section-head__hint {
@@ -2104,4 +2102,24 @@ a.section-head__link:hover { text-decoration: underline; }
     border-right: 2px solid var(--accent);
     pointer-events: none;
     z-index: 2;
+}
+
+/* Waveform section divider — branded separator between major sections */
+.wf-divider { display: flex; align-items: center; gap: 1rem; color: var(--accent); }
+.wf-divider::before, .wf-divider::after { content: ""; height: 1px; background: var(--hairline); flex: 1; }
+.wf-divider__mark { display: inline-flex; }
+.wf-divider__mark svg { width: 22px; height: 22px; display: block; }
+
+/* Extend the corner-tick device to the Connect cards (smaller, proportional) */
+.social { position: relative; }
+.social::after {
+    content: "";
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    width: 9px;
+    height: 9px;
+    border-top: 2px solid var(--accent);
+    border-right: 2px solid var(--accent);
+    pointer-events: none;
 }
