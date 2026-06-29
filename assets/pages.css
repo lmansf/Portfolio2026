@@ -2069,7 +2069,7 @@ a.section-head__link:hover { text-decoration: underline; }
 
 /* Project cards (Home featured + Projects grid) */
 .project-grid { display: grid; gap: 1.25rem; grid-template-columns: 1fr; margin-top: 1.25rem; }
-@media (min-width: 880px) { .project-grid { grid-template-columns: repeat(3, 1fr); } }
+@media (min-width: 720px) { .project-grid { grid-template-columns: repeat(2, 1fr); } }
 .project {
     display: flex;
     flex-direction: column;
@@ -2097,3 +2097,5 @@ a.section-head__link:hover { text-decoration: underline; }
 .projects-more { margin-top: 1.5rem; font-family: var(--font-mono); font-size: 0.85rem; color: var(--ink-2); }
 .projects-more a { color: var(--accent-ink); text-decoration: none; font-weight: 600; }
 .projects-more a:hover { text-decoration: underline; }
+
+.project__badge--muted { background: var(--surface-2); color: var(--ink-2); }

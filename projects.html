@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Projects · Logan Mansfield</title>
-    <meta name="description" content="Selected projects by Logan Mansfield, Data Analyst: eFrog frog-sound classifier, realtime fraud detection, and Lighthouse (a privacy-first RAG system).">
+    <meta name="description" content="Selected projects by Logan Mansfield, Data Analyst: eFrog frog-sound classifier, realtime fraud detection, the Owl Park data pipeline, and Lighthouse (a privacy-first RAG system).">
     <meta property="og:title" content="Projects · Logan Mansfield">
     <meta property="og:description" content="eFrog frog-sound classifier, realtime fraud detection, and Lighthouse — a privacy-first RAG system.">
     <meta property="og:type" content="website">
@@ -56,7 +56,7 @@
         <section class="hero" aria-labelledby="projects-title">
             <div class="hero__main">
                 <h1 class="hero__name" id="projects-title">Projects.</h1>
-                <p class="hero__role">A few builds I&rsquo;m proud of — a live ML app, a realtime fraud pipeline, and a privacy-first RAG system in the works.</p>
+                <p class="hero__role">A few builds I&rsquo;m proud of — a live ML app, a realtime fraud pipeline, an end-to-end data pipeline, and a privacy-first RAG system in the works.</p>
             </div>
         </section>
 
@@ -86,6 +86,19 @@
                         <p class="project__desc">A streaming pipeline that scores transactions for fraud signals in near real time, with downstream monitoring. The latest iteration of a project I&rsquo;ve rebuilt several times to push latency and precision.</p>
                         <ul class="project__tags"><li>Python</li><li>Supabase</li><li>Streaming</li></ul>
                         <a class="project__link" href="https://github.com/lmansf/realtimeFraud_supabase" target="_blank" rel="noopener">View on GitHub ↗</a>
+                    </div>
+                </article>
+
+                <article class="project">
+                    <figure class="shot" role="img" aria-label="Screenshot placeholder — Owl Park dashboards">
+                        <span class="shot__label">Screenshot coming</span>
+                    </figure>
+                    <div class="project__body">
+                        <p class="project__eyebrow">End-to-end pipeline</p>
+                        <h2 class="project__title">Owl Park <span class="project__badge project__badge--muted">Archived</span></h2>
+                        <p class="project__desc">A full real-time pipeline: four n8n agents fed events into Supabase, Microsoft Fabric modeled the data with a medallion architecture, and Power BI turned it into decisions. Retired now — but the architecture is worth a look.</p>
+                        <ul class="project__tags"><li>n8n</li><li>Supabase</li><li>Microsoft Fabric</li><li>Power BI</li></ul>
+                        <a class="project__link" href="/owl-park">View the architecture diagram ↗</a>
                     </div>
                 </article>
 
