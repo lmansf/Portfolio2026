@@ -2090,3 +2090,18 @@ a.section-head__link:hover { text-decoration: underline; }
 .project__badge--muted { background: var(--surface-2); color: var(--ink-2); }
 
 .pitch__cta { color: var(--on-accent); }
+
+/* Signature corner tick on project cards (option 6c) */
+.project { position: relative; }
+.project::after {
+    content: "";
+    position: absolute;
+    top: 16px;
+    right: 16px;
+    width: 12px;
+    height: 12px;
+    border-top: 2px solid var(--accent);
+    border-right: 2px solid var(--accent);
+    pointer-events: none;
+    z-index: 2;
+}

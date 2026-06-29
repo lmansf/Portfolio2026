@@ -657,3 +657,7 @@ body.crowbot-sheet-open {
 }
 
 .skip-link { color: var(--on-accent); }
+
+/* Brand mark — waveform/signal glyph in the topbar */
+header.topbar .topbar__brand .brand-mark { display: inline-flex; align-items: center; color: var(--accent); }
+header.topbar .topbar__brand .brand-mark svg { width: 20px; height: 20px; display: block; }
