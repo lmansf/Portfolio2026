@@ -43,6 +43,16 @@ main.page > * {
     gap: 1.25rem;
     padding-top: clamp(0.5rem, 4vw, 1.5rem);
 }
+.hero__avatar {
+    display: block;
+    width: clamp(88px, 13vw, 116px);
+    height: clamp(88px, 13vw, 116px);
+    border-radius: 50%;
+    object-fit: cover;
+    border: 2px solid var(--accent);
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.18);
+    margin-bottom: 1.1rem;
+}
 .hero__eyebrow {
     font-family: var(--font-mono);
     font-size: 0.72rem;

@@ -4,6 +4,13 @@
 # CLI is reinstalled each session if missing, then the repo gate is initialized.
 set -euo pipefail
 
+# Skip when running inside a no-mistakes gate agent (review/test/etc. run with
+# NM_DAEMON set). Re-initializing here restarts the shared daemon and kills the
+# in-progress run, so the gate could never get past its own steps.
+if [ -n "${NM_DAEMON:-}" ]; then
+  exit 0
+fi
+
 export PATH="$HOME/go/bin:$PATH"
 
 if ! command -v no-mistakes >/dev/null 2>&1; then
