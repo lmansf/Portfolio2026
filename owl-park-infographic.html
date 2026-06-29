@@ -15,9 +15,7 @@
     <link rel="icon" type="image/svg+xml" href="/assets/favicon.svg">
     <link rel="alternate icon" type="image/jpeg" href="/mini.jpg">
     <link rel="apple-touch-icon" href="/mini.jpg">
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
 <style>
-  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Playfair+Display:wght@700;800;900&display=swap');
   *{margin:0;padding:0;box-sizing:border-box;}
 
   :root{
@@ -39,7 +37,7 @@
      ═══════════════════════════════════ */
   html,body{
     width:100vw;height:100vh;overflow:hidden;
-    font-family:'Inter',sans-serif;
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
     color:var(--text);
     background:
       radial-gradient(920px 540px at 12% -10%,rgba(240,103,60,.22),transparent 60%),
@@ -58,7 +56,7 @@
     border-bottom:1px solid rgba(201,183,159,.24);
   }
   .header .owl-logo{ width:30px;height:30px; }
-  .header h1{font-size:22px;font-weight:800;letter-spacing:.5px;font-family:'Playfair Display',serif;}
+  .header h1{font-size:22px;font-weight:800;letter-spacing:.5px;font-family:Georgia,"Times New Roman",serif;}
   .header h1 span{color:var(--orange);}
   .header .sep{color:rgba(255,255,255,.35);font-size:18px;}
   .header .subtitle{font-size:10px;color:#d9c7af;letter-spacing:1.2px;text-transform:uppercase;font-weight:600;}
@@ -110,7 +108,6 @@
   .card:hover{transform:translateY(-2px);box-shadow:0 12px 34px rgba(20,14,9,.72);border-color:rgba(234,166,63,.42);}
   .card .icon{display:flex;align-items:center;justify-content:center;flex-shrink:0;}
   .card .icon svg{width:22px;height:22px;}
-  .card .icon i{font-size:20px;}
   .card .label{font-size:13px;font-weight:700;line-height:1.3;}
   .card .sub{font-size:10px;color:var(--muted);margin-top:2px;line-height:1.3;}
 
@@ -125,12 +122,12 @@
     border-left:3px solid var(--red);
     box-shadow:inset 0 0 18px rgba(240,103,60,.22);
   }
-  .card.agent .icon svg,.card.agent .icon i{color:var(--red);}
+  .card.agent .icon svg{color:var(--red);}
   .card.store{
     border-left:3px solid var(--orange);
     box-shadow:inset 0 0 18px rgba(234,166,63,.22);
   }
-  .card.store .icon i{color:var(--orange);}
+  .card.store .icon svg{color:var(--orange);}
   .card.agent .card-text,.card.store .card-text{text-align:left;}
 
   /* ═══════════════════════════════════
@@ -149,6 +146,7 @@
     color:var(--red);font-size:16px;
     animation:pulse-chev 2s ease-in-out infinite;
   }
+  .connector .chev svg,.out-connector .chev svg{width:16px;height:16px;display:block;}
   .connector .clabel{
     position:relative;z-index:1;
     font-size:9px;font-weight:600;color:#d9c7af;
@@ -189,7 +187,7 @@
     white-space:nowrap;
   }
   .supa-table-list .st:hover{background:rgba(234,166,63,.18);color:#fff6ea;}
-  .supa-table-list .st i{font-size:8px;color:#f3c277;flex-shrink:0;}
+  .supa-table-list .st svg{width:11px;height:11px;color:#f3c277;flex-shrink:0;}
   .supa-table-list .st .tname{flex:1;overflow:hidden;text-overflow:ellipsis;}
   .supa-table-list .unrest{
     font-size:7px;font-weight:700;letter-spacing:.5px;
@@ -230,7 +228,7 @@
     border-bottom:1px solid rgba(111,179,168,.32);
     border-radius:10px 10px 0 0;padding:7px 16px;
   }
-  .gen2-pill i{color:var(--cyan);font-size:13px;}
+  .gen2-pill svg{color:var(--cyan);width:15px;height:15px;}
   .gen2-pill .g-label{font-size:12px;font-weight:700;color:#fff6ea;}
   .gen2-pill .g-sub{font-size:10px;color:#c9b79f;}
 
@@ -254,7 +252,7 @@
     border-radius:10px;padding:9px 12px;
     position:relative;overflow:visible;
   }
-  .fabric-storage .fs-card .icon i{font-size:18px;}
+  .fabric-storage .fs-card .icon svg{width:18px;height:18px;}
   .fabric-storage .fs-card .card-text{text-align:left;}
   .fabric-storage .fs-card .label{font-size:12px;font-weight:700;line-height:1.3;}
   .fabric-storage .fs-card .sub{font-size:9px;color:var(--muted);margin-top:1px;line-height:1.25;}
@@ -264,10 +262,10 @@
     padding:2px 7px;border-radius:3px;white-space:nowrap;
   }
   .fs-card.wh{border-left:3px solid var(--red);box-shadow:inset 0 0 14px rgba(240,103,60,.16);}
-  .fs-card.wh .icon i{color:var(--red);}
+  .fs-card.wh .icon svg{color:var(--red);}
   .fs-card.wh .cadence{background:rgba(240,103,60,.18);color:#fff6ea;border:1px solid rgba(240,103,60,.35);}
   .fs-card.dl{border-left:3px solid var(--cyan);box-shadow:inset 0 0 14px rgba(111,179,168,.16);}
-  .fs-card.dl .icon i{color:var(--cyan);}
+  .fs-card.dl .icon svg{color:var(--cyan);}
   .fs-card.dl .cadence{background:rgba(111,179,168,.16);color:#fff6ea;border:1px solid rgba(111,179,168,.34);}
 
   .tbl-heading{
@@ -277,7 +275,7 @@
   .tbl-heading.dim{color:var(--cyan);}
   .tbl-heading.fact{color:var(--red);}
   .tbl-heading.qg{color:#c9b79f;margin-top:10px;font-size:10px;}
-  .tbl-heading i{font-size:9px;}
+  .tbl-heading svg{width:13px;height:13px;flex-shrink:0;}
 
   .tbl-list .t{
     display:block;font-size:10px;color:#d9c7af;line-height:1.35;
@@ -375,6 +373,7 @@
     transition:color .15s,border-color .15s,background .15s;
   }
   .back-home:hover{color:#fff;border-color:rgba(234,166,63,.5);background:rgba(255,255,255,.1);}
+  .back-home svg{width:13px;height:13px;}
 
   /* ═══════════════════════════════════
      MOBILE — stack the flow vertically so it never clips
@@ -398,7 +397,7 @@
 </head>
 <body>
 
-<a class="back-home" href="/"><i class="fa-solid fa-arrow-left"></i> Back to portfolio</a>
+<a class="back-home" href="/"><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20z"/></svg> Back to portfolio</a>
 
 <!-- ═══ HEADER ═══ -->
 <div class="header">
@@ -472,7 +471,7 @@
     </div>
 
     <div class="card store">
-      <div class="icon"><i class="fa-solid fa-store"></i></div>
+      <div class="icon"><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M20 4H4v2h16zm1 10v-2l-1-5H4l-1 5v2h1v6h10v-6h4v6h2v-6zm-9 4H6v-4h6z"/></svg></div>
       <div class="card-text">
         <div class="label">Owl Park Webstore</div>
         <div class="sub">E-commerce &amp; Tickets</div>
@@ -485,7 +484,7 @@
     <div class="connector">
       <span class="line"></span>
       <span class="clabel">Stream</span>
-      <span class="chev"><i class="fa-solid fa-angles-right"></i></span>
+      <span class="chev"><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M5.6 7.4 10.17 12 5.6 16.6 7 18l6-6-6-6zm6 0L16.17 12 11.6 16.6 13 18l6-6-6-6z"/></svg></span>
     </div>
   </div>
 
@@ -503,16 +502,16 @@
       <div class="sub">Raw Data Repository</div>
     </div>
     <div class="supa-table-list">
-      <div class="st"><i class="fa-solid fa-globe"></i><span class="tname">Analyst_Transactions</span></div>
-      <div class="st"><i class="fa-solid fa-globe"></i><span class="tname">Weather_Impact</span></div>
-      <div class="st"><i class="fa-solid fa-globe"></i><span class="tname">events</span></div>
-      <div class="st"><i class="fa-solid fa-globe"></i><span class="tname">issues</span></div>
-      <div class="st"><i class="fa-solid fa-globe"></i><span class="tname">products</span></div>
-      <div class="st"><i class="fa-solid fa-globe"></i><span class="tname">sales_summary</span></div>
-      <div class="st"><i class="fa-solid fa-globe"></i><span class="tname">sellout_counter</span></div>
-      <div class="st"><i class="fa-solid fa-globe"></i><span class="tname">transactions</span></div>
-      <div class="st"><i class="fa-solid fa-globe"></i><span class="tname">visit_dates</span></div>
-      <div class="st"><i class="fa-solid fa-globe"></i><span class="tname">wh_transactions</span></div>
+      <div class="st"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3c2.5 2.5 2.5 15.5 0 18M12 3c-2.5 2.5-2.5 15.5 0 18"/></svg><span class="tname">Analyst_Transactions</span></div>
+      <div class="st"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3c2.5 2.5 2.5 15.5 0 18M12 3c-2.5 2.5-2.5 15.5 0 18"/></svg><span class="tname">Weather_Impact</span></div>
+      <div class="st"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3c2.5 2.5 2.5 15.5 0 18M12 3c-2.5 2.5-2.5 15.5 0 18"/></svg><span class="tname">events</span></div>
+      <div class="st"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3c2.5 2.5 2.5 15.5 0 18M12 3c-2.5 2.5-2.5 15.5 0 18"/></svg><span class="tname">issues</span></div>
+      <div class="st"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3c2.5 2.5 2.5 15.5 0 18M12 3c-2.5 2.5-2.5 15.5 0 18"/></svg><span class="tname">products</span></div>
+      <div class="st"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3c2.5 2.5 2.5 15.5 0 18M12 3c-2.5 2.5-2.5 15.5 0 18"/></svg><span class="tname">sales_summary</span></div>
+      <div class="st"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3c2.5 2.5 2.5 15.5 0 18M12 3c-2.5 2.5-2.5 15.5 0 18"/></svg><span class="tname">sellout_counter</span></div>
+      <div class="st"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3c2.5 2.5 2.5 15.5 0 18M12 3c-2.5 2.5-2.5 15.5 0 18"/></svg><span class="tname">transactions</span></div>
+      <div class="st"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3c2.5 2.5 2.5 15.5 0 18M12 3c-2.5 2.5-2.5 15.5 0 18"/></svg><span class="tname">visit_dates</span></div>
+      <div class="st"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3c2.5 2.5 2.5 15.5 0 18M12 3c-2.5 2.5-2.5 15.5 0 18"/></svg><span class="tname">wh_transactions</span></div>
     </div>
   </div>
 
@@ -521,7 +520,7 @@
     <div class="connector">
       <span class="line"></span>
       <span class="clabel">Real-time<br>Pull</span>
-      <span class="chev"><i class="fa-solid fa-angles-right"></i></span>
+      <span class="chev"><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M5.6 7.4 10.17 12 5.6 16.6 7 18l6-6-6-6zm6 0L16.17 12 11.6 16.6 13 18l6-6-6-6z"/></svg></span>
     </div>
   </div>
 
@@ -542,7 +541,7 @@
 
       <div class="gen2-container">
       <div class="gen2-pill">
-        <i class="fa-solid fa-arrows-spin"></i>
+        <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 6V3L8 7l4 4V8a4 4 0 1 1-4 4H6a6 6 0 1 0 6-6z"/></svg>
         <span class="g-label">Gen2 Dataflow</span>
         <span class="g-sub">· Real-time Schedule</span>
       </div>
@@ -551,7 +550,7 @@
         <!-- Dimensions -->
         <div class="tbl-panel">
           <div class="tbl-heading dim">
-            <i class="fa-solid fa-cube"></i> Dimensions (19)
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round" aria-hidden="true"><path d="M12 2 3 7v10l9 5 9-5V7z"/><path d="m3 7 9 5 9-5M12 12v10"/></svg> Dimensions (19)
           </div>
           <div class="tbl-list dim-list">
             <span class="t">dim_time</span>
@@ -578,7 +577,7 @@
         <!-- Facts + Query Groups -->
         <div class="tbl-panel">
           <div class="tbl-heading fact">
-            <i class="fa-solid fa-chart-bar"></i> Facts &amp; Bridge (7)
+            <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M4 13h3v7H4zm6.5-5h3v12h-3zM17 3h3v17h-3z"/></svg> Facts &amp; Bridge (7)
           </div>
           <div class="tbl-list fact-list">
             <span class="t">facts_events</span>
@@ -590,7 +589,7 @@
             <span class="t">facts_visit_dates</span>
           </div>
           <div class="tbl-heading qg">
-            <i class="fa-solid fa-folder"></i> Query Groups — 26 Queries
+            <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M10 4H4a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2h-8z"/></svg> Query Groups — 26 Queries
           </div>
           <div class="tbl-list" style="padding-left:12px;">
             <span class="t" style="color:#c9b79f;">Events (4) · Products (4) · Sellouts (4)</span>
@@ -605,7 +604,7 @@
       <div class="fabric-storage">
         <div class="fs-card wh">
           <span class="cadence">REAL-TIME</span>
-          <div class="icon"><i class="fa-solid fa-warehouse"></i></div>
+          <div class="icon"><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 3 2 7v13h4v-8h12v8h4V7zM8 14h8v2H8zm0 3h8v3H8z"/></svg></div>
           <div class="card-text">
             <div class="label">Data Warehouse</div>
             <div class="sub">Real-time OLAP · Structured Queries</div>
@@ -613,7 +612,7 @@
         </div>
         <div class="fs-card dl">
           <span class="cadence">EVERY 24H</span>
-          <div class="icon"><i class="fa-solid fa-hard-drive"></i></div>
+          <div class="icon"><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M4 5h16a2 2 0 0 1 2 2v6H2V7a2 2 0 0 1 2-2zM2 15h20v2a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2zm15 1.5a1 1 0 1 0 2 0 1 1 0 0 0-2 0z"/></svg></div>
           <div class="card-text">
             <div class="label">Data Lake</div>
             <div class="sub">Daily Backup · Historical Archive</div>
@@ -626,7 +625,7 @@
   <!-- ───────── ARROW → ───────── -->
   <div class="out-connector">
     <span class="line"></span>
-    <span class="chev"><i class="fa-solid fa-angles-right"></i></span>
+    <span class="chev"><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M5.6 7.4 10.17 12 5.6 16.6 7 18l6-6-6-6zm6 0L16.17 12 11.6 16.6 13 18l6-6-6-6z"/></svg></span>
   </div>
 
   <!-- ───────── ④ OUTPUTS ───────── -->
