@@ -119,14 +119,7 @@ main.page > * {
 .hero__availability a:hover { border-bottom-color: var(--accent-ink); }
 
 @media (min-width: 768px) {
-    .hero {
-        display: grid;
-        grid-template-columns: 1.2fr 1fr;
-        gap: 3rem;
-        align-items: end;
-    }
     .hero__main { display: grid; gap: 1.25rem; }
-    .hero .now { align-self: end; }
 }
 
 /* ──────────────────── Now card ──────────────────── */
@@ -1953,7 +1946,7 @@ span.chip { cursor: default; pointer-events: none; }
 }
 .about__photo { max-width: 280px; }
 .about__body { display: grid; gap: 0.9rem; align-content: start; }
-.about__body p { color: var(--ink-2); line-height: 1.6; max-width: 60ch; }
+.about__body p { color: var(--ink-2); line-height: 1.6; max-width: 72ch; }
 .about__body em { color: var(--ink-3); font-style: italic; }
 @media (min-width: 768px) {
     .about__grid { grid-template-columns: 280px 1fr; gap: 2.5rem; align-items: start; }
