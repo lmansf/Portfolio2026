@@ -26,7 +26,7 @@
     --accent-ink:       #22d3ee;     /* cyan reads as bright text on dark — no darkening needed */
     --on-accent:        #06141a;     /* dark text/icons on cyan fills */
     --accent-2:         #7dd3fc;     /* soft sky — secondary */
-    --accent-glow:      rgba(34, 211, 238, 0.22);
+    --accent-glow:      color-mix(in srgb, var(--accent) 22%, transparent);
     --success:          #34d399;     /* emerald */
     --danger:           #f87171;     /* soft red */
 
