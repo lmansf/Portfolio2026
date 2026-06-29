@@ -25,7 +25,7 @@ main.page {
     grid-auto-columns: minmax(0, 1fr) !important;
     align-content: start !important;
     justify-content: stretch !important;
-    gap: clamp(2rem, 5vw, 3.5rem);
+    gap: clamp(2.5rem, 6vw, 4.5rem);
     position: relative;
     z-index: 1;
 }
@@ -2050,11 +2050,7 @@ a.section-head__link:hover { text-decoration: underline; }
     justify-content: center;
     aspect-ratio: 16 / 9;
     width: 100%;
-    background:
-        repeating-linear-gradient(45deg, transparent, transparent 11px,
-            color-mix(in srgb, var(--ink-3) 7%, transparent) 11px,
-            color-mix(in srgb, var(--ink-3) 7%, transparent) 12px),
-        var(--surface-2);
+    background: var(--surface-2);
     border-bottom: 1px solid var(--hairline);
     overflow: hidden;
 }
