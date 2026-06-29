@@ -10,33 +10,34 @@
  * ────────────────────────────────────────────────────────────── */
 
 :root {
-    /* ── Surfaces (relaxed) ── */
-    --bg:               #faf3e7;     /* warm cream paper */
-    --surface-1:        #fffbf3;     /* high-key warm white card */
-    --surface-2:        #f3e8d0;     /* sandy paper, deeper */
-    --surface-3:        #e7d4ad;     /* warm toast, hover state */
+    /* ── Surfaces (dark canvas) ── */
+    --bg:               #0c1116;     /* near-black, faintly cool */
+    --surface-1:        #141b22;     /* raised card */
+    --surface-2:        #1b242d;     /* chips / empty states / deeper */
+    --surface-3:        #26323d;     /* hover */
 
-    /* ── Ink (high contrast on cream) ── */
-    --ink-1:            #2c1f17;     /* deep coffee — primary text */
-    --ink-2:            #6e5947;     /* warm muted brown — secondary */
-    --ink-3:            #776147;     /* warm sand — tertiary / disabled (AA on cream) */
+    /* ── Ink (light on dark) ── */
+    --ink-1:            #e9eef3;     /* near-white — primary text */
+    --ink-2:            #aab6c0;     /* muted — secondary */
+    --ink-3:            #8a96a1;     /* tertiary / labels (AA on dark) */
 
-    /* ── Accents (energized) ── */
-    --accent:           #e85d2f;     /* sunset coral — primary accent (fills, borders, icons) */
-    --accent-ink:       #c0461a;     /* deeper coral for small text/links on light (WCAG AA) */
-    --accent-2:         #e8a93a;     /* honey amber — relaxed counterpoint */
-    --accent-glow:      rgba(232, 93, 47, 0.18);
-    --success:          #5a8f5e;     /* warm sage */
-    --danger:           #c53d3d;     /* warm crimson */
+    /* ── Accents (electric cyan) ── */
+    --accent:           #22d3ee;     /* electric cyan — primary accent */
+    --accent-ink:       #22d3ee;     /* cyan reads as bright text on dark — no darkening needed */
+    --on-accent:        #06141a;     /* dark text/icons on cyan fills */
+    --accent-2:         #7dd3fc;     /* soft sky — secondary */
+    --accent-glow:      color-mix(in srgb, var(--accent) 22%, transparent);
+    --success:          #34d399;     /* emerald */
+    --danger:           #f87171;     /* soft red */
 
     /* ── Lines ── */
-    --hairline:         rgba(44, 31, 23, 0.10);
-    --hairline-strong:  rgba(44, 31, 23, 0.20);
-    --focus-ring:       #e85d2f;
+    --hairline:         rgba(255, 255, 255, 0.10);
+    --hairline-strong:  rgba(255, 255, 255, 0.17);
+    --focus-ring:       #22d3ee;
 
-    /* ── Type ── */
-    --font-display: "Inter", system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
-    --font-text:    "Inter", system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+    /* ── Type (SF on Apple via the system stack; no web-font download) ── */
+    --font-display: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    --font-text:    -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
     --font-mono:    "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
 
     /* ── Radii ── */
@@ -56,7 +57,7 @@
     --tab-bar-h:   64px;
     --top-bar-h:   56px;
     --gutter:      clamp(1rem, 4vw, 1.5rem);
-    --max-w:       1100px;
+    --max-w:       880px;
 
     /* ── Legacy aliases ──
      * Keep old token names mapped to new values during transition.

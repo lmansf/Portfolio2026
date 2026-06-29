@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Projects · Logan Mansfield</title>
+    <meta name="description" content="Selected projects by Logan Mansfield, Data Analyst: eFrog frog-sound classifier, realtime fraud detection, the Owl Park data pipeline, and Lighthouse (a privacy-first RAG system).">
+    <meta property="og:title" content="Projects · Logan Mansfield">
+    <meta property="og:description" content="eFrog frog-sound classifier, realtime fraud detection, and Lighthouse — a privacy-first RAG system.">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://loganmansfield.org/projects">
+    <meta property="og:image" content="https://loganmansfield.org/mini.jpg">
+    <meta name="twitter:card" content="summary">
+    <link rel="canonical" href="https://loganmansfield.org/projects">
+    <link rel="icon" type="image/svg+xml" href="/assets/favicon.svg">
+    <link rel="alternate icon" type="image/jpeg" href="/mini.jpg">
+    <link rel="apple-touch-icon" href="/mini.jpg">
+    <script src="/assets/theme.min.js"></script>
+    <link rel="stylesheet" href="/assets/tokens.min.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/assets/shell.min.css">
+    <link rel="stylesheet" href="/assets/pages.min.css">
+    <script>
+        window.va = window.va || function () { (window.vaq = window.vaq || []).push(arguments); };
+    </script>
+    <script defer src="/_vercel/insights/script.js"></script>
+</head>
+<body>
+    <a class="skip-link" href="#main-content">Skip to content</a>
+    <div class="shell-bg" aria-hidden="true"></div>
+
+    <header class="topbar">
+        <div class="topbar__brand">
+            <a href="/"><span class="brand-mark" aria-hidden="true"><svg viewBox="0 0 24 24" fill="currentColor"><rect x="2" y="9" width="3" height="6" rx="1.5"/><rect x="7" y="5" width="3" height="14" rx="1.5"/><rect x="12" y="2" width="3" height="20" rx="1.5"/><rect x="17" y="6.5" width="3" height="11" rx="1.5"/></svg></span> L. MANSFIELD</a>
+        </div>
+        <nav class="topnav" aria-label="Primary">
+            <a href="/">Home</a>
+            <a href="/projects">Projects</a>
+            <a href="/assets/resume_current.pdf" download="Logan-Mansfield-Resume.pdf">Résumé</a>
+        </nav>
+        <button class="burger" type="button" aria-label="Open navigation" aria-expanded="false" aria-controls="site-nav" data-burger>
+            <span class="burger__bar"></span><span class="burger__bar"></span><span class="burger__bar"></span>
+        </button>
+    </header>
+
+    <nav class="site-nav" id="site-nav" aria-label="Primary navigation" aria-hidden="true">
+        <div class="site-nav__backdrop" data-nav-close aria-hidden="true"></div>
+        <div class="site-nav__panel">
+            <a class="site-nav__item" href="/">Home</a>
+            <a class="site-nav__item" href="/projects">Projects</a>
+            <a class="site-nav__item" href="/assets/resume_current.pdf" download="Logan-Mansfield-Resume.pdf">Résumé</a>
+        </div>
+    </nav>
+
+    <main id="main-content" class="page page-projects">
+        <section class="hero" aria-labelledby="projects-title">
+            <div class="hero__main">
+                <h1 class="hero__name" id="projects-title">Projects.</h1>
+                <p class="hero__role">A few builds I&rsquo;m proud of — a live ML app, a realtime fraud pipeline, an end-to-end data pipeline, and a privacy-first RAG system in the works.</p>
+            </div>
+        </section>
+
+        <div class="wf-divider" aria-hidden="true">
+            <span class="wf-divider__mark"><svg viewBox="0 0 24 24" fill="currentColor"><rect x="2" y="9" width="3" height="6" rx="1.5"/><rect x="7" y="5" width="3" height="14" rx="1.5"/><rect x="12" y="2" width="3" height="20" rx="1.5"/><rect x="17" y="6.5" width="3" height="11" rx="1.5"/></svg></span>
+        </div>
+
+        <section aria-label="Selected projects">
+            <div class="project-grid">
+
+                <article class="project">
+                    <div class="project__body">
+                        <p class="project__eyebrow">Live app · Machine learning</p>
+                        <h2 class="project__title">eFrog — Frog Sound Classifier</h2>
+                        <p class="project__desc">An audio-classification model that identifies 19 Floridian frog species from sound input — record a call, get a species. Built around a deep-learning model with a live web interface.</p>
+                        <ul class="project__tags"><li>Python</li><li>Audio ML</li><li>Web app</li></ul>
+                        <a class="project__link" href="https://efrog-seven.vercel.app/" target="_blank" rel="noopener">Open the live app ↗</a>
+                    </div>
+                </article>
+
+                <article class="project">
+                    <div class="project__body">
+                        <p class="project__eyebrow">Data engineering · Streaming</p>
+                        <h2 class="project__title">Realtime Fraud Detection</h2>
+                        <p class="project__desc">A streaming pipeline that scores transactions for fraud signals in near real time, with downstream monitoring. The latest iteration of a project I&rsquo;ve rebuilt several times to push latency and precision.</p>
+                        <ul class="project__tags"><li>Python</li><li>Supabase</li><li>Streaming</li></ul>
+                        <a class="project__link" href="https://github.com/lmansf/realtimeFraud_supabase" target="_blank" rel="noopener">View on GitHub ↗</a>
+                    </div>
+                </article>
+
+                <article class="project">
+                    <div class="project__body">
+                        <p class="project__eyebrow">End-to-end pipeline</p>
+                        <h2 class="project__title">Owl Park <span class="project__badge project__badge--muted">Archived</span></h2>
+                        <p class="project__desc">A full real-time pipeline: four n8n agents fed events into Supabase, Microsoft Fabric modeled the data with a medallion architecture, and Power BI turned it into decisions. Retired now — but the architecture is worth a look.</p>
+                        <ul class="project__tags"><li>n8n</li><li>Supabase</li><li>Microsoft Fabric</li><li>Power BI</li></ul>
+                        <a class="project__link" href="/owl-park">View the architecture diagram ↗</a>
+                    </div>
+                </article>
+
+                <article class="project project--soon">
+                    <div class="project__body">
+                        <p class="project__eyebrow">In prerelease</p>
+                        <h2 class="project__title">Lighthouse <span class="project__badge">Coming soon</span></h2>
+                        <p class="project__desc">A security- and privacy-first RAG system for your personal files — answers questions over your own documents without handing them to a third party. Currently in prerelease while I finish the branding.</p>
+                        <ul class="project__tags"><li>RAG</li><li>Privacy</li><li>LLMs</li></ul>
+                        <span class="project__link project__link--disabled" aria-disabled="true">Download &amp; GitHub coming soon</span>
+                    </div>
+                </article>
+
+            </div>
+
+            <p class="projects-more">
+                More on <a href="https://github.com/lmansf" target="_blank" rel="noopener">GitHub &rarr;</a>
+            </p>
+        </section>
+    </main>
+
+    <footer class="shell-footer">
+        <div class="footer-socials">
+            <a href="https://www.linkedin.com/in/lmansf96/" target="_blank" rel="noopener">LinkedIn</a>
+            <a href="mailto:lmansf96@gmail.com">Email</a>
+            <a href="https://github.com/lmansf" target="_blank" rel="noopener">GitHub</a>
+            <a href="/assets/resume_current.pdf" download="Logan-Mansfield-Resume.pdf">Résumé</a>
+        </div>
+    </footer>
+
+    <script defer src="/assets/transition.min.js"></script>
+</body>
+</html>

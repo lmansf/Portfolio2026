@@ -1,132 +1,67 @@
-# Portfolio Website & Ecommerce Ecosystem
+# loganmansfield.org — portfolio
 
-The site is designed to be lightweight, fast, and easy to deploy, using plain HTML, CSS, and JavaScript.
+Personal portfolio for **Logan Mansfield, Data Analyst** (Tampa, FL — open to
+remote). Static HTML/CSS/JS, no build step, deployed on Vercel.
 
-## Website Overview
+## Site structure
 
-The website has three core views:
+A deliberately lean two-page site, plus one archived project page:
 
-- **Home page** (`index.html`) — the main landing experience.
-- **Projects page** (`projects.html`) — a curated overview of selected work.
-- **Blog page** (`blog.html`) — blog content powered by frontend JavaScript.
-- **Mock Shop page** (`shop.html`) — product catalog loaded from Supabase.
+- **Home** (`index.html`, `/`) — intro, availability, a featured project
+  (Realtime Fraud Detection), a short about, and the fastest ways to connect.
+- **Projects** (`projects.html`, `/projects`) — eFrog (live ML app), Realtime
+  Fraud Detection, Owl Park (archived), and Lighthouse (coming soon), with a
+  link out to GitHub for the rest.
+- **Owl Park** (`owl-park-infographic.html`, `/owl-park`) — a standalone
+  infographic of an archived end-to-end data pipeline.
+- **404** (`404.html`) — branded not-found page.
 
-# Featured Project: Agentic Webstore Ecosystem
-# Task 1: Create an E-Commerce Store
-Goal: Create a fully working E-Commerce webstore integrated with the stock and pricing system used by the agents.
-## Task 1a: Create the Database
-Responsibility: Data Engineer
-</br>Tools Used:
-- Supabase
-- SQL
-About the Solution:
-	I created a total of 14 tables to make up my Webstore Database hosted on Supabase. While it did require some manual work to set up everything, supabase makes it very easy to quick start projects like this, which is why I chose it.
-## Task 1b: Create the Frontend & Connections
-Responsibility: Ai Engineer (LLM/Software Specialist)
-Tools Used:
-- LLMs for Coding Partners: GPT 5.3 Codex, Gemini 3.2 Pro, Claude Sonnet 4.6
-- Hosting on Vercel
-# Task 2: Create an Active Market
-Goal: create an ecosystem of supply and demand to generate data for pipelines and BI dashboards.
-Responsibility: Ai Engineer
-</br>Tools Used:
-- n8n
-- Agents: ChatGPT 5.2
-- Supabase
-- OpenWeather API
-## Task 2a: Create Purchasing Agents
-About the Solution
-	The n8n workflow calls the products table and calendar to see what events are available. Based on prices, weather, and availability, a gpt-4o-mini agent selects how many tickets to purchase, and a second agent (also gpt4) selects the date. In the future I'd like to update the date selection to happen as part of the ticket selection, better simulating what typically happens in a ticket purchase.
-	
-	Scheduled to run 3 times an hour.
-![Dashboard Visual](PurchaseAgents.png)
-## Task 2b: Creating a Warehouse Agent
-About the Solution
-	The n8n workflow calls the products table and checks how many tickets of each type are available. If any tickets fall below a preset threshold, an agent may decide to purchase stock from a warehouse to replenish our tickets.
-	
-	Scheduled to run once a week.
-![Dashboard Visual](WarehouseAgent.png)
-## Task 2c: Creating a Dynamic Price Simulating Agent
-About the Solution
-	In this workflow I was experimenting with using kimi-k2 as the agent, as well as a secondary agent whose role was to challenge my first agents decision. The critique evaluated the results against the original inputs (products, visit count, date), and redistributes the original decision to better reflect the environment. This is a placeholder for the true dynamic pricing system to be developed in the Data Scientist Task that remains.
-	
-	Scheduled to run twice a day.
-![Dashboard Visual](DynamicPricing.png)
-# Task 3: Build a Pipeline for Streaming Data
-Goal: create the pipelines to extract, transform, and load data specializing in business analytics and machine learning.
-Responsibility: Data Engineer
-</br>Tools Used:
-- Dagster
-- Python
-- SQL
-- Supabase
-## Task 3a: Create the Business Analytics Data Pipeline
-About the Solution
-	Collects weather data from an api and loads it alongside ticket sales from a supabase transaction table. Aggregated by date, and then loaded into tables that refresh once a day using dagster.
-![Dashboard Visual](GlobalAssetLineage.png)
-![Dashboard Visual](Assets.png)
-## Task 3b: Create the Machine Learning Pipeline (Coming Soon)
-About the Solution
-	Coming Soon!'
-# Task 4: Analyst Dashboard
-Goal: To analyze the impact of rainfall and temperature on ticket sales.
-Responsibility: Data Analyst
-</br>Tools Used:
-- Power Bi
-About the Solution
-	Visualizes the potential impact of temperature and weather on ticket sales.
-![Dashboard Visual](whole_dashboard.png)
-# Task 5: Dynamic Pricing (Coming Soon)
-Goal: To develop a machine learning model based on actual transaction data to price tickets in realtime.
-## Task 5a: Model the Historical Data
-Responsibility: Data Scientist
-</br>Tools Used:
-- Python
-- SQL
-About the Solution
-	Coming Soon
-## Task 5b: Train Dynamic Pricing Model
-Responsibility: Data Scientist
-</br>Tools Used:
-- Python
-About the Solution
-	Coming Soon
-## Task 5c: Implement Live Dynamic Pricing
-Responsibility: Data Scientist
-</br>Tools Used:
-- TBD
-About the Solution
-	Coming Soon
+Clean URLs (`/projects`, `/owl-park`) and legacy redirects are configured in
+`vercel.json`.
 
-## Performance Optimizations Implemented
+## Assets
 
-This project received a focused optimization pass for faster load, improved Core Web Vitals, and leaner deployment:
+- `assets/tokens.css` — design tokens (dark canvas + electric-cyan accent;
+  system font stack). Imported first on every page.
+- `assets/shell.css` — top bar, nav, and page chrome.
+- `assets/pages.css` — page/section components.
+- `assets/transition.js` — SPA-style page transitions and the mobile nav.
+- `assets/theme.js` — optional per-company accent theming via `?ink=<company>`
+  (see [`docs/referrers.md`](docs/referrers.md)).
+- `assets/profilepicture.webp` — circular hero avatar on the home page.
+- `assets/favicon.svg`, `mini.jpg` — icons / share image.
+- `assets/resume_current.pdf` — résumé served from the site.
 
-- Removed Font Awesome dependency from `index.html`, `projects.html`, and `blog.html`.
-- Replaced marquee icon `<i>` tags with inline Unicode symbols to eliminate webfont/CSS overhead.
-- Improved hero image delivery on the home page with AVIF + JPEG fallback using `<picture>`.
-- Added high-priority preload/fetch settings for the LCP hero image.
-- Kept minified route-critical assets in use (`assets/index.min.css`, `assets/transition.min.js`).
-- Preserved strong cache headers in `vercel.json` for static assets (`max-age=31536000, immutable`).
-- Removed unneeded local optimization artifacts (temporary Lighthouse output and unused WebP variant).
+The pages load the minified `.min` variants. After editing any source asset,
+regenerate its minified file:
 
-## Lighthouse Snapshot (Desktop)
+    npx esbuild <src> --minify --outfile=<min> --allow-overwrite
 
-Latest optimization run reached a **100/100 Performance score** with key metrics in excellent range:
+## Local development
 
-- FCP: ~0.2s
-- LCP: ~0.3s
-- TBT: 0ms
-- CLS: 0
+No build step — serve the folder and open it:
 
-## Author Note
+    python3 -m http.server 8000
 
-The latest performance optimization pass was authored by **GitHub Copilot (GPT-5.3-Codex)**.
+Note that `vercel.json` clean URLs/redirects aren't applied by a plain static
+server; `vercel dev` reproduces production routing if needed.
 
-## AI Development Note
+## Validation gate
 
-This website and the user-facing implementation were developed with assistance from:
+Portfolio changes are validated with the `no-mistakes` skill (`/no-mistakes`)
+before opening a PR. See [`CLAUDE.md`](CLAUDE.md) for setup and environment
+notes.
 
-- **GPT-5.3-Codex**
-- **Gemini 3.1 Pro**
+## Owl Park (archived project)
 
+An earlier end-to-end pipeline built around a simulated ticket-sales
+ecosystem: n8n agents generated demand and managed stock, data landed in
+Supabase, Microsoft Fabric modeled it with a medallion architecture, and
+Power BI turned it into decisions. A few visuals from that work:
+
+![Purchasing agent workflow](PurchaseAgents.png)
+![Warehouse replenishment agent](WarehouseAgent.png)
+![Dynamic pricing experiment](DynamicPricing.png)
+![Pipeline asset lineage](GlobalAssetLineage.png)
+![Dagster assets](Assets.png)
+![Power BI dashboard](whole_dashboard.png)
