@@ -28,6 +28,7 @@ Clean URLs (`/projects`, `/owl-park`) and legacy redirects are configured in
 - `assets/transition.js` — SPA-style page transitions and the mobile nav.
 - `assets/theme.js` — optional per-company accent theming via `?ink=<company>`
   (see [`docs/referrers.md`](docs/referrers.md)).
+- `assets/profilepicture.webp` — circular hero avatar on the home page.
 - `assets/favicon.svg`, `mini.jpg` — icons / share image.
 - `assets/resume_current.pdf` — résumé served from the site.
 
