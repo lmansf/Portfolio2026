@@ -2009,3 +2009,91 @@ span.chip { cursor: default; pointer-events: none; }
     text-overflow: ellipsis;
     white-space: nowrap;
 }
+
+/* ──────────────── Simplified 2-page site ──────────────── */
+/* Intro credential chip + contact row */
+.cred-chip {
+    display: inline-block;
+    font-family: var(--font-mono);
+    font-size: 0.72rem;
+    color: var(--ink-2);
+    background: var(--surface-2);
+    border: 1px solid var(--hairline-strong);
+    border-radius: 999px;
+    padding: 0.3rem 0.7rem;
+}
+.contact-row { display: flex; flex-wrap: wrap; gap: 0.6rem; margin-top: 0.5rem; }
+.contact-row__link {
+    display: inline-flex;
+    align-items: center;
+    font-size: 0.85rem;
+    font-weight: 500;
+    text-decoration: none;
+    color: var(--ink-1);
+    border: 1px solid var(--hairline-strong);
+    border-radius: 999px;
+    padding: 0.45rem 0.9rem;
+    transition: border-color var(--dur-fast) var(--ease-out), color var(--dur-fast) var(--ease-out);
+}
+.contact-row__link:hover { border-color: var(--accent); color: var(--accent-ink); }
+.contact-row__link--cta { background: var(--accent); color: var(--ink-1); border-color: var(--accent); }
+.contact-row__link--cta:hover { color: var(--ink-1); filter: brightness(1.04); }
+
+a.section-head__link { text-decoration: none; color: var(--accent-ink); }
+a.section-head__link:hover { text-decoration: underline; }
+
+/* Screenshot slot — clean framed empty state, swap in <img class="shot__img"> later */
+.shot {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    aspect-ratio: 16 / 9;
+    width: 100%;
+    background:
+        repeating-linear-gradient(45deg, transparent, transparent 11px,
+            color-mix(in srgb, var(--ink-3) 7%, transparent) 11px,
+            color-mix(in srgb, var(--ink-3) 7%, transparent) 12px),
+        var(--surface-2);
+    border-bottom: 1px solid var(--hairline);
+    overflow: hidden;
+}
+.shot__label {
+    font-family: var(--font-mono);
+    font-size: 0.72rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--ink-3);
+}
+.shot__img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+
+/* Project cards (Home featured + Projects grid) */
+.project-grid { display: grid; gap: 1.25rem; grid-template-columns: 1fr; margin-top: 1.25rem; }
+@media (min-width: 880px) { .project-grid { grid-template-columns: repeat(3, 1fr); } }
+.project {
+    display: flex;
+    flex-direction: column;
+    border: 1px solid var(--card-border);
+    border-radius: var(--r-lg);
+    overflow: hidden;
+    background: var(--surface-1);
+    transition: border-color var(--dur-fast) var(--ease-out),
+                transform var(--dur-fast) var(--ease-out),
+                box-shadow var(--dur-fast) var(--ease-out);
+}
+.project:hover { border-color: var(--accent); transform: translateY(-2px); box-shadow: 0 10px 30px rgba(44, 31, 23, 0.10); }
+.project--featured { margin-top: 1.25rem; }
+.project__body { display: flex; flex-direction: column; gap: 0.55rem; padding: clamp(1rem, 2.5vw, 1.4rem); flex: 1; }
+.project__eyebrow { font-family: var(--font-mono); font-size: 0.68rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--accent-ink); }
+.project__title { font-family: var(--font-display); font-size: 1.15rem; font-weight: 700; color: var(--ink-1); line-height: 1.2; display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap; margin: 0; }
+.project--featured .project__title { font-size: clamp(1.3rem, 3vw, 1.7rem); }
+.project__desc { font-size: 0.92rem; color: var(--ink-2); line-height: 1.55; }
+.project__tags { list-style: none; display: flex; flex-wrap: wrap; gap: 0.4rem; padding: 0; margin: 0.1rem 0 0.3rem; }
+.project__tags li { font-family: var(--font-mono); font-size: 0.68rem; color: var(--ink-3); background: var(--surface-2); border-radius: var(--r-sm); padding: 0.2rem 0.5rem; }
+.project__link { margin-top: auto; font-weight: 600; font-size: 0.9rem; color: var(--accent-ink); text-decoration: none; }
+.project__link:hover { text-decoration: underline; }
+.project__link--disabled { color: var(--ink-3); font-weight: 500; }
+.project__badge { font-family: var(--font-mono); font-size: 0.6rem; letter-spacing: 0.08em; text-transform: uppercase; color: var(--ink-1); background: var(--accent-2); border-radius: 999px; padding: 0.2rem 0.5rem; }
+.projects-more { margin-top: 1.5rem; font-family: var(--font-mono); font-size: 0.85rem; color: var(--ink-2); }
+.projects-more a { color: var(--accent-ink); text-decoration: none; font-weight: 600; }
+.projects-more a:hover { text-decoration: underline; }

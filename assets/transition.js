@@ -72,17 +72,7 @@ function normalizeInternalPath(url) {
     const routeAliases = {
         '': 'index.html',
         index: 'index.html',
-        work: 'work.html',
-        pipeline: 'pipeline.html',
-        sql: 'sql.html',
-        python: 'python.html',
-        bi: 'bi.html',
-        'ai-engineering': 'ai-engineering.html',
-        shop: 'shop.html',
-        resume: 'resume.html',
-        feedback: 'feedback.html',
-        projects: 'work.html',
-        architecture: 'pipeline.html'
+        projects: 'projects.html'
     };
 
     if (segment.endsWith('.html')) return segment;
@@ -90,7 +80,7 @@ function normalizeInternalPath(url) {
 }
 
 function isTransitionPage(path) {
-    return ['index.html', 'work.html', 'pipeline.html', 'shop.html', 'resume.html', 'feedback.html', 'sql.html', 'python.html', 'bi.html', 'ai-engineering.html'].includes(path);
+    return ['index.html', 'projects.html'].includes(path);
 }
 
 function isAtsResumeLink(link) {

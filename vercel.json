@@ -5,130 +5,43 @@
   "headers": [
     {
       "source": "/(.*).html",
-      "headers": [
-        {
-          "key": "Cache-Control",
-          "value": "no-cache, max-age=0, must-revalidate"
-        }
-      ]
+      "headers": [{ "key": "Cache-Control", "value": "no-cache, max-age=0, must-revalidate" }]
     },
     {
       "source": "/",
-      "headers": [
-        {
-          "key": "Cache-Control",
-          "value": "no-cache, max-age=0, must-revalidate"
-        }
-      ]
+      "headers": [{ "key": "Cache-Control", "value": "no-cache, max-age=0, must-revalidate" }]
     },
     {
-      "source": "/(work|pipeline|fraud|shop|resume|feedback|sql|python|bi|ai-engineering|owl-park)",
-      "headers": [
-        {
-          "key": "Cache-Control",
-          "value": "no-cache, max-age=0, must-revalidate"
-        }
-      ]
+      "source": "/(projects|owl-park)",
+      "headers": [{ "key": "Cache-Control", "value": "no-cache, max-age=0, must-revalidate" }]
     },
     {
       "source": "/(.*).(css|js|json|txt|xml)",
-      "headers": [
-        {
-          "key": "Cache-Control",
-          "value": "public, max-age=0, must-revalidate"
-        }
-      ]
+      "headers": [{ "key": "Cache-Control", "value": "public, max-age=0, must-revalidate" }]
     },
     {
       "source": "/(.*).(avif|png|jpg|jpeg|svg|webp|ico|pdf|woff|woff2|ttf)",
-      "headers": [
-        {
-          "key": "Cache-Control",
-          "value": "public, max-age=604800, stale-while-revalidate=86400"
-        }
-      ]
+      "headers": [{ "key": "Cache-Control", "value": "public, max-age=604800, stale-while-revalidate=86400" }]
     }
   ],
   "redirects": [
-    {
-      "source": "/blog",
-      "destination": "/",
-      "permanent": true
-    },
-    {
-      "source": "/blog.html",
-      "destination": "/",
-      "permanent": true
-    },
-    {
-      "source": "/projects",
-      "destination": "/work",
-      "permanent": true
-    },
-    {
-      "source": "/projects.html",
-      "destination": "/work.html",
-      "permanent": true
-    },
-    {
-      "source": "/architecture",
-      "destination": "/pipeline",
-      "permanent": true
-    },
-    {
-      "source": "/architecture.html",
-      "destination": "/pipeline.html",
-      "permanent": true
-    }
+    { "source": "/blog", "destination": "/", "permanent": true },
+    { "source": "/blog.html", "destination": "/", "permanent": true },
+    { "source": "/sql", "destination": "/", "permanent": true },
+    { "source": "/python", "destination": "/", "permanent": true },
+    { "source": "/bi", "destination": "/", "permanent": true },
+    { "source": "/ai-engineering", "destination": "/", "permanent": true },
+    { "source": "/work", "destination": "/projects", "permanent": true },
+    { "source": "/shop", "destination": "/projects", "permanent": true },
+    { "source": "/fraud", "destination": "/projects", "permanent": true },
+    { "source": "/pipeline", "destination": "/owl-park", "permanent": true },
+    { "source": "/architecture", "destination": "/owl-park", "permanent": true },
+    { "source": "/resume", "destination": "/assets/resume_current.pdf", "permanent": false },
+    { "source": "/feedback", "destination": "/", "permanent": true }
   ],
   "rewrites": [
-    {
-      "source": "/",
-      "destination": "/index.html"
-    },
-    {
-      "source": "/work",
-      "destination": "/work.html"
-    },
-    {
-      "source": "/pipeline",
-      "destination": "/pipeline.html"
-    },
-    {
-      "source": "/shop",
-      "destination": "/shop.html"
-    },
-    {
-      "source": "/resume",
-      "destination": "/resume.html"
-    },
-    {
-      "source": "/feedback",
-      "destination": "/feedback.html"
-    },
-    {
-      "source": "/sql",
-      "destination": "/sql.html"
-    },
-    {
-      "source": "/python",
-      "destination": "/python.html"
-    },
-    {
-      "source": "/bi",
-      "destination": "/bi.html"
-    },
-    {
-      "source": "/ai-engineering",
-      "destination": "/ai-engineering.html"
-    },
-    {
-      "source": "/fraud",
-      "destination": "/fraud.html"
-    },
-    {
-      "source": "/owl-park",
-      "destination": "/owl-park-infographic.html"
-    }
+    { "source": "/", "destination": "/index.html" },
+    { "source": "/projects", "destination": "/projects.html" },
+    { "source": "/owl-park", "destination": "/owl-park-infographic.html" }
   ]
 }
