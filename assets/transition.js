@@ -204,6 +204,7 @@ document.addEventListener('DOMContentLoaded', () => {
             return;
         }
         if (href.startsWith('#') || href.startsWith('http') || href.startsWith('mailto:') || link.target === '_blank' || href.endsWith('.pdf')) {
+            closeSiteNav();
             return;
         }
 
