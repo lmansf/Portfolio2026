@@ -2022,3 +2022,7 @@ a.section-head__link:hover { text-decoration: underline; }
     border-right: 2px solid var(--accent);
     pointer-events: none;
 }
+
+/* Project start date (no label) — right-aligned in the eyebrow row */
+.project__eyebrow { display: flex; justify-content: space-between; align-items: baseline; gap: 0.75rem; }
+.project__date { color: var(--ink-3); white-space: nowrap; }
