@@ -1,4 +1,4 @@
-/* Per-company accent theming via ?for=<company> — cosmetic, client-side only.
+/* Per-company accent theming via ?ink=<company> — cosmetic, client-side only.
  * Swaps ONLY the accent (links, mark, ticks, CTA, glow); the dark canvas and
  * layout are unchanged so contrast stays AA. No match -> default cyan brand.
  *
@@ -16,10 +16,11 @@
         meta:    { accent: '#0866ff', ink: '#2678ff', on: '#ffffff' },
         google:  { accent: '#4285f4', ink: '#4285f4', on: '#06141a' },
         stripe:  { accent: '#635bff', ink: '#6f68ff', on: '#ffffff' },
-        amazon:  { accent: '#ff9900', ink: '#ff9900', on: '#06141a' }
+        amazon:  { accent: '#ff9900', ink: '#ff9900', on: '#06141a' },
+        spotify: { accent: '#1ed760', ink: '#1ed760', on: '#06141a' }
     };
     try {
-        var key = new URLSearchParams(window.location.search).get('for');
+        var key = new URLSearchParams(window.location.search).get('ink');
         if (!key) return;
         var t = THEMES[key.toLowerCase()];
         if (!t) return;

@@ -6,13 +6,16 @@ and client-side (no tracking); the public link stays cyan.
 
 ## How it works
 `assets/theme.js` runs synchronously in each page's `<head>` (before paint, so
-there's no color flash). It reads the `?for=` query parameter, looks it up in
+there's no color flash). It reads the `?ink=` query parameter, looks it up in
 the `THEMES` map, and overrides the accent CSS variables on `:root`
 (`--accent`, `--accent-ink`, `--on-accent`, `--focus-ring`). The accent glow
 derives from `--accent` automatically. Unknown / missing key → default cyan.
 
 Only the **accent** changes — the dark canvas and layout stay, so contrast
 remains legible.
+
+(The query parameter is `?ink=`; not to be confused with the per-theme `ink`
+field below, which is the link-text color.)
 
 Each theme has three values:
 - **`accent`** — the brand-*exact* hex. Used for fills, the waveform mark,
@@ -26,13 +29,14 @@ Each theme has three values:
 ## URLs
 | Company  | URL                                  |
 |----------|--------------------------------------|
-| Netflix  | `https://<site>/?for=netflix`        |
-| Meta     | `https://<site>/?for=meta`           |
-| Google   | `https://<site>/?for=google`         |
-| Stripe   | `https://<site>/?for=stripe`         |
-| Amazon   | `https://<site>/?for=amazon`         |
+| Netflix  | `https://<site>/?ink=netflix`        |
+| Meta     | `https://<site>/?ink=meta`           |
+| Google   | `https://<site>/?ink=google`         |
+| Stripe   | `https://<site>/?ink=stripe`         |
+| Amazon   | `https://<site>/?ink=amazon`         |
+| Spotify  | `https://<site>/?ink=spotify`        |
 
-(Keys are case-insensitive. Works on any page, e.g. `/projects?for=meta`.)
+(Keys are case-insensitive. Works on any page, e.g. `/projects?ink=meta`.)
 
 ## Current palette (official brand colors)
 | Key      | Accent (brand) | Link ink   | Text-on-accent | Notes                          |
@@ -42,6 +46,7 @@ Each theme has three values:
 | google   | `#4285f4`      | `#4285f4`  | `#06141a`      | Google Blue (already AA)       |
 | stripe   | `#635bff`      | `#6f68ff`  | `#ffffff`      | Stripe "blurple"               |
 | amazon   | `#ff9900`      | `#ff9900`  | `#06141a`      | Amazon Orange (already AA)     |
+| spotify  | `#1ed760`      | `#1ed760`  | `#06141a`      | Spotify Green (already AA)     |
 
 ## Add a company
 Edit the `THEMES` object in `assets/theme.js`, then regenerate the minified file:
