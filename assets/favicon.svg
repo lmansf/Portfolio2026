@@ -1,9 +1,0 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-label="Logan Mansfield">
-  <rect width="64" height="64" rx="14" fill="#0c1116"/>
-  <g fill="#22d3ee">
-    <rect x="13" y="26" width="6" height="12" rx="3"/>
-    <rect x="25" y="17" width="6" height="30" rx="3"/>
-    <rect x="37" y="9"  width="6" height="46" rx="3"/>
-    <rect x="49" y="22" width="6" height="20" rx="3"/>
-  </g>
-</svg>

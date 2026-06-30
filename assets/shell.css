@@ -653,6 +653,16 @@ body.crowbot-sheet-open {
 
 .skip-link { color: var(--on-accent); }
 
-/* Brand mark — waveform/signal glyph in the topbar */
+/* Brand mark — crow glyph in the topbar */
 header.topbar .topbar__brand .brand-mark { display: inline-flex; align-items: center; color: var(--accent); }
 header.topbar .topbar__brand .brand-mark svg { width: 20px; height: 20px; display: block; }
+
+/* Crow mark — rasterized silhouette painted via CSS mask, so it inherits the
+ * accent color (and recolors with every ?ink= per-company theme). */
+.crow-mark {
+    display: block;
+    background-color: currentColor;
+    -webkit-mask: url("/assets/crow.png") center / contain no-repeat;
+            mask: url("/assets/crow.png") center / contain no-repeat;
+}
+header.topbar .topbar__brand .brand-mark .crow-mark { width: 27px; height: 22px; }
