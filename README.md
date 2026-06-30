@@ -30,7 +30,7 @@ Clean URLs (`/projects`, `/owl-park`) and legacy redirects are configured in
   (see [`docs/referrers.md`](docs/referrers.md)).
 - `assets/profilepicture.webp` — circular hero avatar on the home page.
 - `assets/favicon.svg`, `mini.jpg` — icons / share image.
-- `assets/resume_current.pdf` — résumé served from the site.
+- `assets/loganmansfield.pdf` — résumé served from the site.
 
 The pages load the minified `.min` variants. After editing any source asset,
 regenerate its minified file:

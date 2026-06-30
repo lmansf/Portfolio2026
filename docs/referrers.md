@@ -34,6 +34,7 @@ Each theme has three values:
 | Google   | `https://<site>/?ink=google`         |
 | Stripe   | `https://<site>/?ink=stripe`         |
 | Amazon   | `https://<site>/?ink=amazon`         |
+| Microsoft| `https://<site>/?ink=microsoft`      |
 | Spotify  | `https://<site>/?ink=spotify`        |
 | LinkedIn | `https://<site>/?ink=linkedin`       |
 | Anthropic| `https://<site>/?ink=anthropic`      |
@@ -49,6 +50,7 @@ Each theme has three values:
 | google   | `#4285f4`      | `#4285f4`  | `#06141a`      | Google Blue (already AA)       |
 | stripe   | `#635bff`      | `#6f68ff`  | `#ffffff`      | Stripe "blurple"               |
 | amazon   | `#ff9900`      | `#ff9900`  | `#06141a`      | Amazon Orange (already AA)     |
+| microsoft| `#00a4ef`      | `#00a4ef`  | `#06141a`      | Microsoft logo blue (already AA)|
 | spotify  | `#1ed760`      | `#1ed760`  | `#06141a`      | Spotify Green (already AA)     |
 | linkedin | `#0a66c2`      | `#3682cd`  | `#ffffff`      | LinkedIn Blue                  |
 | anthropic| `#d97757`      | `#d97757`  | `#06141a`      | Claude coral (already AA)      |
