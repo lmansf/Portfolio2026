@@ -2046,6 +2046,7 @@ a.section-head__link:hover { text-decoration: underline; }
 .wf-divider::before, .wf-divider::after { content: ""; height: 1px; background: var(--hairline); flex: 1; }
 .wf-divider__mark { display: inline-flex; }
 .wf-divider__mark svg { width: 22px; height: 22px; display: block; }
+.wf-divider__mark .crow-mark { width: 30px; height: 25px; }
 
 /* Extend the corner-tick device to the Connect cards (smaller, proportional) */
 .social { position: relative; }
