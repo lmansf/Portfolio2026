@@ -151,6 +151,7 @@ main.page > * {
 .hero__availability a:hover { border-bottom-color: var(--accent-ink); }
 
 @media (min-width: 768px) {
+    .hero__main { display: grid; gap: 1.25rem; }
     .hero__card {
         grid-template-columns: auto minmax(0, 1fr);
         align-items: center;
