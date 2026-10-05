@@ -14,9 +14,12 @@ Checks every root-level *.html page and exits 1 on any failure:
   - Open Graph + Twitter tags present; og:image is an absolute URL whose file
     exists here and whose real pixel size matches og:image:width/height.
   - JSON-LD parses; the full Person node (#person) is identical on every page
-    that carries it; every reference to #person uses the same name and url;
-    on ProfilePage pages the Person description equals the visible short bio
-    (.bio__text / .hero__bio) word for word.
+    that carries it, and its image exists at the declared size; every reference
+    to #person uses the same name and url; on ProfilePage pages the Person
+    description equals the visible short bio (.bio__text / .hero__bio) word for
+    word; breadcrumb URLs are canonical pages (the last one this page's); a
+    CollectionPage's hasPart name/description/keywords match the visible
+    project cards.
   - Links to the profiles listed in the Person sameAs carry rel="me".
   - data/mentions.json is valid: every entry has title, outlet, date
     (YYYY-MM-DD, YYYY-MM or YYYY) and an http(s) url.
@@ -121,7 +124,61 @@ def image_size(path):
                 h, w = struct.unpack(">HH", data[i + 5:i + 9])
                 return w, h
             i += 2 + length
+    if data[:4] == b"RIFF" and data[8:12] == b"WEBP":
+        chunk = data[12:16]
+        if chunk == b"VP8X":
+            w = 1 + int.from_bytes(data[24:27], "little")
+            h = 1 + int.from_bytes(data[27:30], "little")
+            return w, h
+        if chunk == b"VP8 ":
+            w, h = struct.unpack("<HH", data[26:30])
+            return w & 0x3FFF, h & 0x3FFF
+        if chunk == b"VP8L":
+            b = data[21:25]
+            return 1 + (b[0] | (b[1] & 0x3F) << 8), 1 + (b[1] >> 6 | b[2] << 2 | (b[3] & 0x0F) << 10)
     return None
+
+
+class ProjectCards(HTMLParser):
+    """Visible project cards: title (minus badges), description, tags."""
+
+    def __init__(self):
+        super().__init__(convert_charrefs=True)
+        self.cards = []
+        self._field = None       # "title" | "desc" | "tag"
+        self._skip = 0           # depth inside a .project__badge
+        self._buf = []
+
+    def handle_starttag(self, tag, attrs):
+        classes = dict(attrs).get("class", "") or ""
+        classes = classes.split()
+        if tag == "article" and "project" in classes:
+            self.cards.append({"title": "", "desc": "", "tags": []})
+        if not self.cards:
+            return
+        if "project__badge" in classes:
+            self._skip += 1
+        elif "project__title" in classes or "project__desc" in classes:
+            self._field, self._buf = ("title" if "project__title" in classes else "desc"), []
+        elif tag == "li" and self._field is None:
+            self._field, self._buf = "tag", []
+
+    def handle_endtag(self, tag):
+        if self._skip and tag == "span":
+            self._skip -= 1
+            return
+        if self._field and tag in ("h2", "h3", "p", "li"):
+            text = " ".join("".join(self._buf).split())
+            card = self.cards[-1]
+            if self._field == "tag":
+                card["tags"].append(text)
+            else:
+                card[self._field] = text
+            self._field = None
+
+    def handle_data(self, data):
+        if self._field and not self._skip:
+            self._buf.append(data)
 
 
 def valid_date(value):
@@ -223,6 +280,7 @@ def main():
             descs[desc] = name
 
         has_profile_page = False
+        cards = None
         for raw in p.ld:
             try:
                 data = json.loads(raw)
@@ -230,6 +288,27 @@ def main():
                 err(f"JSON-LD does not parse: {e}")
                 continue
             for node in walk(data):
+                if node.get("@type") == "BreadcrumbList":
+                    items = [li.get("item") for li in node.get("itemListElement", [])]
+                    if not noindex and items and items[-1] != canonical:
+                        err(f"last breadcrumb {items[-1]!r} != canonical {canonical!r}")
+                    for url in items:
+                        if url not in sitemap_locs:
+                            err(f"breadcrumb URL {url!r} is not a canonical page in sitemap.xml")
+                if node.get("@type") == "CollectionPage":
+                    if cards is None:
+                        parser = ProjectCards()
+                        parser.feed((ROOT / name).read_text(encoding="utf-8"))
+                        cards = {c["title"]: c for c in parser.cards}
+                    for part in node.get("hasPart", []):
+                        card = cards.get(part.get("name"))
+                        if not card:
+                            err(f"hasPart {part.get('name')!r} matches no visible project card title")
+                            continue
+                        if part.get("description") != card["desc"]:
+                            err(f"hasPart {part.get('name')!r} description differs from the visible card text")
+                        if part.get("keywords") != ", ".join(card["tags"]):
+                            err(f"hasPart {part.get('name')!r} keywords differ from the card tags {card['tags']}")
                 if node.get("@type") == "ProfilePage":
                     has_profile_page = True
                 if node.get("@id") != PERSON_ID:
@@ -254,6 +333,15 @@ def main():
 
     if person_full:
         first_page, first = next(iter(person_full.items()))
+        image = first.get("image", {})
+        url = image.get("url", "") if isinstance(image, dict) else image
+        local = ROOT / url[len(ORIGIN) + 1:] if url.startswith(f"{ORIGIN}/") else None
+        size = image_size(local) if local and local.exists() else None
+        if size is None:
+            errors.append(f"{first_page}: Person image {url!r} is missing or not an on-site image")
+        elif isinstance(image, dict) and (image.get("width"), image.get("height")) != size:
+            errors.append(f"{first_page}: Person image is {size[0]}×{size[1]} but JSON-LD says "
+                          f"{image.get('width')}×{image.get('height')}")
         for name, node in person_full.items():
             if node != first:
                 errors.append(f"{name}: Person node differs from the one in {first_page}")

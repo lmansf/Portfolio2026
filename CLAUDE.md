@@ -15,6 +15,8 @@ what the pages load, so regenerate them after editing source (esbuild is fine:
   `.bio__text`, About `.hero__bio`, and the Person `description` in the JSON-LD
   of `index.html` and `about.html`. The Person node itself must be identical on
   both pages.
+- `/projects` JSON-LD (`hasPart`) repeats each project card's title,
+  description and tags verbatim; edit both together (seo-check enforces it).
 - Never add skills, titles, credentials or claims that aren't already on the
   site; new copy needs the owner's approval before it ships.
 
