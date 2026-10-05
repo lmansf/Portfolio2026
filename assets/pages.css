@@ -2025,6 +2025,7 @@ a.section-head__link:hover { text-decoration: underline; }
 .project__badge--muted { background: var(--surface-2); color: var(--ink-2); }
 
 .pitch__cta { color: var(--on-accent); }
+.pitch__cta--ghost { color: var(--ink-1); }   /* transparent ghost CTA keeps light text */
 
 /* Signature corner tick on project cards (option 6c) */
 .project { position: relative; }
@@ -2075,6 +2076,7 @@ a.section-head__link:hover { text-decoration: underline; }
     max-width: 72ch;
 }
 .hero__bio { color: var(--ink-2); line-height: 1.65; max-width: 62ch; }
+.about__body { margin-top: 1.25rem; }   /* same heading-to-body gap as the other sections */
 
 /* ──────────────── Elsewhere / Mentions (/about) ──────────────── */
 /* Filled from data/mentions.json by mentions.js; hidden while empty. */

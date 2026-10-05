@@ -443,9 +443,17 @@
     .header .sep{display:none;}
     /* In flow above the header so it no longer covers the title */
     .back-home{position:static;margin:12px 0 0 12px;}
-    /* Keep small labels legible on phones (>= 12px) */
+    /* Keep small labels legible on phones (>= 12px); selectors match the base
+       rules' specificity so they win */
     .tbl-list .t,.card .sub,.fabric-storage .fs-card .sub,.header .subtitle,.tbl-heading,
-    .phase-tag span,.supa-table-list .st,.gen2-pill .g-sub,.back-home,.footer{font-size:12px;}
+    .tbl-heading.qg,.phase-tag span,.supa-table-list .st,.gen2-pill .g-sub,.back-home,.footer,
+    .connector .clabel,.fabric-storage .fs-card .cadence,.card.out .cadence{font-size:12px;}
+    .fabric-storage .fs-card .cadence,.card.out .cadence{top:-10px;}
+    .fabric-storage .fs-card,.card.out{padding-top:18px;}  /* room for the larger badges */
+    /* Mask the dashed rule behind the connector labels; keep the output
+       connector as narrow as the stacked columns */
+    .connector .clabel{background:var(--bg);padding:0 8px;}
+    .out-connector{max-width:520px;margin:0 auto;}
   }
   @media (max-width:520px){
     .tables-grid{grid-template-columns:1fr;}
