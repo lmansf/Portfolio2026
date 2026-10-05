@@ -6,36 +6,33 @@
  * scroll + focus reset on navigation, and back/forward (popstate).
  * ───────────────────────────────────────────────────────────── */
 
+// The routes the SPA swap handles, by exact pathname (clean URL or its file).
+const ROUTES = {
+    '/': 'index.html',
+    '/index.html': 'index.html',
+    '/about': 'about.html',
+    '/about.html': 'about.html',
+    '/projects': 'projects.html',
+    '/projects.html': 'projects.html'
+};
+
+// Map a link or location to the page file it shows, or null when it isn't one
+// of the swappable routes (other pages, assets, case or nesting variants such
+// as /About or /old/about, which the server 404s).
 function normalizeInternalPath(url) {
-    const rawUrl = (url || '').trim();
-    if (!rawUrl || rawUrl === '/' || rawUrl === './') return 'index.html';
-
-    const base = (typeof window !== 'undefined' && window.location && window.location.origin)
-        ? window.location.origin
-        : 'http://localhost';
-
-    let pathname = '';
+    const origin = (typeof window !== 'undefined' && window.location && window.location.origin
+        && window.location.origin !== 'null') ? window.location.origin : 'http://localhost';
+    let pathname;
     try {
-        pathname = new URL(rawUrl, base).pathname || '';
+        pathname = new URL((url || '').trim() || '/', origin).pathname;
     } catch {
-        pathname = rawUrl.split('#')[0].split('?')[0];
+        return null;
     }
-
-    const normalizedPathname = pathname.replace(/\/+$/, '') || '/';
-    const segment = (normalizedPathname.split('/').pop() || 'index').toLowerCase();
-    const routeAliases = {
-        '': 'index.html',
-        index: 'index.html',
-        about: 'about.html',
-        projects: 'projects.html'
-    };
-
-    if (segment.endsWith('.html')) return segment;
-    return routeAliases[segment] || segment;
+    return ROUTES[pathname.replace(/\/+$/, '') || '/'] || null;
 }
 
 function isTransitionPage(path) {
-    return ['index.html', 'about.html', 'projects.html'].includes(path);
+    return path !== null && Object.values(ROUTES).includes(path);
 }
 
 async function getIncomingDocumentForNavigation(url) {
@@ -240,15 +237,10 @@ document.addEventListener('DOMContentLoaded', () => {
         closeSiteNav();
 
         const normalizedHref = normalizeInternalPath(href);
-        const currentPath = normalizeInternalPath(window.location.pathname);
-        if (normalizedHref === currentPath) {
-            e.preventDefault();
-            return;
-        }
-        if (isTransitionPage(normalizedHref)) {
-            e.preventDefault();
-            navigateTo(href);
-        }
+        if (!isTransitionPage(normalizedHref)) return; // let the browser navigate
+        e.preventDefault();
+        if (normalizedHref === normalizeInternalPath(window.location.pathname)) return;
+        navigateTo(href);
     });
 
     document.addEventListener('keydown', (e) => {
@@ -260,7 +252,8 @@ document.addEventListener('DOMContentLoaded', () => {
     window.addEventListener('popstate', async () => {
         const path = normalizeInternalPath(window.location.pathname);
         if (isTransitionPage(path)) {
-            await navigateTo(path, { updateHistory: false });
+            // Fetch the real URL, not the .html file (which 308s to it).
+            await navigateTo(window.location.pathname + window.location.search, { updateHistory: false });
             return;
         }
         window.location.reload();

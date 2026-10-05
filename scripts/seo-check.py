@@ -149,7 +149,7 @@ def main():
     profiles = set()
     for name, p in pages.items():
         err = lambda msg: errors.append(f"{name}: {msg}")  # noqa: E731
-        noindex = "noindex" in p.meta.get("robots", "")
+        noindex = any(re.search(r"\b(noindex|none)\b", p.meta.get(k, ""), re.I) for k in ("robots", "googlebot"))
         canonical = next((h for r, h in p.links if r == "canonical"), None)
         is_home = canonical == f"{ORIGIN}/"
 

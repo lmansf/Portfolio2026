@@ -42,12 +42,12 @@ function lastmodFor(file) {
 }
 
 function attr(tag, name) {
-    const m = tag.match(new RegExp(`\\b${name}\\s*=\\s*"([^"]*)"`, 'i'));
-    return m ? m[1] : null;
+    const m = tag.match(new RegExp(`\\b${name}\\s*=\\s*(?:"([^"]*)"|'([^']*)'|([^\\s>]+))`, 'i'));
+    return m ? (m[1] ?? m[2] ?? m[3]) : null;
 }
 
 function pageInfo(file) {
-    const html = readFileSync(join(ROOT, file), 'utf8');
+    const html = readFileSync(join(ROOT, file), 'utf8').replace(/<!--[\s\S]*?-->/g, '');
     const head = html.slice(0, html.search(/<\/head>/i) + 1 || undefined);
     let canonical = null;
     let noindex = false;
@@ -55,12 +55,46 @@ function pageInfo(file) {
         if (/^<link/i.test(tag) && (attr(tag, 'rel') || '').toLowerCase() === 'canonical') {
             canonical = attr(tag, 'href');
         }
-        if (/^<meta/i.test(tag) && (attr(tag, 'name') || '').toLowerCase() === 'robots'
-            && /noindex/i.test(attr(tag, 'content') || '')) {
+        // robots/googlebot "noindex" or "none" keeps a page out of the index.
+        if (/^<meta/i.test(tag) && ['robots', 'googlebot'].includes((attr(tag, 'name') || '').toLowerCase())
+            && /\b(noindex|none)\b/i.test(attr(tag, 'content') || '')) {
             noindex = true;
         }
     }
     return { file, canonical, noindex };
+}
+
+// Vercel-style source pattern → RegExp, for the forms vercel.json uses:
+// literals, :name, :name*, :name(regex) and bare (regex) groups.
+function sourceToRegExp(source) {
+    let out = '';
+    for (let i = 0; i < source.length;) {
+        const rest = source.slice(i);
+        const param = rest.match(/^:(\w+)(\((?:[^()]|\([^()]*\))*\))?([*+?])?/);
+        const group = rest.match(/^\((?:[^()]|\([^()]*\))*\)/);
+        if (param) {
+            out += param[2] ? param[2] : param[3] === '*' ? '(.*)' : '([^/]+)';
+            i += param[0].length;
+        } else if (group) {
+            out += group[0];
+            i += group[0].length;
+        } else {
+            out += source[i].replace(/[.+*?^${}|[\]\\]/g, '\\$&');
+            i += 1;
+        }
+    }
+    return new RegExp(`^${out}$`);
+}
+
+// A redirect that applies on the canonical host (no host condition, or one
+// naming that host) runs before rewrites and the filesystem on Vercel.
+function redirectFor(pathname, vercel) {
+    const host = new URL(ORIGIN).host;
+    return (vercel.redirects || []).find((r) => {
+        const hosts = (r.has || []).filter((h) => h.type === 'host').map((h) => h.value);
+        if (hosts.length && !hosts.includes(host)) return false;
+        return sourceToRegExp(r.source).test(pathname);
+    });
 }
 
 function routedFile(pathname, vercel) {
@@ -80,7 +114,12 @@ function collect() {
         if (!p.canonical.startsWith(`${ORIGIN}/`)) {
             throw new Error(`${p.file}: canonical ${p.canonical} is not on ${ORIGIN}`);
         }
-        const target = routedFile(new URL(p.canonical).pathname, vercel);
+        const pathname = new URL(p.canonical).pathname;
+        const redirect = redirectFor(pathname, vercel);
+        if (redirect) {
+            throw new Error(`${p.file}: canonical ${p.canonical} is redirected by vercel.json (${redirect.source} → ${redirect.destination})`);
+        }
+        const target = routedFile(pathname, vercel);
         if (target !== p.file) {
             throw new Error(`${p.file}: canonical ${p.canonical} routes to "${target}", not to this file — add a rewrite in vercel.json`);
         }
@@ -127,7 +166,13 @@ function check(entries) {
     return { problems, warnings };
 }
 
-const entries = collect();
+let entries;
+try {
+    entries = collect();
+} catch (err) {
+    console.error(`build-sitemap: ${err.message}`);
+    process.exit(1);
+}
 if (process.argv.includes('--check')) {
     const { problems, warnings } = check(entries);
     for (const w of warnings) console.warn(`warning: ${w} — run: node scripts/build-sitemap.mjs`);
