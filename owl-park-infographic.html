@@ -417,10 +417,17 @@
   .back-home:hover{color:#fff;border-color:rgba(234,166,63,.5);background:rgba(255,255,255,.1);}
   .back-home svg{width:13px;height:13px;}
 
+  /* Between the stacked layout and ~1480px the four columns already fill the
+     viewport, so the 1.08 zoom would push the outer cards off-screen. */
+  @media (min-width:1141px) and (max-width:1480px){
+    .flow{transform:none;}
+  }
+
   /* ═══════════════════════════════════
-     MOBILE — stack the flow vertically so it never clips
+     MOBILE / NARROW — stack the flow vertically so it never clips
+     (below ~1140px the four columns can't fit side by side)
      ═══════════════════════════════════ */
-  @media (max-width:900px){
+  @media (max-width:1140px){
     html,body{height:auto;min-height:100vh;overflow-x:hidden;overflow-y:auto;}
     .flow{flex-direction:column;align-items:stretch;justify-content:flex-start;
       height:auto;transform:none;padding:14px 14px 48px;gap:14px;}
@@ -434,6 +441,14 @@
     .header{height:auto;padding:10px 12px;flex-wrap:wrap;}
     .header h1{font-size:18px;}
     .footer{position:static;margin-top:18px;}
+    /* In flow above the header so it no longer covers the title */
+    .back-home{position:static;margin:12px 0 0 12px;}
+    /* Keep small labels legible on phones (>= 12px) */
+    .tbl-list .t,.card .sub,.fabric-storage .fs-card .sub,.header .subtitle,.tbl-heading,
+    .phase-tag span,.supa-table-list .st,.gen2-pill .g-sub,.back-home,.footer{font-size:12px;}
+  }
+  @media (max-width:520px){
+    .tables-grid{grid-template-columns:1fr;}
   }
 </style>
 </head>

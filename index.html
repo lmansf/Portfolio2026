@@ -42,7 +42,9 @@
     <link rel="stylesheet" href="/assets/tokens.min.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <!-- Mono labels only: load the font CSS without blocking first render -->
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&display=swap" media="print" onload="this.media='all'">
+    <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&display=swap"></noscript>
     <link rel="stylesheet" href="/assets/shell.min.css">
     <link rel="stylesheet" href="/assets/pages.min.css">
     <script>
@@ -153,7 +155,7 @@
         </button>
     </header>
 
-    <nav class="site-nav" id="site-nav" aria-label="Primary navigation" aria-hidden="true">
+    <nav class="site-nav" id="site-nav" aria-label="Primary navigation" aria-hidden="true" inert>
         <div class="site-nav__backdrop" data-nav-close aria-hidden="true"></div>
         <div class="site-nav__panel">
             <a class="site-nav__item" href="/">Home</a>
@@ -168,7 +170,7 @@
         <!-- Intro -->
         <section class="hero" aria-labelledby="home-name">
             <div class="hero__card">
-                <img class="hero__avatar" src="assets/profilepicture.webp" alt="Logan Mansfield" width="180" height="180" decoding="async" fetchpriority="high">
+                <img class="hero__avatar" src="/assets/profilepicture.webp" srcset="/assets/profilepicture-256.webp 256w, /assets/profilepicture.webp 400w" sizes="(min-width: 900px) 180px, (min-width: 700px) 20vw, 140px" alt="Logan Mansfield" width="180" height="180" decoding="async" fetchpriority="high">
                 <div class="hero__intro">
                     <h1 class="hero__name" id="home-name">Logan <br>Mansfield.</h1>
                     <p class="hero__role">

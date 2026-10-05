@@ -145,6 +145,7 @@ function openSiteNav() {
         panel.style.right = Math.round(window.innerWidth - r.right) + 'px';
     }
     document.body.classList.add('site-nav-open');
+    nav.inert = false;
     nav.setAttribute('aria-hidden', 'false');
     if (burger) burger.setAttribute('aria-expanded', 'true');
     const firstLink = nav.querySelector('.site-nav__item');
@@ -155,6 +156,8 @@ function closeSiteNav() {
     const nav = getSiteNav();
     if (!nav) return;
     document.body.classList.remove('site-nav-open');
+    // `inert` keeps the visually hidden links out of the tab order.
+    nav.inert = true;
     nav.setAttribute('aria-hidden', 'true');
     const burger = document.querySelector('[data-burger]');
     if (burger) burger.setAttribute('aria-expanded', 'false');

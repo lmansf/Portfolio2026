@@ -26,7 +26,9 @@
     <link rel="stylesheet" href="/assets/tokens.min.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <!-- Mono labels only: load the font CSS without blocking first render -->
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&display=swap" media="print" onload="this.media='all'">
+    <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&display=swap"></noscript>
     <link rel="stylesheet" href="/assets/shell.min.css">
     <link rel="stylesheet" href="/assets/pages.min.css">
     <script>
@@ -57,7 +59,7 @@
         </button>
     </header>
 
-    <nav class="site-nav" id="site-nav" aria-label="Primary navigation" aria-hidden="true">
+    <nav class="site-nav" id="site-nav" aria-label="Primary navigation" aria-hidden="true" inert>
         <div class="site-nav__backdrop" data-nav-close aria-hidden="true"></div>
         <div class="site-nav__panel">
             <a class="site-nav__item" href="/">Home</a>
