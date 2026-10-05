@@ -174,12 +174,17 @@ function openSiteNav() {
 function closeSiteNav() {
     const nav = getSiteNav();
     if (!nav) return;
+    const focusWasInMenu = nav.contains(document.activeElement);
     document.body.classList.remove('site-nav-open');
     // `inert` keeps the visually hidden links out of the tab order.
     nav.inert = true;
     nav.setAttribute('aria-hidden', 'true');
     const burger = document.querySelector('[data-burger]');
-    if (burger) burger.setAttribute('aria-expanded', 'false');
+    if (burger) {
+        burger.setAttribute('aria-expanded', 'false');
+        // The closed menu is inert, so hand focus back to the burger.
+        if (focusWasInMenu) burger.focus();
+    }
 }
 
 function toggleSiteNav() {
@@ -245,12 +250,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     document.addEventListener('keydown', (e) => {
         if (e.key === 'Escape' && document.body.classList.contains('site-nav-open')) {
-            const nav = getSiteNav();
-            const focusWasInMenu = nav && nav.contains(document.activeElement);
             closeSiteNav();
-            // The closed menu is inert, so hand focus back to the burger.
-            const burger = document.querySelector('[data-burger]');
-            if (focusWasInMenu && burger) burger.focus();
         }
     });
 

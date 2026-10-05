@@ -14,8 +14,14 @@
 (function () {
     var SRC = '/data/mentions.json';
 
+    function nonEmpty(value) {
+        return typeof value === 'string' && value.trim() !== '';
+    }
+
+    // Same contract as scripts/seo-check.py: title, outlet, a real date and
+    // an http(s) url are all required.
     function isValid(m) {
-        if (!m || typeof m.title !== 'string' || !m.title.trim() || typeof m.url !== 'string') return false;
+        if (!m || !nonEmpty(m.title) || !nonEmpty(m.outlet) || !formatDate(m.date) || typeof m.url !== 'string') return false;
         try {
             var protocol = new URL(m.url).protocol;
             return protocol === 'https:' || protocol === 'http:';
@@ -36,11 +42,6 @@
         if (m[2]) opts.month = 'short';
         if (m[3]) opts.day = 'numeric';
         return date.toLocaleDateString('en-US', opts);
-    }
-
-    // Sort key: the date when it is a real one, else '' (undated sorts last).
-    function sortKey(m) {
-        return formatDate(m.date) ? m.date : '';
     }
 
     function el(tag, className, text) {
@@ -83,8 +84,8 @@
             .then(function (data) {
                 var items = (data && Array.isArray(data.mentions) ? data.mentions : []).filter(isValid);
                 if (!items.length) return;
-                // Newest first; undated entries last.
-                items.sort(function (a, b) { return sortKey(b).localeCompare(sortKey(a)); });
+                // Newest first.
+                items.sort(function (a, b) { return b.date.localeCompare(a.date); });
                 var list = buildSection(section);
 
                 items.forEach(function (m) {
@@ -96,14 +97,11 @@
                     item.appendChild(link);
 
                     var meta = el('p', 'mention__meta');
-                    if (typeof m.outlet === 'string' && m.outlet.trim()) meta.appendChild(el('span', 'mention__outlet', m.outlet.trim()));
-                    var label = formatDate(m.date);
-                    if (label) {
-                        var time = el('time', 'mention__date', label);
-                        time.dateTime = m.date;
-                        meta.appendChild(time);
-                    }
-                    if (meta.childNodes.length) item.appendChild(meta);
+                    meta.appendChild(el('span', 'mention__outlet', m.outlet.trim()));
+                    var time = el('time', 'mention__date', formatDate(m.date));
+                    time.dateTime = m.date;
+                    meta.appendChild(time);
+                    item.appendChild(meta);
                     list.appendChild(item);
                 });
                 section.hidden = false;
