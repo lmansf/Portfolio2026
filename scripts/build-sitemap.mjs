@@ -27,18 +27,20 @@ const ORIGIN = 'https://loganmansfield.org';
 
 function git(...args) {
     try {
-        return execFileSync('git', args, { cwd: ROOT, encoding: 'utf8' }).trim();
+        return execFileSync('git', args, { cwd: ROOT, encoding: 'utf8', env: { ...process.env, TZ: 'UTC' } }).trim();
     } catch {
         return '';
     }
 }
 
+// Dates are UTC on both paths (dirty file → today; committed → commit date),
+// so re-running on a clean tree never flips a lastmod by a day.
 const today = () => new Date().toISOString().slice(0, 10);
 
 function lastmodFor(file) {
     const dirty = git('status', '--porcelain', '--', file) !== '';
     if (dirty) return today();
-    return git('log', '-1', '--format=%cs', '--', file) || today();
+    return git('log', '-1', '--format=%cd', '--date=format-local:%Y-%m-%d', '--', file) || today();
 }
 
 function attr(tag, name) {
@@ -55,10 +57,11 @@ function pageInfo(file) {
         if (/^<link/i.test(tag) && (attr(tag, 'rel') || '').toLowerCase() === 'canonical') {
             canonical = attr(tag, 'href');
         }
-        // robots/googlebot "noindex" or "none" keeps a page out of the index.
-        if (/^<meta/i.test(tag) && ['robots', 'googlebot'].includes((attr(tag, 'name') || '').toLowerCase())
-            && /\b(noindex|none)\b/i.test(attr(tag, 'content') || '')) {
-            noindex = true;
+        // robots/googlebot "noindex" or "none" keeps a page out of the index
+        // (whole directives only: max-image-preview:none is not noindex).
+        if (/^<meta/i.test(tag) && ['robots', 'googlebot'].includes((attr(tag, 'name') || '').toLowerCase())) {
+            const directives = (attr(tag, 'content') || '').split(',').map((d) => d.trim().toLowerCase());
+            if (directives.includes('noindex') || directives.includes('none')) noindex = true;
         }
     }
     return { file, canonical, noindex };

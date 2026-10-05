@@ -9,19 +9,21 @@ Checks every root-level *.html page and exits 1 on any failure:
   - Titles: homepage "Logan Mansfield — …", every other page "… | Logan Mansfield";
     titles and meta descriptions unique across indexable pages; the homepage and
     /about descriptions lead with the full name.
-  - Indexable pages (no robots noindex) have an absolute https canonical on
-    loganmansfield.org that is listed in sitemap.xml, and og:url == canonical.
+  - Indexable pages (no robots/googlebot noindex or none) have an absolute https
+    canonical on loganmansfield.org that is listed in sitemap.xml, and
+    og:url == canonical.
   - Open Graph + Twitter tags present; og:image is an absolute URL whose file
     exists here and whose real pixel size matches og:image:width/height.
-  - JSON-LD parses; the full Person node (#person) is identical on every page
-    that carries it, and its image exists at the declared size; every reference
-    to #person uses the same name and url; on ProfilePage pages the Person
-    description equals the visible short bio (.bio__text / .hero__bio) word for
-    word; breadcrumb URLs are canonical pages (the last one this page's); a
-    CollectionPage's hasPart name/description/keywords match the visible
-    project cards.
-  - Links to the profiles listed in the Person sameAs carry rel="me".
-  - data/mentions.json is valid: every entry has title, outlet, date
+  - JSON-LD parses; every full Person node (#person) is identical, on a page and
+    across pages, and its image exists (at the declared size, if given); every
+    reference to #person uses the same name and url; on ProfilePage pages the
+    Person description equals the visible short bio (.bio__text / .hero__bio)
+    word for word; breadcrumb URLs are canonical pages (the last one this
+    page's); a CollectionPage's hasPart entries and the visible project cards
+    match one-to-one (name, description, tags).
+  - Links to the profiles listed in the Person sameAs carry rel="me" (matching
+    ignores scheme, www., case, trailing slash and twitter.com vs x.com).
+  - data/mentions.json is valid: every entry has title, outlet, a real date
     (YYYY-MM-DD, YYYY-MM or YYYY) and an http(s) url.
 """
 import datetime
@@ -31,12 +33,75 @@ import struct
 import sys
 from html.parser import HTMLParser
 from pathlib import Path
+from urllib.parse import urlsplit
 
 ROOT = Path(__file__).resolve().parent.parent
 ORIGIN = "https://loganmansfield.org"
 PERSON_ID = f"{ORIGIN}/#person"
 NAME = "Logan Mansfield"
 VOID = {"area", "base", "br", "col", "embed", "hr", "img", "input", "link", "meta", "source", "track", "wbr"}
+
+
+def as_list(value):
+    if value is None:
+        return []
+    return value if isinstance(value, list) else [value]
+
+
+def types_of(node):
+    return as_list(node.get("@type"))
+
+
+def is_noindex(meta):
+    """robots/googlebot carrying the noindex or none directive."""
+    for key in ("robots", "googlebot"):
+        directives = {d.strip().lower() for d in meta.get(key, "").split(",")}
+        if directives & {"noindex", "none"}:
+            return True
+    return False
+
+
+def profile_key(url):
+    """Comparable form of a profile URL: host without www. (twitter.com → x.com) + path."""
+    try:
+        parts = urlsplit(url)
+        host = parts.hostname
+    except ValueError:
+        return None
+    if parts.scheme.lower() not in ("http", "https") or not host:
+        return None
+    host = host.lower().removeprefix("www.")
+    host = "x.com" if host == "twitter.com" else host
+    return host + parts.path.rstrip("/").lower()
+
+
+def valid_url(url):
+    try:
+        parts = urlsplit(url)
+        host = parts.hostname
+    except ValueError:
+        return False
+    return parts.scheme.lower() in ("http", "https") and bool(host) and not re.search(r"\s", url)
+
+
+def valid_date(value):
+    """A real calendar date written as YYYY-MM-DD, YYYY-MM or YYYY."""
+    m = re.fullmatch(r"(\d{4})(?:-(\d{2})(?:-(\d{2}))?)?", value)
+    if not m:
+        return False
+    try:
+        datetime.date(int(m[1]), int(m[2] or 1), int(m[3] or 1))
+    except ValueError:
+        return False
+    return True
+
+
+def local_file(url):
+    """The file in this repo that an absolute on-site URL serves, if any."""
+    if not isinstance(url, str) or not url.startswith(f"{ORIGIN}/"):
+        return None
+    path = ROOT / urlsplit(url).path.lstrip("/")
+    return path if path.is_file() else None
 
 
 class Page(HTMLParser):
@@ -46,7 +111,7 @@ class Page(HTMLParser):
         self.title = None
         self.meta = {}
         self.links = []          # (rel, href) from <link>
-        self.anchors = []        # (href, rel)
+        self.anchors = []        # (href, rel tokens)
         self.imgs = []           # attrs
         self.h1 = []             # text of each h1
         self.ld = []             # raw JSON-LD strings
@@ -54,11 +119,19 @@ class Page(HTMLParser):
         self._capture = None     # ("title"|"h1"|"ld"|"bio", depth)
         self._buf = []
         self._depth = 0
+        self._in_head = False
+        self._svg = 0            # depth inside inline <svg> (its <title> isn't the page's)
 
     def handle_starttag(self, tag, attrs):
         a = {k: (v or "") for k, v in attrs}
         if tag not in VOID:
             self._depth += 1
+        if tag == "head":
+            self._in_head = True
+        elif tag == "body":
+            self._in_head = False
+        elif tag == "svg":
+            self._svg += 1
         if tag == "html":
             self.lang = a.get("lang")
         elif tag == "meta":
@@ -71,9 +144,9 @@ class Page(HTMLParser):
             self.anchors.append((a.get("href", ""), a.get("rel", "").lower().split()))
         elif tag == "img":
             self.imgs.append(a)
-        if self._capture is None:
+        if self._capture is None and not self._svg:
             classes = a.get("class", "").split()
-            if tag == "title":
+            if tag == "title" and self._in_head:
                 self._start("title")
             elif tag == "h1":
                 self._start("h1")
@@ -99,6 +172,10 @@ class Page(HTMLParser):
             elif kind == "bio":
                 self.bio.append(" ".join(text.split()))
             self._capture = None
+        if tag == "head":
+            self._in_head = False
+        elif tag == "svg" and self._svg:
+            self._svg -= 1
         if tag not in VOID:
             self._depth -= 1
 
@@ -112,13 +189,63 @@ class Page(HTMLParser):
             self._buf.append(data)
 
 
+class ProjectCards(HTMLParser):
+    """Visible project cards (article.project): title minus badges, description, tags."""
+
+    def __init__(self):
+        super().__init__(convert_charrefs=True)
+        self.cards = []
+        self._card = None
+        self._field = None       # ("title"|"desc"|"tag", closing tag)
+        self._in_tags = False    # inside ul.project__tags
+        self._badge = False      # inside span.project__badge
+        self._buf = []
+
+    def handle_starttag(self, tag, attrs):
+        classes = (dict(attrs).get("class") or "").split()
+        if tag == "article" and "project" in classes:
+            self._card = {"title": "", "desc": "", "tags": []}
+            self.cards.append(self._card)
+        if self._card is None:
+            return
+        if tag == "span" and "project__badge" in classes:
+            self._badge = True
+        elif tag == "ul" and "project__tags" in classes:
+            self._in_tags = True
+        elif self._field is None and "project__title" in classes:
+            self._field, self._buf = ("title", tag), []
+        elif self._field is None and "project__desc" in classes:
+            self._field, self._buf = ("desc", tag), []
+        elif self._field is None and tag == "li" and self._in_tags:
+            self._field, self._buf = ("tag", "li"), []
+
+    def handle_endtag(self, tag):
+        if tag == "article":
+            self._card, self._field, self._in_tags = None, None, False
+        elif tag == "span" and self._badge:
+            self._badge = False
+        elif tag == "ul" and self._in_tags:
+            self._in_tags = False
+        elif self._field and tag == self._field[1]:
+            text = " ".join("".join(self._buf).split())
+            if self._field[0] == "tag":
+                self._card["tags"].append(text)
+            else:
+                self._card[self._field[0]] = text
+            self._field = None
+
+    def handle_data(self, data):
+        if self._field and not self._badge:
+            self._buf.append(data)
+
+
 def image_size(path):
     data = path.read_bytes()
     if data[:8] == b"\x89PNG\r\n\x1a\n":
         return struct.unpack(">II", data[16:24])
     if data[:2] == b"\xff\xd8":
         i = 2
-        while i < len(data):
+        while i + 9 <= len(data):
             marker, length = data[i + 1], struct.unpack(">H", data[i + 2:i + 4])[0]
             if marker in (0xC0, 0xC1, 0xC2):
                 h, w = struct.unpack(">HH", data[i + 5:i + 9])
@@ -127,9 +254,7 @@ def image_size(path):
     if data[:4] == b"RIFF" and data[8:12] == b"WEBP":
         chunk = data[12:16]
         if chunk == b"VP8X":
-            w = 1 + int.from_bytes(data[24:27], "little")
-            h = 1 + int.from_bytes(data[27:30], "little")
-            return w, h
+            return 1 + int.from_bytes(data[24:27], "little"), 1 + int.from_bytes(data[27:30], "little")
         if chunk == b"VP8 ":
             w, h = struct.unpack("<HH", data[26:30])
             return w & 0x3FFF, h & 0x3FFF
@@ -137,60 +262,6 @@ def image_size(path):
             b = data[21:25]
             return 1 + (b[0] | (b[1] & 0x3F) << 8), 1 + (b[1] >> 6 | b[2] << 2 | (b[3] & 0x0F) << 10)
     return None
-
-
-class ProjectCards(HTMLParser):
-    """Visible project cards: title (minus badges), description, tags."""
-
-    def __init__(self):
-        super().__init__(convert_charrefs=True)
-        self.cards = []
-        self._field = None       # "title" | "desc" | "tag"
-        self._skip = 0           # depth inside a .project__badge
-        self._buf = []
-
-    def handle_starttag(self, tag, attrs):
-        classes = dict(attrs).get("class", "") or ""
-        classes = classes.split()
-        if tag == "article" and "project" in classes:
-            self.cards.append({"title": "", "desc": "", "tags": []})
-        if not self.cards:
-            return
-        if "project__badge" in classes:
-            self._skip += 1
-        elif "project__title" in classes or "project__desc" in classes:
-            self._field, self._buf = ("title" if "project__title" in classes else "desc"), []
-        elif tag == "li" and self._field is None:
-            self._field, self._buf = "tag", []
-
-    def handle_endtag(self, tag):
-        if self._skip and tag == "span":
-            self._skip -= 1
-            return
-        if self._field and tag in ("h2", "h3", "p", "li"):
-            text = " ".join("".join(self._buf).split())
-            card = self.cards[-1]
-            if self._field == "tag":
-                card["tags"].append(text)
-            else:
-                card[self._field] = text
-            self._field = None
-
-    def handle_data(self, data):
-        if self._field and not self._skip:
-            self._buf.append(data)
-
-
-def valid_date(value):
-    """A real calendar date written as YYYY-MM-DD, YYYY-MM or YYYY."""
-    m = re.fullmatch(r"(\d{4})(?:-(\d{2})(?:-(\d{2}))?)?", value)
-    if not m:
-        return False
-    try:
-        datetime.date(int(m[1]), int(m[2] or 1), int(m[3] or 1))
-    except ValueError:
-        return False
-    return True
 
 
 def walk(node):
@@ -201,6 +272,12 @@ def walk(node):
     elif isinstance(node, list):
         for v in node:
             yield from walk(v)
+
+
+def crumb_url(item):
+    if isinstance(item, dict):
+        return item.get("@id") or item.get("url")
+    return item
 
 
 def main():
@@ -215,11 +292,11 @@ def main():
     sitemap_locs = set(re.findall(r"<loc>([^<]+)</loc>", sitemap))
 
     titles, descs = {}, {}
-    person_full = {}
-    profiles = set()
+    persons = []                 # (page, full #person node) — all must be equal
+    profiles = set()             # profile_key() of every sameAs URL
     for name, p in pages.items():
         err = lambda msg: errors.append(f"{name}: {msg}")  # noqa: E731
-        noindex = any(re.search(r"\b(noindex|none)\b", p.meta.get(k, ""), re.I) for k in ("robots", "googlebot"))
+        noindex = is_noindex(p.meta)
         canonical = next((h for r, h in p.links if r == "canonical"), None)
         is_home = canonical == f"{ORIGIN}/"
 
@@ -254,16 +331,15 @@ def main():
             err("twitter:card should be summary_large_image")
         og_image = p.meta.get("og:image", "")
         if og_image:
+            local = local_file(og_image)
+            size = image_size(local) if local else None
             if not og_image.startswith(f"{ORIGIN}/"):
                 err(f"og:image {og_image} is not an absolute {ORIGIN} URL")
-            else:
-                local = ROOT / og_image[len(ORIGIN) + 1:]
-                size = image_size(local) if local.exists() else None
-                if size is None:
-                    err(f"og:image file {local.relative_to(ROOT)} is missing or unreadable")
-                elif (str(size[0]), str(size[1])) != (p.meta.get("og:image:width"), p.meta.get("og:image:height")):
-                    err(f"og:image is {size[0]}×{size[1]} but tags say "
-                        f"{p.meta.get('og:image:width')}×{p.meta.get('og:image:height')}")
+            elif size is None:
+                err(f"og:image {og_image} is not an image file in this repo")
+            elif (str(size[0]), str(size[1])) != (p.meta.get("og:image:width"), p.meta.get("og:image:height")):
+                err(f"og:image is {size[0]}×{size[1]} but tags say "
+                    f"{p.meta.get('og:image:width')}×{p.meta.get('og:image:height')}")
 
         if not noindex:
             if not canonical or not canonical.startswith(f"{ORIGIN}/"):
@@ -273,13 +349,14 @@ def main():
             if p.meta.get("og:url") != canonical:
                 err(f"og:url {p.meta.get('og:url')!r} != canonical {canonical!r}")
             if title in titles:
-                err(f'title duplicates {titles[title]}')
+                err(f"title duplicates {titles[title]}")
             titles[title] = name
             if desc in descs:
                 err(f"meta description duplicates {descs[desc]}")
             descs[desc] = name
 
         has_profile_page = False
+        page_persons = []
         cards = None
         for raw in p.ld:
             try:
@@ -288,19 +365,26 @@ def main():
                 err(f"JSON-LD does not parse: {e}")
                 continue
             for node in walk(data):
-                if node.get("@type") == "BreadcrumbList":
-                    items = [li.get("item") for li in node.get("itemListElement", [])]
+                types = types_of(node)
+                if "ProfilePage" in types:
+                    has_profile_page = True
+                if "BreadcrumbList" in types:
+                    items = [crumb_url(li.get("item")) for li in as_list(node.get("itemListElement"))
+                             if isinstance(li, dict)]
+                    if items and items[-1] is None:
+                        items[-1] = canonical    # Google allows omitting the current page's item
                     if not noindex and items and items[-1] != canonical:
                         err(f"last breadcrumb {items[-1]!r} != canonical {canonical!r}")
                     for url in items:
                         if url not in sitemap_locs:
                             err(f"breadcrumb URL {url!r} is not a canonical page in sitemap.xml")
-                if node.get("@type") == "CollectionPage":
+                if "CollectionPage" in types and "hasPart" in node:
                     if cards is None:
                         parser = ProjectCards()
                         parser.feed((ROOT / name).read_text(encoding="utf-8"))
                         cards = {c["title"]: c for c in parser.cards}
-                    for part in node.get("hasPart", []):
+                    parts = [x for x in as_list(node.get("hasPart")) if isinstance(x, dict)]
+                    for part in parts:
                         card = cards.get(part.get("name"))
                         if not card:
                             err(f"hasPart {part.get('name')!r} matches no visible project card title")
@@ -309,46 +393,46 @@ def main():
                             err(f"hasPart {part.get('name')!r} description differs from the visible card text")
                         if part.get("keywords") != ", ".join(card["tags"]):
                             err(f"hasPart {part.get('name')!r} keywords differ from the card tags {card['tags']}")
-                if node.get("@type") == "ProfilePage":
-                    has_profile_page = True
+                    for missing in sorted(set(cards) - {x.get("name") for x in parts}):
+                        err(f"visible project card {missing!r} has no hasPart entry")
                 if node.get("@id") != PERSON_ID:
                     continue
-                extra = set(node) - {"@id", "@type", "name", "url"}
-                if extra:
-                    person_full[name] = node
-                    profiles.update(node.get("sameAs", []))
-                elif len(node) > 1 and (node.get("name"), node.get("url")) not in ((None, None), (NAME, f"{ORIGIN}/")):
+                if set(node) - {"@id", "@type", "name", "url"}:
+                    page_persons.append(node)
+                    profiles.update(k for k in map(profile_key, as_list(node.get("sameAs"))) if k)
+                elif len(node) > 1 and (node.get("name"), node.get("url")) != (NAME, f"{ORIGIN}/"):
                     err(f"#person reference has name/url {node.get('name')!r}/{node.get('url')!r}")
 
+        persons.extend((name, n) for n in page_persons)
         if has_profile_page:
             if not desc.startswith(NAME):
                 err(f'meta description should lead with "{NAME}"')
-            person = person_full.get(name)
-            if not person:
+            if not page_persons:
                 err("ProfilePage without a full Person node")
             elif not p.bio:
                 err("ProfilePage without a visible short bio (.bio__text / .hero__bio)")
-            elif any(b != person.get("description") for b in p.bio):
+            elif any(b != page_persons[0].get("description") for b in p.bio):
                 err("visible short bio differs from the Person description in the JSON-LD")
 
-    if person_full:
-        first_page, first = next(iter(person_full.items()))
-        image = first.get("image", {})
-        url = image.get("url", "") if isinstance(image, dict) else image
-        local = ROOT / url[len(ORIGIN) + 1:] if url.startswith(f"{ORIGIN}/") else None
-        size = image_size(local) if local and local.exists() else None
-        if size is None:
-            errors.append(f"{first_page}: Person image {url!r} is missing or not an on-site image")
-        elif isinstance(image, dict) and (image.get("width"), image.get("height")) != size:
-            errors.append(f"{first_page}: Person image is {size[0]}×{size[1]} but JSON-LD says "
-                          f"{image.get('width')}×{image.get('height')}")
-        for name, node in person_full.items():
+    if persons:
+        first_page, first = persons[0]
+        for name, node in persons[1:]:
             if node != first:
                 errors.append(f"{name}: Person node differs from the one in {first_page}")
+        image = next(iter(as_list(first.get("image"))), None)
+        url = image.get("url") if isinstance(image, dict) else image
+        local = local_file(url)
+        size = image_size(local) if local else None
+        if size is None:
+            errors.append(f"{first_page}: Person image {url!r} is not an image file in this repo")
+        elif isinstance(image, dict) and "width" in image and "height" in image \
+                and (image["width"], image["height"]) != size:
+            errors.append(f"{first_page}: Person image is {size[0]}×{size[1]} but JSON-LD says "
+                          f"{image['width']}×{image['height']}")
 
     for name, p in pages.items():
         for href, rel in p.anchors:
-            if href.rstrip("/") in {u.rstrip("/") for u in profiles} and "me" not in rel:
+            if profile_key(href) in profiles and "me" not in rel:
                 errors.append(f'{name}: link to {href} is missing rel="me"')
 
     mentions_path = ROOT / "data" / "mentions.json"
@@ -366,10 +450,10 @@ def main():
         for key in ("title", "outlet", "date", "url"):
             if not isinstance(m.get(key), str) or not m[key].strip():
                 errors.append(f"{where}: missing {key}")
-        if isinstance(m.get("date"), str) and not valid_date(m["date"]):
+        if isinstance(m.get("date"), str) and m["date"].strip() and not valid_date(m["date"]):
             errors.append(f"{where}: date must be a real date as YYYY-MM-DD, YYYY-MM or YYYY")
-        if isinstance(m.get("url"), str) and not re.match(r"https?://", m["url"]):
-            errors.append(f"{where}: url must start with http:// or https://")
+        if isinstance(m.get("url"), str) and m["url"].strip() and not valid_url(m["url"]):
+            errors.append(f"{where}: url must be a full http(s) URL")
 
     if errors:
         print("SEO check failed:\n- " + "\n- ".join(errors))

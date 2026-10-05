@@ -37,6 +37,14 @@ const browser = await chromium.launch({ executablePath, args: ['--allow-file-acc
 const page = await browser.newPage({ viewport: { width: 1200, height: 630 }, deviceScaleFactor: 1 });
 await page.goto(pathToFileURL(page_).href);
 await page.evaluate(() => document.fonts.ready);
+// A missing @fontsource file would silently fall back to a system font with
+// different metrics; refuse to overwrite the card in that case.
+const fonts = await page.evaluate(() => [...document.fonts].map((f) => `${f.family} ${f.weight}: ${f.status}`));
+if (fonts.length === 0 || fonts.some((f) => !f.endsWith('loaded'))) {
+    console.error(`Fonts did not load (${fonts.join(', ') || 'none'}); is ${tools} the tools dir?`);
+    await browser.close();
+    process.exit(1);
+}
 const out = join(root, 'assets', 'og-card.jpg');
 await page.screenshot({ path: out, type: 'jpeg', quality: 88 });
 await browser.close();
