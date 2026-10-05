@@ -44,6 +44,27 @@ async function getIncomingDocumentForNavigation(url) {
     return new DOMParser().parseFromString(html, 'text/html');
 }
 
+// Page-identity tags in <head> that must follow the swapped-in page, so the
+// canonical URL (used by share sheets), description, social tags and JSON-LD
+// always describe the URL in the address bar.
+const HEAD_IDENTITY = [
+    'link[rel="canonical"]',
+    'link[rel="me"]',
+    'meta[name="description"]',
+    'meta[name="robots"]',
+    'meta[property^="og:"]',
+    'meta[property^="profile:"]',
+    'meta[name^="twitter:"]',
+    'script[type="application/ld+json"]'
+].join(',');
+
+function syncHeadIdentity(doc) {
+    document.head.querySelectorAll(HEAD_IDENTITY).forEach((node) => node.remove());
+    doc.head.querySelectorAll(HEAD_IDENTITY).forEach((node) => {
+        document.head.appendChild(document.importNode(node, true));
+    });
+}
+
 async function navigateTo(url, options = {}) {
     if (navigateTo.isNavigating) return;
     navigateTo.isNavigating = true;
@@ -85,6 +106,7 @@ async function navigateTo(url, options = {}) {
             }
 
             document.title = newTitle;
+            syncHeadIdentity(doc);
 
             if (updateHistory) {
                 history.pushState({}, newTitle, url);
