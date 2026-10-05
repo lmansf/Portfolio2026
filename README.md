@@ -36,7 +36,8 @@ configured in `vercel.json`, which also 308-redirects `www.` and the raw
 - `assets/mentions.js` — renders `data/mentions.json` into the About page.
 - `assets/theme.js` — optional per-company accent theming via `?ink=<company>`
   (see [`docs/referrers.md`](docs/referrers.md)).
-- `assets/profilepicture.webp` — circular hero avatar on the home page.
+- `assets/profilepicture.webp` (+ `profilepicture-256.webp` for the `srcset`)
+  — circular hero avatar on Home and About.
 - `assets/favicon-crow.png`, `mini.jpg` — icons.
 - `assets/og-card.jpg` — 1200×630 Open Graph / Twitter card (source:
   `scripts/og-card/`, re-render with `scripts/og-card/render.mjs`).
