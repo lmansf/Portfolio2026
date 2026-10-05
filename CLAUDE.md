@@ -5,6 +5,19 @@ Static HTML/CSS/JS portfolio (no build step), deployed on Vercel. Routing is in
 what the pages load, so regenerate them after editing source (esbuild is fine:
 `npx esbuild <src> --minify --outfile=<min> --allow-overwrite`).
 
+## Search & identity invariants
+
+- After adding, removing or editing a page, regenerate the sitemap:
+  `node scripts/build-sitemap.mjs`. Before a PR, both
+  `python3 scripts/seo-check.py` and `node scripts/build-sitemap.mjs --check`
+  must pass (CI runs them too).
+- The canonical short bio lives in four places that must stay identical: Home
+  `.bio__text`, About `.hero__bio`, and the Person `description` in the JSON-LD
+  of `index.html` and `about.html`. The Person node itself must be identical on
+  both pages.
+- Never add skills, titles, credentials or claims that aren't already on the
+  site; new copy needs the owner's approval before it ships.
+
 ## Validate portfolio PRs through the `no-mistakes` gate
 
 Before opening a pull request for this portfolio, validate the change with the

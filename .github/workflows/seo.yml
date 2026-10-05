@@ -1,0 +1,26 @@
+# Guards the site's search/identity invariants on every PR and push to main:
+# sitemap.xml lists exactly the indexable pages, and each page keeps its
+# canonical, title/description, Open Graph tags, one <h1>, consistent Person
+# JSON-LD and rel="me" profile links. See scripts/seo-check.py.
+name: SEO checks
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  seo:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0 # lastmod comes from git history
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - run: node scripts/build-sitemap.mjs --check
+      - run: python3 scripts/seo-check.py

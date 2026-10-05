@@ -1,7 +1,7 @@
 /* ─────────────────────────────────────────────────────────────
- * transition.js — page transitions + nav for the 2-page site.
+ * transition.js — page transitions + nav for the site.
  *
- * Scope: Home + Projects. Handles the SPA-style page swap (with the
+ * Scope: Home + About + Projects. Handles the SPA-style page swap (with the
  * View Transitions API where supported), the burger / site-nav dropdown,
  * scroll + focus reset on navigation, and back/forward (popstate).
  * ───────────────────────────────────────────────────────────── */
@@ -26,6 +26,7 @@ function normalizeInternalPath(url) {
     const routeAliases = {
         '': 'index.html',
         index: 'index.html',
+        about: 'about.html',
         projects: 'projects.html'
     };
 
@@ -34,7 +35,7 @@ function normalizeInternalPath(url) {
 }
 
 function isTransitionPage(path) {
-    return ['index.html', 'projects.html'].includes(path);
+    return ['index.html', 'about.html', 'projects.html'].includes(path);
 }
 
 async function getIncomingDocumentForNavigation(url) {
@@ -88,6 +89,9 @@ async function navigateTo(url, options = {}) {
             if (updateHistory) {
                 history.pushState({}, newTitle, url);
             }
+
+            // Let page scripts (e.g. mentions.js) render into the new content.
+            document.dispatchEvent(new CustomEvent('page:swap'));
 
             // Reset scroll, then move focus to the top of the new content for
             // keyboard / screen-reader users.

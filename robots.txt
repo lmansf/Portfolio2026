@@ -1,4 +1,15 @@
+# Every public page may be crawled and indexed. Googlebot (Search, AI
+# Overviews, AI Mode) and Google-Extended (Gemini) are named explicitly so
+# their access is unambiguous; each named group fully replaces "*" for that
+# crawler, so every group must carry its own Allow.
+
 User-agent: *
+Allow: /
+
+User-agent: Googlebot
+Allow: /
+
+User-agent: Google-Extended
 Allow: /
 
 Sitemap: https://loganmansfield.org/sitemap.xml

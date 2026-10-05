@@ -2065,3 +2065,38 @@ a.section-head__link:hover { text-decoration: underline; }
 /* Project start date (no label) — right-aligned in the eyebrow row */
 .project__eyebrow { display: flex; justify-content: space-between; align-items: baseline; gap: 0.75rem; }
 .project__date { color: var(--ink-3); white-space: nowrap; }
+
+/* ──────────────── Short bio (Home "In brief" + /about lead) ──────────────── */
+.bio__text {
+    margin-top: 1.25rem;
+    color: var(--ink-1);
+    font-size: clamp(1rem, 2.2vw, 1.1rem);
+    line-height: 1.65;
+    max-width: 72ch;
+}
+.hero__bio { color: var(--ink-2); line-height: 1.65; max-width: 62ch; }
+
+/* ──────────────── Elsewhere / Mentions (/about) ──────────────── */
+/* Filled from data/mentions.json by mentions.js; hidden while empty. */
+.mentions[hidden] { display: none; }
+.mentions__divider { margin-bottom: clamp(2.5rem, 6vw, 4.5rem); }
+.mentions__list { list-style: none; padding: 0; margin: 1.25rem 0 0; display: grid; gap: 0.75rem; }
+.mention {
+    display: grid;
+    gap: 0.3rem;
+    padding: 0.9rem 1.1rem;
+    background: var(--surface-1);
+    border: 1px solid var(--hairline-strong);
+    border-radius: var(--r-lg);
+}
+.mention__title { font-weight: 600; color: var(--ink-1); text-decoration: none; }
+.mention__title:hover { color: var(--accent-ink); text-decoration: underline; }
+.mention__meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.4rem;
+    font-family: var(--font-mono);
+    font-size: 0.74rem;
+    color: var(--ink-3);
+}
+.mention__outlet + .mention__date::before { content: "·"; margin-right: 0.4rem; }

@@ -12,7 +12,7 @@
       "headers": [{ "key": "Cache-Control", "value": "no-cache, max-age=0, must-revalidate" }]
     },
     {
-      "source": "/(projects|owl-park)",
+      "source": "/(about|projects|owl-park)",
       "headers": [{ "key": "Cache-Control", "value": "no-cache, max-age=0, must-revalidate" }]
     },
     {
@@ -25,6 +25,16 @@
     }
   ],
   "redirects": [
+    {
+      "source": "/:path(.*)",
+      "has": [{ "type": "host", "value": "www.loganmansfield.org" }],
+      "destination": "https://loganmansfield.org/:path",
+      "permanent": true
+    },
+    { "source": "/index.html", "destination": "/", "permanent": true },
+    { "source": "/about.html", "destination": "/about", "permanent": true },
+    { "source": "/projects.html", "destination": "/projects", "permanent": true },
+    { "source": "/owl-park-infographic.html", "destination": "/owl-park", "permanent": true },
     { "source": "/blog", "destination": "/", "permanent": true },
     { "source": "/blog.html", "destination": "/", "permanent": true },
     { "source": "/sql", "destination": "/", "permanent": true },
@@ -41,6 +51,7 @@
   ],
   "rewrites": [
     { "source": "/", "destination": "/index.html" },
+    { "source": "/about", "destination": "/about.html" },
     { "source": "/projects", "destination": "/projects.html" },
     { "source": "/owl-park", "destination": "/owl-park-infographic.html" }
   ]

@@ -3,20 +3,16 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Logan Mansfield — Data Analyst</title>
-    <meta name="description" content="Logan Mansfield — Data Analyst in Tampa, FL (open to remote). Microsoft-certified Power BI Data Analyst (PL-300). SQL, Python, and end-to-end data pipelines.">
+    <title>About | Logan Mansfield</title>
+    <meta name="description" content="Logan Mansfield is a data analyst in Tampa, FL who turns raw business data into trusted, decision-ready datasets and dashboards. Background, credentials and profiles.">
     <meta name="author" content="Logan Mansfield">
-    <link rel="canonical" href="https://loganmansfield.org/">
-    <!-- Google Search Console, HTML-tag method: replace [VERIFICATION CODE] with the code
-         Search Console gives you, then uncomment. Not needed if you verify by DNS.
-    <meta name="google-site-verification" content="[VERIFICATION CODE]">
-    -->
+    <link rel="canonical" href="https://loganmansfield.org/about">
     <meta property="og:type" content="profile">
     <meta property="og:site_name" content="Logan Mansfield">
     <meta property="og:locale" content="en_US">
-    <meta property="og:title" content="Logan Mansfield — Data Analyst">
-    <meta property="og:description" content="Data Analyst in Tampa, FL — open to work. SQL, Python, Power BI, and end-to-end data pipelines.">
-    <meta property="og:url" content="https://loganmansfield.org/">
+    <meta property="og:title" content="About | Logan Mansfield">
+    <meta property="og:description" content="Logan Mansfield is a data analyst in Tampa, FL who turns raw business data into trusted, decision-ready datasets and dashboards. Background, credentials and profiles.">
+    <meta property="og:url" content="https://loganmansfield.org/about">
     <meta property="og:image" content="https://loganmansfield.org/assets/og-card.jpg">
     <meta property="og:image:type" content="image/jpeg">
     <meta property="og:image:width" content="1200">
@@ -26,8 +22,8 @@
     <meta property="profile:last_name" content="Mansfield">
     <meta name="twitter:card" content="summary_large_image">
     <meta name="twitter:creator" content="@StatBird">
-    <meta name="twitter:title" content="Logan Mansfield — Data Analyst">
-    <meta name="twitter:description" content="Data Analyst in Tampa, FL — open to work. SQL, Python, Power BI, and end-to-end data pipelines.">
+    <meta name="twitter:title" content="About | Logan Mansfield">
+    <meta name="twitter:description" content="Logan Mansfield is a data analyst in Tampa, FL who turns raw business data into trusted, decision-ready datasets and dashboards. Background, credentials and profiles.">
     <meta name="twitter:image" content="https://loganmansfield.org/assets/og-card.jpg">
     <meta name="twitter:image:alt" content="Logan Mansfield — Data Analyst, Tampa, FL">
     <link rel="me" href="https://github.com/lmansf">
@@ -54,23 +50,20 @@
         "@context": "https://schema.org",
         "@graph": [
             {
-                "@type": "WebSite",
-                "@id": "https://loganmansfield.org/#website",
-                "url": "https://loganmansfield.org/",
-                "name": "Logan Mansfield",
-                "inLanguage": "en-US",
-                "publisher": {
-                    "@id": "https://loganmansfield.org/#person"
-                }
-            },
-            {
                 "@type": "ProfilePage",
-                "@id": "https://loganmansfield.org/#profilepage",
-                "url": "https://loganmansfield.org/",
-                "name": "Logan Mansfield — Data Analyst",
+                "@id": "https://loganmansfield.org/about#profilepage",
+                "url": "https://loganmansfield.org/about",
+                "name": "About | Logan Mansfield",
+                "description": "Logan Mansfield is a data analyst in Tampa, FL who turns raw business data into trusted, decision-ready datasets and dashboards. Background, credentials and profiles.",
                 "inLanguage": "en-US",
                 "isPartOf": {
-                    "@id": "https://loganmansfield.org/#website"
+                    "@type": "WebSite",
+                    "@id": "https://loganmansfield.org/#website",
+                    "name": "Logan Mansfield",
+                    "url": "https://loganmansfield.org/"
+                },
+                "breadcrumb": {
+                    "@id": "https://loganmansfield.org/about#breadcrumb"
                 },
                 "mainEntity": {
                     "@id": "https://loganmansfield.org/#person"
@@ -129,6 +122,24 @@
                     "https://www.linkedin.com/in/lmansf96/",
                     "https://x.com/StatBird"
                 ]
+            },
+            {
+                "@type": "BreadcrumbList",
+                "@id": "https://loganmansfield.org/about#breadcrumb",
+                "itemListElement": [
+                    {
+                        "@type": "ListItem",
+                        "position": 1,
+                        "name": "Home",
+                        "item": "https://loganmansfield.org/"
+                    },
+                    {
+                        "@type": "ListItem",
+                        "position": 2,
+                        "name": "About",
+                        "item": "https://loganmansfield.org/about"
+                    }
+                ]
             }
         ]
     }
@@ -163,17 +174,16 @@
         </div>
     </nav>
 
-    <main id="main-content" class="page page-home">
+    <main id="main-content" class="page page-about">
 
-        <!-- Intro -->
-        <section class="hero" aria-labelledby="home-name">
+        <!-- Intro: the canonical short bio. Keep it word-for-word identical to the
+             homepage "In brief" block and the Person "description" in the JSON-LD. -->
+        <section class="hero" aria-labelledby="about-title">
             <div class="hero__card">
-                <img class="hero__avatar" src="assets/profilepicture.webp" alt="Logan Mansfield" width="180" height="180" decoding="async" fetchpriority="high">
+                <img class="hero__avatar" src="/assets/profilepicture.webp" alt="Logan Mansfield" width="180" height="180" decoding="async" fetchpriority="high">
                 <div class="hero__intro">
-                    <h1 class="hero__name" id="home-name">Logan <br>Mansfield.</h1>
-                    <p class="hero__role">
-                        Data Analyst — I turn raw business data into <em>trusted, decision-ready</em> datasets and dashboards, from source system to stakeholder.
-                    </p>
+                    <h1 class="hero__name" id="about-title">About Logan <br>Mansfield.</h1>
+                    <p class="hero__bio">Logan Mansfield is a data analyst based in Tampa, Florida, who turns raw business data into trusted, decision-ready datasets and dashboards. At ZooTampa, Logan keeps production point-of-sale systems and their data running. Logan holds the Microsoft Certified: Power BI Data Analyst (PL-300) certification and builds end-to-end data pipelines and machine-learning projects, including a realtime fraud-detection pipeline and eFrog, an audio classifier that identifies 19 Floridian frog species.</p>
                     <p class="hero__availability">
                         <span class="hero__availability-dot" aria-hidden="true"></span>
                         Open to Data Analyst roles · Tampa, FL &amp; remote
@@ -191,47 +201,10 @@
             <span class="wf-divider__mark"><span class="crow-mark"></span></span>
         </div>
 
-        <!-- Short bio: the canonical summary. Keep it word-for-word identical to
-             /about and to the Person "description" in the JSON-LD of both pages. -->
-        <section class="bio" aria-labelledby="home-bio">
+        <!-- Background (same wording as the homepage About section) -->
+        <section class="about" aria-labelledby="about-background">
             <header class="section-head">
-                <h2 class="section-head__title" id="home-bio">In brief</h2>
-                <a class="section-head__hint section-head__link" href="/about">Full bio →</a>
-            </header>
-            <p class="bio__text">Logan Mansfield is a data analyst based in Tampa, Florida, who turns raw business data into trusted, decision-ready datasets and dashboards. At ZooTampa, Logan keeps production point-of-sale systems and their data running. Logan holds the Microsoft Certified: Power BI Data Analyst (PL-300) certification and builds end-to-end data pipelines and machine-learning projects, including a realtime fraud-detection pipeline and eFrog, an audio classifier that identifies 19 Floridian frog species.</p>
-        </section>
-
-        <div class="wf-divider" aria-hidden="true">
-            <span class="wf-divider__mark"><span class="crow-mark"></span></span>
-        </div>
-
-        <!-- Featured project -->
-        <section aria-labelledby="home-featured">
-            <header class="section-head">
-                <h2 class="section-head__title" id="home-featured">Featured project</h2>
-                <a class="section-head__hint section-head__link" href="/projects">All projects →</a>
-            </header>
-            <article class="project project--featured">
-                <div class="project__body">
-                    <p class="project__eyebrow">Data engineering · Streaming</p>
-                    <h3 class="project__title">Realtime Fraud Detection</h3>
-                    <p class="project__desc">A streaming pipeline that scores transactions for fraud signals in near real time, with downstream monitoring — the latest iteration of a project I&rsquo;ve rebuilt several times to push latency and precision.</p>
-                    <ul class="project__tags">
-                        <li>Python</li><li>Supabase</li><li>Streaming</li>
-                    </ul>
-                    <a class="project__link" href="https://github.com/lmansf/realtimeFraud_supabase" target="_blank" rel="noopener">View on GitHub ↗</a>
-                </div>
-            </article>
-        </section>
-
-        <div class="wf-divider" aria-hidden="true">
-            <span class="wf-divider__mark"><span class="crow-mark"></span></span>
-        </div>
-
-        <!-- About -->
-        <section class="about" aria-labelledby="home-about">
-            <header class="section-head">
-                <h2 class="section-head__title" id="home-about">About</h2>
+                <h2 class="section-head__title" id="about-background">Background</h2>
             </header>
             <div class="about__body">
                 <p>I&rsquo;m a data analyst in Tampa, FL. By day I keep production point-of-sale systems and their data running at ZooTampa; the rest of the time I model messy operational data into metrics a business can act on, and build the pipelines that move it from source to dashboard.</p>
@@ -239,14 +212,27 @@
             </div>
         </section>
 
+        <!-- Elsewhere / Mentions: rendered from data/mentions.json by mentions.js.
+             Stays hidden (divider included) until the file has a real entry. -->
+        <section class="mentions" id="mentions" aria-labelledby="about-mentions" data-mentions hidden>
+            <div class="wf-divider mentions__divider" aria-hidden="true">
+                <span class="wf-divider__mark"><span class="crow-mark"></span></span>
+            </div>
+            <header class="section-head">
+                <h2 class="section-head__title" id="about-mentions">Elsewhere / Mentions</h2>
+                <span class="section-head__hint">Talks, posts, podcasts &amp; features</span>
+            </header>
+            <ul class="mentions__list" data-mentions-list></ul>
+        </section>
+
         <div class="wf-divider" aria-hidden="true">
             <span class="wf-divider__mark"><span class="crow-mark"></span></span>
         </div>
 
-        <!-- Connect -->
-        <section class="connect" aria-labelledby="home-connect">
+        <!-- Profiles -->
+        <section class="connect" aria-labelledby="about-connect">
             <header class="section-head">
-                <h2 class="section-head__title" id="home-connect">Let&rsquo;s connect</h2>
+                <h2 class="section-head__title" id="about-connect">Let&rsquo;s connect</h2>
                 <span class="section-head__hint">The fastest ways to reach me</span>
             </header>
             <div class="socials">
