@@ -49,7 +49,7 @@ regenerate its minified file:
 
 ## Search & identity (SEO)
 
-Every page carries a canonical URL, a unique title (`<Page> | Logan Mansfield`;
+Every indexable page (all but the noindex 404) carries a canonical URL, a unique title (`<Page> | Logan Mansfield`;
 the homepage is `Logan Mansfield — Data Analyst`) and description, Open Graph +
 Twitter card tags, and JSON-LD. Home and About publish a `ProfilePage` whose
 `mainEntity` is the one `Person` node (`https://loganmansfield.org/#person`);

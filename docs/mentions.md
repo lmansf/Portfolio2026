@@ -5,8 +5,8 @@ lists talks, guest posts, podcasts and features **about or by Logan published
 on other sites**. It is driven entirely by [`data/mentions.json`](../data/mentions.json),
 so adding an entry never touches the page layout.
 
-While the list is empty the whole section (heading and divider included) stays
-hidden. Only add real, published items — never placeholders.
+While the list is empty the section stays empty and hidden — not even its
+heading is in the page. Only add real, published items — never placeholders.
 
 ## Add an entry
 
@@ -44,7 +44,9 @@ push and the entry appears on the next page load (the JSON is served with
 ## How it works
 
 `assets/mentions.js` (loaded as `mentions.min.js`) fetches `/data/mentions.json`,
-drops malformed entries, renders the list with `textContent` (no HTML from the
-file is ever injected), and un-hides the section if anything is left. It runs
+drops malformed entries and, if anything is left, builds the divider, heading
+and list inside the empty `<section data-mentions hidden>` on /about and
+un-hides it. Entries are rendered with `textContent` (no HTML from the file is
+ever injected). It runs
 on first load and again on the `page:swap` event that `transition.js` fires
 after an in-site page transition.

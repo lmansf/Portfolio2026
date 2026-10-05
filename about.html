@@ -214,18 +214,10 @@
             </div>
         </section>
 
-        <!-- Elsewhere / Mentions: rendered from data/mentions.json by mentions.js.
-             Stays hidden (divider included) until the file has a real entry. -->
-        <section class="mentions" id="mentions" aria-labelledby="about-mentions" data-mentions hidden>
-            <div class="wf-divider mentions__divider" aria-hidden="true">
-                <span class="wf-divider__mark"><span class="crow-mark"></span></span>
-            </div>
-            <header class="section-head">
-                <h2 class="section-head__title" id="about-mentions">Elsewhere / Mentions</h2>
-                <span class="section-head__hint">Talks, posts, podcasts &amp; features</span>
-            </header>
-            <ul class="mentions__list" data-mentions-list></ul>
-        </section>
+        <!-- Elsewhere / Mentions: mentions.js builds this section from
+             data/mentions.json. It stays empty and hidden (no heading in the
+             HTML either) until the file has a real entry. -->
+        <section class="mentions" id="mentions" data-mentions hidden></section>
 
         <div class="wf-divider" aria-hidden="true">
             <span class="wf-divider__mark"><span class="crow-mark"></span></span>
