@@ -245,7 +245,12 @@ document.addEventListener('DOMContentLoaded', () => {
 
     document.addEventListener('keydown', (e) => {
         if (e.key === 'Escape' && document.body.classList.contains('site-nav-open')) {
+            const nav = getSiteNav();
+            const focusWasInMenu = nav && nav.contains(document.activeElement);
             closeSiteNav();
+            // The closed menu is inert, so hand focus back to the burger.
+            const burger = document.querySelector('[data-burger]');
+            if (focusWasInMenu && burger) burger.focus();
         }
     });
 

@@ -24,15 +24,23 @@
         }
     }
 
-    // Accepts "YYYY-MM-DD", "YYYY-MM" or "YYYY"; anything else is not shown.
+    // Accepts real calendar dates as "YYYY-MM-DD", "YYYY-MM" or "YYYY";
+    // anything else (incl. impossible dates like 2025-14-02) returns null.
     function formatDate(value) {
         var m = /^(\d{4})(?:-(\d{2})(?:-(\d{2}))?)?$/.exec(value || '');
         if (!m) return null;
+        var year = +m[1], month = m[2] ? +m[2] - 1 : 0, day = m[3] ? +m[3] : 1;
+        var date = new Date(Date.UTC(year, month, day));
+        if (date.getUTCFullYear() !== year || date.getUTCMonth() !== month || date.getUTCDate() !== day) return null;
         var opts = { year: 'numeric', timeZone: 'UTC' };
         if (m[2]) opts.month = 'short';
         if (m[3]) opts.day = 'numeric';
-        var date = new Date(Date.UTC(+m[1], m[2] ? +m[2] - 1 : 0, m[3] ? +m[3] : 1));
         return date.toLocaleDateString('en-US', opts);
+    }
+
+    // Sort key: the date when it is a real one, else '' (undated sorts last).
+    function sortKey(m) {
+        return formatDate(m.date) ? m.date : '';
     }
 
     function el(tag, className, text) {
@@ -76,7 +84,7 @@
                 var items = (data && Array.isArray(data.mentions) ? data.mentions : []).filter(isValid);
                 if (!items.length) return;
                 // Newest first; undated entries last.
-                items.sort(function (a, b) { return String(b.date || '').localeCompare(String(a.date || '')); });
+                items.sort(function (a, b) { return sortKey(b).localeCompare(sortKey(a)); });
                 var list = buildSection(section);
 
                 items.forEach(function (m) {

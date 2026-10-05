@@ -21,6 +21,7 @@ Checks every root-level *.html page and exits 1 on any failure:
   - data/mentions.json is valid: every entry has title, outlet, date
     (YYYY-MM-DD, YYYY-MM or YYYY) and an http(s) url.
 """
+import datetime
 import json
 import re
 import struct
@@ -121,6 +122,18 @@ def image_size(path):
                 return w, h
             i += 2 + length
     return None
+
+
+def valid_date(value):
+    """A real calendar date written as YYYY-MM-DD, YYYY-MM or YYYY."""
+    m = re.fullmatch(r"(\d{4})(?:-(\d{2})(?:-(\d{2}))?)?", value)
+    if not m:
+        return False
+    try:
+        datetime.date(int(m[1]), int(m[2] or 1), int(m[3] or 1))
+    except ValueError:
+        return False
+    return True
 
 
 def walk(node):
@@ -265,8 +278,8 @@ def main():
         for key in ("title", "outlet", "date", "url"):
             if not isinstance(m.get(key), str) or not m[key].strip():
                 errors.append(f"{where}: missing {key}")
-        if isinstance(m.get("date"), str) and not re.fullmatch(r"\d{4}(-\d{2}(-\d{2})?)?", m["date"]):
-            errors.append(f"{where}: date must be YYYY-MM-DD, YYYY-MM or YYYY")
+        if isinstance(m.get("date"), str) and not valid_date(m["date"]):
+            errors.append(f"{where}: date must be a real date as YYYY-MM-DD, YYYY-MM or YYYY")
         if isinstance(m.get("url"), str) and not re.match(r"https?://", m["url"]):
             errors.append(f"{where}: url must start with http:// or https://")
 

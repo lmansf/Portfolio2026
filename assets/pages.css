@@ -2080,7 +2080,7 @@ a.section-head__link:hover { text-decoration: underline; }
 /* Filled from data/mentions.json by mentions.js; hidden while empty. */
 .mentions[hidden] { display: none; }
 .mentions__divider { margin-bottom: clamp(2.5rem, 6vw, 4.5rem); }
-.mentions__list { list-style: none; padding: 0; margin: 1.25rem 0 0; display: grid; gap: 0.75rem; }
+.mentions__list { list-style: none; padding: 0; margin: 1.25rem 0 0; display: grid; grid-template-columns: minmax(0, 1fr); gap: 0.75rem; }
 .mention {
     display: grid;
     gap: 0.3rem;
@@ -2089,7 +2089,7 @@ a.section-head__link:hover { text-decoration: underline; }
     border: 1px solid var(--hairline-strong);
     border-radius: var(--r-lg);
 }
-.mention__title { font-weight: 600; color: var(--ink-1); text-decoration: none; }
+.mention__title { font-weight: 600; color: var(--ink-1); text-decoration: none; overflow-wrap: anywhere; }
 .mention__title:hover { color: var(--accent-ink); text-decoration: underline; }
 .mention__meta {
     display: flex;
@@ -2098,5 +2098,6 @@ a.section-head__link:hover { text-decoration: underline; }
     font-family: var(--font-mono);
     font-size: 0.74rem;
     color: var(--ink-3);
+    overflow-wrap: anywhere;
 }
 .mention__outlet + .mention__date::before { content: "·"; margin-right: 0.4rem; }
