@@ -37,6 +37,21 @@ function isTransitionPage(path) {
     return ['index.html', 'projects.html'].includes(path);
 }
 
+function getHashTarget(url) {
+    let hash = '';
+    try {
+        hash = new URL(url, window.location.origin).hash;
+    } catch {
+        hash = '';
+    }
+    if (!hash || hash.length < 2) return null;
+    try {
+        return document.getElementById(decodeURIComponent(hash.slice(1)));
+    } catch {
+        return null;
+    }
+}
+
 async function getIncomingDocumentForNavigation(url) {
     const response = await fetch(url);
     const html = await response.text();
@@ -89,10 +104,15 @@ async function navigateTo(url, options = {}) {
                 history.pushState({}, newTitle, url);
             }
 
-            // Reset scroll, then move focus to the top of the new content for
-            // keyboard / screen-reader users.
-            window.scrollTo({ top: 0, left: 0, behavior: 'instant' });
-            const focusTarget = document.getElementById('main-content') || main;
+            // Scroll to the hash target when the URL names one; otherwise reset
+            // to the top. Then move focus there for keyboard / screen-reader users.
+            const hashTarget = getHashTarget(url);
+            if (hashTarget) {
+                hashTarget.scrollIntoView({ block: 'start', behavior: 'instant' });
+            } else {
+                window.scrollTo({ top: 0, left: 0, behavior: 'instant' });
+            }
+            const focusTarget = hashTarget || document.getElementById('main-content') || main;
             if (focusTarget) {
                 focusTarget.setAttribute('tabindex', '-1');
                 focusTarget.focus({ preventScroll: true });
@@ -213,7 +233,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const normalizedHref = normalizeInternalPath(href);
         const currentPath = normalizeInternalPath(window.location.pathname);
         if (normalizedHref === currentPath) {
-            e.preventDefault();
+            if (!href.includes('#')) e.preventDefault();
             return;
         }
         if (isTransitionPage(normalizedHref)) {
@@ -231,7 +251,7 @@ document.addEventListener('DOMContentLoaded', () => {
     window.addEventListener('popstate', async () => {
         const path = normalizeInternalPath(window.location.pathname);
         if (isTransitionPage(path)) {
-            await navigateTo(path, { updateHistory: false });
+            await navigateTo(path + window.location.hash, { updateHistory: false });
             return;
         }
         window.location.reload();
