@@ -16,12 +16,13 @@
     <link rel="alternate icon" type="image/jpeg" href="/mini.jpg">
     <link rel="apple-touch-icon" href="/assets/apple-touch-icon.png">
     <link rel="manifest" href="/manifest.json">
-    <meta name="theme-color" content="#0c1116">
+    <meta name="theme-color" media="(prefers-color-scheme: light)" content="#fdf9f3">
+    <meta name="theme-color" media="(prefers-color-scheme: dark)" content="#1b140f">
     <script src="/assets/theme.min.js"></script>
     <link rel="stylesheet" href="/assets/tokens.min.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,600&family=Figtree:wght@400;500;600&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="/assets/shell.min.css">
     <link rel="stylesheet" href="/assets/pages.min.css">
     <script>
@@ -35,19 +36,15 @@
 
     <header class="topbar">
         <div class="topbar__brand">
-            <a href="/">
-                <span class="brand-mark" aria-hidden="true"><span class="crow-mark"></span></span>
-                L. MANSFIELD
-            </a>
+            <a href="/"><span class="brand-mark" aria-hidden="true"><span class="crow-mark"></span></span> L. Mansfield</a>
         </div>
         <nav class="topnav" aria-label="Primary">
             <a href="/">Home</a>
             <a href="/projects">Projects</a>
             <a href="/assets/loganmansfield.pdf" download="Logan-Mansfield-Resume.pdf">Résumé</a>
-        </nav><button class="burger" type="button" aria-label="Open navigation" aria-expanded="false" aria-controls="site-nav" data-burger>
-            <span class="burger__bar"></span>
-            <span class="burger__bar"></span>
-            <span class="burger__bar"></span>
+        </nav>
+        <button class="burger" type="button" aria-label="Open navigation" aria-expanded="false" aria-controls="site-nav" data-burger>
+            <span class="burger__bar"></span><span class="burger__bar"></span><span class="burger__bar"></span>
         </button>
     </header>
 
@@ -60,29 +57,32 @@
         </div>
     </nav>
 
-    <main id="main-content" class="page page-home">
+    <main id="main-content" class="page page-404">
         <section class="hero" aria-labelledby="nf-title">
             <div class="hero__main">
-                <p class="hero__eyebrow">404 · Page not found</p>
-                <h1 class="hero__name" id="nf-title">This page<br>wandered off.</h1>
+                <p class="eyebrow">404 · Page not found</p>
+                <h1 class="hero__name" id="nf-title">This page<br>flew off.</h1>
                 <p class="hero__role">
                     The link is broken or the page moved. No dead ends here &mdash; pick a
                     <em>way back in</em> below.
                 </p>
                 <div class="pitch__actions">
-                    <a class="pitch__cta" href="/">Back to home <span class="arrow">&rarr;</span></a>
-                    <a class="pitch__cta pitch__cta--ghost" href="/projects">See projects <span class="arrow">&rarr;</span></a>
+                    <a class="btn btn--primary" href="/">Back to home <span class="arrow">&rarr;</span></a>
+                    <a class="btn btn--ghost" href="/projects">See projects <span class="arrow">&rarr;</span></a>
                 </div>
             </div>
         </section>
     </main>
 
     <footer class="shell-footer">
-        <div class="footer-socials">
-            <a href="https://www.linkedin.com/in/lmansf96/" target="_blank" rel="noopener">LinkedIn</a>
-            <a href="mailto:lmansf96@gmail.com">Email</a>
-            <a href="https://github.com/lmansf" target="_blank" rel="noopener">GitHub</a>
-            <a href="/assets/loganmansfield.pdf" download="Logan-Mansfield-Resume.pdf">Résumé</a>
+        <div class="footer-inner">
+            <div class="footer-brand"><span class="crow-mark" aria-hidden="true"></span> Logan Mansfield · Tampa, FL</div>
+            <div class="footer-socials">
+                <a href="https://www.linkedin.com/in/lmansf96/" target="_blank" rel="noopener">LinkedIn</a>
+                <a href="mailto:lmansf96@gmail.com">Email</a>
+                <a href="https://github.com/lmansf" target="_blank" rel="noopener">GitHub</a>
+                <a href="/assets/loganmansfield.pdf" download="Logan-Mansfield-Resume.pdf">Résumé</a>
+            </div>
         </div>
     </footer>
 

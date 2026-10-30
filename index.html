@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Logan Mansfield · Data Analyst</title>
-    <meta name="description" content="Logan Mansfield — Data Analyst in Tampa, FL (open to remote). Microsoft-certified Power BI Data Analyst (PL-300). SQL, Python, and end-to-end data pipelines.">
+    <meta name="description" content="Logan Mansfield — Data Analyst in Tampa, FL (open to remote). Runs the ticketing and webstore systems at ZooTampa; builds data pipelines, forecasts, and dashboards with SQL, Python, Power BI, DuckDB, and Databricks. Microsoft PL-300 certified.">
     <meta property="og:title" content="Logan Mansfield · Data Analyst">
     <meta property="og:description" content="Data Analyst in Tampa, FL — open to work. SQL, Python, Power BI, and end-to-end data pipelines.">
     <meta property="og:type" content="website">
@@ -12,16 +12,20 @@
     <meta property="og:image" content="https://loganmansfield.org/mini.jpg">
     <meta name="twitter:card" content="summary">
     <link rel="canonical" href="https://loganmansfield.org/">
+    <link rel="me" href="https://github.com/lmansf">
+    <link rel="me" href="https://www.linkedin.com/in/lmansf96/">
+    <link rel="me" href="https://x.com/StatBird">
     <link rel="icon" type="image/png" href="/assets/favicon-crow.png">
     <link rel="alternate icon" type="image/jpeg" href="/mini.jpg">
     <link rel="apple-touch-icon" href="/assets/apple-touch-icon.png">
     <link rel="manifest" href="/manifest.json">
-    <meta name="theme-color" content="#0c1116">
+    <meta name="theme-color" media="(prefers-color-scheme: light)" content="#fdf9f3">
+    <meta name="theme-color" media="(prefers-color-scheme: dark)" content="#1b140f">
     <script src="/assets/theme.min.js"></script>
     <link rel="stylesheet" href="/assets/tokens.min.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,600&family=Figtree:wght@400;500;600&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="/assets/shell.min.css">
     <link rel="stylesheet" href="/assets/pages.min.css">
     <script>
@@ -31,17 +35,38 @@
     <script type="application/ld+json">
     {
         "@context": "https://schema.org",
-        "@type": "Person",
-        "name": "Logan Mansfield",
-        "jobTitle": "Data Analyst",
-        "email": "mailto:lmansf96@gmail.com",
-        "url": "https://loganmansfield.org/",
-        "image": "https://loganmansfield.org/mini.jpg",
-        "address": { "@type": "PostalAddress", "addressLocality": "Tampa", "addressRegion": "FL", "addressCountry": "US" },
-        "worksFor": { "@type": "Organization", "name": "ZooTampa at Lowry Park" },
-        "knowsAbout": ["SQL", "Data Modeling", "Power BI", "Microsoft Fabric", "Python", "Analytics Engineering", "ETL", "Data Warehousing"],
-        "hasCredential": [{ "@type": "EducationalOccupationalCredential", "credentialCategory": "certification", "name": "Microsoft Certified: Power BI Data Analyst Associate (PL-300)" }],
-        "sameAs": ["https://www.linkedin.com/in/lmansf96/", "https://github.com/lmansf", "https://x.com/StatBird"]
+        "@graph": [
+            {
+                "@type": "WebSite",
+                "@id": "https://loganmansfield.org/#website",
+                "url": "https://loganmansfield.org/",
+                "name": "Logan Mansfield",
+                "publisher": { "@id": "https://loganmansfield.org/#person" }
+            },
+            {
+                "@type": "ProfilePage",
+                "@id": "https://loganmansfield.org/#profilepage",
+                "url": "https://loganmansfield.org/",
+                "mainEntity": { "@id": "https://loganmansfield.org/#person" }
+            },
+            {
+                "@type": "Person",
+                "@id": "https://loganmansfield.org/#person",
+                "name": "Logan Mansfield",
+                "jobTitle": "Data Analyst",
+                "description": "Logan Mansfield is a data analyst based in Tampa, Florida, who turns raw business data into decision-ready datasets and dashboards. By day, Logan runs the ticketing and webstore systems at ZooTampa; the rest of the time, Logan builds data pipelines, forecasts, and dashboards.",
+                "email": "mailto:lmansf96@gmail.com",
+                "url": "https://loganmansfield.org/",
+                "image": "https://loganmansfield.org/assets/profilepicture.webp",
+                "homeLocation": { "@type": "PostalAddress", "addressLocality": "Tampa", "addressRegion": "FL", "addressCountry": "US" },
+                "knowsAbout": ["SQL", "Data Modeling", "Power BI", "Microsoft Fabric", "Python", "Analytics Engineering", "ETL", "Data Warehousing", "DuckDB", "Databricks"],
+                "hasCredential": [
+                    { "@type": "EducationalOccupationalCredential", "credentialCategory": "certification", "name": "Microsoft Certified: Power BI Data Analyst Associate (PL-300)", "recognizedBy": { "@type": "Organization", "name": "Microsoft" } },
+                    { "@type": "EducationalOccupationalCredential", "credentialCategory": "certification", "name": "SQL Professional: Certificate of Competency", "recognizedBy": { "@type": "Organization", "name": "LearnSQL.com" } }
+                ],
+                "sameAs": ["https://www.linkedin.com/in/lmansf96/", "https://github.com/lmansf", "https://x.com/StatBird"]
+            }
+        ]
     }
     </script>
 </head>
@@ -51,10 +76,10 @@
 
     <header class="topbar">
         <div class="topbar__brand">
-            <a href="/"><span class="brand-mark" aria-hidden="true"><span class="crow-mark"></span></span> L. MANSFIELD</a>
+            <a href="/"><span class="brand-mark" aria-hidden="true"><span class="crow-mark"></span></span> L. Mansfield</a>
         </div>
         <nav class="topnav" aria-label="Primary">
-            <a href="/">Home</a>
+            <a href="/" aria-current="page">Home</a>
             <a href="/projects">Projects</a>
             <a href="/assets/loganmansfield.pdf" download="Logan-Mansfield-Resume.pdf">Résumé</a>
         </nav>
@@ -66,7 +91,7 @@
     <nav class="site-nav" id="site-nav" aria-label="Primary navigation" aria-hidden="true">
         <div class="site-nav__backdrop" data-nav-close aria-hidden="true"></div>
         <div class="site-nav__panel">
-            <a class="site-nav__item" href="/">Home</a>
+            <a class="site-nav__item" href="/" aria-current="page">Home</a>
             <a class="site-nav__item" href="/projects">Projects</a>
             <a class="site-nav__item" href="/assets/loganmansfield.pdf" download="Logan-Mansfield-Resume.pdf">Résumé</a>
         </div>
@@ -77,21 +102,36 @@
         <!-- Intro -->
         <section class="hero" aria-labelledby="home-name">
             <div class="hero__card">
-                <img class="hero__avatar" src="assets/profilepicture.webp" alt="Logan Mansfield" width="180" height="180" decoding="async" fetchpriority="high">
+                <img class="hero__avatar" src="/assets/profilepicture.webp" alt="Logan Mansfield" width="172" height="172" decoding="async" fetchpriority="high">
                 <div class="hero__intro">
-                    <h1 class="hero__name" id="home-name">Logan<br>Mansfield.</h1>
+                    <h1 class="hero__name" id="home-name">Logan Mansfield.</h1>
                     <p class="hero__role">
-                        Data Analyst — I turn raw business data into <em>trusted, decision-ready</em> datasets and dashboards, from source system to stakeholder.
+                        Data analyst. By day I run the <em>ticketing and webstore systems</em> at ZooTampa; the rest of the time I build the pipelines, forecasts, and dashboards that turn operational data into decisions.
                     </p>
                     <p class="hero__availability">
                         <span class="hero__availability-dot" aria-hidden="true"></span>
-                        Open to Data Analyst roles · Tampa, FL &amp; remote
+                        Open to Data Analyst &amp; Analytics Engineer roles · Tampa, FL · remote · relocation
                     </p>
-                    <p class="cred-chip">Microsoft Certified: Power BI Data Analyst (PL-300)</p>
                     <div class="contact-row" aria-label="Contact">
-                        <a class="contact-row__link contact-row__link--cta" href="/assets/loganmansfield.pdf" download="Logan-Mansfield-Resume.pdf">Download résumé ↓</a>
-                        <a class="contact-row__link" href="https://www.linkedin.com/in/lmansf96/" target="_blank" rel="noopener noreferrer">LinkedIn</a>
+                        <a class="btn btn--primary" href="/assets/loganmansfield.pdf" download="Logan-Mansfield-Resume.pdf">Download résumé <span class="arrow">↓</span></a>
+                        <a class="btn btn--ghost" href="https://www.linkedin.com/in/lmansf96/" target="_blank" rel="noopener noreferrer">LinkedIn</a>
+                        <a class="btn btn--ghost" href="/projects">Projects</a>
                     </div>
+                </div>
+            </div>
+
+            <div class="now" aria-label="What I'm doing now">
+                <div class="now__row">
+                    <span class="now__label">Now</span>
+                    <span class="now__value">IT Point of Sale Systems Analyst at ZooTampa at Lowry Park</span>
+                </div>
+                <div class="now__row">
+                    <span class="now__label">Building</span>
+                    <span class="now__value">A <a href="/projects#fraud">fraud-detection pipeline</a> on Databricks and Supabase, with a daily dashboard</span>
+                </div>
+                <div class="now__row">
+                    <span class="now__label">Latest</span>
+                    <span class="now__value"><a href="/projects#lighthouse">Lighthouse 0.15</a> — a local-first desktop app that answers questions about your files</span>
                 </div>
             </div>
         </section>
@@ -100,23 +140,169 @@
             <span class="wf-divider__mark"><span class="crow-mark"></span></span>
         </div>
 
-        <!-- Featured project -->
+        <!-- Featured projects -->
         <section aria-labelledby="home-featured">
             <header class="section-head">
-                <h2 class="section-head__title" id="home-featured">Featured project</h2>
-                <a class="section-head__hint section-head__link" href="/projects">All projects →</a>
+                <h2 class="section-head__title" id="home-featured">Featured projects</h2>
+                <a class="section-head__link" href="/projects">All projects →</a>
             </header>
-            <article class="project project--featured">
-                <div class="project__body">
-                    <p class="project__eyebrow">Data engineering · Streaming</p>
-                    <h3 class="project__title">Realtime Fraud Detection</h3>
-                    <p class="project__desc">A streaming pipeline that scores transactions for fraud signals in near real time, with downstream monitoring — the latest iteration of a project I&rsquo;ve rebuilt several times to push latency and precision.</p>
-                    <ul class="project__tags">
-                        <li>Python</li><li>Supabase</li><li>Streaming</li>
-                    </ul>
-                    <a class="project__link" href="https://github.com/lmansf/realtimeFraud_supabase" target="_blank" rel="noopener">View on GitHub ↗</a>
-                </div>
-            </article>
+            <div class="project-grid project-grid--featured">
+
+                <article class="project project--featured">
+                    <div class="project__body">
+                        <div class="project__head">
+                            <p class="project__eyebrow">Data engineering</p>
+                            <span class="project__date">2026</span>
+                        </div>
+                        <h3 class="project__title">Fraud Detection Pipeline</h3>
+                        <p class="project__desc">A scheduled Databricks job simulates an hour of webstore checkouts, normal guests plus five kinds of fraud episode, scores every order, and lands four raw tables in Supabase in one transaction. A daily dashboard tracks catch rate, false positives, and fail-open exposure.</p>
+                        <ul class="project__tags"><li>Databricks</li><li>Python</li><li>Supabase</li><li>SQL</li></ul>
+                        <div class="project__links">
+                            <a class="project__link" href="https://github.com/lmansf/fraud-detection-pipeline" target="_blank" rel="noopener">GitHub ↗</a>
+                        </div>
+                    </div>
+                </article>
+
+                <article class="project project--featured">
+                    <div class="project__body">
+                        <div class="project__head">
+                            <p class="project__eyebrow">Multiplayer web app</p>
+                            <span class="project__date">2026</span>
+                        </div>
+                        <h3 class="project__title">Owl Park</h3>
+                        <p class="project__desc">A virtual owl park you visit online: every visitor is an owl, you tap to walk through 2D rooms, and you see everyone else there in real time. An authoritative room server runs on Cloudflare Workers and Durable Objects; quests, collectibles, a shop, and ticketing sit on top.</p>
+                        <ul class="project__tags"><li>TypeScript</li><li>Phaser</li><li>Cloudflare Workers</li><li>Playwright</li></ul>
+                        <div class="project__links">
+                            <a class="project__link" href="https://github.com/lmansf/Welcome-to-Owl-Park" target="_blank" rel="noopener">GitHub ↗</a>
+                        </div>
+                    </div>
+                </article>
+
+                <article class="project project--featured">
+                    <div class="project__body">
+                        <div class="project__head">
+                            <p class="project__eyebrow">Desktop app · v0.15</p>
+                            <span class="project__date">2026</span>
+                        </div>
+                        <h3 class="project__title">Lighthouse</h3>
+                        <p class="project__desc">A local-first desktop app that answers questions about a small set of files with citations. Rust engine in a Tauri shell: on-device embeddings and OCR, and a question over a spreadsheet becomes one read-only SQL query, shown verbatim and run by DataFusion.</p>
+                        <ul class="project__tags"><li>Rust</li><li>Tauri</li><li>DataFusion</li><li>Next.js</li></ul>
+                        <div class="project__links">
+                            <a class="project__link" href="https://lhvault.app" target="_blank" rel="noopener">lhvault.app ↗</a>
+                            <a class="project__link" href="https://github.com/lmansf/lighthouse" target="_blank" rel="noopener">GitHub ↗</a>
+                        </div>
+                    </div>
+                </article>
+
+            </div>
+        </section>
+
+        <div class="wf-divider" aria-hidden="true">
+            <span class="wf-divider__mark"><span class="crow-mark"></span></span>
+        </div>
+
+        <!-- Experience -->
+        <section aria-labelledby="home-experience">
+            <header class="section-head">
+                <h2 class="section-head__title" id="home-experience">Experience</h2>
+                <a class="section-head__link" href="/assets/loganmansfield.pdf" download="Logan-Mansfield-Resume.pdf">Full résumé ↓</a>
+            </header>
+            <ol class="xp">
+                <li class="xp__item xp__item--now">
+                    <div class="xp__rail"><span class="xp__dot" aria-hidden="true"></span></div>
+                    <div class="xp__card">
+                        <div class="xp__head">
+                            <h3 class="xp__role">IT Point of Sale Systems Analyst</h3>
+                            <span class="xp__dates">Nov 2024 – present</span>
+                        </div>
+                        <p class="xp__org">ZooTampa at Lowry Park · Tampa, FL</p>
+                        <p class="xp__desc">I administer Gateway Galaxy and PAR Pixel end to end, manage the vendor relationships for both platforms, and own the eGalaxy webstore, including the custom HTML, JavaScript, and CSS that shapes the online checkout. Every admission, membership, and add-on sale flows through systems I keep running, so I know how a transaction is created, where the data breaks, and what a discrepancy between the POS and the finance report usually means.</p>
+                    </div>
+                </li>
+                <li class="xp__item">
+                    <div class="xp__rail"><span class="xp__dot" aria-hidden="true"></span></div>
+                    <div class="xp__card">
+                        <div class="xp__head">
+                            <h3 class="xp__role">Coordinator of Guest Engagement</h3>
+                            <span class="xp__dates">Aug 2023 – Nov 2024</span>
+                        </div>
+                        <p class="xp__org">ZooTampa at Lowry Park</p>
+                        <p class="xp__desc">Coordinated operational workflows in a high-traffic park, on the front line where pricing, promotions, and capacity decisions actually land.</p>
+                    </div>
+                </li>
+                <li class="xp__item xp__item--compact">
+                    <div class="xp__rail"><span class="xp__dot" aria-hidden="true"></span></div>
+                    <div class="xp__card">
+                        <div class="xp__head">
+                            <h3 class="xp__role">Guest Engagement Guide</h3>
+                            <span class="xp__dates">Feb 2022 – Aug 2023</span>
+                        </div>
+                        <p class="xp__org">ZooTampa at Lowry Park</p>
+                    </div>
+                </li>
+                <li class="xp__item">
+                    <div class="xp__rail"><span class="xp__dot" aria-hidden="true"></span></div>
+                    <div class="xp__card">
+                        <div class="xp__head">
+                            <h3 class="xp__role">Data Analyst</h3>
+                            <span class="xp__dates">Aug 2019 – Jul 2022</span>
+                        </div>
+                        <p class="xp__org">Excel Esports · London, UK (remote)</p>
+                        <p class="xp__desc">Three years turning performance and audience data into reports that leadership used to make strategic and roster decisions.</p>
+                    </div>
+                </li>
+                <li class="xp__item">
+                    <div class="xp__rail"><span class="xp__dot" aria-hidden="true"></span></div>
+                    <div class="xp__card">
+                        <div class="xp__head">
+                            <h3 class="xp__role">Data Analyst (contract)</h3>
+                            <span class="xp__dates">Nov 2017 – Aug 2019</span>
+                        </div>
+                        <p class="xp__org">Dire Wolves and League of Legends teams across the OPL, LEC, and LCS · remote</p>
+                        <p class="xp__desc">Scouting and reflection reports from gameplay data, delivered across time zones on a repeatable cadence.</p>
+                    </div>
+                </li>
+                <li class="xp__item xp__item--compact">
+                    <div class="xp__rail"><span class="xp__dot" aria-hidden="true"></span></div>
+                    <div class="xp__card">
+                        <div class="xp__head">
+                            <h3 class="xp__role">Research Assistant</h3>
+                            <span class="xp__dates">Nov 2018 – Aug 2019</span>
+                        </div>
+                        <p class="xp__org">Towson University · Towson, MD</p>
+                    </div>
+                </li>
+            </ol>
+        </section>
+
+        <!-- Credentials + toolkit -->
+        <section class="two-col" aria-label="Credentials and toolkit">
+            <div>
+                <header class="section-head">
+                    <h2 class="section-head__title">Credentials</h2>
+                </header>
+                <ul class="chip-list">
+                    <li class="chip chip--cred">Microsoft Certified: Power BI Data Analyst Associate <span class="chip__sub">PL-300</span></li>
+                    <li class="chip chip--cred">SQL Professional: Certificate of Competency <span class="chip__sub">LearnSQL.com</span></li>
+                </ul>
+            </div>
+            <div>
+                <header class="section-head">
+                    <h2 class="section-head__title">Toolkit</h2>
+                </header>
+                <ul class="chip-list">
+                    <li class="chip">SQL</li>
+                    <li class="chip">Python</li>
+                    <li class="chip">Power BI</li>
+                    <li class="chip">DuckDB</li>
+                    <li class="chip">Databricks</li>
+                    <li class="chip">Microsoft Fabric</li>
+                    <li class="chip">Postgres / Supabase</li>
+                    <li class="chip">XGBoost</li>
+                    <li class="chip">Tableau</li>
+                    <li class="chip">JavaScript · HTML · CSS</li>
+                </ul>
+            </div>
         </section>
 
         <div class="wf-divider" aria-hidden="true">
@@ -129,14 +315,11 @@
                 <h2 class="section-head__title" id="home-about">About</h2>
             </header>
             <div class="about__body">
-                <p>I&rsquo;m a data analyst in Tampa, FL. By day I keep production point-of-sale systems and their data running at ZooTampa; the rest of the time I model messy operational data into metrics a business can act on, and build the pipelines that move it from source to dashboard.</p>
-                <p>I came to data engineering through analysis — years of turning numbers into decisions — then earned my Microsoft PL-300 and built end-to-end pipelines and ML projects. I care about data people can trust: clear models, honest metrics, and reporting a non-technical stakeholder can read at a glance.</p>
+                <p>I&rsquo;m a data analyst in Tampa, FL. I came to data through analysis, years of turning esports performance numbers into decisions, and then moved into the systems side: today I own the point-of-sale and webstore platforms at ZooTampa, which puts me on top of the data every ticket, membership, and add-on sale flows through.</p>
+                <p>My analytics work is self-driven and public. I hold the Microsoft PL-300 and a LearnSQL certificate of competency, and on my own time I build end-to-end projects: an attendance demand model on nine seasons of match data, a fraud-detection pipeline over simulated webstore checkouts, a data-quality-first ingestion pipeline, and a local-first desktop app for asking questions of your own files.</p>
+                <p>What I care about is <strong>data people can trust</strong>: clear models, honest metrics, and reporting a non-technical stakeholder can read at a glance, plus the question behind the number: why a channel underperformed, whether a pricing change did what it was supposed to, and what the pipeline missed.</p>
             </div>
         </section>
-
-        <div class="wf-divider" aria-hidden="true">
-            <span class="wf-divider__mark"><span class="crow-mark"></span></span>
-        </div>
 
         <!-- Connect -->
         <section class="connect" aria-labelledby="home-connect">
@@ -167,11 +350,14 @@
     </main>
 
     <footer class="shell-footer">
-        <div class="footer-socials">
-            <a href="https://www.linkedin.com/in/lmansf96/" target="_blank" rel="noopener">LinkedIn</a>
-            <a href="mailto:lmansf96@gmail.com">Email</a>
-            <a href="https://github.com/lmansf" target="_blank" rel="noopener">GitHub</a>
-            <a href="/assets/loganmansfield.pdf" download="Logan-Mansfield-Resume.pdf">Résumé</a>
+        <div class="footer-inner">
+            <div class="footer-brand"><span class="crow-mark" aria-hidden="true"></span> Logan Mansfield · Tampa, FL</div>
+            <div class="footer-socials">
+                <a href="https://www.linkedin.com/in/lmansf96/" target="_blank" rel="noopener">LinkedIn</a>
+                <a href="mailto:lmansf96@gmail.com">Email</a>
+                <a href="https://github.com/lmansf" target="_blank" rel="noopener">GitHub</a>
+                <a href="/assets/loganmansfield.pdf" download="Logan-Mansfield-Resume.pdf">Résumé</a>
+            </div>
         </div>
     </footer>
 

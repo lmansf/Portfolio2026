@@ -4,9 +4,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Projects · Logan Mansfield</title>
-    <meta name="description" content="Selected projects by Logan Mansfield, Data Analyst: Lighthouse (a privacy-first RAG system), the eFrog frog-sound classifier, realtime fraud detection, and the Owl Park data pipeline.">
+    <meta name="description" content="Projects by Logan Mansfield, Data Analyst: a fraud-detection pipeline on Databricks and Supabase, Owl Park (a multiplayer web app on Cloudflare Workers), Lighthouse (a local-first desktop app), Quack Query, an attendance demand model, a data-quality pipeline, and more.">
     <meta property="og:title" content="Projects · Logan Mansfield">
-    <meta property="og:description" content="Lighthouse — a privacy-first RAG system — plus the eFrog classifier, realtime fraud detection, and the Owl Park pipeline.">
+    <meta property="og:description" content="Fraud-detection pipeline, Owl Park, Lighthouse, Quack Query, attendance forecasting, and more.">
     <meta property="og:type" content="website">
     <meta property="og:url" content="https://loganmansfield.org/projects">
     <meta property="og:image" content="https://loganmansfield.org/mini.jpg">
@@ -16,18 +16,30 @@
     <link rel="alternate icon" type="image/jpeg" href="/mini.jpg">
     <link rel="apple-touch-icon" href="/assets/apple-touch-icon.png">
     <link rel="manifest" href="/manifest.json">
-    <meta name="theme-color" content="#0c1116">
+    <meta name="theme-color" media="(prefers-color-scheme: light)" content="#fdf9f3">
+    <meta name="theme-color" media="(prefers-color-scheme: dark)" content="#1b140f">
     <script src="/assets/theme.min.js"></script>
     <link rel="stylesheet" href="/assets/tokens.min.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,600&family=Figtree:wght@400;500;600&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="/assets/shell.min.css">
     <link rel="stylesheet" href="/assets/pages.min.css">
     <script>
         window.va = window.va || function () { (window.vaq = window.vaq || []).push(arguments); };
     </script>
     <script defer src="/_vercel/insights/script.js"></script>
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "CollectionPage",
+        "@id": "https://loganmansfield.org/projects#page",
+        "url": "https://loganmansfield.org/projects",
+        "name": "Projects · Logan Mansfield",
+        "author": { "@id": "https://loganmansfield.org/#person" },
+        "isPartOf": { "@id": "https://loganmansfield.org/#website" }
+    }
+    </script>
 </head>
 <body>
     <a class="skip-link" href="#main-content">Skip to content</a>
@@ -35,11 +47,11 @@
 
     <header class="topbar">
         <div class="topbar__brand">
-            <a href="/"><span class="brand-mark" aria-hidden="true"><span class="crow-mark"></span></span> L. MANSFIELD</a>
+            <a href="/"><span class="brand-mark" aria-hidden="true"><span class="crow-mark"></span></span> L. Mansfield</a>
         </div>
         <nav class="topnav" aria-label="Primary">
             <a href="/">Home</a>
-            <a href="/projects">Projects</a>
+            <a href="/projects" aria-current="page">Projects</a>
             <a href="/assets/loganmansfield.pdf" download="Logan-Mansfield-Resume.pdf">Résumé</a>
         </nav>
         <button class="burger" type="button" aria-label="Open navigation" aria-expanded="false" aria-controls="site-nav" data-burger>
@@ -51,7 +63,7 @@
         <div class="site-nav__backdrop" data-nav-close aria-hidden="true"></div>
         <div class="site-nav__panel">
             <a class="site-nav__item" href="/">Home</a>
-            <a class="site-nav__item" href="/projects">Projects</a>
+            <a class="site-nav__item" href="/projects" aria-current="page">Projects</a>
             <a class="site-nav__item" href="/assets/loganmansfield.pdf" download="Logan-Mansfield-Resume.pdf">Résumé</a>
         </div>
     </nav>
@@ -59,8 +71,66 @@
     <main id="main-content" class="page page-projects">
         <section class="hero" aria-labelledby="projects-title">
             <div class="hero__main">
+                <p class="eyebrow">Selected work · 2026</p>
                 <h1 class="hero__name" id="projects-title">Projects.</h1>
-                <p class="hero__role">A few builds I&rsquo;m proud of — a live ML app, a realtime fraud pipeline, an end-to-end data pipeline, and a privacy-first RAG system in the works.</p>
+                <p class="hero__role">Builds I&rsquo;m proud of: a fraud-detection pipeline, a multiplayer park, a local-first desktop app, forecasting models, and a few smaller tools. Each one runs end to end, from source data to something a person can use.</p>
+            </div>
+        </section>
+
+        <!-- Featured -->
+        <section aria-labelledby="projects-featured">
+            <header class="section-head">
+                <h2 class="section-head__title" id="projects-featured">Featured</h2>
+                <span class="section-head__hint">The three I&rsquo;d show first</span>
+            </header>
+            <div class="project-grid project-grid--featured">
+
+                <article class="project project--featured" id="fraud">
+                    <div class="project__body">
+                        <div class="project__head">
+                            <p class="project__eyebrow">Data engineering</p>
+                            <span class="project__date">2026</span>
+                        </div>
+                        <h3 class="project__title">Fraud Detection Pipeline</h3>
+                        <p class="project__desc">A scheduled Databricks job simulates an hour of Owl Park webstore checkouts, normal guests plus five kinds of fraud episode (card testing, stolen-card resale, gift-card cash-out, account takeover, fraud rings), scores every order with a rules model, simulates the issuer&rsquo;s response with a fail-open timeout, and writes four raw tables to Supabase in one transaction. Ground-truth labels arrive days later, like a chargeback. A daily dashboard tracks catch rate, false positives, decline rate, and fail-open exposure.</p>
+                        <ul class="project__tags"><li>Databricks</li><li>Python</li><li>Supabase / Postgres</li><li>SQL</li></ul>
+                        <div class="project__links">
+                            <a class="project__link" href="https://github.com/lmansf/fraud-detection-pipeline" target="_blank" rel="noopener">View on GitHub ↗</a>
+                        </div>
+                    </div>
+                </article>
+
+                <article class="project project--featured" id="owl-park">
+                    <div class="project__body">
+                        <div class="project__head">
+                            <p class="project__eyebrow">Multiplayer web app</p>
+                            <span class="project__date">2026</span>
+                        </div>
+                        <h3 class="project__title">Owl Park</h3>
+                        <p class="project__desc">A virtual owl park you visit online. Every visitor is an owl: tap to walk through 2D rooms and see everyone else there in real time. A Vite + TypeScript + Phaser client talks to an authoritative room server on Cloudflare Workers and Durable Objects (hibernating WebSockets), with quests, collectibles, a shop, and ticketing on top. Unit tests, Playwright end-to-end runs on desktop and phone, and a bot swarm for load.</p>
+                        <ul class="project__tags"><li>TypeScript</li><li>Phaser 3</li><li>Cloudflare Workers</li><li>Durable Objects</li><li>Playwright</li></ul>
+                        <div class="project__links">
+                            <a class="project__link" href="https://github.com/lmansf/Welcome-to-Owl-Park" target="_blank" rel="noopener">View on GitHub ↗</a>
+                        </div>
+                    </div>
+                </article>
+
+                <article class="project project--featured" id="lighthouse">
+                    <div class="project__body">
+                        <div class="project__head">
+                            <p class="project__eyebrow">Desktop app</p>
+                            <span class="project__date">2026</span>
+                        </div>
+                        <h3 class="project__title">Lighthouse <span class="project__badge">v0.15</span></h3>
+                        <p class="project__desc">A local-first desktop app that answers questions about a small group of files, with citations back to the passages it read. A Rust engine in a Tauri 2 shell handles extraction, on-device OCR and embeddings, and hybrid retrieval. A question over a spreadsheet becomes one read-only SQL query, run by DataFusion and shown verbatim. Use the bundled private model or bring your own key. Installers for Windows, macOS, and Linux.</p>
+                        <ul class="project__tags"><li>Rust</li><li>Tauri 2</li><li>DataFusion</li><li>Next.js</li></ul>
+                        <div class="project__links">
+                            <a class="project__link" href="https://lhvault.app" target="_blank" rel="noopener">lhvault.app ↗</a>
+                            <a class="project__link" href="https://github.com/lmansf/lighthouse" target="_blank" rel="noopener">GitHub ↗</a>
+                        </div>
+                    </div>
+                </article>
+
             </div>
         </section>
 
@@ -68,63 +138,137 @@
             <span class="wf-divider__mark"><span class="crow-mark"></span></span>
         </div>
 
-        <section aria-label="Selected projects">
+        <!-- More -->
+        <section aria-labelledby="projects-more">
+            <header class="section-head">
+                <h2 class="section-head__title" id="projects-more">More builds</h2>
+                <span class="section-head__hint">Analytics, forecasting, and tools</span>
+            </header>
             <div class="project-grid">
 
-                <article class="project project--soon">
+                <article class="project" id="quack-query">
                     <div class="project__body">
-                        <p class="project__eyebrow">In prerelease</p>
-                        <h2 class="project__title">Lighthouse <span class="project__badge">Coming soon</span></h2>
-                        <p class="project__desc">A security- and privacy-first RAG system for your personal files — answers questions over your own documents without handing them to a third party. Currently in prerelease while I finish the branding.</p>
-                        <ul class="project__tags"><li>RAG</li><li>Privacy</li><li>LLMs</li></ul>
-                        <span class="project__link project__link--disabled" aria-disabled="true">Download &amp; GitHub coming soon</span>
+                        <div class="project__head">
+                            <p class="project__eyebrow">Browser app · LLM + SQL</p>
+                            <span class="project__date">2026</span>
+                        </div>
+                        <h3 class="project__title">Quack Query</h3>
+                        <p class="project__desc">Ask a data file questions in plain English. DuckDB runs as WebAssembly entirely in the browser, so files never leave it; a serverless function has an LLM write one read-only SQL query, which is validated twice and run locally. A live A/B test compares two query strategies with p-values.</p>
+                        <ul class="project__tags"><li>DuckDB-Wasm</li><li>TypeScript</li><li>Vercel</li></ul>
+                        <div class="project__links">
+                            <a class="project__link" href="https://github.com/lmansf/Quack-Query" target="_blank" rel="noopener">View on GitHub ↗</a>
+                        </div>
                     </div>
                 </article>
 
-                <article class="project">
+                <article class="project" id="usl">
                     <div class="project__body">
-                        <p class="project__eyebrow">Live app · Machine learning</p>
-                        <h2 class="project__title">eFrog — Frog Sound Classifier</h2>
-                        <p class="project__desc">An audio-classification model that identifies 19 Floridian frog species from sound input — record a call, get a species. Built around a deep-learning model with a live web interface.</p>
+                        <div class="project__head">
+                            <p class="project__eyebrow">Forecasting · Machine learning</p>
+                            <span class="project__date">2026</span>
+                        </div>
+                        <h3 class="project__title">USL Attendance Forecasting</h3>
+                        <p class="project__desc">An XGBoost demand model on nine seasons of USL Championship matches, on a staged DuckDB warehouse (raw → staging → marts). Two models share every upstream table and differ only by league-position features, so the error gap measures what promotion and relegation will do to attendance from 2028. Tableau views on top.</p>
+                        <ul class="project__tags"><li>Python</li><li>XGBoost</li><li>DuckDB</li><li>Tableau</li></ul>
+                        <div class="project__links">
+                            <a class="project__link" href="https://github.com/lmansf/USL-ticketing-and-stadium-revenue-forecasting" target="_blank" rel="noopener">View on GitHub ↗</a>
+                        </div>
+                    </div>
+                </article>
+
+                <article class="project" id="roll-call">
+                    <div class="project__body">
+                        <div class="project__head">
+                            <p class="project__eyebrow">Data quality · Pipeline</p>
+                            <span class="project__date">2026</span>
+                        </div>
+                        <h3 class="project__title">Roll Call</h3>
+                        <p class="project__desc">A daily manatee-count pipeline for Blue Spring State Park, built around its data-quality layer: freshness, volume, distribution, and cross-source checks that quarantine suspect observations, open incidents, and email what newly broke. DuckDB on a systemd timer; an Evidence dashboard on Vercel.</p>
+                        <ul class="project__tags"><li>Python</li><li>DuckDB</li><li>Evidence</li><li>Resend</li></ul>
+                        <div class="project__links">
+                            <a class="project__link" href="https://github.com/lmansf/Manatee-Role-Call" target="_blank" rel="noopener">View on GitHub ↗</a>
+                        </div>
+                    </div>
+                </article>
+
+                <article class="project" id="efrog">
+                    <div class="project__body">
+                        <div class="project__head">
+                            <p class="project__eyebrow">Live app · Machine learning</p>
+                            <span class="project__date">2026</span>
+                        </div>
+                        <h3 class="project__title">eFrog <span class="project__badge project__badge--live">Live</span></h3>
+                        <p class="project__desc">An audio-classification model that identifies 19 Floridian frog species from a recording. Record a call, get a species. A deep-learning model behind a live web interface.</p>
                         <ul class="project__tags"><li>Python</li><li>Audio ML</li><li>Web app</li></ul>
-                        <a class="project__link" href="https://efrog-seven.vercel.app/" target="_blank" rel="noopener">Open the live app ↗</a>
+                        <div class="project__links">
+                            <a class="project__link" href="https://efrog-seven.vercel.app/" target="_blank" rel="noopener">Open the live app ↗</a>
+                            <a class="project__link" href="https://github.com/lmansf/efrog" target="_blank" rel="noopener">GitHub ↗</a>
+                        </div>
                     </div>
                 </article>
 
-                <article class="project">
+                <article class="project" id="nowcast">
                     <div class="project__body">
-                        <p class="project__eyebrow">Data engineering · Streaming</p>
-                        <h2 class="project__title">Realtime Fraud Detection</h2>
-                        <p class="project__desc">A streaming pipeline that scores transactions for fraud signals in near real time, with downstream monitoring. The latest iteration of a project I&rsquo;ve rebuilt several times to push latency and precision.</p>
-                        <ul class="project__tags"><li>Python</li><li>Supabase</li><li>Streaming</li></ul>
-                        <a class="project__link" href="https://github.com/lmansf/realtimeFraud_supabase" target="_blank" rel="noopener">View on GitHub ↗</a>
+                        <div class="project__head">
+                            <p class="project__eyebrow">Learning project · Data assimilation</p>
+                            <span class="project__date">2026</span>
+                        </div>
+                        <h3 class="project__title">Attendance Nowcast</h3>
+                        <p class="project__desc">A Kalman-filter nowcast of daily theme-park attendance: predict from yesterday&rsquo;s state, then correct with today&rsquo;s partial signals, weighting each by its uncertainty. Written up as a five-notebook series from the scalar filter upward.</p>
+                        <ul class="project__tags"><li>Python</li><li>Kalman filter</li><li>Notebooks</li></ul>
+                        <div class="project__links">
+                            <a class="project__link" href="https://github.com/lmansf/Attendance-Nowcast" target="_blank" rel="noopener">View on GitHub ↗</a>
+                        </div>
                     </div>
                 </article>
 
-                <article class="project">
+                <article class="project" id="rfm">
                     <div class="project__body">
-                        <p class="project__eyebrow">End-to-end pipeline</p>
-                        <h2 class="project__title">Owl Park <span class="project__badge project__badge--muted">Archived</span></h2>
-                        <p class="project__desc">A complete, simulated e-commerce site: bots role-play as customers, dynamic-pricing agents adjust prices on the fly, and performance analytics track it all — generating live data for an end-to-end pipeline you can explore in the architecture diagram. Retired now, but still worth a look.</p>
+                        <div class="project__head">
+                            <p class="project__eyebrow">Analytics · Power BI</p>
+                            <span class="project__date">2025</span>
+                        </div>
+                        <h3 class="project__title">Member Segmentation (RFM)</h3>
+                        <p class="project__desc">Recency, frequency, and monetary segmentation of membership data, modeled in SQL and reported in Power BI, to turn one big member list into groups a marketing team can act on differently.</p>
+                        <ul class="project__tags"><li>Power BI</li><li>SQL</li><li>Segmentation</li></ul>
+                        <div class="project__links">
+                            <a class="project__link" href="https://github.com/lmansf/Member-Segmentation-Analysis" target="_blank" rel="noopener">View on GitHub ↗</a>
+                        </div>
+                    </div>
+                </article>
+
+                <article class="project project--archived" id="owl-park-pipeline">
+                    <div class="project__body">
+                        <div class="project__head">
+                            <p class="project__eyebrow">End-to-end pipeline</p>
+                            <span class="project__date">2025</span>
+                        </div>
+                        <h3 class="project__title">Owl Park Data Architecture <span class="project__badge project__badge--muted">Archived</span></h3>
+                        <p class="project__desc">The first Owl Park: a simulated ticket-sales ecosystem where n8n agents role-played customers and managed stock, Supabase stored the orders, Microsoft Fabric modeled them medallion-style, and Power BI turned them into decisions. Retired, but the architecture diagram is still worth a look.</p>
                         <ul class="project__tags"><li>n8n</li><li>Supabase</li><li>Microsoft Fabric</li><li>Power BI</li></ul>
-                        <a class="project__link" href="/owl-park">View the architecture diagram ↗</a>
+                        <div class="project__links">
+                            <a class="project__link" href="/owl-park">View the architecture diagram ↗</a>
+                        </div>
                     </div>
                 </article>
 
             </div>
 
             <p class="projects-more">
-                More on <a href="https://github.com/lmansf" target="_blank" rel="noopener">GitHub &rarr;</a>
+                More, including learning repos for dbt, Dagster, Docker, and assembly, on <a href="https://github.com/lmansf" target="_blank" rel="noopener">GitHub &rarr;</a>
             </p>
         </section>
     </main>
 
     <footer class="shell-footer">
-        <div class="footer-socials">
-            <a href="https://www.linkedin.com/in/lmansf96/" target="_blank" rel="noopener">LinkedIn</a>
-            <a href="mailto:lmansf96@gmail.com">Email</a>
-            <a href="https://github.com/lmansf" target="_blank" rel="noopener">GitHub</a>
-            <a href="/assets/loganmansfield.pdf" download="Logan-Mansfield-Resume.pdf">Résumé</a>
+        <div class="footer-inner">
+            <div class="footer-brand"><span class="crow-mark" aria-hidden="true"></span> Logan Mansfield · Tampa, FL</div>
+            <div class="footer-socials">
+                <a href="https://www.linkedin.com/in/lmansf96/" target="_blank" rel="noopener">LinkedIn</a>
+                <a href="mailto:lmansf96@gmail.com">Email</a>
+                <a href="https://github.com/lmansf" target="_blank" rel="noopener">GitHub</a>
+                <a href="/assets/loganmansfield.pdf" download="Logan-Mansfield-Resume.pdf">Résumé</a>
+            </div>
         </div>
     </footer>
 
