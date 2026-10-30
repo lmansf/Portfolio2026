@@ -81,16 +81,6 @@
     --top-bar-h:   60px;
     --gutter:      clamp(1rem, 4vw, 1.5rem);
     --max-w:       920px;
-
-    /* ── Legacy aliases (theme.js and older selectors) ── */
-    --accent-2:        var(--chestnut);
-    --bg-color:        var(--bg);
-    --text-color:      var(--ink-1);
-    --accent-color:    var(--accent);
-    --secondary-text:  var(--ink-2);
-    --card-bg:         var(--surface-1);
-    --card-border:     var(--hairline-strong);
-    --font-main:       var(--font-text);
 }
 
 /* ── Night: the owl's hunting hour ── */
@@ -185,8 +175,7 @@ main {
 }
 
 .page-enter,
-.page-initial-enter,
-.projects-load-enter {
+.page-initial-enter {
     animation: page-fade-in 0.5s ease-out forwards;
 }
 
@@ -199,8 +188,7 @@ main {
     html { scroll-behavior: auto; }
     main { transition: none; }
     .page-enter,
-    .page-initial-enter,
-    .projects-load-enter { animation-duration: 1ms; }
+    .page-initial-enter { animation-duration: 1ms; }
 }
 
 /* Scrollbar on-palette */
