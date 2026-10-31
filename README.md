@@ -14,14 +14,14 @@ A deliberately lean two-page site, plus one archived project page:
   Pipeline, Owl Park, and Lighthouse; then Quack Query, USL Attendance
   Forecasting, Roll Call, eFrog (live), Attendance Nowcast, Member
   Segmentation (RFM), and the archived Owl Park data architecture. Cards have
-  anchor ids (`#fraud`, `#owl-park`, `#lighthouse`, …) so the home page can
-  deep-link to them.
+  anchor ids (`#fraud`, `#owl-park`, `#lighthouse`, …) so the home page and
+  legacy redirects can deep-link to them.
 - **Owl Park** (`owl-park-infographic.html`, `/owl-park`) — a standalone
   infographic of the archived end-to-end data pipeline.
 - **404** (`404.html`) — branded not-found page.
 
-Clean URLs (`/projects`, `/owl-park`) and legacy redirects are configured in
-`vercel.json`.
+Clean URLs (`/projects`, `/owl-park`) and legacy redirects (e.g. `/fraud` →
+`/projects#fraud`, `/pipeline` → `/owl-park`) are configured in `vercel.json`.
 
 ## Design: "Barn Owl"
 
