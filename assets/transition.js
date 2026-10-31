@@ -3,7 +3,9 @@
  *
  * Scope: Home + Projects. Handles the SPA-style page swap (with the
  * View Transitions API where supported), the burger / site-nav dropdown,
- * scroll + focus reset on navigation, and back/forward (popstate).
+ * scroll + focus on navigation (to the `#hash` target when the link names
+ * one, e.g. /projects#fraud, otherwise the top of the page), and
+ * back/forward (popstate, hash preserved).
  * ───────────────────────────────────────────────────────────── */
 
 function normalizeInternalPath(url) {

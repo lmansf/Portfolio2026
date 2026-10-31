@@ -1,5 +1,13 @@
 # Portfolio 2026 — Redesign Plan
 
+> **Status: superseded (historical).** This plan drove the earlier
+> dark-canvas / electric-cyan redesign. The site has since been rebuilt on the
+> "Barn Owl" palette (cream surfaces, brown ink, creamy-blue action color,
+> Fraunces + Figtree type) as a two-page site, and the Shop, Resume, Feedback
+> and bottom tab bar described below no longer exist. For the current design
+> see the **Design: "Barn Owl"** section of [`README.md`](README.md) and
+> `assets/tokens.css`.
+
 **Direction (locked):** Refined minimalism+ · Data-forward palette · Mobile-first IA · Plan + visual mockup.
 
 This document is the contract for the overhaul. It takes the site from a warm-gold, desktop-first, JS-driven multi-page setup to a mobile-first, data-forward design with cinematic moments per page and continuous flow between them.

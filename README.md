@@ -33,7 +33,8 @@ soft fills). Day is the default theme; Night follows
 `prefers-color-scheme: dark`. Every text/background pair meets WCAG AA.
 
 Type is Fraunces (display, 600) for headlines and Figtree for everything else,
-loaded from Google Fonts. Corners are soft and tappable things are pills.
+loaded from Google Fonts; code uses the system monospace stack. Corners are
+soft and tappable things are pills.
 
 ## Assets
 
@@ -47,8 +48,10 @@ loaded from Google Fonts. Corners are soft and tappable things are pills.
 - `assets/theme.js` — optional per-company accent theming via `?ink=<company>`
   (see [`docs/referrers.md`](docs/referrers.md)).
 - `assets/profilepicture.webp` — circular hero avatar on the home page.
-- `assets/crow.png`, `assets/favicon-crow.png`, `mini.jpg` — the crow mark,
-  icons, and share image.
+- `assets/crow.png`, `assets/favicon-crow.png`, `mini.jpg` — the crow mark
+  (painted via CSS mask), favicon, and share image.
+- `assets/apple-touch-icon.png`, `assets/icon-192.png`, `assets/icon-512.png`
+  — home-screen icons referenced from `manifest.json`.
 - `assets/loganmansfield.pdf` — résumé served from the site.
 
 The pages load the minified `.min` variants. After editing any source asset,

@@ -7,9 +7,17 @@ and client-side (no tracking); the public link stays blue.
 ## How it works
 `assets/theme.js` runs synchronously in each page's `<head>` (before paint, so
 there's no color flash). It reads the `?ink=` query parameter, looks it up in
-the `THEMES` map, and overrides the accent CSS variables on `:root`
-(`--accent`, `--accent-ink`, `--on-accent`, `--focus-ring`). The accent glow
-derives from `--accent` automatically. Unknown / missing key → default creamy blue.
+the `THEMES` map, checks `prefers-color-scheme` once to pick the Day or Night
+link ink, and overrides the accent CSS variables on `:root`:
+
+- `--accent` ← the brand-exact `accent`;
+- `--accent-ink` and `--focus-ring` ← `ink` (Day) or `inkDark` (Night);
+- `--on-accent` ← `on`;
+- `--accent-soft`, `--accent-mist` and `--accent-glow` are re-derived with
+  `color-mix()` from the brand accent against the Day or Night canvas, so the
+  soft fills, hover tints and ambient glow follow the brand too.
+
+Unknown / missing key → default creamy blue.
 
 Only the **accent** changes — the cream (or Night) canvas and layout stay, so
 contrast remains legible.
