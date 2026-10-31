@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Projects · Logan Mansfield</title>
-    <meta name="description" content="Projects by Logan Mansfield, Data Analyst: a fraud-detection pipeline on Databricks and Supabase, Owl Park (a multiplayer web app on Cloudflare Workers), Lighthouse (a local-first desktop app), Quack Query, an attendance demand model, a data-quality pipeline, and more.">
+    <meta name="description" content="Projects by Logan Mansfield, Data Analyst: a fraud-detection pipeline on Databricks and Supabase, Owl Park (a multiplayer web app on Cloudflare Workers), Lighthouse (a local-first desktop app), Quack Query (natural language to SQL on DuckDB), attendance forecasting, a data-quality pipeline, and more.">
     <meta property="og:title" content="Projects · Logan Mansfield">
     <meta property="og:description" content="Fraud-detection pipeline, Owl Park, Lighthouse, Quack Query, attendance forecasting, and more.">
     <meta property="og:type" content="website">
@@ -152,11 +152,27 @@
                             <p class="project__eyebrow">Browser app · LLM + SQL</p>
                             <span class="project__date">2026</span>
                         </div>
-                        <h3 class="project__title">Quack Query</h3>
-                        <p class="project__desc">Ask a data file questions in plain English. DuckDB runs as WebAssembly entirely in the browser, so files never leave it; a serverless function has an LLM write one read-only SQL query, which is validated twice and run locally. A live A/B test compares two query strategies with p-values.</p>
-                        <ul class="project__tags"><li>DuckDB-Wasm</li><li>TypeScript</li><li>Vercel</li></ul>
+                        <h3 class="project__title">Quack Query <span class="project__badge project__badge--live">Live</span></h3>
+                        <p class="project__desc">Ask a data file questions in plain English. CSV, Excel, Parquet, or JSON files load into DuckDB running as WebAssembly in the browser, so files never leave it; a serverless function has an LLM write one read-only SQL query from automatic table profiles and join-key hints, validated on both server and client and run locally. The public endpoint is hardened with a request guard, per-IP rate limiting, a locked-down engine, a content security policy, and personal-data columns withheld from the model.</p>
+                        <ul class="project__tags"><li>DuckDB-Wasm</li><li>TypeScript</li><li>Vercel</li><li>LLM APIs</li></ul>
                         <div class="project__links">
-                            <a class="project__link" href="https://github.com/lmansf/Quack-Query" target="_blank" rel="noopener">View on GitHub ↗</a>
+                            <a class="project__link" href="https://quack-query.vercel.app" target="_blank" rel="noopener">Open the live app ↗</a>
+                            <a class="project__link" href="https://github.com/lmansf/Quack-Query" target="_blank" rel="noopener">GitHub ↗</a>
+                        </div>
+                    </div>
+                </article>
+
+                <article class="project" id="attendance">
+                    <div class="project__body">
+                        <div class="project__head">
+                            <p class="project__eyebrow">Forecasting · Machine learning</p>
+                            <span class="project__date">2026</span>
+                        </div>
+                        <h3 class="project__title">Attendance Forecasting</h3>
+                        <p class="project__desc">Daily theme-park attendance forecast from weather, calendar, and flight-traffic features. A LightGBM, ridge, and random-forest blend selected by rolling-origin cross-validation beat a tuned XGBoost by about 6% MAE out of fold and cut mean bias from +90 to −7 guests a day. The last 30 operating days are held out as an unseen live forecast with an 80% planning band from pooled out-of-fold ratios.</p>
+                        <ul class="project__tags"><li>Python</li><li>LightGBM</li><li>XGBoost</li><li>scikit-learn</li></ul>
+                        <div class="project__links">
+                            <a class="project__link" href="https://github.com/lmansf/Attendance-Projections" target="_blank" rel="noopener">View on GitHub ↗</a>
                         </div>
                     </div>
                 </article>

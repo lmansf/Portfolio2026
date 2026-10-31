@@ -511,6 +511,19 @@ main.page > * { min-width: 0; }
     line-height: 1.55;
 }
 .xp__item--compact .xp__card { padding: 0.8rem 1.1rem; }
+.xp__note {
+    font-weight: 400;
+    font-size: 0.85rem;
+    color: var(--ink-2);
+}
+
+.section-note {
+    margin-top: 1rem;
+    font-size: 0.9rem;
+    line-height: 1.5;
+    color: var(--ink-2);
+    max-width: 48ch;
+}
 
 /* ──────────────────── Chips (skills, stack, credentials) ──────────────────── */
 .chip-list {

@@ -1,103 +1,81 @@
 LOGAN MANSFIELD
-Tampa, Florida, United States
-Email: lmansf96@gmail.com
-LinkedIn: www.linkedin.com/in/lmansf96
 
-TARGET ROLE
-Analytics Engineer
+IT Systems Analyst | Data Analyst
 
-PROFESSIONAL SUMMARY
-Systems Analyst with hands-on production data experience and a strong transition path into Analytics Engineering. Experienced in SQL, Python, and Power BI, with practical project work in customer segmentation (RFM), data modeling, reporting, and automation. Focused on building reliable data transformations, improving data quality, and delivering analytics-ready datasets and dashboards for business stakeholders.
+Tampa, FL | 443-929-5292 | lmansf96@gmail.com | linkedin.com/in/lmansf | github.com/lmansf | loganmansfield.org
 
-ANALYTICS ENGINEERING SKILLS
-- SQL (query design, data validation, joins, aggregations)
-- Python (data analysis and scripting)
-- Data Warehousing concepts
-- Data Quality checks and validation workflows
-- Reporting data preparation for BI use cases
-- Microsoft Power BI
-- JavaScript, HTML, CSS
+Professional Summary
 
-TOOLS AND TECHNOLOGIES
-SQL | Python | Microsoft Power BI | Microsoft Fabric | JavaScript | CSS | Excel
+IT systems analyst who owns the ticketing and webstore platforms behind ZooTampa's admissions revenue; three prior years as a data analyst; Microsoft PL-300 (Power BI) certified. Ships self-directed data tools: natural-language-to-SQL on DuckDB, attendance forecasting, a desktop analytics assistant. Targeting data analyst and BI roles that combine systems expertise with analytics.
 
-PROFESSIONAL EXPERIENCE
+Skills
 
-ZooTampa at Lowry Park — IT Point of Sale Analyst
-Nov 2024 - Present | United States
-- Support and analyze point-of-sale systems in a production environment.
-- Troubleshoot system issues and improve process reliability for business operations.
-- Work across technical and business teams to maintain stable data-related workflows.
-- Use technical tooling (including JavaScript/CSS) in systems support and enhancements.
+Analytics and Business Intelligence (BI): SQL, Power BI, Excel, dashboards and KPI reporting, data modeling, statistical modeling, forecasting
 
-ZooTampa at Lowry Park — Coordinator of Guest Engagement
-Aug 2023 - Nov 2024 | Tampa, Florida, United States
-- Coordinated operational workflows and service processes in a high-traffic environment.
-- Built stakeholder communication and process ownership skills applicable to cross-functional engineering work.
+Data Engineering: Python (pandas, scikit-learn, LightGBM, XGBoost), DuckDB, dbt, Databricks, Microsoft Fabric, ETL/ELT pipelines
 
-ZooTampa at Lowry Park — Guest Engagement Guide
-Feb 2022 - Aug 2023 | Tampa, Florida, United States
-- Delivered frontline support while maintaining process consistency and execution quality.
+Systems and Platforms: Gateway Galaxy 8 and eGalaxy ticketing/webstore, PAR Pixel point of sale (POS), HubSpot CRM (pipeline and reporting configuration), Dynamics 365 (end user), HTML, CSS, JavaScript
 
-EXCEL ESPORTS — Data Analyst (Full-time)
-Aug 2019 - Jul 2022 | London, England, United Kingdom
-- Performed data analysis to support strategic and performance decisions.
-- Produced repeatable analysis outputs to support team planning and execution.
+Business Analysis: requirements gathering, SOP documentation, stakeholder reporting, POS hardware inventory and maintenance
 
-Esports (League of Legends) — Data Analyst (Contract)
-Nov 2017 - Aug 2019 | Remote
-- Delivered analysis and reporting support for teams across OPL, LEC, and LCS.
+Professional Experience
 
-Dire Wolves — Data Analyst
-Jan 2018 - Jun 2018 | Remote
-- Created structured scouting and reflection reports from gameplay data.
-- Supported cross-time-zone collaboration and repeatable reporting workflows.
+IT Point of Sale Systems Analyst
 
-Towson University — Paid Research Assistant
-Nov 2018 - Aug 2019 | Towson, Maryland
-- Processed and prepared soil samples for analysis using lab workflows.
-- Performed structured data tracking and documentation in datasheets.
+ZooTampa at Lowry Park | Tampa, FL | Nov 2024 - Present
 
-Towson University — Credit Research Assistant
-Jan 2019 - Aug 2019 | Towson, Maryland
-- Identified biological samples and recorded observations in structured datasets.
+-   Own the Gateway Galaxy 8 ticketing platform and eGalaxy webstores (product and pricing configuration, monitoring, vendor escalation), the systems behind the Zoo's admissions and membership revenue.
 
-PROJECTS
+-   Built 9 new premium animal-experience products and an admission-inclusive bundle in the ticketing and webstore systems; all still on sale.
 
-RFM Analysis (Associated with ZooTampa at Lowry Park)
-Nov 2025
-- Built customer segmentation using Recency, Frequency, Monetary analysis.
-- Generated business-relevant groupings to support targeted decision-making.
-- Tools: Power BI, data analysis, SQL concepts.
+-   Designed, implemented, and monitored webstore upsells: add-on offers, a membership upsell tile, sticky navigation, and announcement ribbons built in custom HTML, CSS, and JavaScript.
 
-Production E-commerce Website (In Progress)
-Nov 2025 - Present
-- Building a production web application with HTML, CSS, and JavaScript.
-- Reinforces production readiness, deployment thinking, and maintainable architecture.
+-   Administer two POS platforms (PAR Pixel, Galaxy) and a fleet of about 90 terminals: inventory, maintenance, replacements.
 
-Portfolio + Blog Workflow
-- Built and maintain a portfolio with automated blog handling components.
-- Demonstrates practical data flow handling from source to display layer.
+-   Gather requirements from front-line departments for platform changes and provide tier 1-2 POS hardware and software support.
 
-CERTIFICATIONS
+Guest Engagement Coordinator (started as Guide)
 
-Microsoft
+ZooTampa at Lowry Park | Tampa, FL | Nov 2022 - Nov 2024
+
+-   Overhauled the department's reporting system, saving about 4 coordinator hours per week (roughly 200 hours a year).
+
+-   Produced weekly operational reports for leadership flagging risks and changes in department operations.
+
+-   Co-wrote and revised education programs and their standard operating procedures (SOPs) with animal care staff.
+
+Data Analyst
+
+Excel Esports | London, UK | Aug 2019 - Jul 2022
+
+-   Designed and delivered a data-driven talent scouting system in Excel and Python within six months; the resulting academy roster became the most dominant in the organization's history by league performance.
+
+-   Delivered weekly tactical, meta, and player-development analysis reports that produced direct advantages in official matches.
+
+Projects (Self-Directed, Code on GitHub)
+
+Quack Query | TypeScript, DuckDB-Wasm, Vercel serverless, LLM APIs | quack-query.vercel.app | github.com/lmansf/Quack-Query
+
+-   Built a browser-based natural-language-to-SQL tool: CSV, Excel, Parquet, or JSON files load into in-browser DuckDB, an LLM writes one read-only query from automatic table profiles and join-key hints, and answers are grounded in the returned rows.
+
+-   Hardened the public endpoint: request guard and per-IP rate limiting, SQL validated on both server and client, DuckDB locked against file and network access, a content security policy, and personal-data columns withheld from the model.
+
+Attendance Forecasting | Python, LightGBM, XGBoost, scikit-learn
+
+-   Forecast daily theme park attendance from weather, calendar, and flight features; a LightGBM, ridge, and random forest blend selected by rolling-origin cross-validation beat a tuned XGBoost by about 6% MAE out of fold.
+
+-   Cut mean forecast bias from +90 to -7 guests per day; held out the last 30 operating days as an unseen live forecast with an 80% planning band from pooled out-of-fold ratios.
+
+Lighthouse | desktop app, local LLM (Mistral-7B-Instruct), OCR | github.com/lmansf/lighthouse
+
+-   Shipped a desktop analytics assistant (v0.11) with a local LLM and OCR: PDF table extraction, briefings, charts, local audit log.
+
+Education and Certifications
+
 Microsoft Certified: Power BI Data Analyst Associate (PL-300)
 
-LearnSQL.com
-SQL Professional: Certificate of Competency
-Issued Dec 2025
-Credential ID: CAC9A0/12/2025
+LearnSQL.com SQL Certification of Competency | Microsoft Fabric in a Day Workshop
 
-EDUCATION
+Associate of Arts (A.A.), General Studies, Carroll Community College | 2014 - 2016
 
-University of South Florida
-Bachelor of Science (BS), Ecology (On hold)
-
-Carroll Community College
-Associate's Degree, General Studies
-2014 - 2016
-
-ADDITIONAL INFORMATION
-- Open to Analytics Engineer roles and adjacent data engineering or BI engineering opportunities.
-- Interests include scalable analytics workflows, machine learning projects, and AI-assisted analytics tooling.
+Plus 55 credits in Biology and Ecology (biostatistics, field research methods) at Carroll, Towson, and University of South Florida
