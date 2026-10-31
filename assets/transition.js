@@ -3,7 +3,9 @@
  *
  * Scope: Home + Projects. Handles the SPA-style page swap (with the
  * View Transitions API where supported), the burger / site-nav dropdown,
- * scroll + focus reset on navigation, and back/forward (popstate).
+ * scroll + focus on navigation (to the `#hash` target when the link names
+ * one, e.g. /projects#fraud, otherwise the top of the page), and
+ * back/forward (popstate, hash preserved).
  * ───────────────────────────────────────────────────────────── */
 
 function normalizeInternalPath(url) {
@@ -35,6 +37,21 @@ function normalizeInternalPath(url) {
 
 function isTransitionPage(path) {
     return ['index.html', 'projects.html'].includes(path);
+}
+
+function getHashTarget(url) {
+    let hash = '';
+    try {
+        hash = new URL(url, window.location.origin).hash;
+    } catch {
+        hash = '';
+    }
+    if (!hash || hash.length < 2) return null;
+    try {
+        return document.getElementById(decodeURIComponent(hash.slice(1)));
+    } catch {
+        return null;
+    }
 }
 
 async function getIncomingDocumentForNavigation(url) {
@@ -89,10 +106,15 @@ async function navigateTo(url, options = {}) {
                 history.pushState({}, newTitle, url);
             }
 
-            // Reset scroll, then move focus to the top of the new content for
-            // keyboard / screen-reader users.
-            window.scrollTo({ top: 0, left: 0, behavior: 'instant' });
-            const focusTarget = document.getElementById('main-content') || main;
+            // Scroll to the hash target when the URL names one; otherwise reset
+            // to the top. Then move focus there for keyboard / screen-reader users.
+            const hashTarget = getHashTarget(url);
+            if (hashTarget) {
+                hashTarget.scrollIntoView({ block: 'start', behavior: 'instant' });
+            } else {
+                window.scrollTo({ top: 0, left: 0, behavior: 'instant' });
+            }
+            const focusTarget = hashTarget || document.getElementById('main-content') || main;
             if (focusTarget) {
                 focusTarget.setAttribute('tabindex', '-1');
                 focusTarget.focus({ preventScroll: true });
@@ -142,6 +164,7 @@ function openSiteNav() {
     }
     document.body.classList.add('site-nav-open');
     nav.setAttribute('aria-hidden', 'false');
+    nav.removeAttribute('inert');
     if (burger) burger.setAttribute('aria-expanded', 'true');
     const firstLink = nav.querySelector('.site-nav__item');
     if (firstLink) setTimeout(() => firstLink.focus(), 50);
@@ -152,6 +175,7 @@ function closeSiteNav() {
     if (!nav) return;
     document.body.classList.remove('site-nav-open');
     nav.setAttribute('aria-hidden', 'true');
+    nav.setAttribute('inert', '');
     const burger = document.querySelector('[data-burger]');
     if (burger) burger.setAttribute('aria-expanded', 'false');
 }
@@ -213,7 +237,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const normalizedHref = normalizeInternalPath(href);
         const currentPath = normalizeInternalPath(window.location.pathname);
         if (normalizedHref === currentPath) {
-            e.preventDefault();
+            if (!href.includes('#')) e.preventDefault();
             return;
         }
         if (isTransitionPage(normalizedHref)) {
@@ -231,7 +255,7 @@ document.addEventListener('DOMContentLoaded', () => {
     window.addEventListener('popstate', async () => {
         const path = normalizeInternalPath(window.location.pathname);
         if (isTransitionPage(path)) {
-            await navigateTo(path, { updateHistory: false });
+            await navigateTo(path + window.location.hash, { updateHistory: false });
             return;
         }
         window.location.reload();

@@ -1,54 +1,41 @@
 /* ─────────────────────────────────────────────────────────────
- * shell.css — 2026 chrome: top app bar, bottom tab bar, ticker, Crowbot FAB.
+ * shell.css — site chrome: ambient background, top bar, nav, footer,
+ * focus rings, view transitions and a11y utilities.
  *
- * Loaded AFTER index.css / style.css so it overrides legacy header/footer
- * styling. Page-specific content is unaffected — Phase 4 redesigns those.
- *
- * Mobile-first. Bottom tab bar is the primary nav < 768px; on ≥ 768px it
- * morphs into a floating top-right pill.
+ * Loaded after tokens.css on every page. Page content lives in pages.css.
  * ───────────────────────────────────────────────────────────── */
-
-/* ─── ambient gradient mesh: replaces the heavy crosshatch ─── */
-body {
-    background: var(--bg) !important;
-    color: var(--ink-1) !important;
-    font-family: var(--font-text) !important;
-    /* stop the legacy `overflow: hidden` from style.css that broke scrolling */
-    overflow-x: hidden !important;
-    overflow-y: auto !important;
-    height: auto !important;
-    min-height: 100vh;
-    padding-bottom: 0;
-}
-
-body::before,
-body::after {
-    /* neutralize the legacy crosshatch overlays */
-    background: none !important;
-    opacity: 0 !important;
-}
 
 body {
     position: relative;
+    min-height: 100vh;
+    overflow-x: hidden;
+    display: flex;
+    flex-direction: column;
 }
 
-/* New ambient mesh painted on a single fixed pseudo-layer */
+/* ─── Ambient background: a soft blue wash top-right, fawn bottom-left,
+ *     and a faint speckle like the owl's vermiculated back feathers. ─── */
 body > .shell-bg {
     position: fixed;
     inset: 0;
     z-index: -1;
     pointer-events: none;
     background:
-        radial-gradient(1200px 600px at 80% -10%, rgba(34, 211, 238, 0.10), transparent 60%),
-        radial-gradient(900px 500px at -10% 110%, rgba(125, 211, 252, 0.06), transparent 60%);
-    animation: shell-drift 24s ease-in-out infinite alternate;
+        radial-gradient(1100px 560px at 85% -12%, var(--accent-glow), transparent 62%),
+        radial-gradient(820px 480px at -8% 108%, color-mix(in srgb, var(--fawn) 55%, transparent), transparent 60%);
 }
-@keyframes shell-drift {
-    from { transform: translate3d(0, 0, 0); }
-    to   { transform: translate3d(-2%, 1%, 0); }
-}
-@media (prefers-reduced-motion: reduce) {
-    body > .shell-bg { animation: none; }
+body > .shell-bg::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    opacity: 0.35;
+    background-image:
+        radial-gradient(color-mix(in srgb, var(--plume) 55%, transparent) 0.6px, transparent 0.9px),
+        radial-gradient(color-mix(in srgb, var(--plume) 40%, transparent) 0.5px, transparent 0.8px);
+    background-size: 23px 23px, 41px 41px;
+    background-position: 0 0, 11px 17px;
+    mask-image: linear-gradient(180deg, rgba(0,0,0,0.9), rgba(0,0,0,0.25));
+    -webkit-mask-image: linear-gradient(180deg, rgba(0,0,0,0.9), rgba(0,0,0,0.25));
 }
 
 /* ─────────────────────────────────────────────────────────────
@@ -62,21 +49,21 @@ header.topbar {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding: 0 var(--gutter) !important;
-    background: color-mix(in srgb, var(--bg) 88%, transparent);
-    backdrop-filter: blur(12px);
-    -webkit-backdrop-filter: blur(12px);
+    gap: 1rem;
+    padding: 0 var(--gutter);
+    background: color-mix(in srgb, var(--bg) 84%, transparent);
+    backdrop-filter: blur(14px) saturate(1.1);
+    -webkit-backdrop-filter: blur(14px) saturate(1.1);
     border-bottom: 1px solid var(--hairline);
-    font-size: 0.9rem;
 }
 header.topbar .topbar__brand {
     display: flex;
     align-items: center;
-    gap: 0.6rem;
-    font-weight: 700;
-    letter-spacing: 0.04em;
+    font-weight: 600;
+    letter-spacing: 0.08em;
     font-size: 0.78rem;
     color: var(--ink-1);
+    text-transform: uppercase;
 }
 header.topbar .topbar__brand a {
     color: inherit;
@@ -84,42 +71,90 @@ header.topbar .topbar__brand a {
     display: flex;
     align-items: center;
     gap: 0.6rem;
+    padding: 0.35rem 0.55rem 0.35rem 0.35rem;
+    margin-left: -0.35rem;
+    border-radius: var(--r-pill);
+    transition: background var(--dur-fast) var(--ease-out);
 }
-header.topbar .topbar__page {
-    font-family: var(--font-mono);
-    font-size: 0.72rem;
-    color: var(--ink-2);
-    letter-spacing: 0.06em;
-    text-transform: uppercase;
+header.topbar .topbar__brand a:hover { background: var(--surface-2); }
+
+/* Brand mark — the crow, painted via CSS mask so it takes any color */
+header.topbar .topbar__brand .brand-mark {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 34px;
+    height: 34px;
+    border-radius: 50%;
+    background: var(--accent-soft);
+    color: var(--ink-1);
+    box-shadow: var(--shadow-sm);
 }
-header.topbar .topbar__page strong { color: var(--ink-1); font-weight: 500; }
+.crow-mark {
+    display: block;
+    background-color: currentColor;
+    -webkit-mask: url("/assets/crow.png") center / contain no-repeat;
+            mask: url("/assets/crow.png") center / contain no-repeat;
+}
+header.topbar .topbar__brand .brand-mark .crow-mark { width: 21px; height: 17px; }
 
 /* ─────────────────────────────────────────────────────────────
- * Burger button (in topbar)
+ * Desktop inline nav (≥ 768px) — pills in the top bar
+ * ───────────────────────────────────────────────────────────── */
+.topnav { display: none; }
+@media (min-width: 768px) {
+    .burger { display: none; }
+    .site-nav { display: none; }
+    .topnav {
+        display: flex;
+        align-items: center;
+        gap: 0.15rem;
+        margin-left: auto;
+        padding: 0.25rem;
+        background: color-mix(in srgb, var(--surface-1) 85%, transparent);
+        border: 1px solid var(--hairline);
+        border-radius: var(--r-pill);
+        box-shadow: var(--shadow-sm);
+    }
+    .topnav a {
+        padding: 0.42rem 0.9rem;
+        font-size: 0.86rem;
+        font-weight: 500;
+        color: var(--ink-2);
+        text-decoration: none;
+        border-radius: var(--r-pill);
+        transition: color var(--dur-fast) var(--ease-out),
+                    background var(--dur-fast) var(--ease-out);
+    }
+    .topnav a:hover { color: var(--ink-1); background: var(--surface-2); }
+    .topnav a[aria-current="page"] {
+        color: var(--on-accent);
+        background: var(--accent);
+        box-shadow: var(--shadow-press);
+    }
+}
+
+/* ─────────────────────────────────────────────────────────────
+ * Burger button (mobile)
  * ───────────────────────────────────────────────────────────── */
 .burger {
     display: flex;
     flex-direction: column;
     justify-content: center;
     gap: 5px;
-    width: 36px;
-    height: 36px;
-    padding: 6px;
-    background: none;
-    border: none;
+    width: 40px;
+    height: 40px;
+    padding: 9px;
+    background: var(--surface-1);
+    border: 1px solid var(--hairline);
     cursor: pointer;
     color: var(--ink-1);
-    border-radius: var(--r-sm, 6px);
+    border-radius: var(--r-pill);
+    box-shadow: var(--shadow-sm);
     transition: background var(--dur-fast) var(--ease-out);
     flex-shrink: 0;
 }
-.burger:hover {
-    background: var(--hairline);
-}
-.burger:focus-visible {
-    outline: 2px solid var(--focus-ring);
-    outline-offset: 2px;
-}
+.burger:hover { background: var(--surface-2); }
 .burger__bar {
     display: block;
     width: 100%;
@@ -128,387 +163,150 @@ header.topbar .topbar__page strong { color: var(--ink-1); font-weight: 500; }
     border-radius: 2px;
     transform-origin: center;
     transition:
-        transform 260ms var(--ease-out, cubic-bezier(0.4, 0, 0.2, 1)),
-        opacity 200ms var(--ease-out, cubic-bezier(0.4, 0, 0.2, 1));
+        transform 260ms var(--ease-out),
+        opacity 200ms var(--ease-out);
 }
-/* X state when nav is open */
-body.site-nav-open .burger .burger__bar:nth-child(1) {
-    transform: translateY(7px) rotate(45deg);
+body.site-nav-open .burger .burger__bar:nth-child(1) { transform: translateY(7px) rotate(45deg); }
+body.site-nav-open .burger .burger__bar:nth-child(2) { opacity: 0; transform: scaleX(0); }
+body.site-nav-open .burger .burger__bar:nth-child(3) { transform: translateY(-7px) rotate(-45deg); }
+@media (min-width: 768px) {
+    .burger { display: none; }
 }
-body.site-nav-open .burger .burger__bar:nth-child(2) {
-    opacity: 0;
-    transform: scaleX(0);
-}
-body.site-nav-open .burger .burger__bar:nth-child(3) {
-    transform: translateY(-7px) rotate(-45deg);
-}
-
-/* Burger is visible at all screen sizes */
 
 /* ─────────────────────────────────────────────────────────────
- * Site nav — top-right dropdown (all screen sizes)
+ * Mobile dropdown nav
  * ───────────────────────────────────────────────────────────── */
 .site-nav {
     position: fixed;
     z-index: 90;
     pointer-events: none;
 }
-/* Invisible full-screen backdrop catches click-outside */
 .site-nav__backdrop {
     position: fixed;
     inset: 0;
     background: transparent;
 }
-/* Dropdown panel — top/right set by JS to align exactly under the burger button */
 .site-nav__panel {
     position: fixed;
-    top: calc(var(--top-bar-h, 56px) + 8px); /* fallback until JS runs */
-    right: var(--gutter, 1.25rem);            /* fallback until JS runs */
-    min-width: 180px;
+    top: calc(var(--top-bar-h) + 8px);
+    right: var(--gutter);
+    min-width: 200px;
     background: var(--surface-1);
-    border: 1px solid var(--hairline-strong);
-    border-radius: 12px;
-    padding: 0.4rem;
+    border: 1px solid var(--hairline);
+    border-radius: var(--r-lg);
+    padding: 0.45rem;
     display: flex;
     flex-direction: column;
-    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.18);
+    box-shadow: var(--shadow-lg);
     transform-origin: top right;
-    transform: scale(0.88) translateY(-6px);
+    transform: scale(0.9) translateY(-6px);
     opacity: 0;
+    visibility: hidden;
     pointer-events: none;
     transition:
         transform 220ms cubic-bezier(0.34, 1.26, 0.64, 1),
-        opacity 180ms cubic-bezier(0.4, 0, 0.2, 1);
+        opacity 180ms var(--ease-out),
+        visibility 0s linear 220ms;
 }
-/* Open state */
-body.site-nav-open .site-nav {
-    pointer-events: auto;
-}
+body.site-nav-open .site-nav { pointer-events: auto; }
 body.site-nav-open .site-nav__panel {
     transform: scale(1) translateY(0);
     opacity: 1;
+    visibility: visible;
     pointer-events: auto;
+    transition:
+        transform 220ms cubic-bezier(0.34, 1.26, 0.64, 1),
+        opacity 180ms var(--ease-out),
+        visibility 0s;
 }
 @media (prefers-reduced-motion: reduce) {
-    .site-nav__panel { transition: opacity 120ms linear; }
+    .site-nav__panel { transition: opacity 120ms linear, visibility 0s linear 120ms; }
+    body.site-nav-open .site-nav__panel { transition: opacity 120ms linear, visibility 0s; }
 }
-/* Nav links — no active highlight */
 .site-nav__item {
     display: block;
-    padding: 0.65rem 0.85rem;
-    font-size: 0.9rem;
+    padding: 0.7rem 0.95rem;
+    font-size: 0.95rem;
     font-weight: 500;
     color: var(--ink-2);
     text-decoration: none;
-    border-radius: 8px;
+    border-radius: var(--r-md);
     transition:
         color var(--dur-fast) var(--ease-out),
         background var(--dur-fast) var(--ease-out);
 }
-.site-nav__item:hover {
-    color: var(--ink-1);
-    background: var(--surface-2);
-}
+.site-nav__item:hover { color: var(--ink-1); background: var(--surface-2); }
+.site-nav__item[aria-current="page"] { color: var(--accent-ink); font-weight: 600; }
 
 /* ─────────────────────────────────────────────────────────────
- * Refined ticker (replaces the marquee)
+ * Footer — an umber band, the owl's dark barring
  * ───────────────────────────────────────────────────────────── */
 footer.shell-footer {
-    background: none !important;
-    border-top: 1px solid var(--hairline);
-    padding: 1rem var(--gutter) 1.25rem;
-    margin-top: 3rem;
-    display: grid;
-    gap: 1rem;
+    margin-top: auto;
+    background: var(--umber);
+    color: var(--on-umber);
+    padding: 1.6rem var(--gutter) calc(1.6rem + env(safe-area-inset-bottom, 0px));
     position: relative;
     z-index: 1;
 }
-footer.shell-footer .ticker {
-    overflow: hidden;
-}
-footer.shell-footer .ticker__track {
+footer.shell-footer .footer-inner {
+    max-width: var(--max-w);
+    margin: 0 auto;
     display: flex;
-    gap: 2.5rem;
-    font-family: var(--font-mono);
-    font-size: 0.76rem;
-    color: var(--ink-2);
-    letter-spacing: 0.06em;
-    text-transform: uppercase;
-    white-space: nowrap;
-    animation: shell-ticker 40s linear infinite;
-    width: max-content;
-}
-@keyframes shell-ticker {
-    from { transform: translateX(0); }
-    to   { transform: translateX(-50%); }
-}
-@media (prefers-reduced-motion: reduce) {
-    footer.shell-footer .ticker__track { animation: none; }
-}
-footer.shell-footer .ticker__item .dot {
-    color: var(--accent-ink);
-    margin-right: 0.6rem;
-}
-footer.shell-footer .ticker__item strong {
-    color: var(--ink-1);
-    font-weight: 500;
-}
-footer.shell-footer .footer-socials {
-    display: flex;
-    gap: 1.5rem;
     flex-wrap: wrap;
-    font-family: var(--font-mono);
-    font-size: 0.75rem;
-    letter-spacing: 0.08em;
-}
-footer.shell-footer .footer-socials a {
-    color: var(--ink-2);
-    text-decoration: none;
-    border-bottom: 1px solid transparent;
-    transition: color var(--dur-fast) var(--ease-out), border-color var(--dur-fast) var(--ease-out);
-}
-footer.shell-footer .footer-socials a:hover {
-    color: var(--accent-ink);
-    border-bottom-color: var(--accent-ink);
-}
-
-/* ─────────────────────────────────────────────────────────────
- * Crowbot FAB + bottom sheet (site-wide)
- * ───────────────────────────────────────────────────────────── */
-.crowbot-fab {
-    position: fixed;
-    left: var(--gutter);
-    bottom: calc(env(safe-area-inset-bottom, 0px) + 20px);
-    z-index: 90;
-    width: 56px; height: 56px;
-    border-radius: 50%;
-    border: 1px solid var(--hairline-strong);
-    background: var(--surface-1);
-    color: var(--accent-ink);
-    font-size: 1.4rem;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    cursor: pointer;
-    box-shadow: 0 10px 30px rgba(0,0,0,0.4), 0 0 0 4px var(--accent-glow);
-    transition: transform var(--dur-base) var(--ease-out);
-}
-.crowbot-fab:hover { transform: translateY(-2px) scale(1.04); }
-.crowbot-fab[aria-expanded="true"] {
-    background: var(--accent);
-    color: var(--ink-1);
-}
-
-.crowbot-sheet {
-    position: fixed;
-    inset: 0;
-    z-index: 200;
-    display: none;
-}
-.crowbot-sheet.is-open { display: block; }
-.crowbot-sheet__backdrop {
-    position: absolute;
-    inset: 0;
-    background: rgba(0, 0, 0, 0.55);
-    backdrop-filter: blur(4px);
-    -webkit-backdrop-filter: blur(4px);
-    animation: sheet-fade var(--dur-base) var(--ease-out);
-}
-.crowbot-sheet__panel {
-    position: absolute;
-    left: 0; right: 0; bottom: 0;
-    max-height: 88vh;
-    background: var(--surface-1);
-    border-top: 1px solid var(--hairline-strong);
-    border-radius: var(--r-xl) var(--r-xl) 0 0;
-    padding: 1rem;
-    padding-bottom: calc(1rem + env(safe-area-inset-bottom, 0px));
-    overflow-y: auto;
-    animation: sheet-up var(--dur-slow) var(--ease-out);
-    box-shadow: 0 -20px 60px rgba(0,0,0,0.5);
-}
-@keyframes sheet-up {
-    from { transform: translateY(100%); }
-    to   { transform: translateY(0); }
-}
-@keyframes sheet-fade {
-    from { opacity: 0; }
-    to   { opacity: 1; }
-}
-@media (prefers-reduced-motion: reduce) {
-    .crowbot-sheet__panel { animation: none; }
-    .crowbot-sheet__backdrop { animation: none; }
-}
-.crowbot-sheet__head {
-    display: flex;
     align-items: center;
     justify-content: space-between;
-    margin-bottom: 0.75rem;
+    gap: 0.9rem 1.5rem;
 }
-.crowbot-sheet__head h2 {
-    font-family: var(--font-display);
-    font-size: 1.1rem;
-    font-weight: 600;
-    color: var(--ink-1);
-}
-.crowbot-sheet__head p {
-    font-size: 0.85rem;
-    color: var(--ink-2);
-    max-width: 56ch;
-    margin-top: 0.3rem;
-}
-.crowbot-sheet__close {
-    width: 36px; height: 36px;
-    border-radius: 50%;
-    border: 1px solid var(--hairline-strong);
-    background: var(--surface-2);
-    color: var(--ink-2);
-    cursor: pointer;
-    font-size: 1.1rem;
+footer.shell-footer .footer-brand {
     display: flex;
     align-items: center;
-    justify-content: center;
+    gap: 0.6rem;
+    font-size: 0.8rem;
+    color: color-mix(in srgb, var(--on-umber) 78%, transparent);
 }
-.crowbot-sheet__close:hover { color: var(--ink-1); }
-.crowbot-sheet__body {
-    background: var(--surface-2);
-    border: 1px solid var(--hairline);
-    border-radius: var(--r-md);
-    min-height: 360px;
+footer.shell-footer .footer-brand .crow-mark { width: 22px; height: 18px; color: var(--tan); }
+footer.shell-footer .footer-socials {
     display: flex;
-    flex-direction: column;
+    gap: 0.25rem;
+    flex-wrap: wrap;
 }
-.crowbot-sheet__body gradio-app {
-    flex: 1;
-    width: 100%;
+footer.shell-footer .footer-socials a {
+    color: var(--on-umber);
+    text-decoration: none;
+    font-size: 0.86rem;
+    font-weight: 500;
+    padding: 0.4rem 0.8rem;
+    border-radius: var(--r-pill);
+    transition: background var(--dur-fast) var(--ease-out);
 }
-/* Crowbot loading + email fallback (Space can cold-start ~30s) */
-.crowbot-loading {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    gap: 0.5rem;
-    text-align: center;
-    padding: 1.5rem 1.25rem;
-    color: var(--ink-2);
-}
-.crowbot-loading.is-hidden { display: none; }
-.crowbot-loading__spinner {
-    width: 22px;
-    height: 22px;
-    border: 2px solid var(--hairline-strong);
-    border-top-color: var(--accent-ink);
-    border-radius: 50%;
-    animation: crowbot-spin 0.8s linear infinite;
-}
-.crowbot-loading.is-stalled .crowbot-loading__spinner { animation: none; opacity: 0.4; }
-@keyframes crowbot-spin { to { transform: rotate(360deg); } }
-@media (prefers-reduced-motion: reduce) {
-    .crowbot-loading__spinner { animation: none; }
-}
-.crowbot-loading__msg { margin: 0; font-size: 0.85rem; color: var(--ink-1); }
-.crowbot-loading__fallback { margin: 0; font-size: 0.78rem; }
-.crowbot-loading__fallback a { color: var(--accent-ink); }
-
-/* ─────────────────────────────────────────────────────────────
- * Desktop progressive enhancement
- * ───────────────────────────────────────────────────────────── */
-@media (min-width: 768px) {
-    body { padding-bottom: 0; }
-
-    /* Bottom tab bar morphs into a floating top-right pill */
-    .tabbar {
-        position: fixed;
-        top: 12px;
-        bottom: auto;
-        left: auto;
-        right: var(--gutter);
-        height: auto;
-        padding: 0.4rem;
-        gap: 0.2rem;
-        background: color-mix(in srgb, var(--surface-1) 80%, transparent);
-        border: 1px solid var(--hairline-strong);
-        border-top: 1px solid var(--hairline-strong);
-        border-radius: 999px;
-        box-shadow: 0 8px 30px rgba(0, 0, 0, 0.35);
-        backdrop-filter: blur(16px);
-        -webkit-backdrop-filter: blur(16px);
-        width: max-content;
-    }
-    /* Desktop: keep brand + page indicator together on the left, leaving right
- * side completely clear for the floating tab-bar pill. */
-header.topbar {
-    padding-right: var(--gutter) !important;
-    justify-content: flex-start !important;
-    gap: 1.25rem;
-}
-header.topbar .topbar__brand { flex: 0 0 auto; }
-header.topbar .topbar__page  {
-    margin-left: 0;
-    border-left: 1px solid var(--hairline);
-    padding-left: 1.25rem;
-    align-self: center;
-}
-    .tabbar__item {
-        flex: 0 0 auto;
-        flex-direction: row;
-        font-size: 0.82rem;
-        gap: 0.45rem;
-        padding: 0.5rem 0.9rem;
-        min-height: 0;
-        border-radius: 999px;
-    }
-    .tabbar__item .tabbar__icon { width: 16px; height: 16px; }
-    .tabbar__item.is-active { color: var(--accent-ink); }
-
-    /* Desktop: indicator becomes a full-height background pill */
-    .tabbar__indicator {
-        border-radius: 999px;
-        background: var(--accent-glow);
-        box-shadow: none;
-        height: 0; /* overridden by JS */
-        transition:
-            left var(--dur-base) var(--ease-out),
-            width var(--dur-base) var(--ease-out),
-            top var(--dur-base) var(--ease-out),
-            height var(--dur-base) var(--ease-out),
-            opacity var(--dur-fast) var(--ease-out);
-    }
-
-    /* Crowbot FAB stays bottom-left on desktop too — no tab bar in the way */
-    .crowbot-fab { bottom: 24px; }
+footer.shell-footer .footer-socials a:hover {
+    background: color-mix(in srgb, var(--on-umber) 14%, transparent);
 }
 
 /* ─────────────────────────────────────────────────────────────
  * Focus ring (global)
  * ───────────────────────────────────────────────────────────── */
 a:focus-visible,
-button:focus-visible,
-.tabbar__item:focus-visible {
+button:focus-visible {
     outline: 2px solid var(--focus-ring);
     outline-offset: 3px;
     border-radius: var(--r-sm);
 }
+.topnav a:focus-visible,
+.burger:focus-visible,
+footer.shell-footer .footer-socials a:focus-visible { border-radius: var(--r-pill); }
 
 /* ─────────────────────────────────────────────────────────────
- * View Transitions API — shared element morphs across navigations.
- * Browsers without support fall back to the legacy fade in transition.js.
+ * View Transitions API — persistent shell stays put while the page
+ * content cross-fades. Browsers without support use the fade in
+ * transition.js.
  * ───────────────────────────────────────────────────────────── */
-
 @supports (view-transition-name: a) {
-    /* Name the persistent shell elements so the browser tracks them across pages.
-     * The brand and tab bar are visually identical between pages — this makes them
-     * stay perfectly still while the rest of the page cross-fades. */
     header.topbar .topbar__brand { view-transition-name: nav-brand; }
-    .topbar__page                { view-transition-name: nav-page; }
-    .tabbar                      { view-transition-name: nav-tabbar; }
-    .crowbot-fab                 { view-transition-name: fab-crowbot; }
     main                         { view-transition-name: page-main; }
     footer.shell-footer          { view-transition-name: page-footer; }
 
-    /* Default new/old animations: a quick crossfade is fine for most things,
-     * but main gets a subtle slide-up on entry to feel intentional. */
     ::view-transition-old(page-main) {
         animation: vt-fade-out var(--dur-base) var(--ease-out) both;
     }
@@ -516,33 +314,14 @@ button:focus-visible,
         animation: vt-fade-up var(--dur-slow) var(--ease-out) both;
     }
     ::view-transition-old(page-footer),
-    ::view-transition-new(page-footer) {
-        animation-duration: var(--dur-base);
-    }
-
-    /* The named persistent elements get no animation — they stay in place. */
+    ::view-transition-new(page-footer),
     ::view-transition-old(nav-brand),
-    ::view-transition-new(nav-brand),
-    ::view-transition-old(nav-tabbar),
-    ::view-transition-new(nav-tabbar),
-    ::view-transition-old(fab-crowbot),
-    ::view-transition-new(fab-crowbot) {
+    ::view-transition-new(nav-brand) {
         animation-duration: 0s;
-    }
-
-    /* The page indicator (01 / Now → 02 / Work) is the most visible piece of
-     * "where am I now" — give it a smooth swap. */
-    ::view-transition-old(nav-page) {
-        animation: vt-page-out var(--dur-base) var(--ease-out) both;
-    }
-    ::view-transition-new(nav-page) {
-        animation: vt-page-in var(--dur-base) var(--ease-out) both;
     }
 
     @keyframes vt-fade-out  { to { opacity: 0; } }
     @keyframes vt-fade-up   { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
-    @keyframes vt-page-out  { to { opacity: 0; transform: translateY(-4px); } }
-    @keyframes vt-page-in   { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: translateY(0); } }
 
     @media (prefers-reduced-motion: reduce) {
         ::view-transition-old(*),
@@ -555,32 +334,27 @@ button:focus-visible,
 /* ─────────────────────────────────────────────────────────────
  * A11y utilities
  * ───────────────────────────────────────────────────────────── */
-
-/* Skip-to-content link — visible on keyboard focus, hidden otherwise. */
 .skip-link {
     position: fixed;
     top: 8px;
     left: 8px;
     z-index: 1000;
     background: var(--accent);
-    color: var(--ink-1);
-    padding: 0.5rem 0.85rem;
-    border-radius: var(--r-sm);
-    font-family: var(--font-mono);
-    font-size: 0.78rem;
-    letter-spacing: 0.06em;
-    text-transform: uppercase;
+    color: var(--on-accent);
+    padding: 0.55rem 0.95rem;
+    border-radius: var(--r-pill);
+    font-size: 0.82rem;
+    font-weight: 600;
     text-decoration: none;
     transform: translateY(-200%);
     transition: transform var(--dur-fast) var(--ease-out);
 }
 .skip-link:focus {
     transform: translateY(0);
-    outline: 2px solid var(--bg);
+    outline: 2px solid var(--ink-1);
     outline-offset: 2px;
 }
 
-/* Generic visually-hidden utility for accessible labels */
 .visually-hidden,
 .sr-only {
     position: absolute;
@@ -594,75 +368,3 @@ button:focus-visible,
     white-space: nowrap;
     border: 0;
 }
-
-/* Body scroll lock when Crowbot sheet is open */
-body.crowbot-sheet-open {
-    overflow: hidden !important;
-}
-
-/* Temporarily hide Crowbot UI across the site */
-.crowbot-fab,
-.crowbot-sheet {
-    display: none !important;
-}
-
-/* ──────────────── Site-wide construction banner ──────────────── */
-.site-banner {
-    position: relative;
-    z-index: 51;
-    background: var(--accent-2);
-    color: #2c1f17;
-    font-family: var(--font-mono);
-    font-size: 0.72rem;
-    line-height: 1.45;
-    letter-spacing: 0.01em;
-    text-align: center;
-    padding: 0.5rem 1rem;
-}
-
-/* ──────────────── Desktop: inline top nav (≥768px) ──────────────── */
-/* A separate static nav that lives inside the header. On desktop it shows
-   inline and the burger is hidden; on mobile it is hidden and the existing
-   burger + dropdown take over. Keeping them separate avoids fixed-position /
-   backdrop-filter containing-block issues with the mobile dropdown. */
-.topnav { display: none; }
-@media (min-width: 768px) {
-    .burger { display: none; }
-    /* The .topnav replaces the burger dropdown on desktop. Remove the closed
-       .site-nav entirely so its (only opacity-hidden) links don't linger in the
-       tab order as phantom focus stops or register as a duplicate nav landmark. */
-    .site-nav { display: none; }
-    .topnav {
-        display: flex;
-        align-items: center;
-        gap: 0.1rem;
-        margin-left: auto;
-    }
-    .topnav a {
-        padding: 0.4rem 0.7rem;
-        font-size: 0.82rem;
-        font-weight: 500;
-        color: var(--ink-2);
-        text-decoration: none;
-        border-radius: 8px;
-        transition: color var(--dur-fast) var(--ease-out),
-                    background var(--dur-fast) var(--ease-out);
-    }
-    .topnav a:hover { color: var(--accent-ink); background: var(--surface-2); }
-}
-
-.skip-link { color: var(--on-accent); }
-
-/* Brand mark — crow glyph in the topbar */
-header.topbar .topbar__brand .brand-mark { display: inline-flex; align-items: center; color: var(--accent); }
-header.topbar .topbar__brand .brand-mark svg { width: 20px; height: 20px; display: block; }
-
-/* Crow mark — rasterized silhouette painted via CSS mask, so it inherits the
- * accent color (and recolors with every ?ink= per-company theme). */
-.crow-mark {
-    display: block;
-    background-color: currentColor;
-    -webkit-mask: url("/assets/crow.png") center / contain no-repeat;
-            mask: url("/assets/crow.png") center / contain no-repeat;
-}
-header.topbar .topbar__brand .brand-mark .crow-mark { width: 27px; height: 22px; }

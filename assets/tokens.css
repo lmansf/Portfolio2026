@@ -1,50 +1,74 @@
 /* ─────────────────────────────────────────────────────────────
- * tokens.css — design tokens for the 2026 portfolio overhaul.
+ * tokens.css — design tokens for loganmansfield.org.
  *
- * v2 palette: warm "relaxed + energized" — cream paper surfaces,
- * deep coffee ink, sunset coral as the energized primary accent,
- * honey amber as the warm relaxed counterpoint, sage for success.
+ * Palette: "Barn Owl" — the pale heart-shaped facial disc and cream
+ * breast of Tyto alba as the page, deep eye-brown as ink, the plumage
+ * browns (tan → caramel → chestnut → umber) as warm accents, and a
+ * creamy, milk-washed blue as the one action color (links, buttons,
+ * focus). Day is the default; Night follows prefers-color-scheme: dark.
  *
- * Source of truth: REDESIGN_PLAN.md §2.1 (palette refreshed Phase 7).
  * Every page imports this BEFORE any other stylesheet.
  * ────────────────────────────────────────────────────────────── */
 
 :root {
-    /* ── Surfaces (dark canvas) ── */
-    --bg:               #0c1116;     /* near-black, faintly cool */
-    --surface-1:        #141b22;     /* raised card */
-    --surface-2:        #1b242d;     /* chips / empty states / deeper */
-    --surface-3:        #26323d;     /* hover */
+    color-scheme: light;
 
-    /* ── Ink (light on dark) ── */
-    --ink-1:            #e9eef3;     /* near-white — primary text */
-    --ink-2:            #aab6c0;     /* muted — secondary */
-    --ink-3:            #8a96a1;     /* tertiary / labels (AA on dark) */
+    /* ── Ground (the facial disc) ── */
+    --bg:               #fdf9f3;     /* page: the white of the disc */
+    --surface-1:        #f6eee2;     /* raised cards: cream breast feathers */
+    --surface-2:        #ede1cf;     /* sunken / hover / chips */
+    --surface-3:        #e4d5c0;     /* deeper hover, pressed */
 
-    /* ── Accents (electric cyan) ── */
-    --accent:           #22d3ee;     /* electric cyan — primary accent */
-    --accent-ink:       #22d3ee;     /* cyan reads as bright text on dark — no darkening needed */
-    --on-accent:        #06141a;     /* dark text/icons on cyan fills */
-    --accent-2:         #7dd3fc;     /* soft sky — secondary */
-    --accent-glow:      color-mix(in srgb, var(--accent) 22%, transparent);
-    --success:          #34d399;     /* emerald */
-    --danger:           #f87171;     /* soft red */
+    /* ── Ink (deep eye-brown, never black) ── */
+    --ink-1:            #3a281c;     /* primary text (13:1 on --bg) */
+    --ink-2:            #715a47;     /* secondary text (6.1:1) */
+    --ink-3:            #6f5945;     /* labels, meta (≥ 4.5:1 on every surface) */
+
+    /* ── Creamy blue: the action color ── */
+    --accent:           #35607b;     /* links, primary button, active states (6.4:1 on --bg) */
+    --accent-ink:       #35607b;     /* link text; aliases --accent on the light canvas */
+    --on-accent:        #fdf9f3;     /* text on an accent fill (6.4:1) */
+    --accent-soft:      #c5d9e6;     /* the creamy blue itself: fills, badges, avatar ring */
+    --accent-mist:      #e2ecf3;     /* faint blue wash for hover tints */
+    --accent-glow:      rgba(53, 96, 123, 0.14);
+
+    /* ── Plumage browns (warm counterpoint) ── */
+    --tan:              #c4a07c;     /* identity fill: the crow mark, dividers, badges (fill only) */
+    --on-tan:           #3a281c;
+    --caramel:          #a3622e;     /* eyebrows, icons, large display accents (4.6:1) */
+    --chestnut:         #7a3f1f;     /* secondary action, emphasis text (7.8:1) */
+    --umber:            #4a3122;     /* deep band: footers, dark feature blocks */
+    --on-umber:         #fdf9f3;
+    --fawn:             #dcc8b2;     /* one soft callout per screen */
+    --plume:            #b3a597;     /* texture / disabled only, never text */
+
+    /* ── Signal ── */
+    --success:          #4d6b38;     /* moss */
+    --danger:           #a3352b;
 
     /* ── Lines ── */
-    --hairline:         rgba(255, 255, 255, 0.10);
-    --hairline-strong:  rgba(255, 255, 255, 0.17);
-    --focus-ring:       #22d3ee;
+    --hairline:         #e4d5c0;     /* decorative dividers, card outlines */
+    --hairline-strong:  #957e69;     /* control borders (3.7:1) */
+    --focus-ring:       #35607b;
 
-    /* ── Type (SF on Apple via the system stack; no web-font download) ── */
-    --font-display: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-    --font-text:    -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-    --font-mono:    "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
+    /* ── Shadows (warm, stacked: contact + ambient) ── */
+    --shadow-sm:  0 1px 2px rgba(58, 40, 28, 0.08), 0 2px 4px rgba(58, 40, 28, 0.06);
+    --shadow-md:  0 2px 4px rgba(58, 40, 28, 0.08), 0 6px 14px rgba(58, 40, 28, 0.10);
+    --shadow-lg:  0 4px 8px rgba(58, 40, 28, 0.08), 0 14px 32px rgba(58, 40, 28, 0.14);
+    --shadow-press: inset 0 -3px 0 rgba(58, 40, 28, 0.22), inset 0 1px 0 rgba(255, 255, 255, 0.35), 0 2px 4px rgba(58, 40, 28, 0.12);
+    --shadow-pressed: inset 0 2px 3px rgba(58, 40, 28, 0.22);
 
-    /* ── Radii ── */
-    --r-sm:  6px;
-    --r-md:  10px;
-    --r-lg:  16px;
-    --r-xl:  24px;
+    /* ── Type ── */
+    --font-display: "Fraunces", Georgia, "Times New Roman", serif;
+    --font-text:    "Figtree", system-ui, -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    --font-mono:    ui-monospace, "SF Mono", SFMono-Regular, Menlo, Consolas, "Liberation Mono", monospace;
+
+    /* ── Radii (soft, a little bubbly) ── */
+    --r-sm:   8px;
+    --r-md:   14px;
+    --r-lg:   20px;
+    --r-xl:   28px;
+    --r-pill: 999px;
 
     /* ── Motion ── */
     --ease-out:    cubic-bezier(0.16, 1, 0.3, 1);
@@ -54,29 +78,57 @@
     --dur-slow:    520ms;
 
     /* ── Layout ── */
-    --tab-bar-h:   64px;
-    --top-bar-h:   56px;
+    --top-bar-h:   60px;
     --gutter:      clamp(1rem, 4vw, 1.5rem);
-    --max-w:       880px;
-
-    /* ── Legacy aliases ──
-     * Keep old token names mapped to new values during transition.
-     * Once all pages are fully redesigned, these aliases can be removed.
-     */
-    --bg-color:        var(--bg);
-    --text-color:      var(--ink-1);
-    --accent-color:    var(--accent);
-    --secondary-text:  var(--ink-2);
-    --card-bg:         var(--surface-1);
-    --card-border:     var(--hairline-strong);
-    --font-main:       var(--font-text);
+    --max-w:       920px;
 }
 
-/* ─── Base reset + page chrome ───
- * Moved here from the legacy index.css / style.css so pages no longer
- * need those files. Keep identical to the legacy reset: shell.css and
- * pages.css were built assuming it.
- */
+/* ── Night: the owl's hunting hour ── */
+@media (prefers-color-scheme: dark) {
+    :root {
+        color-scheme: dark;
+
+        --bg:               #1b140f;
+        --surface-1:        #261c15;
+        --surface-2:        #31251c;
+        --surface-3:        #3d2f24;
+
+        --ink-1:            #f4e9db;
+        --ink-2:            #c4ad96;
+        --ink-3:            #b09a84;
+
+        --accent:           #9ec3da;
+        --accent-ink:       #9ec3da;
+        --on-accent:        #1b140f;
+        --accent-soft:      #2b4254;
+        --accent-mist:      #22323e;
+        --accent-glow:      rgba(158, 195, 218, 0.16);
+
+        --tan:              #c9a682;
+        --on-tan:           #1b140f;
+        --caramel:          #c98a51;
+        --chestnut:         #e0976a;
+        --umber:            #5a3f2d;
+        --on-umber:         #f4e9db;
+        --fawn:             #4a3628;
+        --plume:            #8b7d70;
+
+        --success:          #93b57a;
+        --danger:           #e88473;
+
+        --hairline:         #3d2f24;
+        --hairline-strong:  #86705b;
+        --focus-ring:       #9ec3da;
+
+        --shadow-sm:  0 1px 2px rgba(0, 0, 0, 0.40), 0 2px 4px rgba(0, 0, 0, 0.30);
+        --shadow-md:  0 2px 4px rgba(0, 0, 0, 0.45), 0 6px 14px rgba(0, 0, 0, 0.40);
+        --shadow-lg:  0 4px 8px rgba(0, 0, 0, 0.50), 0 14px 32px rgba(0, 0, 0, 0.50);
+        --shadow-press: inset 0 -3px 0 rgba(0, 0, 0, 0.35), inset 0 1px 0 rgba(255, 255, 255, 0.12), 0 2px 4px rgba(0, 0, 0, 0.45);
+        --shadow-pressed: inset 0 2px 3px rgba(0, 0, 0, 0.45);
+    }
+}
+
+/* ─── Base reset + page chrome ─── */
 *,
 *::before,
 *::after {
@@ -85,10 +137,28 @@
     padding: 0;
 }
 
+html {
+    -webkit-text-size-adjust: 100%;
+    scroll-behavior: smooth;
+}
+
 body {
     background: var(--bg);
     color: var(--ink-1);
     font-family: var(--font-text);
+    font-size: 1rem;
+    line-height: 1.55;
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+}
+
+img, svg { max-width: 100%; }
+
+a { color: var(--accent-ink); }
+
+::selection {
+    background: var(--accent-soft);
+    color: var(--ink-1);
 }
 
 /* Page transitions (classes toggled by transition.js) */
@@ -105,8 +175,7 @@ main {
 }
 
 .page-enter,
-.page-initial-enter,
-.projects-load-enter {
+.page-initial-enter {
     animation: page-fade-in 0.5s ease-out forwards;
 }
 
@@ -116,14 +185,14 @@ main {
 }
 
 @media (prefers-reduced-motion: reduce) {
+    html { scroll-behavior: auto; }
     main { transition: none; }
     .page-enter,
-    .page-initial-enter,
-    .projects-load-enter { animation-duration: 1ms; }
+    .page-initial-enter { animation-duration: 1ms; }
 }
 
-/* Scrollbar on-palette (was dark-theme gray/gold) */
-::-webkit-scrollbar { width: 8px; }
-::-webkit-scrollbar-track { background: var(--surface-2); }
-::-webkit-scrollbar-thumb { background: var(--ink-3); border-radius: 4px; }
-::-webkit-scrollbar-thumb:hover { background: var(--ink-2); }
+/* Scrollbar on-palette */
+::-webkit-scrollbar { width: 10px; }
+::-webkit-scrollbar-track { background: var(--surface-1); }
+::-webkit-scrollbar-thumb { background: var(--plume); border-radius: 5px; border: 2px solid var(--surface-1); }
+::-webkit-scrollbar-thumb:hover { background: var(--ink-3); }
