@@ -164,6 +164,7 @@ function openSiteNav() {
     }
     document.body.classList.add('site-nav-open');
     nav.setAttribute('aria-hidden', 'false');
+    nav.removeAttribute('inert');
     if (burger) burger.setAttribute('aria-expanded', 'true');
     const firstLink = nav.querySelector('.site-nav__item');
     if (firstLink) setTimeout(() => firstLink.focus(), 50);
@@ -174,6 +175,7 @@ function closeSiteNav() {
     if (!nav) return;
     document.body.classList.remove('site-nav-open');
     nav.setAttribute('aria-hidden', 'true');
+    nav.setAttribute('inert', '');
     const burger = document.querySelector('[data-burger]');
     if (burger) burger.setAttribute('aria-expanded', 'false');
 }
