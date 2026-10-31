@@ -33,7 +33,7 @@
     { "source": "/ai-engineering", "destination": "/", "permanent": true },
     { "source": "/work", "destination": "/projects", "permanent": true },
     { "source": "/shop", "destination": "/projects", "permanent": true },
-    { "source": "/fraud", "destination": "/projects", "permanent": true },
+    { "source": "/fraud", "destination": "/projects#fraud", "permanent": true },
     { "source": "/pipeline", "destination": "/owl-park", "permanent": true },
     { "source": "/architecture", "destination": "/owl-park", "permanent": true },
     { "source": "/resume", "destination": "/assets/loganmansfield.pdf", "permanent": false },
