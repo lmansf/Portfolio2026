@@ -10,7 +10,9 @@
 # Needs one repository secret, FRAUD_DB_URL: the Supabase "Session pooler"
 # connection string (IPv4; GitHub runners can't reach the IPv6-only direct
 # host). Until it is set, the job skips without failing and the page keeps
-# showing the last committed snapshot.
+# showing the last committed snapshot. An empty 30-day window (generator
+# paused) also skips quietly, leaving the committed snapshot in place so the
+# page's stale and paused notices carry the message.
 name: Fraud snapshot
 
 on:
@@ -60,8 +62,20 @@ jobs:
           psql "$FRAUD_DB_URL" -X -q -A -t -v ON_ERROR_STOP=1 \
             -f scripts/fraud-snapshot.sql > "$RUNNER_TEMP/raw.json"
 
-      - name: Check the result holds aggregates only
+      - name: Check the window has data
         if: steps.secret.outputs.ready == 'true'
+        id: window
+        run: |
+          set -euo pipefail
+          if jq -e '.totals.checkouts | type == "number" and . > 0' "$RUNNER_TEMP/raw.json" > /dev/null; then
+            echo "empty=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "::notice::No checkouts in the last 30 days (generator paused?); keeping the committed snapshot."
+            echo "empty=true" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Check the result holds aggregates only
+        if: steps.secret.outputs.ready == 'true' && steps.window.outputs.empty == 'false'
         run: |
           set -euo pipefail
           jq -e '
@@ -78,7 +92,7 @@ jobs:
           jq '.' "$RUNNER_TEMP/raw.json" > data/fraud-snapshot.json
 
       - name: Commit the new snapshot
-        if: steps.secret.outputs.ready == 'true'
+        if: steps.secret.outputs.ready == 'true' && steps.window.outputs.empty == 'false'
         run: |
           if git diff --quiet -- data/fraud-snapshot.json; then
             echo "Snapshot unchanged; nothing to publish."

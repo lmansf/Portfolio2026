@@ -89,8 +89,12 @@
 
     /* ── Tooltip ── */
     const tooltip = root.querySelector('[data-live-tooltip]');
+    let tipAnchor = null;
+    let tipHtml = '';
     function showTip(html, anchor) {
         if (!tooltip) return;
+        tipAnchor = anchor;
+        tipHtml = html;
         tooltip.innerHTML = html;
         tooltip.hidden = false;
         const r = anchor.getBoundingClientRect();
@@ -106,9 +110,15 @@
     let activeGroup = null;
     function hideTip() {
         if (tooltip) tooltip.hidden = true;
+        tipAnchor = null;
+        tipHtml = '';
         if (activeGroup) { activeGroup.classList.remove('is-active'); activeGroup = null; }
     }
-    window.addEventListener('scroll', hideTip, { passive: true });
+    window.addEventListener('scroll', () => {
+        const focused = document.activeElement;
+        if (tipAnchor && focused === tipAnchor && focused.classList.contains('hit')) showTip(tipHtml, tipAnchor);
+        else hideTip();
+    }, { passive: true });
     document.addEventListener('keydown', (e) => { if (e.key === 'Escape' || e.key === 'Esc') hideTip(); });
 
     function bindTip(target, html, group) {
