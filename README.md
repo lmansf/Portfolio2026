@@ -13,9 +13,10 @@ A deliberately lean two-page site, plus one archived project page:
   featured projects, an experience timeline, credentials (B.S. Biology, Towson)
   and a toolkit grouped into data stack / forecasting & ML / platforms run at
   ZooTampa, a short about, and the fastest ways to connect.
-- **Projects** (`projects.html`, `/projects`) — featured: the Fraud Detection
-  Pipeline (running on a schedule; links to the branch that holds the code),
-  Owl Park (live at exploreowlpark.com), and Quack Query (the latest build);
+- **Projects** (`projects.html`, `/projects`) — featured: Quack Query (the
+  latest build, first), the Fraud Detection Pipeline (running on a schedule;
+  links to the branch that holds the code), and Owl Park (live at
+  exploreowlpark.com);
   then Lighthouse, Attendance Forecasting, USL Attendance Forecasting, Roll
   Call, Attendance Nowcast, Member Segmentation (RFM), and two retired cards:
   eFrog (code only, no live link) and the archived Owl Park data architecture.
