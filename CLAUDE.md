@@ -11,8 +11,9 @@ Text colors must stay WCAG AA on every surface token: chestnut, the blue
 accent, and the ink tokens pass; tan and caramel are fills, not text.
 
 Motion extras (the walking Owl Park owl and scroll reveals) live only in
-`assets/motion.js`, which injects its own CSS, so a page opts in with one
-deferred script tag; `pages.css` is untouched and `shell.css` only carries
+`assets/motion.js` and `assets/motion.css` (the script loads the stylesheet
+itself, never as an inline `<style>`, which the playground's CSP blocks), so a
+page opts in with one deferred script tag; `pages.css` is untouched and `shell.css` only carries
 the `@view-transition` opt-in (it must be render-blocking to work). Keep the owl
 in its reserved lane above the footer (it must never cover content or
 buttons), keep every animation off or static under `prefers-reduced-motion`,

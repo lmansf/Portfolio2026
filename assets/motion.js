@@ -1,9 +1,9 @@
 /* ─────────────────────────────────────────────────────────────
  * motion.js — the walking owl and scroll reveals.
  *
- * Self-contained: it injects its own small stylesheet, so a page opts in
- * with one tag (`<script defer src="/assets/motion.min.js"></script>`)
- * and nothing in shell.css / pages.css depends on it.
+ * A page opts in with one tag (`<script defer src="/assets/motion.min.js"></script>`);
+ * the script loads its own stylesheet (assets/motion.min.css) and nothing in
+ * shell.css / pages.css depends on it.
  *
  *  1. Owl lane. A short strip between <main> and the footer where a barn
  *     owl (art from Owl Park, github.com/lmansf/Welcome-to-Owl-Park) waddles
@@ -34,51 +34,25 @@
     function reduceMotion() { return !!(mql && mql.matches); }
 
     /* ─── Styles ─── */
-    var CSS = [
-        /* Owl lane: its own space above the footer. */
-        '.owl-lane { position: relative; z-index: 1; width: 100%; max-width: var(--max-w, 920px); margin: auto auto 0; padding: 0 var(--gutter, 1rem); height: 60px; box-sizing: border-box; pointer-events: none; }',
-        '.owl-lane + footer.shell-footer { margin-top: 0; }',
-        '.owl-lane__track { position: relative; height: 100%; margin-right: 5.5rem; }',
-        '.owl-lane.is-hidden { height: 34px; }',
-        '.owl-lane.is-hidden .owl-walker { display: none; }',
 
-        '.owl-walker { position: absolute; left: 0; bottom: 0; width: 44px; height: 55px; display: block; pointer-events: auto; text-decoration: none; will-change: transform; -webkit-tap-highlight-color: transparent; }',
-        '.owl-walker:focus-visible { outline: 2px solid var(--focus-ring, #35607b); outline-offset: 4px; border-radius: var(--r-sm, 8px); }',
-        '.owl-walker__face { position: absolute; inset: 0; transform-origin: 50% 100%; }',
-        '.owl-walker.is-right .owl-walker__face { transform: scaleX(-1); }',
-        '.owl-walker__sprite { position: absolute; inset: 0; transform-origin: 50% 100%; }',
-        '.owl-walker__sprite img { position: absolute; inset: 0; width: 100%; height: 100%; display: block; user-select: none; -webkit-user-drag: none; }',
-        '.owl-walker__sprite img + img { visibility: hidden; }',
-        '.owl-walker.is-blink .owl-walker__sprite img + img { visibility: visible; }',
-        '.owl-walker.is-blink .owl-walker__sprite img:first-child { visibility: hidden; }',
-        '.owl-walker.is-walking .owl-walker__sprite { animation: owl-waddle 0.42s ease-in-out infinite alternate; }',
-        '@keyframes owl-waddle { from { transform: rotate(-5deg) translateY(0); } to { transform: rotate(5deg) translateY(-2px); } }',
-        '.owl-walker.is-hop .owl-walker__sprite { animation: owl-hop 0.5s cubic-bezier(0.34, 1.4, 0.64, 1); }',
-        '@keyframes owl-hop { 0%, 100% { transform: translateY(0); } 40% { transform: translateY(-9px) scaleY(1.04); } 70% { transform: translateY(0) scaleY(0.94); } }',
+    var CSS_HREF = '/assets/motion.min.css';
 
-        /* Speech bubble: floats above the owl's head, into main's empty bottom padding. */
-        '.owl-walker__bubble { position: absolute; bottom: calc(100% + 6px); left: 50%; transform: translate(calc(-50% + var(--bubble-shift, 0px)), 4px); white-space: nowrap; font: 600 0.78rem/1.2 var(--font-text, system-ui, sans-serif); color: var(--ink-1, #3a281c); background: var(--surface-1, #f6eee2); border: 1px solid var(--hairline, #e4d5c0); border-radius: var(--r-pill, 999px); padding: 0.32rem 0.7rem; box-shadow: var(--shadow-sm, 0 1px 2px rgba(0,0,0,.1)); opacity: 0; transition: opacity 180ms ease, transform 180ms ease; pointer-events: none; }',
-        '.owl-walker__bubble::after { content: ""; position: absolute; top: 100%; left: calc(50% - var(--bubble-shift, 0px)); margin-left: -5px; border: 5px solid transparent; border-top-color: var(--surface-1, #f6eee2); }',
-        '.owl-walker:hover .owl-walker__bubble, .owl-walker:focus-visible .owl-walker__bubble, .owl-walker.is-talking .owl-walker__bubble { opacity: 1; transform: translate(calc(-50% + var(--bubble-shift, 0px)), 0); }',
-
-        '.owl-lane__toggle { position: absolute; right: var(--gutter, 1rem); bottom: 10px; pointer-events: auto; font: 500 0.75rem/1 var(--font-text, system-ui, sans-serif); color: var(--ink-3, #6f5945); background: transparent; border: 1px solid transparent; border-radius: var(--r-pill, 999px); padding: 0.4rem 0.65rem; cursor: pointer; }',
-        '.owl-lane__toggle:hover { color: var(--ink-1, #3a281c); background: var(--surface-2, #ede1cf); }',
-        '.owl-lane__toggle:focus-visible { outline: 2px solid var(--focus-ring, #35607b); outline-offset: 2px; }',
-
-        /* Scroll reveals: only applied by JS, only to elements below the fold. */
-        '.reveal { opacity: 0; transform: translateY(14px); transition: opacity 520ms var(--ease-out, ease-out), transform 520ms var(--ease-out, ease-out); transition-delay: var(--reveal-delay, 0ms); }',
-        '.reveal.is-revealed { opacity: 1; transform: none; }',
-
-        '@media (prefers-reduced-motion: reduce) { .owl-walker__sprite { animation: none !important; } .reveal { opacity: 1; transform: none; transition: none; } }',
-        '@media print { .owl-lane { display: none; } .reveal { opacity: 1 !important; transform: none !important; } }'
-    ].join('\n');
-
-    function injectStyles() {
-        if (document.getElementById('motion-styles')) return;
-        var style = document.createElement('style');
-        style.id = 'motion-styles';
-        style.textContent = CSS;
-        document.head.appendChild(style);
+    /* Load motion.css, then call done. External (not inline) so a strict
+     * style-src 'self' CSP allows it; done runs once, also on error, so a
+     * failed load never leaves reveal targets hidden (they are only tagged
+     * after this, and without the stylesheet the tags do nothing). */
+    function loadStyles(done) {
+        var called = false;
+        function finish(ok) { if (called) return; called = true; done(ok); }
+        var existing = document.getElementById('motion-styles');
+        if (existing) { finish(true); return; }
+        var link = document.createElement('link');
+        link.id = 'motion-styles';
+        link.rel = 'stylesheet';
+        link.href = CSS_HREF;
+        link.onload = function () { finish(true); };
+        link.onerror = function () { finish(false); };
+        document.head.appendChild(link);
     }
 
     /* ─── Storage (may throw in private windows) ─── */
@@ -364,11 +338,13 @@
     }
 
     function init() {
-        injectStyles();
-        mountOwl();
-        // Let transition.js's first-paint fade settle before measuring the fold.
-        requestAnimationFrame(function () { scanReveals(); });
-        watchMainSwaps();
+        loadStyles(function (ok) {
+            if (!ok) return; // no stylesheet: leave the page as it is
+            mountOwl();
+            // Let transition.js's first-paint fade settle before measuring the fold.
+            requestAnimationFrame(function () { scanReveals(); });
+            watchMainSwaps();
+        });
     }
 
     if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init);
