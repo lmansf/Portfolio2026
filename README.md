@@ -49,7 +49,10 @@ soft and tappable things are pills.
   (see [`docs/referrers.md`](docs/referrers.md)).
 - `assets/profilepicture.webp` — circular hero avatar on the home page.
 - `assets/crow.png`, `assets/favicon-crow.png`, `mini.jpg` — the crow mark
-  (painted via CSS mask), favicon, and share image.
+  (painted via CSS mask), favicon, and alternate (JPEG) icon.
+- `assets/og-card.jpg` — 1200×630 share card (generated from the profile
+  picture) used as `og:image` on every page, with `summary_large_image`
+  Twitter cards.
 - `assets/apple-touch-icon.png`, `assets/icon-192.png`, `assets/icon-512.png`
   — home-screen icons referenced from `manifest.json`.
 - `assets/loganmansfield.pdf` — résumé served from the site.
@@ -58,6 +61,38 @@ The pages load the minified `.min` variants. After editing any source asset,
 regenerate its minified file:
 
     npx esbuild <src> --minify --outfile=<min> --allow-overwrite
+
+## Search and sharing metadata
+
+The goal is that a search for "Logan Mansfield" (with or without ZooTampa /
+analytics / data) lands on this site with accurate, self-owned information.
+Everything lives in the page `<head>` and a few root files — body copy is not
+part of it:
+
+- **Head tags** — every page (404 included) has a unique `<title>`, meta
+  description, Open Graph tags, the shared `og:image` card, and
+  `summary_large_image` Twitter cards (`@StatBird`); the three content pages
+  also set `author`, `og:site_name` and `og:locale`. The home page is
+  `og:type` `profile` (with `profile:first_name` / `profile:last_name`); the
+  others are `website`.
+- **Structured data (JSON-LD)** — the home page carries a `WebSite`,
+  `ProfilePage`, and `Person` graph: given/family name, both job titles
+  (IT Point of Sale Systems Analyst at ZooTampa at Lowry Park, and Data
+  Analyst), `worksFor`, `hasOccupation`, `alumniOf`, `hasCredential`
+  (certifications and degree), `knowsAbout`, and `sameAs` profile links —
+  enough to disambiguate from other people with the same name. Projects
+  and Owl Park are `WebPage`s that reference the home `#person` /
+  `#website` ids and carry `BreadcrumbList`s.
+- **`sitemap.xml`** / **`robots.txt`** — the three public URLs; bump each
+  `<lastmod>` when its page changes.
+- **`llms.txt`** — a short, factual plain-text summary (role, employer,
+  education, certification, pages, profiles) for AI answer engines. Keep it
+  in sync with the structured data and the résumé.
+
+Framing rule for all of the above: the day job is systems ownership (Galaxy
+ticketing, eGalaxy webstores, PAR Pixel POS, vendors, park-wide POS
+hardware); SQL/Python/Power BI are portfolio and analyst skills. Don't claim
+anything not on the résumé.
 
 ## Local development
 
