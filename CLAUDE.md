@@ -23,6 +23,13 @@ generated, not hand-edited: change `resume-src/resume.md` and run
 Biology, Towson (2019) leads education; no dbt, CRM ownership, UAT, or
 M365/D365 admin; titles and dates unchanged; LinkedIn is `in/lmansf96`.
 
+The `/live` page (`live.html`, `assets/live.*`) is fed by
+`data/fraud-snapshot.json`, which the `fraud-snapshot` GitHub Action
+regenerates daily from `scripts/fraud-snapshot.sql` and commits to `main`.
+Keep the SQL output, the workflow's `jq` allow-list, and `live.js` in step
+when fields change; the snapshot holds aggregates only and the page must
+never carry a database key. See the README's "Live fraud data" section.
+
 ## Validate portfolio PRs through the `no-mistakes` gate
 
 Before opening a pull request for this portfolio, validate the change with the

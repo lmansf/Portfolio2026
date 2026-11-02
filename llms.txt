@@ -17,6 +17,7 @@ This is Logan Mansfield's own site. There are other people named Logan Mansfield
 
 - [Home](https://loganmansfield.org/): profile, experience, credentials, and featured projects
 - [Projects](https://loganmansfield.org/projects): portfolio projects, including a fraud-detection pipeline, Owl Park, and Lighthouse
+- [Live fraud data](https://loganmansfield.org/live): daily numbers from the fraud-detection pipeline over simulated webstore checkouts, refreshed every day
 - [Owl Park data architecture](https://loganmansfield.org/owl-park): architecture infographic for the Owl Park project
 
 ## Profiles

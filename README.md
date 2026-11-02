@@ -6,7 +6,8 @@ HTML/CSS/JS, no build step, deployed on Vercel.
 
 ## Site structure
 
-A deliberately lean two-page site, plus one archived project page:
+A deliberately lean two-page site, plus one archived project page and a
+live data page:
 
 - **Home** (`index.html`, `/`) — intro, availability and contact buttons
   (résumé PDF, email, LinkedIn, GitHub), a three-line "now" strip, three
@@ -31,11 +32,13 @@ A deliberately lean two-page site, plus one archived project page:
   card copy.
 - **Owl Park** (`owl-park-infographic.html`, `/owl-park`) — a standalone
   infographic of the archived end-to-end data pipeline.
+- **Live data** (`live.html`, `/live`) — daily numbers from the fraud
+  pipeline (see "Live fraud data" below).
 - **404** (`404.html`) — branded not-found page.
 
-Clean URLs (`/projects`, `/owl-park`), the `/resume` shortcut to the résumé
-PDF, and legacy redirects (e.g. `/fraud` → `/projects#fraud`, `/pipeline` →
-`/owl-park`) are configured in `vercel.json`.
+Clean URLs (`/projects`, `/owl-park`, `/live`), the `/resume` shortcut to
+the résumé PDF, and legacy redirects (e.g. `/fraud` → `/projects#fraud`,
+`/pipeline` → `/owl-park`) are configured in `vercel.json`.
 
 ## Design: "Barn Owl"
 
@@ -76,6 +79,9 @@ soft and tappable things are pills.
   in-site swap from Home (which is why Home loads the script too).
 - `assets/theme.js` — optional per-company accent theming via `?ink=<company>`
   (see [`docs/referrers.md`](docs/referrers.md)).
+- `assets/live.css`, `assets/live.js` — styles and chart code for the live
+  data page only (see "Live fraud data" below); `data/fraud-snapshot.json`
+  is the aggregate snapshot it draws from, rewritten by a GitHub Action.
 - `assets/profilepicture.webp` — circular hero avatar on the home page.
 - `assets/crow.png`, `assets/favicon-crow.png`, `mini.jpg` — the crow mark
   (painted via CSS mask), favicon, and alternate (JPEG) icon.
@@ -116,7 +122,7 @@ part of it:
 
 - **Head tags** — every page (404 included) has a unique `<title>`, meta
   description, Open Graph tags, the shared `og:image` card, and
-  `summary_large_image` Twitter cards (`@StatBird`); the three content pages
+  `summary_large_image` Twitter cards (`@StatBird`); the four content pages
   also set `author`, `og:site_name` and `og:locale`. The home page is
   `og:type` `profile` (with `profile:first_name` / `profile:last_name`); the
   others are `website`.
@@ -125,10 +131,10 @@ part of it:
   (IT Point of Sale Systems Analyst at ZooTampa at Lowry Park, and Data
   Analyst), `worksFor`, `hasOccupation`, `alumniOf`, `hasCredential`
   (certifications and degree), `knowsAbout`, and `sameAs` profile links —
-  enough to disambiguate from other people with the same name. Projects
-  and Owl Park are `WebPage`s that reference the home `#person` /
+  enough to disambiguate from other people with the same name. Projects,
+  Owl Park and Live data are `WebPage`s that reference the home `#person` /
   `#website` ids and carry `BreadcrumbList`s.
-- **`sitemap.xml`** / **`robots.txt`** — the three public URLs; bump each
+- **`sitemap.xml`** / **`robots.txt`** — the four public URLs; bump each
   `<lastmod>` when its page changes.
 - **`llms.txt`** — a short, factual plain-text summary (role, employer,
   education, certification, pages, profiles) for AI answer engines. Keep it
@@ -139,6 +145,43 @@ ticketing, eGalaxy webstores, PAR Pixel POS, vendors, park-wide POS
 hardware); SQL/Python/Power BI are portfolio and analyst skills. Don't claim
 anything Logan hasn't confirmed (no CRM ownership, UAT, M365/D365
 admin, or dbt as a skill).
+
+## Live fraud data (`/live`)
+
+The page draws its charts in the browser from `data/fraud-snapshot.json`, an
+aggregates-only snapshot of the fraud pipeline's Supabase tables (simulated
+webstore checkouts). Nothing on the page talks to the database.
+
+- **`scripts/fraud-snapshot.sql`** — one query in a read-only transaction.
+  It returns counts, rates, dollar totals, a 20-bin score histogram, and
+  per-pattern catch rates for the last 30 America/New_York days. Fraud is
+  measured against the generator's answer key in `raw_fraud_truth`,
+  including labels whose `label_available_at` is still in the future (the
+  page says so). It never selects an id, email, card, IP, or name into the
+  output.
+- **`.github/workflows/fraud-snapshot.yml`** — runs daily at 05:35 UTC (and
+  on demand), checks the result against an allow-list of fields with `jq`,
+  and commits the file on every run (the timestamp always moves, so the
+  page's staleness notice stays honest); the push redeploys the site. It
+  needs the repository secret `FRAUD_DB_URL`: the Supabase Session pooler
+  connection string for the `fraud_snapshot_reader` role, never the main
+  `postgres` user. Without it, or when the last 30 days hold no
+  checkouts, the job skips and the page keeps the last committed snapshot.
+- **`supabase/fraud_snapshot_reader.sql`** — creates that login role, run
+  once by hand in the Supabase SQL editor (it is not applied by anything in
+  this repo). The role is read-only, may SELECT only the columns the
+  snapshot query reads from its four tables, and gets an RLS SELECT policy
+  that applies to it alone.
+- **`assets/live.js` / `assets/live.css`** — plain SVG charts, stat tiles,
+  and a table view. Series colors are validated separately for Day and
+  Night. The page warns visitors when the snapshot is more than 36 hours
+  old or the generator has been paused (no checkout for 6 hours before the
+  snapshot was taken).
+
+To add a field, change the SQL, add the field to the workflow's
+allow-list, then read it in `live.js`. Don't hand-edit
+`data/fraud-snapshot.json` beyond regenerating it with the query: the next
+scheduled run overwrites it.
 
 ## Local development
 
