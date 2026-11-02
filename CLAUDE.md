@@ -10,6 +10,14 @@ editing source (esbuild is fine:
 Text colors must stay WCAG AA on every surface token: chestnut, the blue
 accent, and the ink tokens pass; tan and caramel are fills, not text.
 
+Motion extras (the walking Owl Park owl and scroll reveals) live only in
+`assets/motion.js`, which injects its own CSS, so a page opts in with one
+deferred script tag; `pages.css` is untouched and `shell.css` only carries
+the `@view-transition` opt-in (it must be render-blocking to work). Keep the owl
+in its reserved lane above the footer (it must never cover content or
+buttons), keep every animation off or static under `prefers-reduced-motion`,
+and leave the "Hide owl" choice in localStorage working.
+
 `playground.html` (the DuckDB-Wasm SQL playground) is served with a
 Content-Security-Policy from `vercel.json`: no inline scripts, and any new
 origin the page loads from must be added to that header. Its data file and
@@ -20,6 +28,20 @@ Search/share metadata (head tags, JSON-LD, `sitemap.xml`, `robots.txt`,
 sharing metadata" section. When a page's head or facts change, bump that
 page's `<lastmod>` in `sitemap.xml` and keep `llms.txt` and the Person
 JSON-LD consistent with each other and with the résumé.
+
+The résumé (`assets/loganmansfield.pdf` and `assets/resume_ats.txt`) is
+generated, not hand-edited: change `resume-src/resume.md` and run
+`python3 resume-src/build.py` (reportlab + Carlito; see the README's
+"Assets" section). It must stay one Letter page. Content rules: B.S.
+Biology, Towson (2019) leads education; no dbt, CRM ownership, UAT, or
+M365/D365 admin; titles and dates unchanged; LinkedIn is `in/lmansf96`.
+
+The `/live` page (`live.html`, `assets/live.*`) is fed by
+`data/fraud-snapshot.json`, which the `fraud-snapshot` GitHub Action
+regenerates daily from `scripts/fraud-snapshot.sql` and commits to `main`.
+Keep the SQL output, the workflow's `jq` allow-list, and `live.js` in step
+when fields change; the snapshot holds aggregates only and the page must
+never carry a database key. See the README's "Live fraud data" section.
 
 ## Validate portfolio PRs through the `no-mistakes` gate
 

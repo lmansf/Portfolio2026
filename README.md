@@ -6,20 +6,27 @@ HTML/CSS/JS, no build step, deployed on Vercel.
 
 ## Site structure
 
-A deliberately lean two-page site, plus a SQL playground and one archived
-project page:
+A deliberately lean two-page site, plus a SQL playground, a live data page,
+and one archived project page:
 
 - **Home** (`index.html`, `/`) — intro, availability and contact buttons
   (résumé PDF, email, LinkedIn, GitHub), a three-line "now" strip, three
   featured projects, an experience timeline, credentials (B.S. Biology, Towson)
   and a toolkit grouped into data stack / forecasting & ML / platforms run at
   ZooTampa, a short about, and the fastest ways to connect.
-- **Projects** (`projects.html`, `/projects`) — featured: the Fraud Detection
-  Pipeline (running on a schedule; links to the branch that holds the code),
-  Owl Park (live at exploreowlpark.com), and Lighthouse; then Quack Query,
-  USL Attendance Forecasting, Roll Call, eFrog (live), Attendance Nowcast,
-  Member Segmentation (RFM), and the archived Owl Park data architecture.
-  Cards have anchor ids (`#fraud`, `#owl-park`, `#lighthouse`, …) so the home
+- **Projects** (`projects.html`, `/projects`) — featured: Quack Query (the
+  latest build, first), the Fraud Detection Pipeline (running on a schedule;
+  links to the branch that holds the code), and Owl Park (live at
+  exploreowlpark.com);
+  then Lighthouse, Attendance Forecasting, USL Attendance Forecasting, Roll
+  Call, Attendance Nowcast, Member Segmentation (RFM), and two retired cards:
+  eFrog (code only, no live link) and the archived Owl Park data architecture.
+  Between the featured cards and the rest, "How the data flows" holds a
+  clickable pipeline diagram for the Fraud Detection Pipeline (`#fraud-flow`)
+  and Owl Park (`#owl-park-flow`); those two featured cards link down to
+  their own. Every stage note is checked against that project's public repo,
+  so update the diagram when the pipeline changes.
+  Cards have anchor ids (`#fraud`, `#owl-park`, `#quack-query`, …) so the home
   page and legacy redirects can deep-link to them. The home page repeats the
   three featured cards in shorter form, so keep the two in step when editing
   card copy.
@@ -29,9 +36,12 @@ project page:
   results table, and CSV download. See "SQL playground data" below.
 - **Owl Park** (`owl-park-infographic.html`, `/owl-park`) — a standalone
   infographic of the archived end-to-end data pipeline.
+- **Live data** (`live.html`, `/live`) — daily numbers from the fraud
+  pipeline (see "Live fraud data" below).
 - **404** (`404.html`) — branded not-found page.
 
-Clean URLs (`/projects`, `/playground`, `/owl-park`) and legacy redirects (e.g. `/fraud` →
+Clean URLs (`/projects`, `/playground`, `/owl-park`, `/live`), the `/resume`
+shortcut to the résumé PDF, and legacy redirects (e.g. `/fraud` →
 `/projects#fraud`, `/pipeline` → `/owl-park`) are configured in `vercel.json`.
 
 ## Design: "Barn Owl"
@@ -52,13 +62,46 @@ soft and tappable things are pills.
 - `assets/tokens.css` — design tokens (Day + Night palette, type, radii,
   shadows, motion). Imported first on every page.
 - `assets/shell.css` — ambient background, top bar, nav, footer, focus rings,
-  view transitions.
+  view transitions (including the `@view-transition` opt-in that fades full
+  page loads between pages).
 - `assets/pages.css` — page components: hero, now strip, project cards,
   experience timeline, chips and toolkit groups, about, connect cards, buttons.
-- `assets/transition.js` — SPA-style page transitions and the mobile nav.
-  Only in-site page swaps fade; the first load paints immediately so the hero
-  is on screen at once. Dismissing the mobile nav (Escape, backdrop, burger)
-  returns focus to the burger, whose label toggles Open/Close navigation.
+- `assets/transition.js` — SPA-style page transitions and the mobile nav
+  (Home and Projects only). In-site page swaps fade here; full page loads
+  between pages that share `shell.css` (e.g. to and from 404) fade via the
+  cross-document `@view-transition` opt-in in `shell.css`, which has to sit in
+  a render-blocking stylesheet. The very first load from elsewhere paints
+  immediately so the hero is on screen at once. In-page `#hash` links (the
+  cards' "See how it flows") are left to the browser rather than re-swapping
+  `<main>`. Dismissing the mobile nav (Escape, backdrop, burger) returns focus
+  to the burger, whose label toggles Open/Close navigation.
+- `assets/pipeline.css` / `assets/pipeline.js` — the clickable pipeline
+  diagrams (`[data-flow]` figures on Projects). The script turns each one into
+  a tabs widget: click, tap or hover a stage to read its note, arrow keys and
+  Home/End move between stages, and "Play the flow" steps through once
+  (choosing a stage pauses it; Play again carries on from there). Stages
+  before the selected one stay lit. Stages stack down a rail on phones and
+  tablets and sit in one row from 880px. Without JS every note shows as a
+  list, styled by a `<noscript>` copy of the stylesheet link. The page
+  preloads the stylesheet; the script applies it, and adds it after an
+  in-site swap from Home (which is why Home loads the script too).
+- `assets/motion.js` — the walking owl and scroll reveals. Self-contained
+  (it injects its own small stylesheet), loaded with one deferred tag on
+  Home, Projects, Live and 404. The owl walks in its own 60px lane
+  between `<main>` and the footer, so it never covers content; it links to
+  exploreowlpark.com, has a "Hide owl" button remembered in localStorage
+  (key `owl-walker-hidden`; the lane shrinks to 34px and keeps a "Show owl"
+  button), pauses off screen and in background tabs, and stands still under
+  `prefers-reduced-motion`. Its art (`assets/owl-walker.webp`,
+  `assets/owl-walker-blink.webp`, about 4 KB each) is the Owl Park barn owl,
+  composited from the game's layered sprites
+  (`apps/park/public/art/owl-barn-*@2x.png` in Welcome-to-Owl-Park, tinted
+  with the species' natural colours). Scroll reveals only touch cards and
+  section heads that start below the fold, drop their `reveal` classes once
+  shown so the cards' own hover styles take over, re-run after in-site page
+  swaps, and are off under reduced motion, for print, and without
+  `IntersectionObserver`. The Owl Park infographic page is standalone (no
+  `shell.css` or site footer), so it gets neither the owl nor the fades.
 - `assets/theme.js` — optional per-company accent theming via `?ink=<company>`
   (see [`docs/referrers.md`](docs/referrers.md)).
 - `assets/playground.css` — the `/playground` page only: starter chips,
@@ -69,6 +112,9 @@ soft and tappable things are pills.
   `transition.js` from swapping `<main>` in place on in-site links, so
   leaving the page is a full navigation that tears down the DuckDB worker.
   Pinned version and limits are the constants at the top of the file.
+- `assets/live.css`, `assets/live.js` — styles and chart code for the live
+  data page only (see "Live fraud data" below); `data/fraud-snapshot.json`
+  is the aggregate snapshot it draws from, rewritten by a GitHub Action.
 - `assets/profilepicture.webp` — circular hero avatar on the home page.
 - `assets/crow.png`, `assets/favicon-crow.png`, `mini.jpg` — the crow mark
   (painted via CSS mask), favicon, and alternate (JPEG) icon.
@@ -80,6 +126,20 @@ soft and tappable things are pills.
 - `assets/loganmansfield.pdf` — résumé served from the site. Every résumé
   link opens it in a new tab (`target="_blank"`) rather than forcing a
   download.
+- `assets/resume_ats.txt` — plain-text copy of the résumé for ATS uploads,
+  generated from the same source as the PDF.
+- `resume-src/` — the résumé's source. Don't hand-edit the PDF or the ATS
+  text: edit `resume-src/resume.md` (a small Markdown subset, documented at
+  the top of `build.py`), then run `python3 resume-src/build.py` to rebuild
+  both (the script resolves paths from its own location, so any working
+  directory works). The build needs `reportlab` (`pip install reportlab`)
+  and the Carlito font (`fonts-crosextra-carlito` on Debian/Ubuntu; it falls
+  back to Helvetica with a warning). It steps the type down from 10pt to
+  9.25pt until the page fits and exits with an error, leaving `assets/`
+  untouched, if the résumé still spills past one page — trim the source
+  instead. The output is deterministic, so a rebuild from unchanged source
+  produces an identical PDF. `resume-src/` is kept out of the deployment by
+  `.vercelignore`.
 
 The pages load the minified `.min` variants. After editing any source asset,
 regenerate its minified file:
@@ -138,8 +198,8 @@ part of it:
   Analyst), `worksFor`, `hasOccupation`, `alumniOf`, `hasCredential`
   (certifications and degree), `knowsAbout`, and `sameAs` profile links —
   enough to disambiguate from other people with the same name. Projects,
-  SQL Playground and Owl Park are `WebPage`s that reference the home
-  `#person` / `#website` ids and carry `BreadcrumbList`s.
+  SQL Playground, Owl Park and Live data are `WebPage`s that reference the
+  home `#person` / `#website` ids and carry `BreadcrumbList`s.
 - **`sitemap.xml`** / **`robots.txt`** — the four public URLs; bump each
   `<lastmod>` when its page changes.
 - **`llms.txt`** — a short, factual plain-text summary (role, employer,
@@ -151,6 +211,43 @@ ticketing, eGalaxy webstores, PAR Pixel POS, vendors, park-wide POS
 hardware); SQL/Python/Power BI are portfolio and analyst skills. Don't claim
 anything Logan hasn't confirmed (no CRM ownership, UAT, M365/D365
 admin, or dbt as a skill).
+
+## Live fraud data (`/live`)
+
+The page draws its charts in the browser from `data/fraud-snapshot.json`, an
+aggregates-only snapshot of the fraud pipeline's Supabase tables (simulated
+webstore checkouts). Nothing on the page talks to the database.
+
+- **`scripts/fraud-snapshot.sql`** — one query in a read-only transaction.
+  It returns counts, rates, dollar totals, a 20-bin score histogram, and
+  per-pattern catch rates for the last 30 America/New_York days. Fraud is
+  measured against the generator's answer key in `raw_fraud_truth`,
+  including labels whose `label_available_at` is still in the future (the
+  page says so). It never selects an id, email, card, IP, or name into the
+  output.
+- **`.github/workflows/fraud-snapshot.yml`** — runs daily at 05:35 UTC (and
+  on demand), checks the result against an allow-list of fields with `jq`,
+  and commits the file on every run (the timestamp always moves, so the
+  page's staleness notice stays honest); the push redeploys the site. It
+  needs the repository secret `FRAUD_DB_URL`: the Supabase Session pooler
+  connection string for the `fraud_snapshot_reader` role, never the main
+  `postgres` user. Without it, or when the last 30 days hold no
+  checkouts, the job skips and the page keeps the last committed snapshot.
+- **`supabase/fraud_snapshot_reader.sql`** — creates that login role, run
+  once by hand in the Supabase SQL editor (it is not applied by anything in
+  this repo). The role is read-only, may SELECT only the columns the
+  snapshot query reads from its four tables, and gets an RLS SELECT policy
+  that applies to it alone.
+- **`assets/live.js` / `assets/live.css`** — plain SVG charts, stat tiles,
+  and a table view. Series colors are validated separately for Day and
+  Night. The page warns visitors when the snapshot is more than 36 hours
+  old or the generator has been paused (no checkout for 6 hours before the
+  snapshot was taken).
+
+To add a field, change the SQL, add the field to the workflow's
+allow-list, then read it in `live.js`. Don't hand-edit
+`data/fraud-snapshot.json` beyond regenerating it with the query: the next
+scheduled run overwrites it.
 
 ## Local development
 

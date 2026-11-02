@@ -1,0 +1,347 @@
+/* ─────────────────────────────────────────────────────────────
+ * pipeline.css — clickable pipeline diagrams on /projects.
+ *
+ *   .flow            one diagram (a <figure>)
+ *   .flow__stages    the stages, in order (becomes a tablist via pipeline.js)
+ *   .flow__node      one stage's button
+ *   .flow__panel     what happens at a stage, and the tools used
+ *
+ * Phone and tablet: stages stack down a rail. 880px and up: one row, left to right.
+ * Stages before the selected one stay lit, so the data reads as having
+ * flowed that far. Without JS every panel shows, as a plain list.
+ * Colors come only from tokens.css, so Day and Night both stay AA.
+ * ────────────────────────────────────────────────────────────── */
+
+.flows {
+    display: grid;
+    gap: 1.25rem;
+}
+
+.flow {
+    display: grid;
+    gap: 1.1rem;
+    background: var(--surface-1);
+    border: 1px solid var(--hairline);
+    border-radius: var(--r-lg);
+    padding: clamp(1.15rem, 3vw, 1.6rem);
+    box-shadow: var(--shadow-sm);
+    scroll-margin-top: calc(var(--top-bar-h) + 1rem);
+}
+
+.flow__head {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.6rem 1rem;
+}
+
+.flow__title {
+    font-family: var(--font-display);
+    font-weight: 600;
+    font-variation-settings: "opsz" 48;
+    font-size: 1.3rem;
+    line-height: 1.2;
+    letter-spacing: -0.01em;
+    color: var(--ink-1);
+}
+
+.flow__sub {
+    font-size: 0.88rem;
+    color: var(--ink-2);
+    flex-basis: 100%;
+}
+
+.flow__play {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.45rem;
+    padding: 0.5rem 0.95rem;
+    border-radius: var(--r-pill);
+    border: 1px solid var(--hairline-strong);
+    background: transparent;
+    color: var(--ink-1);
+    font: inherit;
+    font-size: 0.85rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background var(--dur-fast) var(--ease-out);
+}
+.flow__play:hover { background: var(--surface-2); }
+.flow__play:focus-visible { border-radius: var(--r-pill); }
+.flow__play-icon {
+    width: 0;
+    height: 0;
+    border-style: solid;
+    border-width: 5px 0 5px 8px;
+    border-color: transparent transparent transparent currentColor;
+}
+.flow__play[aria-pressed="true"] .flow__play-icon {
+    width: 8px;
+    height: 10px;
+    border: 0;
+    border-left: 3px solid currentColor;
+    border-right: 3px solid currentColor;
+}
+
+/* ── Stages ── */
+.flow__stages {
+    list-style: none;
+    display: grid;
+    gap: 0.55rem;
+}
+
+.flow__stage {
+    position: relative;
+    display: flex;
+}
+
+/* Phone: a rail joins each stage to the next, down the left edge. */
+.flow__stage:not(:last-child)::after {
+    content: "";
+    position: absolute;
+    left: 1.35rem;
+    top: 100%;
+    width: 2px;
+    height: 0.55rem;
+    background: var(--hairline-strong);
+    transition: background var(--dur-base) var(--ease-out);
+}
+
+.flow__node {
+    flex: 1;
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr);
+    align-items: center;
+    gap: 0.15rem 0.7rem;
+    width: 100%;
+    min-height: 44px;
+    padding: 0.6rem 0.85rem;
+    text-align: left;
+    font: inherit;
+    color: var(--ink-1);
+    background: var(--bg);
+    border: 1px solid var(--hairline-strong);
+    border-radius: var(--r-md);
+    cursor: pointer;
+    transition: background var(--dur-base) var(--ease-out),
+                border-color var(--dur-base) var(--ease-out),
+                color var(--dur-base) var(--ease-out),
+                box-shadow var(--dur-base) var(--ease-out),
+                transform var(--dur-fast) var(--ease-out);
+}
+.flow__node:hover { border-color: var(--accent); }
+.flow__node:focus-visible { border-radius: var(--r-md); }
+
+.flow__num {
+    grid-row: span 2;
+    display: grid;
+    place-items: center;
+    width: 1.6rem;
+    height: 1.6rem;
+    border-radius: 50%;
+    background: var(--surface-2);
+    color: var(--ink-1);
+    font-family: var(--font-mono);
+    font-size: 0.74rem;
+    font-weight: 600;
+    transition: background var(--dur-base) var(--ease-out), color var(--dur-base) var(--ease-out);
+}
+
+.flow__kind {
+    font-family: var(--font-mono);
+    font-size: 0.66rem;
+    font-weight: 600;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--chestnut);
+}
+
+.flow__name {
+    font-size: 0.92rem;
+    font-weight: 600;
+    line-height: 1.25;
+}
+
+/* Lit: the stages the data has already passed through. */
+.flow__stage[data-state="past"] .flow__node {
+    background: var(--accent-mist);
+    border-color: var(--accent);
+}
+.flow__stage[data-state="past"] .flow__num {
+    background: var(--accent-soft);
+}
+.flow__stage[data-state="past"]::after,
+.flow__stage[data-state="current"]::after {
+    background: var(--accent);
+}
+
+/* Current: the stage being read. */
+.flow__stage[data-state="current"] .flow__node {
+    background: var(--accent);
+    border-color: var(--accent);
+    color: var(--on-accent);
+    box-shadow: var(--shadow-press);
+}
+.flow__stage[data-state="current"] .flow__kind { color: var(--on-accent); }
+.flow__stage[data-state="current"] .flow__num {
+    background: var(--on-accent);
+    color: var(--accent-ink);
+}
+/* Before pipeline.js runs (or without it) the nodes are labels only. */
+.flow:not(.is-ready) .flow__node { cursor: default; }
+.flow:not(.is-ready) .flow__node:hover { border-color: var(--hairline-strong); }
+
+@media (min-width: 880px) {
+    .flow__stages {
+        grid-auto-flow: column;
+        grid-auto-columns: minmax(0, 1fr);
+        gap: 1.1rem;
+    }
+    .flow__node {
+        grid-template-columns: minmax(0, 1fr);
+        align-content: start;
+        justify-items: start;
+        gap: 0.3rem;
+        padding: 0.75rem 0.8rem;
+    }
+    .flow__num { grid-row: auto; }
+    /* Desktop: the connector runs right, to the next stage, with an arrowhead. */
+    .flow__stage:not(:last-child)::after {
+        left: 100%;
+        top: 50%;
+        width: 1.1rem;
+        height: 2px;
+    }
+    .flow__stage:not(:last-child)::before {
+        content: "";
+        position: absolute;
+        left: calc(100% + 1.1rem - 6px);
+        top: calc(50% - 4px);
+        width: 0;
+        height: 0;
+        border-style: solid;
+        border-width: 5px 0 5px 6px;
+        border-color: transparent transparent transparent var(--hairline-strong);
+        transition: border-color var(--dur-base) var(--ease-out);
+        z-index: 1;
+    }
+    .flow__stage[data-state="past"]:not(:last-child)::before,
+    .flow__stage[data-state="current"]:not(:last-child)::before {
+        border-left-color: var(--accent);
+    }
+}
+
+/* ── Panels ── */
+.flow__panels {
+    display: grid;
+    gap: 1rem;
+}
+
+.flow__panel {
+    display: grid;
+    gap: 0.5rem;
+    padding: 1rem 1.1rem;
+    background: var(--bg);
+    border: 1px solid var(--hairline);
+    border-left: 4px solid var(--accent);
+    border-radius: var(--r-md);
+}
+.flow__panel[hidden] { display: none; }
+.flow__panel:focus-visible {
+    outline: 2px solid var(--focus-ring);
+    outline-offset: 3px;
+}
+.flow.is-ready .flow__panel { animation: flow-panel-in var(--dur-base) var(--ease-out); }
+
+@keyframes flow-panel-in {
+    from { opacity: 0; transform: translateY(4px); }
+    to   { opacity: 1; transform: translateY(0); }
+}
+
+.flow__panel-title {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.5rem;
+    font-weight: 600;
+    font-size: 1rem;
+    color: var(--ink-1);
+}
+.flow__panel-kind {
+    font-family: var(--font-mono);
+    font-size: 0.7rem;
+    font-weight: 600;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--chestnut);
+}
+
+.flow__note {
+    color: var(--ink-2);
+    font-size: 0.94rem;
+    line-height: 1.6;
+    max-width: 72ch;
+}
+.flow__note code {
+    font-family: var(--font-mono);
+    font-size: 0.85em;
+    color: var(--ink-1);
+    background: var(--surface-2);
+    padding: 0.05rem 0.3rem;
+    border-radius: 4px;
+}
+
+.flow__planned {
+    color: var(--ink-2);
+    font-size: 0.88rem;
+    line-height: 1.55;
+}
+.flow__badge {
+    display: inline-block;
+    font-size: 0.66rem;
+    font-weight: 600;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--ink-1);
+    background: var(--surface-2);
+    padding: 0.18rem 0.5rem;
+    border-radius: var(--r-pill);
+    margin-right: 0.35rem;
+}
+
+.flow__tools {
+    list-style: none;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.4rem;
+    margin-top: 0.15rem;
+}
+.flow__tools li {
+    font-size: 0.74rem;
+    font-weight: 500;
+    color: var(--ink-1);
+    background: var(--accent-soft);
+    padding: 0.26rem 0.6rem;
+    border-radius: var(--r-pill);
+}
+
+.flow__source {
+    font-size: 0.84rem;
+    color: var(--ink-3);
+}
+.flow__source a {
+    color: var(--accent-ink);
+    font-weight: 600;
+    text-decoration: none;
+    border-bottom: 1px solid color-mix(in srgb, var(--accent) 30%, transparent);
+}
+.flow__source a:hover { border-bottom-color: var(--accent); }
+
+@media (prefers-reduced-motion: reduce) {
+    .flow__node,
+    .flow__num,
+    .flow__stage::after,
+    .flow__stage::before { transition: none; }
+    .flow.is-ready .flow__panel { animation: none; }
+}
