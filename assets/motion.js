@@ -65,13 +65,13 @@
 
     /* ─── Storage (may throw in private windows) ─── */
     function isHidden() {
-        try { return window.localStorage.getItem(STORE_KEY) === '1'; } catch (e) { return false; }
+        try { return window.localStorage.getItem(STORE_KEY) === '1'; } catch { return false; }
     }
     function setHidden(v) {
         try {
             if (v) window.localStorage.setItem(STORE_KEY, '1');
             else window.localStorage.removeItem(STORE_KEY);
-        } catch (e) { /* ignore */ }
+        } catch { /* ignore */ }
     }
 
     /* ─────────────────────────────────────────────────────────────
@@ -236,7 +236,7 @@
         if (hasPointer) owl.addEventListener('pointercancel', function () { pointerOver = false; });
         owl.addEventListener('focus', function () {
             var keyboard = true;
-            try { keyboard = owl.matches(':focus-visible'); } catch (e) { /* ignore */ }
+            try { keyboard = owl.matches(':focus-visible'); } catch { /* ignore */ }
             focusPaused = keyboard;
             if (keyboard) placeBubble();
         });
@@ -369,7 +369,7 @@
             document.body.appendChild(ta);
             ta.select();
             var ok = false;
-            try { ok = document.execCommand('copy'); } catch (e) { ok = false; }
+            try { ok = document.execCommand('copy'); } catch { ok = false; }
             ta.remove();
             if (ok) resolve(); else reject(new Error('copy failed'));
         });
@@ -381,7 +381,7 @@
             var row = link.parentElement;
             if (!row || row.querySelector('.copy-email')) return;
             var address = '';
-            try { address = decodeURIComponent(link.getAttribute('href').slice(7).split('?')[0]); } catch (e) { return; }
+            try { address = decodeURIComponent(link.getAttribute('href').slice(7).split('?')[0]); } catch { return; }
             if (!address) return;
             var btn = document.createElement('button');
             btn.type = 'button';
