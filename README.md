@@ -15,10 +15,11 @@ A deliberately lean two-page site, plus one archived project page:
   ZooTampa, a short about, and the fastest ways to connect.
 - **Projects** (`projects.html`, `/projects`) — featured: the Fraud Detection
   Pipeline (running on a schedule; links to the branch that holds the code),
-  Owl Park (live at exploreowlpark.com), and Lighthouse; then Quack Query,
-  USL Attendance Forecasting, Roll Call, eFrog (live), Attendance Nowcast,
-  Member Segmentation (RFM), and the archived Owl Park data architecture.
-  Cards have anchor ids (`#fraud`, `#owl-park`, `#lighthouse`, …) so the home
+  Owl Park (live at exploreowlpark.com), and Quack Query (the latest build);
+  then Lighthouse, Attendance Forecasting, USL Attendance Forecasting, Roll
+  Call, Attendance Nowcast, Member Segmentation (RFM), and two retired cards:
+  eFrog (code only, no live link) and the archived Owl Park data architecture.
+  Cards have anchor ids (`#fraud`, `#owl-park`, `#quack-query`, …) so the home
   page and legacy redirects can deep-link to them. The home page repeats the
   three featured cards in shorter form, so keep the two in step when editing
   card copy.
