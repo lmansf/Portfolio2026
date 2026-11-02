@@ -84,6 +84,7 @@
     cursor: progress;
     transform: none;
 }
+.pg .btn[hidden] { display: none; }
 .pg__status {
     font-size: 0.86rem;
     color: var(--ink-3);

@@ -96,6 +96,12 @@ CSV is used instead of Parquet because DuckDB-Wasm would otherwise fetch its
 Parquet extension from extensions.duckdb.org. On a Save-Data connection
 nothing downloads until the first Run.
 
+Results show the first 500 rows; the CSV download keeps the first 200,000
+(the meta line says so when a result is bigger). A single statement runs
+through DuckDB's pending-query path, which executes in short polled slices so
+the Cancel button can interrupt it; a multi-statement script falls back to the
+blocking path and can't be cancelled.
+
 ## Search and sharing metadata
 
 The goal is that a search for "Logan Mansfield" (with or without ZooTampa /

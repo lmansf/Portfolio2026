@@ -110,6 +110,7 @@
                 <textarea id="pg-sql" class="pg__sql" spellcheck="false" autocapitalize="off" autocomplete="off" autocorrect="off" rows="10" data-sql></textarea>
                 <div class="pg__bar">
                     <button class="btn btn--primary" type="button" data-run disabled>Run query <span class="arrow" aria-hidden="true">→</span></button>
+                    <button class="btn btn--ghost" type="button" data-cancel hidden>Cancel</button>
                     <p class="pg__status" role="status" aria-live="polite" data-status>DuckDB loads when you open this page.</p>
                 </div>
             </div>
@@ -151,7 +152,7 @@
                         <li><code>guest_region</code> <span>Tampa Bay, Rest of Florida, Out of state, International</span></li>
                         <li><code>payment_method</code> <span>card, digital wallet, gift card</span></li>
                         <li><code>status</code> <span>completed, refunded, declined</span></li>
-                        <li><code>risk_score</code> <span>0 to 100, from the fraud rules</span></li>
+                        <li><code>risk_score</code> <span>0 to 100, synthetic, higher is riskier</span></li>
                         <li><code>is_fraud</code> <span>boolean, the ground truth label</span></li>
                     </ul>
                 </details>
@@ -175,7 +176,7 @@
                     </ul>
                 </details>
             </div>
-            <p class="section-note pg-note">Owl Park is a made-up park and every row here is synthetic: no names, emails, or card details, real or simulated. Attendance follows season, weekends, holidays, heat, and rain; about one checkout in a hundred is fraud, scored the way my <a href="/projects#fraud">fraud detection pipeline</a> scores them. The data comes from a seeded <a href="https://github.com/lmansf/Portfolio2026/blob/main/data/playground/generate.py" target="_blank" rel="noopener">Python script</a>. Queries run on your device; reload the page to start fresh.</p>
+            <p class="section-note pg-note">Owl Park is a made-up park and every row here is synthetic: no names, emails, or card details, real or simulated. Attendance follows season, weekends, holidays, heat, and rain; about one checkout in a hundred is fraud, and each order carries a synthetic risk score shaped like the one my <a href="/projects#fraud">fraud detection pipeline</a> produces. The data comes from a seeded <a href="https://github.com/lmansf/Portfolio2026/blob/main/data/playground/generate.py" target="_blank" rel="noopener">Python script</a>. Queries run on your device; reload the page to start fresh.</p>
         </section>
     </main>
 

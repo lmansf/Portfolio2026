@@ -6,7 +6,11 @@
  * in-memory tables, then turns off external file and network access and
  * locks the configuration, so queries can only touch those tables. Every
  * query runs on the visitor's device. Results render as a table (first
- * MAX_ROWS_SHOWN rows) with a CSV download of the full result.
+ * MAX_ROWS_SHOWN rows) with a CSV download (first MAX_ROWS_CSV rows).
+ *
+ * Single statements go through conn.send(), which DuckDB executes in short
+ * polled slices, so the Cancel button can interrupt them; a multi-statement
+ * script falls back to conn.query(), which can't be interrupted.
  *
  * On a Save-Data connection nothing downloads until the first Run.
  * ───────────────────────────────────────────────────────────── */
@@ -125,7 +129,9 @@ ORDER BY cutoff;`
 ];
 
 // Apache Arrow type ids (stable across arrow-js versions).
-const ARROW = { Int: 2, Float: 3, Decimal: 7, Date: 8, Timestamp: 10 };
+const ARROW = { Int: 2, Float: 3, Decimal: 7, Date: 8, Time: 9, Timestamp: 10, Interval: 11 };
+// Arrow TimeUnit (second, millisecond, microsecond, nanosecond) → microseconds.
+const MICROS_PER_TIME_UNIT = [1e6, 1e3, 1, 1e-3];
 
 const root = document.querySelector('[data-playground]');
 if (root) setup();
@@ -135,6 +141,7 @@ function setup() {
         starters: root.querySelector('[data-starters]'),
         sql: root.querySelector('[data-sql]'),
         run: root.querySelector('[data-run]'),
+        cancel: root.querySelector('[data-cancel]'),
         status: root.querySelector('[data-status]'),
         result: root.querySelector('[data-result]'),
         meta: root.querySelector('[data-meta]'),
@@ -144,9 +151,12 @@ function setup() {
     };
 
     let connPromise = null;
+    let activeConn = null;
     let running = false;
+    let cancelled = false;
+    let cancelPending = null;
     let ranOnce = false;
-    let lastTable = null;
+    let lastResult = null;
     const starterButtons = [];
 
     // ── Starter chips ──
@@ -176,6 +186,7 @@ function setup() {
 
     // ── Run triggers ──
     els.run.addEventListener('click', run);
+    els.cancel.addEventListener('click', cancel);
     els.sql.addEventListener('keydown', (e) => {
         if (e.key === 'Enter' && (e.ctrlKey || e.metaKey)) {
             e.preventDefault();
@@ -198,6 +209,23 @@ function setup() {
     });
 
     els.csv.addEventListener('click', downloadCsv);
+
+    // Links leave this page with a normal navigation. transition.js would
+    // otherwise swap <main> in place and leave the DuckDB worker running.
+    document.addEventListener('click', (e) => {
+        const link = e.target instanceof Element ? e.target.closest('a[href]') : null;
+        if (!link || link.target === '_blank') return;
+        const href = link.getAttribute('href').trim();
+        if (!href || href.startsWith('#') || href.endsWith('.pdf')) return;
+        let url;
+        try {
+            url = new URL(href, window.location.href);
+        } catch {
+            return;
+        }
+        if (url.origin !== window.location.origin || url.pathname === window.location.pathname) return;
+        e.stopPropagation();
+    }, true);
 
     // ── Load DuckDB right away unless the visitor asked to save data ──
     const saveData = navigator.connection && navigator.connection.saveData;
@@ -269,35 +297,79 @@ function setup() {
 
     // ── Run a query ──
     async function run() {
-        const sql = els.sql.value.trim();
         if (running) return;
-        if (!sql) {
+        if (!els.sql.value.trim()) {
             setStatus('Type a query first.');
             els.sql.focus();
             return;
         }
         ranOnce = true;
         running = true;
+        cancelled = false;
+        cancelPending = null;
         els.run.disabled = true;
         try {
             const conn = await getConnection();
+            activeConn = conn;
             els.run.disabled = true;
+            const sql = els.sql.value.trim();
+            if (!sql) {
+                setStatus('Type a query first.');
+                els.sql.focus();
+                return;
+            }
             setStatus('Running…');
+            els.cancel.hidden = false;
             const t0 = performance.now();
-            const table = await conn.query(sql);
+            const result = await runQuery(conn, sql);
             const ms = performance.now() - t0;
-            render(table, ms);
+            render(result, ms);
             setStatus(`Done in ${formatMs(ms)}.`);
         } catch (err) {
-            if (connPromise) showError(err);
+            if (cancelled) setStatus('Query cancelled.');
+            else if (connPromise) showError(err);
         } finally {
+            if (cancelPending) await cancelPending;
+            cancelPending = null;
+            els.cancel.hidden = true;
+            els.cancel.disabled = false;
             running = false;
             if (connPromise) els.run.disabled = false;
         }
     }
 
+    // Returns { fields, numRows, batches } (Arrow RecordBatches).
+    async function runQuery(conn, sql) {
+        let reader;
+        try {
+            reader = await conn.send(sql);
+        } catch (err) {
+            // DuckDB's pending (cancellable) path takes one statement at a time.
+            if (cancelled || !/single statement/i.test(cleanError(err))) throw err;
+            els.cancel.hidden = true;
+            const table = await conn.query(sql);
+            return { fields: table.schema.fields, numRows: table.numRows, batches: table.batches };
+        }
+        const batches = [];
+        for await (const batch of reader) batches.push(batch);
+        const schema = batches.length ? batches[0].schema : reader.schema;
+        return {
+            fields: schema ? schema.fields : [],
+            numRows: batches.reduce((n, b) => n + b.numRows, 0),
+            batches
+        };
+    }
+
+    function cancel() {
+        if (!running || !activeConn || cancelled) return;
+        cancelled = true;
+        els.cancel.disabled = true;
+        setStatus('Cancelling…');
+        cancelPending = activeConn.cancelSent().catch(() => false);
+    }
+
     function showError(err) {
-        lastTable = null;
+        lastResult = null;
         els.result.hidden = true;
         els.error.hidden = false;
         els.error.replaceChildren();
@@ -315,20 +387,24 @@ function setup() {
     }
 
     // ── Render results ──
-    function render(table, ms) {
-        lastTable = table;
+    function render(result, ms) {
+        lastResult = result;
         els.error.hidden = true;
         els.result.hidden = false;
 
-        const fields = table.schema.fields;
-        const total = table.numRows;
+        const fields = result.fields;
+        const total = result.numRows;
         const shown = Math.min(total, MAX_ROWS_SHOWN);
-        const cols = fields.map((_, j) => table.getChildAt(j));
 
         const rowWord = total === 1 ? 'row' : 'rows';
-        els.meta.textContent = total > shown
-            ? `${total.toLocaleString('en-US')} ${rowWord}, showing the first ${shown} · ${formatMs(ms)}`
-            : `${total.toLocaleString('en-US')} ${rowWord} · ${formatMs(ms)}`;
+        const meta = [
+            total > shown
+                ? `${total.toLocaleString('en-US')} ${rowWord}, showing the first ${shown}`
+                : `${total.toLocaleString('en-US')} ${rowWord}`,
+            formatMs(ms)
+        ];
+        if (total > MAX_ROWS_CSV) meta.push(`CSV download keeps the first ${MAX_ROWS_CSV.toLocaleString('en-US')} rows`);
+        els.meta.textContent = meta.join(' · ');
         els.csv.hidden = total === 0 || fields.length === 0;
 
         if (fields.length === 0) {
@@ -355,12 +431,12 @@ function setup() {
 
         const tbody = tableEl.createTBody();
         const frag = document.createDocumentFragment();
-        for (let i = 0; i < shown; i++) {
+        eachRow(result, shown, (cols, i) => {
             const tr = document.createElement('tr');
             for (let j = 0; j < fields.length; j++) {
                 const td = document.createElement('td');
-                const v = cols[j] ? cols[j].get(i) : null;
-                if (v === null || v === undefined) {
+                const v = getCell(cols[j], i, fields[j].type);
+                if (v === null) {
                     td.textContent = 'NULL';
                     td.className = 'is-null';
                 } else {
@@ -370,7 +446,7 @@ function setup() {
                 tr.appendChild(td);
             }
             frag.appendChild(tr);
-        }
+        });
         tbody.appendChild(frag);
         els.wrap.replaceChildren(tableEl);
         els.wrap.scrollTop = 0;
@@ -378,19 +454,17 @@ function setup() {
     }
 
     function downloadCsv() {
-        if (!lastTable) return;
-        const fields = lastTable.schema.fields;
-        const cols = fields.map((_, j) => lastTable.getChildAt(j));
-        const n = Math.min(lastTable.numRows, MAX_ROWS_CSV);
+        if (!lastResult) return;
+        const fields = lastResult.fields;
         const lines = [fields.map((f) => csvCell(f.name)).join(',')];
-        for (let i = 0; i < n; i++) {
+        eachRow(lastResult, MAX_ROWS_CSV, (cols, i) => {
             const cells = [];
             for (let j = 0; j < fields.length; j++) {
-                const v = cols[j] ? cols[j].get(i) : null;
-                cells.push(v === null || v === undefined ? '' : csvCell(formatValue(v, fields[j].type)));
+                const v = getCell(cols[j], i, fields[j].type);
+                cells.push(v === null ? '' : csvCell(formatValue(v, fields[j].type)));
             }
             lines.push(cells.join(','));
-        }
+        });
         const blob = new Blob([lines.join('\r\n') + '\r\n'], { type: 'text/csv;charset=utf-8' });
         const url = URL.createObjectURL(blob);
         const a = document.createElement('a');
@@ -401,6 +475,45 @@ function setup() {
         a.remove();
         setTimeout(() => URL.revokeObjectURL(url), 1000);
     }
+}
+
+// Call fn(columns, rowInBatch) for the first `limit` rows across the batches.
+function eachRow(result, limit, fn) {
+    let seen = 0;
+    for (const batch of result.batches) {
+        if (seen >= limit) break;
+        const cols = result.fields.map((_, j) => batch.getChildAt(j));
+        for (let i = 0; i < batch.numRows && seen < limit; i++, seen++) fn(cols, i);
+    }
+}
+
+// Value of row i in an Arrow column vector, or null.
+function getCell(col, i, type) {
+    if (!col) return null;
+    const v = col.get(i);
+    if (v === null || v === undefined) return null;
+    if (type && type.typeId === ARROW.Interval && type.unit === 2) {
+        const raw = monthDayNano(col, i);
+        if (raw) return raw;
+    }
+    return v;
+}
+
+// The Arrow JS bundled with DuckDB-Wasm reads a MONTH_DAY_NANO interval as if
+// it were YEAR_MONTH, so take the row's four int32s (months, days, nanos lo,
+// nanos hi) straight from the buffer → [months, days, nanos (BigInt)].
+function monthDayNano(col, i) {
+    let row = i;
+    for (const data of col.data) {
+        if (row < data.length) {
+            const w = data.values;
+            const at = row * 4;
+            if (!w || w.length < at + 4) return null;
+            return [w[at], w[at + 1], (BigInt(w[at + 3]) << 32n) + BigInt(w[at + 2] >>> 0)];
+        }
+        row -= data.length;
+    }
+    return null;
 }
 
 // Unzip a .gz download. If the host already decoded it (Content-Encoding:
@@ -428,6 +541,14 @@ function formatValue(v, type) {
             return iso.slice(0, 19).replace('T', ' ');
         }
     }
+    if (id === ARROW.Time) {
+        const micros = Number(v) * (MICROS_PER_TIME_UNIT[type.unit] ?? 1);
+        if (Number.isFinite(micros)) return formatClock(Math.round(micros));
+    }
+    if (id === ARROW.Interval) {
+        const text = formatInterval(v, type.unit);
+        if (text !== null) return text;
+    }
     if (typeof v === 'number') {
         if (Number.isInteger(v)) return String(v);
         return String(Math.round(v * 10000) / 10000);
@@ -440,6 +561,52 @@ function formatValue(v, type) {
         return JSON.stringify(v.toJSON(), (_, x) => (typeof x === 'bigint' ? x.toString() : x));
     }
     return String(v);
+}
+
+// Microseconds since midnight → HH:MM:SS[.ffffff]; also the time part of intervals.
+function formatClock(micros) {
+    const sign = micros < 0 ? '-' : '';
+    let rest = Math.abs(micros);
+    const h = Math.floor(rest / 3.6e9);
+    rest -= h * 3.6e9;
+    const m = Math.floor(rest / 6e7);
+    rest -= m * 6e7;
+    const s = Math.floor(rest / 1e6);
+    rest -= s * 1e6;
+    const pad = (n) => String(n).padStart(2, '0');
+    const frac = rest ? '.' + String(rest).padStart(6, '0').replace(/0+$/, '') : '';
+    return `${sign}${pad(h)}:${pad(m)}:${pad(s)}${frac}`;
+}
+
+// Arrow IntervalUnit 0 arrives as [years, months] (or a month count), 1 as
+// [days, millis], and 2 as [months, days, nanos] from monthDayNano() above.
+function formatInterval(v, unit) {
+    let months = 0;
+    let days = 0;
+    let micros = 0;
+    if (unit === 0 && typeof v === 'number') {
+        months = v;
+    } else if (unit === 0 && v && v.length >= 2) {
+        months = v[0] * 12 + v[1];
+    } else if (unit === 1 && v && v.length >= 2) {
+        days = v[0];
+        micros = v[1] * 1000;
+    } else if (unit === 2 && v && v.length >= 3 && typeof v[2] === 'bigint') {
+        months = v[0];
+        days = v[1];
+        micros = Number(v[2] / 1000n);
+    } else {
+        return null;
+    }
+    const years = Math.trunc(months / 12);
+    months -= years * 12;
+    const unitWord = (n, word) => `${n} ${word}${Math.abs(n) === 1 ? '' : 's'}`;
+    const parts = [];
+    if (years) parts.push(unitWord(years, 'year'));
+    if (months) parts.push(unitWord(months, 'month'));
+    if (days) parts.push(unitWord(days, 'day'));
+    if (micros || parts.length === 0) parts.push(formatClock(micros));
+    return parts.join(' ');
 }
 
 function csvCell(s) {
