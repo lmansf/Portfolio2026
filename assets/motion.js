@@ -1,5 +1,5 @@
 /* ─────────────────────────────────────────────────────────────
- * motion.js — the walking owl and scroll reveals.
+ * motion.js — the walking owl, scroll reveals and the site's small motion touches.
  *
  * A page opts in with one tag (`<script defer src="/assets/motion.min.js"></script>`);
  * the script loads its own stylesheet (assets/motion.min.css) and nothing in

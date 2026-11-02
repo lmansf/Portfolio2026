@@ -89,9 +89,10 @@ soft and tappable things are pills.
   reveals, loaded with one deferred script tag on Home, Projects, Live,
   Playground and 404. The script adds `motion.min.css` as an external
   stylesheet (no inline `<style>`, so the playground's strict
-  `style-src 'self'` CSP allows it) and only mounts the owl and tags reveals
-  once it has loaded. The owl walks in its own 60px lane
-  between `<main>` and the footer, so it never covers content; it links to
+  `style-src 'self'` CSP allows it) and only mounts the owl, tags reveals
+  and adds the touches below once it has loaded. The owl walks in its own
+  60px lane between `<main>` and the footer, so it never covers content; it
+  links to
   exploreowlpark.com, has a "Hide owl" button remembered in localStorage
   (key `owl-walker-hidden`; the lane shrinks to 34px and keeps a "Show owl"
   button), pauses off screen and in background tabs, and stands still under
@@ -111,13 +112,16 @@ soft and tappable things are pills.
   the end of each row that holds a `mailto:` button, with a "Copied" bubble
   and a screen-reader announcement; count-up numbers for any element marked
   `data-countup` (the playground row counts, and the `/live` stat tiles,
-  which `live.js` marks and announces with a `motion:countup` event); and a
-  dot beside each `Live numbers` project link that breathes while
-  `data/fraud-snapshot.json` is under 36 hours old and the generator is
-  running, and sits still and muted otherwise. Count-ups keep the final text
+  which `live.js` marks once filled and hands over with a `motion:countup`
+  event); and a dot beside each `Live numbers` project link on Home and
+  Projects that breathes while `data/fraud-snapshot.json` is under 36 hours
+  old and the generator is running, and sits still and muted otherwise
+  (the same limits as the `/live` page's notices; the age also goes into
+  the link's title and accessible name). Count-ups keep the final text
   in the page (transparent, under an `aria-hidden` runner), so screen
   readers, no-JS and print read the exact value and nothing shifts; numbers
-  already on screen at load are left alone so they never blink to zero.
+  already on screen at load are left alone so they never blink to zero
+  (the `/live` tiles, filled after a fetch, count as soon as they land).
 - `assets/theme.js` — optional per-company accent theming via `?ink=<company>`
   (see [`docs/referrers.md`](docs/referrers.md)).
 - `assets/playground.css` — the `/playground` page only: starter chips,
@@ -261,7 +265,10 @@ webstore checkouts). Nothing on the page talks to the database.
   snapshot was taken).
 
 To add a field, change the SQL, add the field to the workflow's
-allow-list, then read it in `live.js`. Don't hand-edit
+allow-list, then read it in `live.js`. `assets/motion.js` also reads
+`generated_at` and `latest_event_at` (for the freshness dot beside the
+`Live numbers` links on Home and Projects), so keep those two when
+reshaping the file. Don't hand-edit
 `data/fraud-snapshot.json` beyond regenerating it with the query: the next
 scheduled run overwrites it.
 

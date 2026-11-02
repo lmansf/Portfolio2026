@@ -6,6 +6,11 @@
  * Charts are plain SVG built here; no chart library, no database key.
  * Every value is also reachable without hover: stat tiles, captions,
  * and the daily table.
+ *
+ * Once the tiles are filled, the checkouts, caught and dollars values are
+ * marked data-countup and a `motion:countup` event asks motion.js to count
+ * them up. motion.js owns that animation; this file only sets the final
+ * text, which is what screen readers, no-JS and print get.
  * ───────────────────────────────────────────────────────────── */
 (function () {
     'use strict';

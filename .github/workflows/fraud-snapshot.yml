@@ -1,4 +1,6 @@
-# Refreshes data/fraud-snapshot.json for the /live page once a day.
+# Refreshes data/fraud-snapshot.json for the /live page (and the freshness
+# dot motion.js puts beside the Home and Projects "Live numbers" links) once
+# a day.
 #
 # Runs scripts/fraud-snapshot.sql (aggregates only, read-only transaction)
 # against the fraud pipeline's Supabase Postgres, checks the result against

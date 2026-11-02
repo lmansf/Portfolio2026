@@ -1,8 +1,11 @@
-/* motion.css — styles for assets/motion.js (the walking owl and scroll reveals).
- * Loaded by motion.js as an external stylesheet, not an inline <style>, so
- * pages with a strict Content-Security-Policy (style-src 'self', e.g.
- * /playground) work. The script mounts the owl and tags reveals only once
- * this file has loaded, so nothing flashes unstyled. */
+/* motion.css — styles for assets/motion.js (the walking owl, scroll reveals,
+ * tactile buttons and links, the copy-email button, count-up numbers and the
+ * live pulse dot). Loaded by motion.js as an external stylesheet, not an
+ * inline <style>, so pages with a strict Content-Security-Policy
+ * (style-src 'self', e.g. /playground) work. The script mounts the owl, tags
+ * reveals and adds the other touches only once this file has loaded, so
+ * nothing flashes unstyled. Every animation here is off or static under
+ * prefers-reduced-motion. */
 .owl-lane { position: relative; z-index: 1; width: 100%; max-width: var(--max-w, 920px); margin: auto auto 0; padding: 0 var(--gutter, 1rem); height: 60px; box-sizing: border-box; pointer-events: none; }
 
 .owl-lane + footer.shell-footer { margin-top: 0; }
