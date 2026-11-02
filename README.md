@@ -105,6 +105,19 @@ soft and tappable things are pills.
   swaps, and are off under reduced motion, for print, and without
   `IntersectionObserver`. The Owl Park infographic page is standalone (no
   `shell.css` or site footer), so it gets neither the owl nor the fades.
+  The same files carry the site's other small responsive touches, all off
+  or static under reduced motion: a hover lift (pointer devices only) and
+  press-down on buttons and nav links; a "Copy email" icon button added at
+  the end of each row that holds a `mailto:` button, with a "Copied" bubble
+  and a screen-reader announcement; count-up numbers for any element marked
+  `data-countup` (the playground row counts, and the `/live` stat tiles,
+  which `live.js` marks and announces with a `motion:countup` event); and a
+  dot beside each `Live numbers` project link that breathes while
+  `data/fraud-snapshot.json` is under 36 hours old and the generator is
+  running, and sits still and muted otherwise. Count-ups keep the final text
+  in the page (transparent, under an `aria-hidden` runner), so screen
+  readers, no-JS and print read the exact value and nothing shifts; numbers
+  already on screen at load are left alone so they never blink to zero.
 - `assets/theme.js` — optional per-company accent theming via `?ink=<company>`
   (see [`docs/referrers.md`](docs/referrers.md)).
 - `assets/playground.css` — the `/playground` page only: starter chips,

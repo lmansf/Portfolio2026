@@ -10,7 +10,8 @@ editing source (esbuild is fine:
 Text colors must stay WCAG AA on every surface token: chestnut, the blue
 accent, and the ink tokens pass; tan and caramel are fills, not text.
 
-Motion extras (the walking Owl Park owl and scroll reveals) live only in
+Motion extras (the walking Owl Park owl, scroll reveals, button hover/press,
+the copy-email button, `data-countup` numbers and the `/live` freshness dot) live only in
 `assets/motion.js` and `assets/motion.css` (the script loads the stylesheet
 itself, never as an inline `<style>`, which the playground's CSP blocks), so a
 page opts in with one deferred script tag; `pages.css` is untouched and `shell.css` only carries
