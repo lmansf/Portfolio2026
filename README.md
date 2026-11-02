@@ -18,6 +18,11 @@ A deliberately lean two-page site, plus one archived project page:
   Owl Park (live at exploreowlpark.com), and Lighthouse; then Quack Query,
   USL Attendance Forecasting, Roll Call, eFrog (live), Attendance Nowcast,
   Member Segmentation (RFM), and the archived Owl Park data architecture.
+  Between the featured cards and the rest, "How the data flows" holds a
+  clickable pipeline diagram for the Fraud Detection Pipeline (`#fraud-flow`)
+  and Owl Park (`#owl-park-flow`); each featured card links down to its own.
+  Every stage note is checked against that project's public repo, so update
+  the diagram when the pipeline changes.
   Cards have anchor ids (`#fraud`, `#owl-park`, `#lighthouse`, …) so the home
   page and legacy redirects can deep-link to them. The home page repeats the
   three featured cards in shorter form, so keep the two in step when editing
@@ -54,6 +59,13 @@ soft and tappable things are pills.
   Only in-site page swaps fade; the first load paints immediately so the hero
   is on screen at once. Dismissing the mobile nav (Escape, backdrop, burger)
   returns focus to the burger, whose label toggles Open/Close navigation.
+- `assets/pipeline.css` / `assets/pipeline.js` — the clickable pipeline
+  diagrams (`[data-flow]` figures on Projects). The script turns each one into
+  a tabs widget: click, tap or hover a stage to read its note, arrow keys and
+  Home/End move between stages, and "Play the flow" steps through once.
+  Stages before the selected one stay lit. Without JS every note shows as a
+  list. The page preloads the stylesheet; the script applies it, and adds it
+  after an in-site swap from Home (which is why Home loads the script too).
 - `assets/theme.js` — optional per-company accent theming via `?ink=<company>`
   (see [`docs/referrers.md`](docs/referrers.md)).
 - `assets/profilepicture.webp` — circular hero avatar on the home page.
