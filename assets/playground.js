@@ -12,7 +12,9 @@
  *   - The page's Content-Security-Policy (vercel.json) only lets it connect
  *     to itself and jsDelivr. There are no keys or backend connections.
  *   - Results are written with textContent, never as HTML.
- *   - At most MAX_ROWS_KEPT rows of a result are read; Cancel, or a
+ *   - DuckDB's own memory is capped by MEMORY_LIMIT, so an oversized result
+ *     fails with an out-of-memory error; the page keeps at most
+ *     MAX_ROWS_KEPT rows of what comes back. Cancel, or a
  *     QUERY_TIMEOUT_MS watchdog, stops a query, and if DuckDB doesn't stop
  *     within a moment the worker is terminated and restarted on the next run.
  *
@@ -373,11 +375,12 @@ function setup() {
     }
 
     // Returns { fields, numRows, batches, truncated } (Arrow RecordBatches).
-    // Reads at most MAX_ROWS_KEPT rows, so a huge result can't eat the tab's memory.
+    // Keeps at most MAX_ROWS_KEPT rows in the page. DuckDB builds the result
+    // before the first batch arrives, so its side is bounded by MEMORY_LIMIT.
     async function runQuery(conn, sql) {
         let reader;
         try {
-            reader = await conn.send(sql, true); // stream: don't build the whole result first
+            reader = await conn.send(sql, true); // batch-by-batch reader that Cancel can interrupt
         } catch (err) {
             // DuckDB's streaming (cancellable) path takes one statement at a
             // time; scripts run whole, and the watchdog still covers them.
