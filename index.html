@@ -195,14 +195,14 @@
                 <article class="project project--featured">
                     <div class="project__body">
                         <div class="project__head">
-                            <p class="project__eyebrow">Data engineering</p>
+                            <p class="project__eyebrow">Data engineering · Fraud analytics</p>
                             <span class="project__date">2026</span>
                         </div>
                         <h3 class="project__title">Fraud Detection Pipeline</h3>
-                        <p class="project__desc">A scheduled Databricks job simulates an hour of webstore checkouts, normal guests plus five kinds of fraud episode, scores every order, and lands four raw tables in Supabase in one transaction. A daily dashboard tracks catch rate, false positives, and fail-open exposure.</p>
+                        <p class="project__desc">A scheduled Databricks job simulates webstore checkouts, normal guests plus five fraud patterns, scores every order, and lands four raw tables in Supabase in one transaction, with fraud labels arriving days later like chargebacks. In its first weeks (mid-October to early November 2026), the baseline rules model flagged about half the fraud and no legitimate orders.</p>
                         <ul class="project__tags"><li>Databricks</li><li>Python</li><li>Supabase</li><li>SQL</li></ul>
                         <div class="project__links">
-                            <a class="project__link" href="https://github.com/lmansf/fraud-detection-pipeline" target="_blank" rel="noopener">GitHub ↗</a>
+                            <a class="project__link" href="https://github.com/lmansf/fraud-detection-pipeline/tree/claude/sweet-curie-3pzt7j" target="_blank" rel="noopener">GitHub ↗</a>
                         </div>
                     </div>
                 </article>
@@ -210,13 +210,14 @@
                 <article class="project project--featured">
                     <div class="project__body">
                         <div class="project__head">
-                            <p class="project__eyebrow">Multiplayer web app</p>
+                            <p class="project__eyebrow">Product analytics · Multiplayer web app</p>
                             <span class="project__date">2026</span>
                         </div>
                         <h3 class="project__title">Owl Park</h3>
-                        <p class="project__desc">A virtual owl park you visit online: every visitor is an owl, you tap to walk through 2D rooms, and you see everyone else there in real time. An authoritative room server runs on Cloudflare Workers and Durable Objects; quests, collectibles, a shop, and ticketing sit on top.</p>
-                        <ul class="project__tags"><li>TypeScript</li><li>Phaser</li><li>Cloudflare Workers</li><li>Playwright</li></ul>
+                        <p class="project__desc">A live online owl park where visitors walk 2D rooms as owls and see each other in real time, on a room server at the edge (Cloudflare Workers). Tickets sell through Shopify, and every visit and ticket event lands in a Supabase analytics schema with views for time per room, conversion and lifetime value.</p>
+                        <ul class="project__tags"><li>TypeScript</li><li>Cloudflare Workers</li><li>Shopify</li><li>Supabase</li></ul>
                         <div class="project__links">
+                            <a class="project__link" href="https://exploreowlpark.com" target="_blank" rel="noopener">Visit the park ↗</a>
                             <a class="project__link" href="https://github.com/lmansf/Welcome-to-Owl-Park" target="_blank" rel="noopener">GitHub ↗</a>
                         </div>
                     </div>

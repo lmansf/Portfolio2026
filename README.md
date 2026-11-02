@@ -14,11 +14,14 @@ A deliberately lean two-page site, plus one archived project page:
   and a toolkit grouped into data stack / forecasting & ML / platforms run at
   ZooTampa, a short about, and the fastest ways to connect.
 - **Projects** (`projects.html`, `/projects`) — featured: the Fraud Detection
-  Pipeline, Owl Park, and Lighthouse; then Quack Query, USL Attendance
-  Forecasting, Roll Call, eFrog (live), Attendance Nowcast, Member
-  Segmentation (RFM), and the archived Owl Park data architecture. Cards have
-  anchor ids (`#fraud`, `#owl-park`, `#lighthouse`, …) so the home page and
-  legacy redirects can deep-link to them.
+  Pipeline (running on a schedule; links to the branch that holds the code),
+  Owl Park (live at exploreowlpark.com), and Lighthouse; then Quack Query,
+  USL Attendance Forecasting, Roll Call, eFrog (live), Attendance Nowcast,
+  Member Segmentation (RFM), and the archived Owl Park data architecture.
+  Cards have anchor ids (`#fraud`, `#owl-park`, `#lighthouse`, …) so the home
+  page and legacy redirects can deep-link to them. The home page repeats the
+  three featured cards in shorter form, so keep the two in step when editing
+  card copy.
 - **Owl Park** (`owl-park-infographic.html`, `/owl-park`) — a standalone
   infographic of the archived end-to-end data pipeline.
 - **404** (`404.html`) — branded not-found page.
