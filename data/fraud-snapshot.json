@@ -15,7 +15,7 @@
     "false_declines": 0,
     "legit": 36679,
     "fraud_dollars_stopped": 317047.8,
-    "fraud_dollars_missed": 866908.93,
+    "fraud_dollars_approved": 866908.93,
     "p50_scoring_ms": 9.1,
     "p95_scoring_ms": 14.5,
     "p95_checkout_ms": 373,
@@ -37,7 +37,7 @@
       "fraud_caught": 12,
       "false_declines": 0,
       "fraud_dollars_stopped": 3638.38,
-      "fraud_dollars_missed": 32661.64,
+      "fraud_dollars_approved": 32661.64,
       "p95_scoring_ms": 14.3
     },
     {
@@ -50,7 +50,7 @@
       "fraud_caught": 75,
       "false_declines": 0,
       "fraud_dollars_stopped": 24439.22,
-      "fraud_dollars_missed": 79782.19,
+      "fraud_dollars_approved": 79782.19,
       "p95_scoring_ms": 14.5
     },
     {
@@ -63,7 +63,7 @@
       "fraud_caught": 64,
       "false_declines": 0,
       "fraud_dollars_stopped": 17325.69,
-      "fraud_dollars_missed": 69993.93,
+      "fraud_dollars_approved": 69993.93,
       "p95_scoring_ms": 14.4
     },
     {
@@ -76,7 +76,7 @@
       "fraud_caught": 104,
       "false_declines": 0,
       "fraud_dollars_stopped": 19475.46,
-      "fraud_dollars_missed": 69815.48,
+      "fraud_dollars_approved": 69815.48,
       "p95_scoring_ms": 14.5
     },
     {
@@ -89,7 +89,7 @@
       "fraud_caught": 92,
       "false_declines": 0,
       "fraud_dollars_stopped": 27547.39,
-      "fraud_dollars_missed": 61344.15,
+      "fraud_dollars_approved": 61344.15,
       "p95_scoring_ms": 14.5
     },
     {
@@ -102,7 +102,7 @@
       "fraud_caught": 89,
       "false_declines": 0,
       "fraud_dollars_stopped": 23416.73,
-      "fraud_dollars_missed": 63390.02,
+      "fraud_dollars_approved": 63390.02,
       "p95_scoring_ms": 14.6
     },
     {
@@ -115,7 +115,7 @@
       "fraud_caught": 87,
       "false_declines": 0,
       "fraud_dollars_stopped": 18769.96,
-      "fraud_dollars_missed": 74453.75,
+      "fraud_dollars_approved": 74453.75,
       "p95_scoring_ms": 14.5
     },
     {
@@ -128,7 +128,7 @@
       "fraud_caught": 100,
       "false_declines": 0,
       "fraud_dollars_stopped": 38408.24,
-      "fraud_dollars_missed": 60725.35,
+      "fraud_dollars_approved": 60725.35,
       "p95_scoring_ms": 14.5
     },
     {
@@ -141,7 +141,7 @@
       "fraud_caught": 96,
       "false_declines": 0,
       "fraud_dollars_stopped": 26385.55,
-      "fraud_dollars_missed": 72908.26,
+      "fraud_dollars_approved": 72908.26,
       "p95_scoring_ms": 14.4
     },
     {
@@ -154,7 +154,7 @@
       "fraud_caught": 51,
       "false_declines": 0,
       "fraud_dollars_stopped": 19345.96,
-      "fraud_dollars_missed": 38523.74,
+      "fraud_dollars_approved": 38523.74,
       "p95_scoring_ms": 14.4
     },
     {
@@ -167,7 +167,7 @@
       "fraud_caught": 13,
       "false_declines": 0,
       "fraud_dollars_stopped": 10132.2,
-      "fraud_dollars_missed": 14899.27,
+      "fraud_dollars_approved": 14899.27,
       "p95_scoring_ms": 14.6
     },
     {
@@ -180,7 +180,7 @@
       "fraud_caught": 123,
       "false_declines": 0,
       "fraud_dollars_stopped": 26338.01,
-      "fraud_dollars_missed": 69765.1,
+      "fraud_dollars_approved": 69765.1,
       "p95_scoring_ms": 14.5
     },
     {
@@ -193,7 +193,7 @@
       "fraud_caught": 107,
       "false_declines": 0,
       "fraud_dollars_stopped": 23318.12,
-      "fraud_dollars_missed": 51579.82,
+      "fraud_dollars_approved": 51579.82,
       "p95_scoring_ms": 14.4
     },
     {
@@ -206,7 +206,7 @@
       "fraud_caught": 96,
       "false_declines": 0,
       "fraud_dollars_stopped": 21243.42,
-      "fraud_dollars_missed": 55874.91,
+      "fraud_dollars_approved": 55874.91,
       "p95_scoring_ms": 14.5
     },
     {
@@ -219,7 +219,7 @@
       "fraud_caught": 19,
       "false_declines": 0,
       "fraud_dollars_stopped": 17263.47,
-      "fraud_dollars_missed": 51191.32,
+      "fraud_dollars_approved": 51191.32,
       "p95_scoring_ms": 14.5
     }
   ],

@@ -164,7 +164,7 @@
         const ageH = (Date.now() - Date.parse(s.generated_at)) / 36e5;
         const pausedH = s.latest_event_at ? (Date.parse(s.generated_at) - Date.parse(s.latest_event_at)) / 36e5 : 0;
         const notes = [];
-        if (ageH > STALE_HOURS) notes.push(`This snapshot is from ${fmtStamp(s.generated_at)}; the daily refresh hasn't run since.`);
+        if (ageH > STALE_HOURS) notes.push(`No newer numbers have been published since ${fmtStamp(s.generated_at)}.`);
         if (pausedH > PAUSED_HOURS) notes.push(`The checkout generator has been paused since ${fmtStamp(s.latest_event_at)}, so these numbers stop there.`);
         if (notes.length) {
             stale.textContent = notes.join(' ');
@@ -189,7 +189,7 @@
         set('false-declines', fmtInt(t.false_declines), t.false_declines > 0
             ? `${fmtPct(ratio(t.false_declines, t.legit), 2)} of ${fmtInt(t.legit)} legitimate orders`
             : `Out of ${fmtInt(t.legit)} legitimate orders`);
-        const fraudDollars = (t.fraud_dollars_stopped || 0) + (t.fraud_dollars_missed || 0);
+        const fraudDollars = (t.fraud_dollars_stopped || 0) + (t.fraud_dollars_approved || 0);
         set('dollars', fmtMoney(t.fraud_dollars_stopped), `${fmtPct(ratio(t.fraud_dollars_stopped, fraudDollars))} of ${fmtMoney(fraudDollars)} attempted`);
         set('latency', `${t.p95_scoring_ms} ms`, `${fmtInt(t.scoring_timeouts)} timeouts failed open (${fmtPct(ratio(t.scoring_timeouts, t.checkouts), 1)})`);
     }

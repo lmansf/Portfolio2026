@@ -38,7 +38,7 @@ daily as (
     count(*) filter (where is_fraud and decision <> 'approve') as fraud_caught,
     count(*) filter (where not is_fraud and decision = 'decline') as false_declines,
     round(sum(total) filter (where is_fraud and decision <> 'approve'), 2)::float8 as fraud_dollars_stopped,
-    round(sum(total) filter (where is_fraud and decision = 'approve'), 2)::float8 as fraud_dollars_missed,
+    round(sum(total) filter (where is_fraud and decision = 'approve'), 2)::float8 as fraud_dollars_approved,
     round((percentile_cont(0.95) within group (order by fraud_scoring_ms))::numeric, 1)::float8 as p95_scoring_ms
   from base
   group by day
@@ -54,7 +54,7 @@ totals as (
     count(*) filter (where not is_fraud and decision = 'decline') as false_declines,
     count(*) filter (where not is_fraud) as legit,
     round(sum(total) filter (where is_fraud and decision <> 'approve'), 2)::float8 as fraud_dollars_stopped,
-    round(sum(total) filter (where is_fraud and decision = 'approve'), 2)::float8 as fraud_dollars_missed,
+    round(sum(total) filter (where is_fraud and decision = 'approve'), 2)::float8 as fraud_dollars_approved,
     round((percentile_cont(0.5) within group (order by fraud_scoring_ms))::numeric, 1)::float8 as p50_scoring_ms,
     round((percentile_cont(0.95) within group (order by fraud_scoring_ms))::numeric, 1)::float8 as p95_scoring_ms,
     round((percentile_cont(0.95) within group (order by total_latency_ms))::numeric, 0)::float8 as p95_checkout_ms,

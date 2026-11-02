@@ -67,6 +67,8 @@ jobs:
         id: window
         run: |
           set -euo pipefail
+          jq -es 'length == 1 and (.[0] | type == "object")' "$RUNNER_TEMP/raw.json" > /dev/null \
+            || { echo "::error::Query output is not a single JSON object."; exit 1; }
           if jq -e '.totals.checkouts | type == "number" and . > 0' "$RUNNER_TEMP/raw.json" > /dev/null; then
             echo "empty=false" >> "$GITHUB_OUTPUT"
           else
@@ -83,9 +85,9 @@ jobs:
             .simulated == true
             and (.totals.checkouts | type == "number" and . > 0)
             and only(["generated_at","timezone","window_days","simulated","model_versions","latest_event_at","totals","thresholds","daily","score_bins","patterns"])
-            and (.totals | only(["checkouts","flagged","declined","reviewed","fraud","fraud_caught","false_declines","legit","fraud_dollars_stopped","fraud_dollars_missed","p50_scoring_ms","p95_scoring_ms","p95_checkout_ms","scoring_timeouts","active_days"]))
+            and (.totals | only(["checkouts","flagged","declined","reviewed","fraud","fraud_caught","false_declines","legit","fraud_dollars_stopped","fraud_dollars_approved","p50_scoring_ms","p95_scoring_ms","p95_checkout_ms","scoring_timeouts","active_days"]))
             and (.thresholds | only(["review_from","decline_from"]))
-            and all(.daily[]; only(["day","checkouts","approved","reviewed","declined","fraud","fraud_caught","false_declines","fraud_dollars_stopped","fraud_dollars_missed","p95_scoring_ms"]))
+            and all(.daily[]; only(["day","checkouts","approved","reviewed","declined","fraud","fraud_caught","false_declines","fraud_dollars_stopped","fraud_dollars_approved","p95_scoring_ms"]))
             and all(.score_bins[]; only(["from","to","legit","fraud"]))
             and all(.patterns[]; only(["pattern","fraud","caught"]))
           ' "$RUNNER_TEMP/raw.json" > /dev/null
