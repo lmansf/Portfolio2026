@@ -124,7 +124,7 @@
         <nav class="topnav" aria-label="Primary">
             <a href="/" aria-current="page">Home</a>
             <a href="/projects">Projects</a>
-            <a href="/assets/loganmansfield.pdf" download="Logan-Mansfield-Resume.pdf">Résumé</a>
+            <a href="/assets/loganmansfield.pdf" target="_blank" rel="noopener">Résumé</a>
         </nav>
         <button class="burger" type="button" aria-label="Open navigation" aria-expanded="false" aria-controls="site-nav" data-burger>
             <span class="burger__bar"></span><span class="burger__bar"></span><span class="burger__bar"></span>
@@ -136,7 +136,7 @@
         <div class="site-nav__panel">
             <a class="site-nav__item" href="/" aria-current="page">Home</a>
             <a class="site-nav__item" href="/projects">Projects</a>
-            <a class="site-nav__item" href="/assets/loganmansfield.pdf" download="Logan-Mansfield-Resume.pdf">Résumé</a>
+            <a class="site-nav__item" href="/assets/loganmansfield.pdf" target="_blank" rel="noopener">Résumé</a>
         </div>
     </nav>
 
@@ -149,16 +149,17 @@
                 <div class="hero__intro">
                     <h1 class="hero__name" id="home-name">Logan Mansfield.</h1>
                     <p class="hero__role">
-                        IT systems analyst and data analyst. By day I own the <em>ticketing and webstore platforms</em> behind ZooTampa&rsquo;s admissions revenue; the rest of the time I build the pipelines, forecasts, and dashboards that turn operational data into decisions.
+                        Data analyst moving into <em>analytics engineering</em>: I build the pipelines, models, and dashboards that turn raw operational data into decisions. By day I own the ticketing and webstore platforms behind ZooTampa&rsquo;s admissions revenue; my SQL, Python, and modeling work is self-driven and on GitHub.
                     </p>
                     <p class="hero__availability">
                         <span class="hero__availability-dot" aria-hidden="true"></span>
-                        Open to Data Analyst &amp; BI roles · Tampa, FL · remote · relocation
+                        Open to analytics engineering &amp; data analyst roles · Tampa, FL · remote · relocation
                     </p>
                     <div class="contact-row" role="group" aria-label="Contact">
-                        <a class="btn btn--primary" href="/assets/loganmansfield.pdf" download="Logan-Mansfield-Resume.pdf">Download résumé <span class="arrow">↓</span></a>
+                        <a class="btn btn--primary" href="/assets/loganmansfield.pdf" target="_blank" rel="noopener">Résumé <span class="btn__meta">PDF</span> <span class="arrow" aria-hidden="true">↗</span></a>
+                        <a class="btn btn--ghost" href="mailto:lmansf96@gmail.com">Email me</a>
                         <a class="btn btn--ghost" href="https://www.linkedin.com/in/lmansf96/" target="_blank" rel="noopener noreferrer">LinkedIn</a>
-                        <a class="btn btn--ghost" href="/projects">Projects</a>
+                        <a class="btn btn--ghost" href="https://github.com/lmansf" target="_blank" rel="noopener noreferrer">GitHub</a>
                     </div>
                 </div>
             </div>
@@ -248,7 +249,7 @@
         <section aria-labelledby="home-experience">
             <header class="section-head">
                 <h2 class="section-head__title" id="home-experience">Experience</h2>
-                <a class="section-head__link" href="/assets/loganmansfield.pdf" download="Logan-Mansfield-Resume.pdf">Full résumé ↓</a>
+                <a class="section-head__link" href="/assets/loganmansfield.pdf" target="_blank" rel="noopener">Full résumé (PDF) ↗</a>
             </header>
             <ol class="xp">
                 <li class="xp__item xp__item--now">
@@ -298,27 +299,44 @@
                     <li class="chip chip--cred">SQL Certification of Competency <span class="chip__sub">LearnSQL.com</span></li>
                     <li class="chip chip--cred">Microsoft Fabric in a Day <span class="chip__sub">workshop</span></li>
                 </ul>
-                <p class="section-note">A.A., General Studies, Carroll Community College, plus 55 credits in biology and ecology (biostatistics, field research methods) at Carroll, Towson, and the University of South Florida.</p>
+                <p class="section-note"><strong>B.S., Biology</strong>, Towson University, 2019. Coursework in biostatistics and field research methods at Towson and the University of South Florida.</p>
             </div>
             <div>
                 <header class="section-head">
                     <h2 class="section-head__title">Toolkit</h2>
                 </header>
-                <ul class="chip-list">
-                    <li class="chip">SQL</li>
-                    <li class="chip">Python</li>
-                    <li class="chip">Power BI</li>
-                    <li class="chip">Excel</li>
-                    <li class="chip">DuckDB</li>
-                    <li class="chip">dbt</li>
-                    <li class="chip">Databricks</li>
-                    <li class="chip">Microsoft Fabric</li>
-                    <li class="chip">Postgres / Supabase</li>
-                    <li class="chip">scikit-learn · LightGBM · XGBoost</li>
-                    <li class="chip">Gateway Galaxy · PAR Pixel</li>
-                    <li class="chip">HubSpot CRM</li>
-                    <li class="chip">JavaScript · HTML · CSS</li>
-                </ul>
+                <div class="toolkit">
+                    <div class="toolkit__group">
+                        <h3 class="toolkit__label" id="tk-data">Data stack</h3>
+                        <ul class="chip-list" aria-labelledby="tk-data">
+                            <li class="chip">SQL</li>
+                            <li class="chip">Python · pandas</li>
+                            <li class="chip">DuckDB</li>
+                            <li class="chip">Databricks</li>
+                            <li class="chip">Postgres / Supabase</li>
+                            <li class="chip">Microsoft Fabric</li>
+                            <li class="chip">Power BI</li>
+                            <li class="chip">Tableau</li>
+                            <li class="chip">Excel</li>
+                        </ul>
+                    </div>
+                    <div class="toolkit__group">
+                        <h3 class="toolkit__label" id="tk-ml">Forecasting &amp; ML</h3>
+                        <ul class="chip-list" aria-labelledby="tk-ml">
+                            <li class="chip">scikit-learn</li>
+                            <li class="chip">LightGBM</li>
+                            <li class="chip">XGBoost</li>
+                        </ul>
+                    </div>
+                    <div class="toolkit__group">
+                        <h3 class="toolkit__label" id="tk-day">Platforms I run at ZooTampa</h3>
+                        <ul class="chip-list" aria-labelledby="tk-day">
+                            <li class="chip">Gateway Galaxy 8 · eGalaxy</li>
+                            <li class="chip">PAR Pixel POS</li>
+                            <li class="chip">HTML · CSS · JavaScript</li>
+                        </ul>
+                    </div>
+                </div>
             </div>
         </section>
 
@@ -332,8 +350,8 @@
                 <h2 class="section-head__title" id="home-about">About</h2>
             </header>
             <div class="about__body">
-                <p>I&rsquo;m an IT systems analyst and data analyst in Tampa, FL. I came to data through analysis, three years turning esports performance numbers into scouting and tactical decisions, and then moved into the systems side: today I own the ticketing and webstore platforms behind ZooTampa&rsquo;s admissions revenue, which puts me on top of the data every ticket, membership, and add-on sale flows through.</p>
-                <p>My analytics work is self-driven and public. I hold the Microsoft PL-300 and a LearnSQL certification of competency, and on my own time I ship data tools: natural-language-to-SQL on DuckDB in the browser, theme-park attendance forecasting, a fraud-detection pipeline over simulated webstore checkouts, and a local-first desktop analytics assistant. I&rsquo;m targeting data analyst and BI roles that combine systems expertise with analytics.</p>
+                <p>I&rsquo;m a data analyst in Tampa, FL, moving into analytics engineering. I came to data through analysis, three years turning esports performance numbers into scouting and tactical decisions, and then moved into the systems side: today I own the ticketing and webstore platforms behind ZooTampa&rsquo;s admissions revenue, from product and pricing setup to vendors and the point-of-sale hardware across the park. That job taught me where operational data comes from and how it breaks.</p>
+                <p>My analytics work is self-driven and public. I hold the Microsoft PL-300 and a LearnSQL certification of competency, and on my own time I ship data tools: natural-language-to-SQL on DuckDB in the browser, theme-park attendance forecasting, a fraud-detection pipeline over simulated webstore checkouts, and a local-first desktop analytics assistant. I&rsquo;m looking for analytics engineering and data analyst roles where I own the path from source system to trusted model.</p>
                 <p>What I care about is <strong>data people can trust</strong>: clear models, honest metrics, and reporting a non-technical stakeholder can read at a glance, plus the question behind the number: why a channel underperformed, whether a pricing change did what it was supposed to, and what the pipeline missed.</p>
             </div>
         </section>
@@ -373,7 +391,7 @@
                 <a href="https://www.linkedin.com/in/lmansf96/" target="_blank" rel="noopener">LinkedIn</a>
                 <a href="mailto:lmansf96@gmail.com">Email</a>
                 <a href="https://github.com/lmansf" target="_blank" rel="noopener">GitHub</a>
-                <a href="/assets/loganmansfield.pdf" download="Logan-Mansfield-Resume.pdf">Résumé</a>
+                <a href="/assets/loganmansfield.pdf" target="_blank" rel="noopener">Résumé</a>
             </div>
         </div>
     </footer>

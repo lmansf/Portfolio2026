@@ -68,6 +68,12 @@ main.page > * { min-width: 0; }
 }
 .btn--ghost:hover { background: var(--surface-2); }
 .btn .arrow { font-family: var(--font-mono); font-weight: 500; }
+.btn__meta {
+    font-size: 0.72rem;
+    font-weight: 600;
+    letter-spacing: 0.06em;
+    opacity: 0.85;
+}
 .btn:focus-visible { border-radius: var(--r-pill); }
 
 /* ──────────────────── Hero ──────────────────── */
@@ -556,6 +562,20 @@ main.page > * { min-width: 0; }
     font-size: 0.78rem;
 }
 .chip__sub::before { content: "· "; }
+
+/* Toolkit: chips grouped so the day-job platforms read apart from the data stack */
+.toolkit {
+    display: grid;
+    gap: 1.1rem;
+}
+.toolkit__label {
+    font-size: 0.74rem;
+    font-weight: 600;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--chestnut);
+    margin-bottom: 0.55rem;
+}
 
 .two-col {
     display: grid;
