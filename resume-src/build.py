@@ -5,7 +5,8 @@ Writes (only when the result fits on one page; otherwise assets/ is left untouch
   assets/loganmansfield.pdf  (one US Letter page, linked from every page)
   assets/resume_ats.txt      (plain-text copy for ATS uploads)
 
-Run from anywhere:  python3 resume-src/build.py
+Run from the repo root:  python3 resume-src/build.py
+(paths are resolved relative to this file, so any working directory works)
 Needs: reportlab (pip install reportlab) and the Carlito font
 (fonts-crosextra-carlito); falls back to Helvetica without it.
 
