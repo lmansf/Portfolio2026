@@ -6,8 +6,8 @@ HTML/CSS/JS, no build step, deployed on Vercel.
 
 ## Site structure
 
-A deliberately lean two-page site, plus one archived project page and a
-live data page:
+A deliberately lean two-page site, plus a SQL playground, a live data page,
+and one archived project page:
 
 - **Home** (`index.html`, `/`) — intro, availability and contact buttons
   (résumé PDF, email, LinkedIn, GitHub), a three-line "now" strip, three
@@ -30,15 +30,19 @@ live data page:
   page and legacy redirects can deep-link to them. The home page repeats the
   three featured cards in shorter form, so keep the two in step when editing
   card copy.
+- **SQL Playground** (`playground.html`, `/playground`) — an in-browser SQL
+  box: DuckDB-Wasm (pinned, from jsDelivr, loaded only on this page) over
+  synthetic Owl Park ticket and webstore data, with starter queries, a
+  results table, and CSV download. See "SQL playground data" below.
 - **Owl Park** (`owl-park-infographic.html`, `/owl-park`) — a standalone
   infographic of the archived end-to-end data pipeline.
 - **Live data** (`live.html`, `/live`) — daily numbers from the fraud
   pipeline (see "Live fraud data" below).
 - **404** (`404.html`) — branded not-found page.
 
-Clean URLs (`/projects`, `/owl-park`, `/live`), the `/resume` shortcut to
-the résumé PDF, and legacy redirects (e.g. `/fraud` → `/projects#fraud`,
-`/pipeline` → `/owl-park`) are configured in `vercel.json`.
+Clean URLs (`/projects`, `/playground`, `/owl-park`, `/live`), the `/resume`
+shortcut to the résumé PDF, and legacy redirects (e.g. `/fraud` →
+`/projects#fraud`, `/pipeline` → `/owl-park`) are configured in `vercel.json`.
 
 ## Design: "Barn Owl"
 
@@ -100,6 +104,14 @@ soft and tappable things are pills.
   `shell.css` or site footer), so it gets neither the owl nor the fades.
 - `assets/theme.js` — optional per-company accent theming via `?ink=<company>`
   (see [`docs/referrers.md`](docs/referrers.md)).
+- `assets/playground.css` — the `/playground` page only: starter chips,
+  editor, run bar, results table, and the table reference.
+- `assets/playground.js` — the SQL box (an ES module, loaded only by
+  `playground.html`): loads the pinned DuckDB-Wasm, attaches the data file,
+  runs and renders queries, and builds the CSV. It also keeps
+  `transition.js` from swapping `<main>` in place on in-site links, so
+  leaving the page is a full navigation that tears down the DuckDB worker.
+  Pinned version and limits are the constants at the top of the file.
 - `assets/live.css`, `assets/live.js` — styles and chart code for the live
   data page only (see "Live fraud data" below); `data/fraud-snapshot.json`
   is the aggregate snapshot it draws from, rewritten by a GitHub Action.
@@ -134,6 +146,39 @@ regenerate its minified file:
 
     npx esbuild <src> --minify --outfile=<min> --allow-overwrite
 
+## SQL playground data
+
+`data/playground/owl_park.duckdb.gz` (about 300 KB) is one DuckDB database
+file with four tables (`park_days`, `products`, `orders`, `order_items`),
+written by the seeded script next to it, `generate.py`. Owl Park is fictional
+and the data has no personal fields at all, real or simulated. To change the
+data, edit the script and rerun it (`python3 -m pip install duckdb numpy`,
+then `python3 data/playground/generate.py`); if you add or rename a column,
+update the table reference in `playground.html`. The file is written in
+DuckDB's v1.1.0 storage format to match the pinned DuckDB-Wasm 1.29.0; move
+both together.
+
+How the page keeps visitor queries safe (all of it runs on the visitor's own
+device, and there is no key, backend, or database connection on the page):
+
+- The database is attached `READ_ONLY`, so `INSERT`, `UPDATE`, `DELETE`,
+  `CREATE` and `DROP` on it fail; temp tables live only in that tab.
+- After setup `assets/playground.js` turns off extension autoinstall and
+  autoload and `enable_external_access` (no file or URL reads, `ATTACH`,
+  `COPY`, `INSTALL`/`LOAD`), then sets `lock_configuration`, so a query
+  can't switch any of that back on.
+- `vercel.json` gives `/playground` a Content-Security-Policy that only lets
+  the page connect to itself and jsDelivr (where the pinned DuckDB-Wasm
+  files come from) and blocks inline scripts; the page has no inline script
+  for that reason.
+- Results are written with `textContent`, never as HTML.
+- A result is read up to 200,000 rows (the first 500 are shown; the CSV
+  download holds what was read). Cancel, or a 30-second watchdog, stops a
+  query; if DuckDB doesn't stop within a moment, the worker is thrown away
+  and restarted on the next run. DuckDB's working memory is capped at 256 MB,
+  so an oversized query fails with an error instead of exhausting the tab.
+- On a Save-Data connection nothing downloads until the first Run.
+
 ## Search and sharing metadata
 
 The goal is that a search for "Logan Mansfield" (with or without ZooTampa /
@@ -153,8 +198,8 @@ part of it:
   Analyst), `worksFor`, `hasOccupation`, `alumniOf`, `hasCredential`
   (certifications and degree), `knowsAbout`, and `sameAs` profile links —
   enough to disambiguate from other people with the same name. Projects,
-  Owl Park and Live data are `WebPage`s that reference the home `#person` /
-  `#website` ids and carry `BreadcrumbList`s.
+  SQL Playground, Owl Park and Live data are `WebPage`s that reference the
+  home `#person` / `#website` ids and carry `BreadcrumbList`s.
 - **`sitemap.xml`** / **`robots.txt`** — the four public URLs; bump each
   `<lastmod>` when its page changes.
 - **`llms.txt`** — a short, factual plain-text summary (role, employer,
@@ -210,8 +255,11 @@ No build step — serve the folder and open it:
 
     python3 -m http.server 8000
 
-Note that `vercel.json` clean URLs/redirects aren't applied by a plain static
-server; `vercel dev` reproduces production routing if needed.
+Note that `vercel.json` clean URLs/redirects and headers (including the
+`/playground` Content-Security-Policy) aren't applied by a plain static
+server, so open `/playground.html` directly and expect the page to run
+without the CSP; `vercel dev` reproduces production routing and headers if
+needed.
 
 ## Validation gate
 

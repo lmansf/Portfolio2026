@@ -12,12 +12,27 @@
       "headers": [{ "key": "Cache-Control", "value": "no-cache, max-age=0, must-revalidate" }]
     },
     {
-      "source": "/(projects|owl-park|live)",
+      "source": "/(projects|owl-park|live|playground)",
       "headers": [{ "key": "Cache-Control", "value": "no-cache, max-age=0, must-revalidate" }]
     },
     {
       "source": "/(.*).(css|js|json|txt|xml)",
       "headers": [{ "key": "Cache-Control", "value": "public, max-age=0, must-revalidate" }]
+    },
+    {
+      "source": "/(playground|playground.html)",
+      "headers": [
+        { "key": "Content-Security-Policy", "value": "default-src 'self'; script-src 'self' https://cdn.jsdelivr.net 'wasm-unsafe-eval'; worker-src 'self' blob:; connect-src 'self' https://cdn.jsdelivr.net; style-src 'self' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data:; object-src 'none'; base-uri 'none'; form-action 'none'; frame-ancestors 'none'" },
+        { "key": "X-Content-Type-Options", "value": "nosniff" },
+        { "key": "Referrer-Policy", "value": "strict-origin-when-cross-origin" }
+      ]
+    },
+    {
+      "source": "/data/playground/(.*).gz",
+      "headers": [
+        { "key": "Cache-Control", "value": "public, max-age=0, must-revalidate" },
+        { "key": "Content-Type", "value": "application/gzip" }
+      ]
     },
     {
       "source": "/(.*).(avif|png|jpg|jpeg|svg|webp|ico|pdf|woff|woff2|ttf)",
@@ -43,6 +58,7 @@
     { "source": "/", "destination": "/index.html" },
     { "source": "/projects", "destination": "/projects.html" },
     { "source": "/owl-park", "destination": "/owl-park-infographic.html" },
-    { "source": "/live", "destination": "/live.html" }
+    { "source": "/live", "destination": "/live.html" },
+    { "source": "/playground", "destination": "/playground.html" }
   ]
 }
