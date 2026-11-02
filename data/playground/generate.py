@@ -7,10 +7,12 @@ gives the same files.
     python3 -m pip install duckdb numpy
     python3 data/playground/generate.py
 
-Writes four gzipped CSV files next to this script: park_days, products,
-orders, order_items. CSV rather than Parquet because DuckDB-Wasm reads CSV
-without downloading an extension; gzipped so the repo and the download stay
-small (the page unzips them with the browser's DecompressionStream).
+Writes owl_park.duckdb.gz next to this script: one DuckDB database file with
+four tables (park_days, products, orders, order_items), gzipped so the repo
+and the download stay small. The page unzips it with the browser's
+DecompressionStream and attaches it READ_ONLY. It is written in DuckDB's
+v1.1.0 storage format so the pinned DuckDB-Wasm (1.29.0, DuckDB 1.1) can read
+it; bump STORAGE_VERSION if the page moves to a newer DuckDB-Wasm.
 """
 import gzip
 from datetime import date, datetime, timedelta
@@ -20,6 +22,7 @@ import duckdb
 import numpy as np
 
 OUT = Path(__file__).resolve().parent
+STORAGE_VERSION = "v1.1.0"
 rng = np.random.default_rng(20261102)
 
 START, END = date(2026, 3, 1), date(2026, 8, 31)
@@ -141,13 +144,17 @@ con.execute("""CREATE TABLE order_items (order_id INTEGER, line_no INTEGER, prod
     quantity INTEGER, unit_price DECIMAL(8,2))""")
 con.executemany("INSERT INTO order_items VALUES (?,?,?,?,?)", items)
 
+db_path, gz_path = OUT / "owl_park.duckdb", OUT / "owl_park.duckdb.gz"
+db_path.unlink(missing_ok=True)
+con.execute(f"ATTACH '{db_path}' AS owl_park (STORAGE_VERSION '{STORAGE_VERSION}')")
 for table, order_by in [("park_days", "visit_date"), ("products", "product_id"),
                         ("orders", "order_id"), ("order_items", "order_id, line_no")]:
-    csv_path, path = OUT / f"{table}.csv", OUT / f"{table}.csv.gz"
-    con.execute(f"COPY (SELECT * FROM {table} ORDER BY {order_by}) TO '{csv_path}' (FORMAT csv, HEADER)")
-    with open(csv_path, "rb") as src, open(path, "wb") as raw:
-        with gzip.GzipFile(filename="", mode="wb", fileobj=raw, compresslevel=9, mtime=0) as gz:
-            gz.write(src.read())
-    csv_path.unlink()
-    n = con.execute(f"SELECT count(*) FROM {table}").fetchone()[0]
-    print(f"{table}: {n} rows, {path.stat().st_size / 1024:.0f} KB")
+    con.execute(f"CREATE TABLE owl_park.{table} AS SELECT * FROM {table} ORDER BY {order_by}")
+    n = con.execute(f"SELECT count(*) FROM owl_park.{table}").fetchone()[0]
+    print(f"{table}: {n} rows")
+con.execute("DETACH owl_park")
+with open(db_path, "rb") as src, open(gz_path, "wb") as raw:
+    with gzip.GzipFile(filename="", mode="wb", fileobj=raw, compresslevel=9, mtime=0) as gz:
+        gz.write(src.read())
+db_path.unlink()
+print(f"{gz_path.name}: {gz_path.stat().st_size / 1024:.0f} KB")

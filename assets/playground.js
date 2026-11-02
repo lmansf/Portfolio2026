@@ -1,16 +1,20 @@
 /* ─────────────────────────────────────────────────────────────
  * playground.js — the /playground SQL box.
  *
- * Loads DuckDB-Wasm from jsDelivr (pinned) only on this page, reads the
- * four synthetic Owl Park CSVs (gzipped) from /data/playground/ into
- * in-memory tables, then turns off external file and network access and
- * locks the configuration, so queries can only touch those tables. Every
- * query runs on the visitor's device. Results render as a table (first
- * MAX_ROWS_SHOWN rows) with a CSV download (first MAX_ROWS_CSV rows).
- *
- * Single statements go through conn.send(), which DuckDB executes in short
- * polled slices, so the Cancel button can interrupt them; a multi-statement
- * script falls back to conn.query(), which can't be interrupted.
+ * Safety model (every query runs on the visitor's own device):
+ *   - DuckDB-Wasm is pinned and loaded from jsDelivr only on this page.
+ *   - The data is one prebuilt DuckDB file (/data/playground/owl_park.duckdb.gz,
+ *     synthetic, no personal fields), attached READ_ONLY: INSERT, UPDATE,
+ *     DELETE, CREATE and DROP on it fail. Temp tables live only in this tab.
+ *   - After setup, extension install/autoload and all external access
+ *     (files, URLs, ATTACH, COPY) are switched off and the configuration is
+ *     locked, so a query can't turn them back on.
+ *   - The page's Content-Security-Policy (vercel.json) only lets it connect
+ *     to itself and jsDelivr. There are no keys or backend connections.
+ *   - Results are written with textContent, never as HTML.
+ *   - At most MAX_ROWS_KEPT rows of a result are read; Cancel, or a
+ *     QUERY_TIMEOUT_MS watchdog, stops a query, and if DuckDB doesn't stop
+ *     within a moment the worker is terminated and restarted on the next run.
  *
  * On a Save-Data connection nothing downloads until the first Run.
  * ───────────────────────────────────────────────────────────── */
@@ -18,20 +22,14 @@
 const DUCKDB_VERSION = '1.29.0';
 const DUCKDB_ESM = `https://cdn.jsdelivr.net/npm/@duckdb/duckdb-wasm@${DUCKDB_VERSION}/+esm`;
 const DATA_BASE = '/data/playground/';
-// Column types for the four CSVs in /data/playground/ (see generate.py there).
-const SCHEMA = {
-    park_days: `visit_date DATE, day_of_week VARCHAR, is_weekend BOOLEAN, is_holiday BOOLEAN,
-        high_temp_f INTEGER, rain_inches DECIMAL(4,2), attendance INTEGER, capacity INTEGER`,
-    products: `product_id INTEGER, product_name VARCHAR, category VARCHAR,
-        list_price DECIMAL(8,2), weekend_surcharge DECIMAL(8,2)`,
-    orders: `order_id INTEGER, ordered_at TIMESTAMP, visit_date DATE, channel VARCHAR,
-        guest_region VARCHAR, payment_method VARCHAR, status VARCHAR, risk_score INTEGER, is_fraud BOOLEAN`,
-    order_items: `order_id INTEGER, line_no INTEGER, product_id INTEGER, quantity INTEGER,
-        unit_price DECIMAL(8,2)`
-};
-const TABLES = Object.keys(SCHEMA);
+// One DuckDB database file holding the four tables (see generate.py there).
+const DATA_FILE = 'owl_park.duckdb';
+const TABLES = ['park_days', 'products', 'orders', 'order_items'];
 const MAX_ROWS_SHOWN = 500;
-const MAX_ROWS_CSV = 200000;
+const MAX_ROWS_KEPT = 200000;      // rows read from a result (and the CSV cap)
+const QUERY_TIMEOUT_MS = 30000;    // watchdog: cancel a query after this long
+const KILL_AFTER_MS = 1500;        // ...and restart DuckDB if it won't stop
+const MEMORY_LIMIT = '256MB';      // DuckDB working memory; a bigger query fails cleanly
 
 const STARTERS = [
     {
@@ -151,10 +149,13 @@ function setup() {
     };
 
     let connPromise = null;
+    let dbRef = null;
     let activeConn = null;
+    let abortRun = null;
+    let watchdog = null;
+    let killTimer = null;
     let running = false;
     let cancelled = false;
-    let cancelPending = null;
     let ranOnce = false;
     let lastResult = null;
     const starterButtons = [];
@@ -167,6 +168,7 @@ function setup() {
         btn.textContent = starter.label;
         btn.setAttribute('aria-pressed', 'false');
         btn.addEventListener('click', () => {
+            if (running) return; // keep the editor in step with what's running
             loadStarter(i);
             run();
         });
@@ -198,6 +200,7 @@ function setup() {
     document.querySelectorAll('[data-preview]').forEach((btn) => {
         btn.addEventListener('click', (e) => {
             e.preventDefault(); // don't toggle the <details>
+            if (running) return;
             const table = btn.getAttribute('data-preview');
             if (!TABLES.includes(table)) return;
             els.sql.value = `SELECT *\nFROM ${table}\nLIMIT 20;`;
@@ -266,33 +269,50 @@ function setup() {
         );
         const worker = new Worker(workerUrl);
         const db = new duckdb.AsyncDuckDB(new duckdb.VoidLogger(), worker);
-        await db.instantiate(bundle.mainModule, bundle.pthreadWorker);
-        URL.revokeObjectURL(workerUrl);
-        await db.open({
-            query: { castBigIntToDouble: true, castDecimalToDouble: true, castTimestampToDate: true }
-        });
+        dbRef = db;
+        try {
+            await db.instantiate(bundle.mainModule, bundle.pthreadWorker);
+            URL.revokeObjectURL(workerUrl);
+            await db.open({
+                query: { castBigIntToDouble: true, castDecimalToDouble: true, castTimestampToDate: true }
+            });
 
-        setStatus('Loading the sample data…');
-        const files = await Promise.all(Object.keys(SCHEMA).map(async (name) => {
-            const res = await fetch(`${DATA_BASE}${name}.csv.gz`);
-            if (!res.ok) throw new Error(`Couldn’t fetch ${name}.csv.gz (${res.status})`);
-            return [name, await gunzip(new Uint8Array(await res.arrayBuffer()))];
-        }));
+            setStatus('Loading the sample data…');
+            const res = await fetch(`${DATA_BASE}${DATA_FILE}.gz`);
+            if (!res.ok) throw new Error(`Couldn’t fetch the sample data (${res.status})`);
+            await db.registerFileBuffer(DATA_FILE, await gunzip(new Uint8Array(await res.arrayBuffer())));
 
-        const conn = await db.connect();
-        for (const [name, bytes] of files) {
-            await db.registerFileBuffer(`${name}.csv`, bytes);
-            await conn.query(`CREATE TABLE ${name} (${SCHEMA[name]})`);
-            await conn.query(`COPY ${name} FROM '${name}.csv' (HEADER)`);
-            await db.dropFile(`${name}.csv`);
+            const conn = await db.connect();
+            await conn.query(`ATTACH '${DATA_FILE}' AS owl_park (READ_ONLY)`);
+            await conn.query('USE owl_park');
+            // Lock it down. From here on a query can read the four tables (and
+            // make temp tables in this tab) but can't load extensions, touch
+            // files or URLs, attach databases, or change these settings.
+            // Keep DuckDB's working memory small enough for a phone's browser tab.
+            await conn.query(`SET memory_limit = '${MEMORY_LIMIT}'`);
+            await conn.query('SET autoinstall_known_extensions = false');
+            await conn.query('SET autoload_known_extensions = false');
+            await conn.query('SET enable_external_access = false');
+            await conn.query('SET lock_configuration = true');
+
+            els.run.disabled = false;
+            setStatus('Ready: four read-only tables loaded.');
+            return conn;
+        } catch (err) {
+            if (dbRef === db) dbRef = null;
+            try { await db.terminate(); } catch { /* already gone */ }
+            throw err;
         }
-        // From here on, queries can only see the four tables above.
-        await conn.query('SET enable_external_access = false');
-        await conn.query('SET lock_configuration = true');
+    }
 
-        els.run.disabled = false;
-        setStatus('Ready: four tables loaded.');
-        return conn;
+    // Throw away the DuckDB worker (a query that won't stop). The next run
+    // starts a fresh one; the browser has the files cached by then.
+    function resetEngine() {
+        const db = dbRef;
+        dbRef = null;
+        connPromise = null;
+        activeConn = null;
+        if (db) db.terminate().catch(() => {});
     }
 
     // ── Run a query ──
@@ -306,7 +326,7 @@ function setup() {
         ranOnce = true;
         running = true;
         cancelled = false;
-        cancelPending = null;
+        let stoppedBy = null;
         els.run.disabled = true;
         try {
             const conn = await getConnection();
@@ -319,53 +339,81 @@ function setup() {
                 return;
             }
             setStatus('Running…');
+            els.error.hidden = true;
             els.cancel.hidden = false;
+            const aborted = new Promise((_, reject) => {
+                abortRun = (why) => { stoppedBy = why; reject(new Error(why)); };
+            });
+            watchdog = setTimeout(() => cancel('timeout'), QUERY_TIMEOUT_MS);
             const t0 = performance.now();
-            const result = await runQuery(conn, sql);
+            const result = await Promise.race([runQuery(conn, sql), aborted]);
             const ms = performance.now() - t0;
+            if (cancelled) throw new Error('cancelled');
             render(result, ms);
             setStatus(`Done in ${formatMs(ms)}.`);
         } catch (err) {
-            if (cancelled) setStatus('Query cancelled.');
-            else if (connPromise) showError(err);
+            if (cancelled) {
+                const why = cancelled === 'timeout'
+                    ? `Stopped after ${QUERY_TIMEOUT_MS / 1000} seconds.`
+                    : 'Query cancelled.';
+                setStatus(stoppedBy === 'killed' ? `${why} DuckDB restarts on your next run.` : why);
+            } else if (connPromise) {
+                showError(err);
+            }
         } finally {
-            if (cancelPending) await cancelPending;
-            cancelPending = null;
+            clearTimeout(watchdog);
+            clearTimeout(killTimer);
+            watchdog = killTimer = abortRun = null;
+            if (document.activeElement === els.cancel) els.run.focus();
             els.cancel.hidden = true;
             els.cancel.disabled = false;
             running = false;
-            if (connPromise) els.run.disabled = false;
+            els.run.disabled = false;
         }
     }
 
-    // Returns { fields, numRows, batches } (Arrow RecordBatches).
+    // Returns { fields, numRows, batches, truncated } (Arrow RecordBatches).
+    // Reads at most MAX_ROWS_KEPT rows, so a huge result can't eat the tab's memory.
     async function runQuery(conn, sql) {
         let reader;
         try {
-            reader = await conn.send(sql);
+            reader = await conn.send(sql, true); // stream: don't build the whole result first
         } catch (err) {
-            // DuckDB's pending (cancellable) path takes one statement at a time.
+            // DuckDB's streaming (cancellable) path takes one statement at a
+            // time; scripts run whole, and the watchdog still covers them.
             if (cancelled || !/single statement/i.test(cleanError(err))) throw err;
-            els.cancel.hidden = true;
             const table = await conn.query(sql);
-            return { fields: table.schema.fields, numRows: table.numRows, batches: table.batches };
+            return { fields: table.schema.fields, numRows: table.numRows, batches: table.batches, truncated: false };
         }
         const batches = [];
-        for await (const batch of reader) batches.push(batch);
+        let numRows = 0;
+        let truncated = false;
+        for await (const batch of reader) {
+            if (cancelled) break;
+            batches.push(batch);
+            numRows += batch.numRows;
+            if (numRows >= MAX_ROWS_KEPT) {
+                truncated = true;
+                break;
+            }
+        }
+        if (truncated) await conn.cancelSent().catch(() => false);
         const schema = batches.length ? batches[0].schema : reader.schema;
-        return {
-            fields: schema ? schema.fields : [],
-            numRows: batches.reduce((n, b) => n + b.numRows, 0),
-            batches
-        };
+        return { fields: schema ? schema.fields : [], numRows, batches, truncated };
     }
 
-    function cancel() {
-        if (!running || !activeConn || cancelled) return;
-        cancelled = true;
+    function cancel(reason = 'user') {
+        if (!running || cancelled) return;
+        cancelled = reason;
         els.cancel.disabled = true;
-        setStatus('Cancelling…');
-        cancelPending = activeConn.cancelSent().catch(() => false);
+        setStatus('Stopping…');
+        if (activeConn) activeConn.cancelSent().catch(() => false);
+        // If DuckDB doesn't stop on its own, throw the worker away.
+        killTimer = setTimeout(() => {
+            if (!running) return;
+            resetEngine();
+            if (abortRun) abortRun('killed');
+        }, KILL_AFTER_MS);
     }
 
     function showError(err) {
@@ -378,6 +426,11 @@ function setup() {
         const pre = document.createElement('pre');
         pre.textContent = cleanError(err);
         els.error.append(head, pre);
+        if (/out of memory/i.test(pre.textContent)) {
+            const tip = document.createElement('p');
+            tip.textContent = 'The result is too big to build in a browser tab. Add a LIMIT, a WHERE, or aggregate it.';
+            els.error.append(tip);
+        }
         setStatus('Fix the query and run it again.');
     }
 
@@ -397,13 +450,13 @@ function setup() {
         const shown = Math.min(total, MAX_ROWS_SHOWN);
 
         const rowWord = total === 1 ? 'row' : 'rows';
+        const count = result.truncated
+            ? `More than ${MAX_ROWS_KEPT.toLocaleString('en-US')} rows; kept the first ${total.toLocaleString('en-US')}`
+            : `${total.toLocaleString('en-US')} ${rowWord}`;
         const meta = [
-            total > shown
-                ? `${total.toLocaleString('en-US')} ${rowWord}, showing the first ${shown}`
-                : `${total.toLocaleString('en-US')} ${rowWord}`,
+            total > shown ? `${count}, showing the first ${shown}` : count,
             formatMs(ms)
         ];
-        if (total > MAX_ROWS_CSV) meta.push(`CSV download keeps the first ${MAX_ROWS_CSV.toLocaleString('en-US')} rows`);
         els.meta.textContent = meta.join(' · ');
         els.csv.hidden = total === 0 || fields.length === 0;
 
@@ -457,7 +510,7 @@ function setup() {
         if (!lastResult) return;
         const fields = lastResult.fields;
         const lines = [fields.map((f) => csvCell(f.name)).join(',')];
-        eachRow(lastResult, MAX_ROWS_CSV, (cols, i) => {
+        eachRow(lastResult, MAX_ROWS_KEPT, (cols, i) => {
             const cells = [];
             for (let j = 0; j < fields.length; j++) {
                 const v = getCell(cols[j], i, fields[j].type);

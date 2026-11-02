@@ -80,27 +80,36 @@ regenerate its minified file:
 
 ## SQL playground data
 
-`data/playground/` holds four gzipped CSVs (`park_days`, `products`,
-`orders`, `order_items`, about 550 KB in all) and the seeded script that
-writes them, `generate.py`. Owl Park is fictional and the data has no
-personal fields at all, real or simulated. To change the data, edit the
-script and rerun it (`python3 -m pip install duckdb numpy`, then
-`python3 data/playground/generate.py`); if you add or rename a column, update
-`SCHEMA` in `assets/playground.js` and the table reference in
-`playground.html`.
+`data/playground/owl_park.duckdb.gz` (about 300 KB) is one DuckDB database
+file with four tables (`park_days`, `products`, `orders`, `order_items`),
+written by the seeded script next to it, `generate.py`. Owl Park is fictional
+and the data has no personal fields at all, real or simulated. To change the
+data, edit the script and rerun it (`python3 -m pip install duckdb numpy`,
+then `python3 data/playground/generate.py`); if you add or rename a column,
+update the table reference in `playground.html`. The file is written in
+DuckDB's v1.1.0 storage format to match the pinned DuckDB-Wasm 1.29.0; move
+both together.
 
-`assets/playground.js` unzips the files in the browser, loads them into
-in-memory tables, then sets `enable_external_access = false` and
-`lock_configuration = true`, so visitor queries can only read those tables.
-CSV is used instead of Parquet because DuckDB-Wasm would otherwise fetch its
-Parquet extension from extensions.duckdb.org. On a Save-Data connection
-nothing downloads until the first Run.
+How the page keeps visitor queries safe (all of it runs on the visitor's own
+device, and there is no key, backend, or database connection on the page):
 
-Results show the first 500 rows; the CSV download keeps the first 200,000
-(the meta line says so when a result is bigger). A single statement runs
-through DuckDB's pending-query path, which executes in short polled slices so
-the Cancel button can interrupt it; a multi-statement script falls back to the
-blocking path and can't be cancelled.
+- The database is attached `READ_ONLY`, so `INSERT`, `UPDATE`, `DELETE`,
+  `CREATE` and `DROP` on it fail; temp tables live only in that tab.
+- After setup `assets/playground.js` turns off extension autoinstall and
+  autoload and `enable_external_access` (no file or URL reads, `ATTACH`,
+  `COPY`, `INSTALL`/`LOAD`), then sets `lock_configuration`, so a query
+  can't switch any of that back on.
+- `vercel.json` gives `/playground` a Content-Security-Policy that only lets
+  the page connect to itself and jsDelivr (where the pinned DuckDB-Wasm
+  files come from) and blocks inline scripts; the page has no inline script
+  for that reason.
+- Results are written with `textContent`, never as HTML.
+- A result is read up to 200,000 rows (the first 500 are shown; the CSV
+  download holds what was read). Cancel, or a 30-second watchdog, stops a
+  query; if DuckDB doesn't stop within a moment, the worker is thrown away
+  and restarted on the next run. DuckDB's working memory is capped at 256 MB,
+  so an oversized query fails with an error instead of exhausting the tab.
+- On a Save-Data connection nothing downloads until the first Run.
 
 ## Search and sharing metadata
 
