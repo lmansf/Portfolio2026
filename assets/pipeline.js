@@ -8,7 +8,7 @@
  *   - arrow keys move between stages (left/right on a wide screen,
  *     up/down on a phone, both always work), Home and End jump to the ends
  *   - "Play the flow" steps through the stages once; any other choice
- *     stops it
+ *     pauses it, and Play again carries on from the current stage
  * Stages before the selected one are marked data-state="past" so the CSS
  * lights the path the data has taken.
  *
@@ -23,6 +23,14 @@
     var STEP_MS = 1900;
     var wide = window.matchMedia ? window.matchMedia('(min-width: 880px)') : null;
     var finePointer = window.matchMedia ? window.matchMedia('(hover: hover) and (pointer: fine)') : null;
+
+    function orient(list) {
+        list.setAttribute('aria-orientation', wide && wide.matches ? 'horizontal' : 'vertical');
+    }
+
+    function orientAll() {
+        Array.prototype.forEach.call(document.querySelectorAll('[data-flow-stages]'), orient);
+    }
 
     function setup(flow) {
         if (flow.classList.contains('is-ready')) return;
@@ -42,10 +50,6 @@
             panels[i].setAttribute('role', 'tabpanel');
             panels[i].setAttribute('tabindex', '0');
         });
-
-        function orient() {
-            list.setAttribute('aria-orientation', wide && wide.matches ? 'horizontal' : 'vertical');
-        }
 
         function select(index, moveFocus) {
             current = index;
@@ -69,11 +73,11 @@
         }
 
         function play() {
-            select(0, false);
+            if (current >= tabs.length - 1) select(0, false);
             playBtn.setAttribute('aria-pressed', 'true');
             playBtn.querySelector('[data-flow-play-label]').textContent = 'Pause';
             timer = window.setInterval(function () {
-                if (current >= tabs.length - 1) { stop(); return; }
+                if (!document.documentElement.contains(flow) || current >= tabs.length - 1) { stop(); return; }
                 select(current + 1, false);
             }, STEP_MS);
         }
@@ -105,8 +109,7 @@
             });
         }
 
-        orient();
-        if (wide && wide.addEventListener) wide.addEventListener('change', orient);
+        orient(list);
         select(0, false);
         flow.classList.add('is-ready');
     }
@@ -129,6 +132,8 @@
         ensureStyles();
         Array.prototype.forEach.call(flows, setup);
     }
+
+    if (wide && wide.addEventListener) wide.addEventListener('change', orientAll);
 
     if (document.readyState === 'loading') {
         document.addEventListener('DOMContentLoaded', init);

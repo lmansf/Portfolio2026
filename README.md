@@ -64,8 +64,9 @@ soft and tappable things are pills.
   a tabs widget: click, tap or hover a stage to read its note, arrow keys and
   Home/End move between stages, and "Play the flow" steps through once.
   Stages before the selected one stay lit. Without JS every note shows as a
-  list. The page preloads the stylesheet; the script applies it, and adds it
-  after an in-site swap from Home (which is why Home loads the script too).
+  list, styled by a `<noscript>` copy of the stylesheet link. The page
+  preloads the stylesheet; the script applies it, and adds it after an
+  in-site swap from Home (which is why Home loads the script too).
 - `assets/theme.js` — optional per-company accent theming via `?ink=<company>`
   (see [`docs/referrers.md`](docs/referrers.md)).
 - `assets/profilepicture.webp` — circular hero avatar on the home page.
