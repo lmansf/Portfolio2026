@@ -21,7 +21,7 @@
     'use strict';
 
     var STEP_MS = 1900;
-    var wide = window.matchMedia ? window.matchMedia('(min-width: 720px)') : null;
+    var wide = window.matchMedia ? window.matchMedia('(min-width: 880px)') : null;
     var finePointer = window.matchMedia ? window.matchMedia('(hover: hover) and (pointer: fine)') : null;
 
     function setup(flow) {
