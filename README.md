@@ -120,10 +120,11 @@ webstore checkouts). Nothing on the page talks to the database.
   selects an id, email, card, IP, or name into the output.
 - **`.github/workflows/fraud-snapshot.yml`** — runs daily at 05:35 UTC (and
   on demand), checks the result against an allow-list of fields with `jq`,
-  and commits the file only when the numbers changed; the push redeploys
-  the site. It needs the repository secret `FRAUD_DB_URL` (the Supabase
-  Session pooler connection string). Without it the job skips and the page
-  keeps the last committed snapshot.
+  and commits the file on every run (the timestamp always moves, so the
+  page's staleness notice stays honest); the push redeploys the site. It
+  needs the repository secret `FRAUD_DB_URL` (the Supabase Session pooler
+  connection string). Without it the job skips and the page keeps the last
+  committed snapshot.
 - **`assets/live.js` / `assets/live.css`** — plain SVG charts, stat tiles,
   and a table view. Series colors are validated separately for Day and
   Night. The page warns visitors when the snapshot is more than 36 hours

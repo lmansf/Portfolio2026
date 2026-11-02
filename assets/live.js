@@ -103,12 +103,22 @@
         tooltip.style.left = `${left}px`;
         tooltip.style.top = `${top}px`;
     }
-    function hideTip() { if (tooltip) tooltip.hidden = true; }
+    let activeGroup = null;
+    function hideTip() {
+        if (tooltip) tooltip.hidden = true;
+        if (activeGroup) { activeGroup.classList.remove('is-active'); activeGroup = null; }
+    }
     window.addEventListener('scroll', hideTip, { passive: true });
+    document.addEventListener('keydown', (e) => { if (e.key === 'Escape' || e.key === 'Esc') hideTip(); });
 
     function bindTip(target, html, group) {
-        const on = () => { group && group.classList.add('is-active'); showTip(html, target); };
-        const off = () => { group && group.classList.remove('is-active'); hideTip(); };
+        const on = () => {
+            if (activeGroup && activeGroup !== group) activeGroup.classList.remove('is-active');
+            activeGroup = group || null;
+            group && group.classList.add('is-active');
+            showTip(html, target);
+        };
+        const off = hideTip;
         target.addEventListener('mouseenter', on);
         target.addEventListener('mouseleave', off);
         target.addEventListener('focus', on);
@@ -198,13 +208,13 @@
         const barW = Math.max(3, Math.min(22, step - 2));
 
         const svg = el('svg', { viewBox: `0 0 ${width} ${height}`, focusable: 'false' }, host);
-        const grid = el('g', { class: 'grid' }, svg);
+        const grid = el('g', { class: 'grid', 'aria-hidden': 'true' }, svg);
         const ticks = Math.round(yMax / scale.step);
         for (let i = 0; i <= ticks; i++) {
             const v = scale.step * i;
             const yy = y(v);
             if (i > 0) el('line', { x1: m.left, x2: width - m.right, y1: yy, y2: yy }, grid);
-            const t = el('text', { x: m.left - 6, y: yy + 4, 'text-anchor': 'end' }, svg);
+            const t = el('text', { 'aria-hidden': 'true', x: m.left - 6, y: yy + 4, 'text-anchor': 'end' }, svg);
             t.textContent = fmtInt(v);
         }
         el('line', { class: 'baseline', x1: m.left, x2: width - m.right, y1: y(0), y2: y(0) }, svg);
@@ -217,7 +227,7 @@
             if ((!missing || i === days.length - 1) && runStart !== null) {
                 const end = missing ? i : i - 1;
                 const cx = m.left + step * ((runStart + end + 1) / 2);
-                const t = el('text', { x: cx, y: m.top + ih / 2, 'text-anchor': 'middle', class: 'gap-label' }, svg);
+                const t = el('text', { 'aria-hidden': 'true', x: cx, y: m.top + ih / 2, 'text-anchor': 'middle', class: 'gap-label' }, svg);
                 t.textContent = end - runStart >= 2 ? 'paused' : '';
                 runStart = null;
             }
@@ -227,7 +237,7 @@
         days.forEach((day, i) => {
             const x = m.left + step * i + (step - barW) / 2;
             if (i % labelEvery === 0) {
-                const t = el('text', { x: x + barW / 2, y: height - 8, 'text-anchor': 'middle' }, svg);
+                const t = el('text', { 'aria-hidden': 'true', x: x + barW / 2, y: height - 8, 'text-anchor': 'middle' }, svg);
                 t.textContent = fmtDay(day);
             }
         });
@@ -308,16 +318,16 @@
         const barW = Math.max(2, Math.min(12, (step - 4) / 2));
 
         const svg = el('svg', { viewBox: `0 0 ${width} ${height}`, focusable: 'false' }, host);
-        const grid = el('g', { class: 'grid' }, svg);
+        const grid = el('g', { class: 'grid', 'aria-hidden': 'true' }, svg);
         for (let i = 0; i <= 4; i++) {
             const v = (yMax / 4) * i;
             if (i > 0) el('line', { x1: m.left, x2: width - m.right, y1: y(v), y2: y(v) }, grid);
-            const t = el('text', { x: m.left - 6, y: y(v) + 4, 'text-anchor': 'end' }, svg);
+            const t = el('text', { 'aria-hidden': 'true', x: m.left - 6, y: y(v) + 4, 'text-anchor': 'end' }, svg);
             t.textContent = fmtPct(v);
         }
         el('line', { class: 'baseline', x1: m.left, x2: width - m.right, y1: y(0), y2: y(0) }, svg);
         for (let v = 0; v <= 1.0001; v += 0.25) {
-            const t = el('text', { x: x(v), y: height - 10, 'text-anchor': v === 0 ? 'start' : v >= 1 ? 'end' : 'middle' }, svg);
+            const t = el('text', { 'aria-hidden': 'true', x: x(v), y: height - 10, 'text-anchor': v === 0 ? 'start' : v >= 1 ? 'end' : 'middle' }, svg);
             t.textContent = v.toFixed(2);
         }
 
@@ -328,7 +338,7 @@
             el('line', { class: 'threshold', x1: x(v), x2: x(v), y1: m.top - 4, y2: y(0) }, svg);
             // Stagger the two labels and flip a label left of its line near the right edge.
             const flip = x(v) > width - (narrow ? 70 : 110);
-            const t = el('text', {
+            const t = el('text', { 'aria-hidden': 'true',
                 x: flip ? x(v) - 4 : x(v) + 4, y: m.top + 6 + i * 16,
                 'text-anchor': flip ? 'end' : 'start', class: 'threshold-label'
             }, svg);
@@ -375,9 +385,11 @@
                 else line += '.';
                 sentences.push(line);
             }
-            if (hasReview && totFraud > 0) {
-                const fraudBelowReview = bins.filter((b) => b.to <= th.review_from + eps).reduce((a, b) => a + b.fraud, 0);
-                sentences.push(`The cost is the fraud that scores low too: ${fmtPct(ratio(fraudBelowReview, totFraud))} of fraudulent orders sat below ${th.review_from.toFixed(2)} and went through.`);
+            if (Number.isFinite(t.fraud) && Number.isFinite(t.fraud_caught) && t.fraud > 0) {
+                const missed = Math.max(0, t.fraud - t.fraud_caught);
+                let line = `The cost is the fraud that scores low too: ${fmtPct(ratio(missed, t.fraud))} of fraudulent orders were approved`;
+                line += hasReview ? `, mostly because they scored below the review line of ${th.review_from.toFixed(2)}.` : '.';
+                sentences.push(line);
             }
             caption.textContent = sentences.join(' ');
         }
