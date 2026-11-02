@@ -14,8 +14,9 @@
  *
  * transition.js swaps the contents of <main> on in-site navigation (it
  * does not bring the new page's <head>), so this script is loaded on
- * every page, adds pipeline.min.css itself the first time a diagram
- * appears, and sets diagrams up on load and whenever <main> changes.
+ * Home as well as Projects (the two pages it swaps between), adds
+ * pipeline.min.css itself the first time a diagram appears, and sets
+ * diagrams up on load and whenever <main> changes.
  * ───────────────────────────────────────────────────────────── */
 (function () {
     'use strict';

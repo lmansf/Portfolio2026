@@ -57,13 +57,17 @@ soft and tappable things are pills.
   experience timeline, chips and toolkit groups, about, connect cards, buttons.
 - `assets/transition.js` — SPA-style page transitions and the mobile nav.
   Only in-site page swaps fade; the first load paints immediately so the hero
-  is on screen at once. Dismissing the mobile nav (Escape, backdrop, burger)
-  returns focus to the burger, whose label toggles Open/Close navigation.
+  is on screen at once. In-page `#hash` links (the cards' "See how it flows")
+  are left to the browser rather than re-swapping `<main>`. Dismissing the
+  mobile nav (Escape, backdrop, burger) returns focus to the burger, whose
+  label toggles Open/Close navigation.
 - `assets/pipeline.css` / `assets/pipeline.js` — the clickable pipeline
   diagrams (`[data-flow]` figures on Projects). The script turns each one into
   a tabs widget: click, tap or hover a stage to read its note, arrow keys and
-  Home/End move between stages, and "Play the flow" steps through once.
-  Stages before the selected one stay lit. Without JS every note shows as a
+  Home/End move between stages, and "Play the flow" steps through once
+  (choosing a stage pauses it; Play again carries on from there). Stages
+  before the selected one stay lit. Stages stack down a rail on phones and
+  tablets and sit in one row from 880px. Without JS every note shows as a
   list, styled by a `<noscript>` copy of the stylesheet link. The page
   preloads the stylesheet; the script applies it, and adds it after an
   in-site swap from Home (which is why Home loads the script too).
