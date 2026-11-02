@@ -10,6 +10,12 @@ editing source (esbuild is fine:
 Text colors must stay WCAG AA on every surface token: chestnut, the blue
 accent, and the ink tokens pass; tan and caramel are fills, not text.
 
+Search/share metadata (head tags, JSON-LD, `sitemap.xml`, `robots.txt`,
+`llms.txt`, `assets/og-card.jpg`) is documented in the README's "Search and
+sharing metadata" section. When a page's head or facts change, bump that
+page's `<lastmod>` in `sitemap.xml` and keep `llms.txt` and the Person
+JSON-LD consistent with each other and with the résumé.
+
 ## Validate portfolio PRs through the `no-mistakes` gate
 
 Before opening a pull request for this portfolio, validate the change with the
