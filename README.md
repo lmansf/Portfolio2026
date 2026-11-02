@@ -67,6 +67,11 @@ soft and tappable things are pills.
 - `assets/loganmansfield.pdf` — résumé served from the site. Every résumé
   link opens it in a new tab (`target="_blank"`) rather than forcing a
   download.
+- `assets/resume_ats.txt` — plain-text copy of the résumé for ATS uploads.
+- `resume-src/` — the résumé's source. Edit `resume-src/resume.md`, then run
+  `python3 resume-src/build.py` (needs `reportlab` and the Carlito font) to
+  rebuild both the PDF and the ATS text; it fails if the résumé spills past
+  one page. Kept out of the deployment by `.vercelignore`.
 
 The pages load the minified `.min` variants. After editing any source asset,
 regenerate its minified file:
