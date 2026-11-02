@@ -19,11 +19,13 @@ ZooTampa at Lowry Park | Tampa, FL | Nov 2024 - Present
 - Designed, implemented, and monitored webstore upsells: add-on offers, a membership upsell tile, sticky navigation, and announcement ribbons built in custom HTML, CSS, and JavaScript.
 - Administer two POS platforms (PAR Pixel, Galaxy) and a fleet of about 90 terminals: inventory, maintenance, replacements.
 - Gather requirements from front-line departments for platform changes and provide tier 1-2 POS hardware and software support.
+
 Guest Engagement Coordinator (started as Guide)
 ZooTampa at Lowry Park | Tampa, FL | Nov 2022 - Nov 2024
 - Overhauled the department's reporting system, saving about 4 coordinator hours per week (roughly 200 hours a year).
 - Produced weekly operational reports for leadership flagging risks and changes in department operations.
 - Co-wrote and revised education programs and their standard operating procedures (SOPs) with animal care staff.
+
 Data Analyst
 Excel Esports | London, UK | Aug 2019 - Jul 2022
 - Designed and delivered a data-driven talent scouting system in Excel and Python within six months; the resulting academy roster became the most dominant in the organization's history by league performance.
@@ -33,10 +35,13 @@ PROJECTS (SELF-DIRECTED, CODE ON GITHUB)
 Fraud Detection Pipeline | Databricks, Python, PostgreSQL (Supabase), SQL | github.com/lmansf/fraud-detection-pipeline
 - Built a scheduled Databricks job that simulates webstore checkouts (normal guests plus five fraud patterns), scores every order with a baseline rules model, and lands four raw tables in Supabase, with fraud labels arriving days to weeks later like chargebacks.
 - Across about 39,000 simulated orders, the baseline flagged about half the fraud and no legitimate orders: the bar a trained model has to clear.
+
 Quack Query | TypeScript, DuckDB-Wasm, Vercel serverless, LLM APIs | quack-query.vercel.app | github.com/lmansf/Quack-Query
 - Built a browser-based natural-language-to-SQL tool on in-browser DuckDB: an LLM writes one read-only query from automatic table profiles and join-key hints, validated on server and client; the public endpoint is rate-limited, locked against file and network access, and withholds personal-data columns from the model.
+
 Attendance Forecasting | Python, LightGBM, XGBoost, scikit-learn | github.com/lmansf/Attendance-Projections
 - Forecast daily theme park attendance from weather, calendar, and flight features; a LightGBM, ridge, and random forest blend selected by rolling-origin cross-validation beat a tuned XGBoost by about 6% MAE out of fold and cut mean bias from +90 to -7 guests per day.
+
 Lighthouse | Rust, Tauri, DataFusion, on-device OCR and embeddings | lhvault.app | github.com/lmansf/lighthouse
 - Shipped a local-first desktop app (v0.15) that answers questions about a small set of files with citations; a question over a spreadsheet becomes one read-only SQL query, shown verbatim and run by DataFusion.
 

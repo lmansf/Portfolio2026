@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Build the résumé from resume-src/resume.md.
 
-Writes:
+Writes (only when the result fits on one page; otherwise assets/ is left untouched):
   assets/loganmansfield.pdf  (one US Letter page, linked from every page)
   assets/resume_ats.txt      (plain-text copy for ATS uploads)
 
@@ -21,6 +21,7 @@ Markdown subset understood by this script:
 import os
 import re
 import sys
+from io import BytesIO
 
 from reportlab.lib.pagesizes import letter
 from reportlab.lib.styles import ParagraphStyle
@@ -82,6 +83,11 @@ def build(base_size=10.0):
     story, bullets, txt = [], [], []
     seen_name = False
     header_lines = 0
+    after_section = False
+
+    def txt_break():
+        if txt and txt[-1] and not after_section:
+            txt.append("")
 
     def flush_bullets():
         if bullets:
@@ -109,16 +115,22 @@ def build(base_size=10.0):
             story.append(Spacer(1, 2))
             txt += ["", title]
             header_lines = 99
+            after_section = True
             continue
         if line.startswith("### "):
             flush_bullets()
             story.append(Paragraph(inline(line[4:]), role))
+            txt_break()
             txt.append(line[4:])
+            after_section = False
             continue
         if line.startswith("- "):
             bullets.append(line[2:])
             txt.append("- " + line[2:].replace("**", ""))
+            after_section = False
             continue
+        if txt and txt[-1].startswith("- "):
+            txt_break()
         flush_bullets()
         style = body
         if seen_name and header_lines == 0:
@@ -126,25 +138,30 @@ def build(base_size=10.0):
         header_lines += 1
         story.append(Paragraph(inline(line), style))
         txt.append(line.replace("**", ""))
+        after_section = False
     flush_bullets()
 
     pages = []
-    doc = SimpleDocTemplate(PDF, pagesize=letter, leftMargin=margin_x, rightMargin=margin_x,
-                            topMargin=margin_y, bottomMargin=margin_y,
+    buf = BytesIO()
+    doc = SimpleDocTemplate(buf, pagesize=letter, leftMargin=margin_x, rightMargin=margin_x,
+                            topMargin=margin_y, bottomMargin=margin_y, invariant=1,
                             title="Logan Mansfield - Résumé", author="Logan Mansfield",
                             subject="Résumé", creator="resume-src/build.py")
     doc.build(story, onLaterPages=lambda c, d: pages.append(d.page), onFirstPage=lambda c, d: pages.append(d.page))
-    with open(TXT, "w", encoding="utf-8") as f:
-        f.write("\n".join(txt).strip() + "\n")
-    return len(pages)
+    return len(pages), buf.getvalue(), "\n".join(txt).strip() + "\n"
 
 
 if __name__ == "__main__":
     # Shrink the type a touch if the content spills onto a second page.
     for size in (10.0, 9.75, 9.5, 9.25):
-        n = build(size)
+        n, pdf, ats = build(size)
         if n == 1:
             break
-    print(f"Built {os.path.relpath(PDF, ROOT)} ({n} page(s), {size}pt) and {os.path.relpath(TXT, ROOT)}")
     if n != 1:
-        sys.exit("résumé does not fit on one page; trim resume-src/resume.md")
+        sys.exit(f"résumé does not fit on one page ({n} pages at {size}pt); trim resume-src/resume.md "
+                 f"({os.path.relpath(PDF, ROOT)} and {os.path.relpath(TXT, ROOT)} left unchanged)")
+    with open(PDF, "wb") as f:
+        f.write(pdf)
+    with open(TXT, "w", encoding="utf-8") as f:
+        f.write(ats)
+    print(f"Built {os.path.relpath(PDF, ROOT)} (1 page, {size}pt) and {os.path.relpath(TXT, ROOT)}")
