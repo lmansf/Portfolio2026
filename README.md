@@ -13,17 +13,19 @@ A deliberately lean two-page site, plus one archived project page:
   featured projects, an experience timeline, credentials (B.S. Biology, Towson)
   and a toolkit grouped into data stack / forecasting & ML / platforms run at
   ZooTampa, a short about, and the fastest ways to connect.
-- **Projects** (`projects.html`, `/projects`) — featured: the Fraud Detection
-  Pipeline (running on a schedule; links to the branch that holds the code),
-  Owl Park (live at exploreowlpark.com), and Lighthouse; then Quack Query,
-  USL Attendance Forecasting, Roll Call, eFrog (live), Attendance Nowcast,
-  Member Segmentation (RFM), and the archived Owl Park data architecture.
+- **Projects** (`projects.html`, `/projects`) — featured: Quack Query (the
+  latest build, first), the Fraud Detection Pipeline (running on a schedule;
+  links to the branch that holds the code), and Owl Park (live at
+  exploreowlpark.com);
+  then Lighthouse, Attendance Forecasting, USL Attendance Forecasting, Roll
+  Call, Attendance Nowcast, Member Segmentation (RFM), and two retired cards:
+  eFrog (code only, no live link) and the archived Owl Park data architecture.
   Between the featured cards and the rest, "How the data flows" holds a
   clickable pipeline diagram for the Fraud Detection Pipeline (`#fraud-flow`)
-  and Owl Park (`#owl-park-flow`); each featured card links down to its own.
-  Every stage note is checked against that project's public repo, so update
-  the diagram when the pipeline changes.
-  Cards have anchor ids (`#fraud`, `#owl-park`, `#lighthouse`, …) so the home
+  and Owl Park (`#owl-park-flow`); those two featured cards link down to
+  their own. Every stage note is checked against that project's public repo,
+  so update the diagram when the pipeline changes.
+  Cards have anchor ids (`#fraud`, `#owl-park`, `#quack-query`, …) so the home
   page and legacy redirects can deep-link to them. The home page repeats the
   three featured cards in shorter form, so keep the two in step when editing
   card copy.
@@ -31,8 +33,9 @@ A deliberately lean two-page site, plus one archived project page:
   infographic of the archived end-to-end data pipeline.
 - **404** (`404.html`) — branded not-found page.
 
-Clean URLs (`/projects`, `/owl-park`) and legacy redirects (e.g. `/fraud` →
-`/projects#fraud`, `/pipeline` → `/owl-park`) are configured in `vercel.json`.
+Clean URLs (`/projects`, `/owl-park`), the `/resume` shortcut to the résumé
+PDF, and legacy redirects (e.g. `/fraud` → `/projects#fraud`, `/pipeline` →
+`/owl-park`) are configured in `vercel.json`.
 
 ## Design: "Barn Owl"
 
@@ -84,6 +87,20 @@ soft and tappable things are pills.
 - `assets/loganmansfield.pdf` — résumé served from the site. Every résumé
   link opens it in a new tab (`target="_blank"`) rather than forcing a
   download.
+- `assets/resume_ats.txt` — plain-text copy of the résumé for ATS uploads,
+  generated from the same source as the PDF.
+- `resume-src/` — the résumé's source. Don't hand-edit the PDF or the ATS
+  text: edit `resume-src/resume.md` (a small Markdown subset, documented at
+  the top of `build.py`), then run `python3 resume-src/build.py` to rebuild
+  both (the script resolves paths from its own location, so any working
+  directory works). The build needs `reportlab` (`pip install reportlab`)
+  and the Carlito font (`fonts-crosextra-carlito` on Debian/Ubuntu; it falls
+  back to Helvetica with a warning). It steps the type down from 10pt to
+  9.25pt until the page fits and exits with an error, leaving `assets/`
+  untouched, if the résumé still spills past one page — trim the source
+  instead. The output is deterministic, so a rebuild from unchanged source
+  produces an identical PDF. `resume-src/` is kept out of the deployment by
+  `.vercelignore`.
 
 The pages load the minified `.min` variants. After editing any source asset,
 regenerate its minified file:

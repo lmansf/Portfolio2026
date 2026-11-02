@@ -16,6 +16,13 @@ sharing metadata" section. When a page's head or facts change, bump that
 page's `<lastmod>` in `sitemap.xml` and keep `llms.txt` and the Person
 JSON-LD consistent with each other and with the résumé.
 
+The résumé (`assets/loganmansfield.pdf` and `assets/resume_ats.txt`) is
+generated, not hand-edited: change `resume-src/resume.md` and run
+`python3 resume-src/build.py` (reportlab + Carlito; see the README's
+"Assets" section). It must stay one Letter page. Content rules: B.S.
+Biology, Towson (2019) leads education; no dbt, CRM ownership, UAT, or
+M365/D365 admin; titles and dates unchanged; LinkedIn is `in/lmansf96`.
+
 ## Validate portfolio PRs through the `no-mistakes` gate
 
 Before opening a pull request for this portfolio, validate the change with the

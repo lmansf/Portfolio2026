@@ -4,12 +4,12 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Projects · Logan Mansfield</title>
-    <meta name="description" content="Projects by Logan Mansfield, Data Analyst: a fraud-detection pipeline on Databricks and Supabase, Owl Park (a multiplayer web app on Cloudflare Workers), Lighthouse (a local-first desktop app), Quack Query (natural language to SQL on DuckDB), attendance forecasting, a data-quality pipeline, and more.">
+    <meta name="description" content="Projects by Logan Mansfield, Data Analyst: a fraud-detection pipeline on Databricks and Supabase, Owl Park (a multiplayer web app on Cloudflare Workers), Quack Query (natural language to SQL on DuckDB), Lighthouse (a local-first desktop app), attendance forecasting, a data-quality pipeline, and more.">
     <meta name="author" content="Logan Mansfield">
     <meta property="og:site_name" content="Logan Mansfield">
     <meta property="og:locale" content="en_US">
     <meta property="og:title" content="Projects · Logan Mansfield">
-    <meta property="og:description" content="Fraud-detection pipeline, Owl Park, Lighthouse, Quack Query, attendance forecasting, and more.">
+    <meta property="og:description" content="Fraud-detection pipeline, Owl Park, Quack Query, Lighthouse, attendance forecasting, and more.">
     <meta property="og:type" content="website">
     <meta property="og:url" content="https://loganmansfield.org/projects">
     <meta property="og:image" content="https://loganmansfield.org/assets/og-card.jpg">
@@ -90,7 +90,7 @@
             <div class="hero__main">
                 <p class="eyebrow">Selected work · 2026</p>
                 <h1 class="hero__name" id="projects-title">Projects.</h1>
-                <p class="hero__role">Builds I&rsquo;m proud of: a fraud-detection pipeline, a multiplayer park, a local-first desktop app, forecasting models, and a few smaller tools. Each one runs end to end, from source data to something a person can use.</p>
+                <p class="hero__role">Builds I&rsquo;m proud of: a fraud-detection pipeline, a multiplayer park, a plain-English SQL tool, a local-first desktop app, forecasting models, and a few smaller tools. Each one runs end to end, from source data to something a person can use.</p>
             </div>
         </section>
 
@@ -101,6 +101,22 @@
                 <span class="section-head__hint">The three I&rsquo;d show first</span>
             </header>
             <div class="project-grid project-grid--featured">
+
+                <article class="project project--featured" id="quack-query">
+                    <div class="project__body">
+                        <div class="project__head">
+                            <p class="project__eyebrow">Latest · LLM + SQL in the browser</p>
+                            <span class="project__date">2026</span>
+                        </div>
+                        <h3 class="project__title">Quack Query <span class="project__badge project__badge--live">Live</span></h3>
+                        <p class="project__desc">Ask a data file questions in plain English. CSV, Excel, Parquet, or JSON files load into DuckDB running as WebAssembly, so files never leave the browser. A serverless function has an LLM write one read-only SQL query from automatic table profiles and join-key hints; the query is checked on server and client, run locally, and shown beside the results. Personal-data columns are withheld from the model, and the public endpoint has a request guard, per-IP rate limiting, and a locked-down engine. A 50/50 A/B test compares a single-query prompt with a multi-step variant on thumbs-up rate, success rate, and latency.</p>
+                        <ul class="project__tags"><li>DuckDB-Wasm</li><li>SQL</li><li>TypeScript</li><li>LLM APIs</li></ul>
+                        <div class="project__links">
+                            <a class="project__link" href="https://quack-query.vercel.app" target="_blank" rel="noopener">Open the live app ↗</a>
+                            <a class="project__link" href="https://github.com/lmansf/Quack-Query" target="_blank" rel="noopener">GitHub ↗</a>
+                        </div>
+                    </div>
+                </article>
 
                 <article class="project project--featured" id="fraud">
                     <div class="project__body">
@@ -131,22 +147,6 @@
                             <a class="project__link" href="https://exploreowlpark.com" target="_blank" rel="noopener">Visit the park ↗</a>
                             <a class="project__link" href="#owl-park-flow">See how it flows ↓</a>
                             <a class="project__link" href="https://github.com/lmansf/Welcome-to-Owl-Park" target="_blank" rel="noopener">GitHub ↗</a>
-                        </div>
-                    </div>
-                </article>
-
-                <article class="project project--featured" id="lighthouse">
-                    <div class="project__body">
-                        <div class="project__head">
-                            <p class="project__eyebrow">Desktop app</p>
-                            <span class="project__date">2026</span>
-                        </div>
-                        <h3 class="project__title">Lighthouse <span class="project__badge">v0.15</span></h3>
-                        <p class="project__desc">A local-first desktop app that answers questions about a small group of files, with citations back to the passages it read. A Rust engine in a Tauri 2 shell handles extraction, on-device OCR and embeddings, and hybrid retrieval. A question over a spreadsheet becomes one read-only SQL query, run by DataFusion and shown verbatim. Use the bundled private model or bring your own key. Installers for Windows, macOS, and Linux.</p>
-                        <ul class="project__tags"><li>Rust</li><li>Tauri 2</li><li>DataFusion</li><li>Next.js</li></ul>
-                        <div class="project__links">
-                            <a class="project__link" href="https://lhvault.app" target="_blank" rel="noopener">lhvault.app ↗</a>
-                            <a class="project__link" href="https://github.com/lmansf/lighthouse" target="_blank" rel="noopener">GitHub ↗</a>
                         </div>
                     </div>
                 </article>
@@ -297,18 +297,18 @@
             </header>
             <div class="project-grid">
 
-                <article class="project" id="quack-query">
+                <article class="project" id="lighthouse">
                     <div class="project__body">
                         <div class="project__head">
-                            <p class="project__eyebrow">Browser app · LLM + SQL</p>
+                            <p class="project__eyebrow">Desktop app</p>
                             <span class="project__date">2026</span>
                         </div>
-                        <h3 class="project__title">Quack Query <span class="project__badge project__badge--live">Live</span></h3>
-                        <p class="project__desc">Ask a data file questions in plain English. CSV, Excel, Parquet, or JSON files load into DuckDB running as WebAssembly in the browser, so files never leave it; a serverless function has an LLM write one read-only SQL query from automatic table profiles and join-key hints, validated on both server and client and run locally. The public endpoint is hardened with a request guard, per-IP rate limiting, a locked-down engine, a content security policy, and personal-data columns withheld from the model.</p>
-                        <ul class="project__tags"><li>DuckDB-Wasm</li><li>TypeScript</li><li>Vercel</li><li>LLM APIs</li></ul>
+                        <h3 class="project__title">Lighthouse <span class="project__badge">v0.15</span></h3>
+                        <p class="project__desc">A local-first desktop app that answers questions about a small group of files, with citations back to the passages it read. A Rust engine in a Tauri 2 shell handles extraction, on-device OCR and embeddings, and hybrid retrieval. A question over a spreadsheet becomes one read-only SQL query, run by DataFusion and shown verbatim. Use the bundled private model or bring your own key. Installers for Windows, macOS, and Linux.</p>
+                        <ul class="project__tags"><li>Rust</li><li>Tauri 2</li><li>DataFusion</li><li>Next.js</li></ul>
                         <div class="project__links">
-                            <a class="project__link" href="https://quack-query.vercel.app" target="_blank" rel="noopener">Open the live app ↗</a>
-                            <a class="project__link" href="https://github.com/lmansf/Quack-Query" target="_blank" rel="noopener">GitHub ↗</a>
+                            <a class="project__link" href="https://lhvault.app" target="_blank" rel="noopener">lhvault.app ↗</a>
+                            <a class="project__link" href="https://github.com/lmansf/lighthouse" target="_blank" rel="noopener">GitHub ↗</a>
                         </div>
                     </div>
                 </article>
@@ -358,22 +358,6 @@
                     </div>
                 </article>
 
-                <article class="project" id="efrog">
-                    <div class="project__body">
-                        <div class="project__head">
-                            <p class="project__eyebrow">Live app · Machine learning</p>
-                            <span class="project__date">2026</span>
-                        </div>
-                        <h3 class="project__title">eFrog <span class="project__badge project__badge--live">Live</span></h3>
-                        <p class="project__desc">An audio-classification model that identifies 19 Floridian frog species from a recording. Record a call, get a species. A deep-learning model behind a live web interface.</p>
-                        <ul class="project__tags"><li>Python</li><li>Audio ML</li><li>Web app</li></ul>
-                        <div class="project__links">
-                            <a class="project__link" href="https://efrog-seven.vercel.app/" target="_blank" rel="noopener">Open the live app ↗</a>
-                            <a class="project__link" href="https://github.com/lmansf/efrog" target="_blank" rel="noopener">GitHub ↗</a>
-                        </div>
-                    </div>
-                </article>
-
                 <article class="project" id="nowcast">
                     <div class="project__body">
                         <div class="project__head">
@@ -400,6 +384,21 @@
                         <ul class="project__tags"><li>Power BI</li><li>SQL</li><li>Segmentation</li></ul>
                         <div class="project__links">
                             <a class="project__link" href="https://github.com/lmansf/Member-Segmentation-Analysis" target="_blank" rel="noopener">View on GitHub ↗</a>
+                        </div>
+                    </div>
+                </article>
+
+                <article class="project project--archived" id="efrog">
+                    <div class="project__body">
+                        <div class="project__head">
+                            <p class="project__eyebrow">Machine learning · Audio</p>
+                            <span class="project__date">2026</span>
+                        </div>
+                        <h3 class="project__title">eFrog <span class="project__badge project__badge--muted">Retired</span></h3>
+                        <p class="project__desc">An audio-classification model that identified 19 Floridian frog species from a recording. The web app is retired; the model and code are still on GitHub.</p>
+                        <ul class="project__tags"><li>Python</li><li>Audio ML</li></ul>
+                        <div class="project__links">
+                            <a class="project__link" href="https://github.com/lmansf/efrog" target="_blank" rel="noopener">GitHub ↗</a>
                         </div>
                     </div>
                 </article>

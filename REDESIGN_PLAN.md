@@ -6,7 +6,11 @@
 > Fraunces + Figtree type) as a two-page site, and the Shop, Resume, Feedback
 > and bottom tab bar described below no longer exist. For the current design
 > see the **Design: "Barn Owl"** section of [`README.md`](README.md) and
-> `assets/tokens.css`.
+> `assets/tokens.css`. The résumé file paths below are also retired: there is
+> no `resume.html` or `/resume` page, and `assets/resume_current.pdf` is gone.
+> The résumé now lives at `assets/loganmansfield.pdf` (with
+> `assets/resume_ats.txt`), both generated from `resume-src/resume.md` by
+> `resume-src/build.py`, and `/resume` simply redirects to the PDF.
 
 **Direction (locked):** Refined minimalism+ · Data-forward palette · Mobile-first IA · Plan + visual mockup.
 
