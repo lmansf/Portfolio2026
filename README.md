@@ -92,7 +92,8 @@ part of it:
 Framing rule for all of the above: the day job is systems ownership (Galaxy
 ticketing, eGalaxy webstores, PAR Pixel POS, vendors, park-wide POS
 hardware); SQL/Python/Power BI are portfolio and analyst skills. Don't claim
-anything not on the résumé.
+anything Logan hasn't confirmed (no CRM ownership, UAT, M365/D365
+admin, or dbt as a skill).
 
 ## Local development
 
