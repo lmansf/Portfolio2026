@@ -2,7 +2,8 @@
  * transition.js — page transitions + nav for the 2-page site.
  *
  * Scope: Home + Projects. Handles the SPA-style page swap (with the
- * View Transitions API where supported), the burger / site-nav dropdown,
+ * View Transitions API where supported), the burger / site-nav dropdown
+ * (focus returns to the burger when the menu is dismissed),
  * scroll + focus on navigation (to the `#hash` target when the link names
  * one, e.g. /projects#fraud, otherwise the top of the page), and
  * back/forward (popstate, hash preserved).
@@ -165,39 +166,42 @@ function openSiteNav() {
     document.body.classList.add('site-nav-open');
     nav.setAttribute('aria-hidden', 'false');
     nav.removeAttribute('inert');
-    if (burger) burger.setAttribute('aria-expanded', 'true');
+    if (burger) {
+        burger.setAttribute('aria-expanded', 'true');
+        burger.setAttribute('aria-label', 'Close navigation');
+    }
     const firstLink = nav.querySelector('.site-nav__item');
     if (firstLink) setTimeout(() => firstLink.focus(), 50);
 }
 
-function closeSiteNav() {
+// options.restoreFocus: move focus back to the burger. Pass it when the menu
+// is dismissed in place (Escape, backdrop, burger); omit it when a link was
+// followed, since navigation moves focus itself.
+function closeSiteNav(options = {}) {
     const nav = getSiteNav();
     if (!nav) return;
+    const wasOpen = document.body.classList.contains('site-nav-open');
     document.body.classList.remove('site-nav-open');
     nav.setAttribute('aria-hidden', 'true');
     nav.setAttribute('inert', '');
     const burger = document.querySelector('[data-burger]');
-    if (burger) burger.setAttribute('aria-expanded', 'false');
+    if (burger) {
+        burger.setAttribute('aria-expanded', 'false');
+        burger.setAttribute('aria-label', 'Open navigation');
+        // Hand focus back to the burger when the menu is dismissed without
+        // following a link (Escape, backdrop, burger), so keyboard users
+        // aren't dropped onto <body>.
+        if (wasOpen && options.restoreFocus) burger.focus();
+    }
 }
 
 function toggleSiteNav() {
-    document.body.classList.contains('site-nav-open') ? closeSiteNav() : openSiteNav();
+    document.body.classList.contains('site-nav-open') ? closeSiteNav({ restoreFocus: true }) : openSiteNav();
 }
 
 document.addEventListener('DOMContentLoaded', () => {
     if (window.location.protocol === 'file:') {
         console.warn('Page transitions require a local server (CORS restrictions on file://).');
-    }
-
-    // Initial page fade-in
-    const main = document.querySelector('main');
-    if (main) {
-        main.classList.add('page-initial-state');
-        requestAnimationFrame(() => {
-            main.classList.add('page-initial-enter');
-            main.classList.remove('page-initial-state');
-            setTimeout(() => main.classList.remove('page-initial-enter'), 500);
-        });
     }
 
     closeSiteNav();
@@ -212,7 +216,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         // Backdrop close
         if (e.target.closest('[data-nav-close]')) {
-            closeSiteNav();
+            closeSiteNav({ restoreFocus: true });
             return;
         }
 
@@ -248,7 +252,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     document.addEventListener('keydown', (e) => {
         if (e.key === 'Escape' && document.body.classList.contains('site-nav-open')) {
-            closeSiteNav();
+            closeSiteNav({ restoreFocus: true });
         }
     });
 

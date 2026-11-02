@@ -170,12 +170,9 @@ main {
     opacity: 0;
 }
 
-.page-initial-state {
-    opacity: 0;
-}
-
-.page-enter,
-.page-initial-enter {
+/* First load paints immediately (no fade), so the hero is the first thing on
+ * screen; only in-site page swaps fade. */
+.page-enter {
     animation: page-fade-in 0.5s ease-out forwards;
 }
 
@@ -187,8 +184,7 @@ main {
 @media (prefers-reduced-motion: reduce) {
     html { scroll-behavior: auto; }
     main { transition: none; }
-    .page-enter,
-    .page-initial-enter { animation-duration: 1ms; }
+    .page-enter { animation-duration: 1ms; }
 }
 
 /* Scrollbar on-palette */
