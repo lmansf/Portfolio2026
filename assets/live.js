@@ -6,6 +6,11 @@
  * Charts are plain SVG built here; no chart library, no database key.
  * Every value is also reachable without hover: stat tiles, captions,
  * and the daily table.
+ *
+ * Once the tiles are filled, the checkouts, caught and dollars values are
+ * marked data-countup and a `motion:countup` event asks motion.js to count
+ * them up. motion.js owns that animation; this file only sets the final
+ * text, which is what screen readers, no-JS and print get.
  * ───────────────────────────────────────────────────────────── */
 (function () {
     'use strict';
@@ -192,6 +197,14 @@
         const fraudDollars = (t.fraud_dollars_stopped || 0) + (t.fraud_dollars_approved || 0);
         set('dollars', fmtMoney(t.fraud_dollars_stopped), `${fmtPct(ratio(t.fraud_dollars_stopped, fraudDollars))} of ${fmtMoney(fraudDollars)} attempted`);
         set('latency', `${t.p95_scoring_ms} ms`, `${fmtInt(t.scoring_timeouts)} timeouts failed open (${fmtPct(ratio(t.scoring_timeouts, t.checkouts), 1)})`);
+
+        // Ask motion.js to count these up once (it skips zeros, and does
+        // nothing under reduced motion). The text set above is the final value.
+        const counted = ['checkouts', 'caught', 'dollars']
+            .map((key) => root.querySelector(`[data-kpi="${key}"]`))
+            .filter(Boolean);
+        counted.forEach((v) => v.setAttribute('data-countup', ''));
+        document.dispatchEvent(new CustomEvent('motion:countup', { detail: { elements: counted } }));
     }
 
     /* ── Daily stacked bars: caught (bottom) + missed (top) ── */

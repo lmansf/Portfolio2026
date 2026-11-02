@@ -1,8 +1,11 @@
-/* motion.css — styles for assets/motion.js (the walking owl and scroll reveals).
- * Loaded by motion.js as an external stylesheet, not an inline <style>, so
- * pages with a strict Content-Security-Policy (style-src 'self', e.g.
- * /playground) work. The script mounts the owl and tags reveals only once
- * this file has loaded, so nothing flashes unstyled. */
+/* motion.css — styles for assets/motion.js (the walking owl, scroll reveals,
+ * tactile buttons and links, the copy-email button, count-up numbers and the
+ * live pulse dot). Loaded by motion.js as an external stylesheet, not an
+ * inline <style>, so pages with a strict Content-Security-Policy
+ * (style-src 'self', e.g. /playground) work. The script mounts the owl, tags
+ * reveals and adds the other touches only once this file has loaded, so
+ * nothing flashes unstyled. Every animation here is off or static under
+ * prefers-reduced-motion. */
 .owl-lane { position: relative; z-index: 1; width: 100%; max-width: var(--max-w, 920px); margin: auto auto 0; padding: 0 var(--gutter, 1rem); height: 60px; box-sizing: border-box; pointer-events: none; }
 
 .owl-lane + footer.shell-footer { margin-top: 0; }
@@ -58,3 +61,48 @@
 @media (prefers-reduced-motion: reduce) { .owl-walker__sprite { animation: none !important; } .reveal { opacity: 1; transform: none; transition: none; } }
 
 @media print { .owl-lane { display: none; } .reveal { opacity: 1 !important; transform: none !important; } }
+
+/* ── Tactile buttons and links ──
+ * A slight lift on hover (pointer devices only, so taps don't leave it stuck)
+ * and a press-down while held. Transforms only: nothing around them moves.
+ * pages.css already lifts .btn--primary, .project and .social on hover. */
+@media (prefers-reduced-motion: no-preference) {
+  @media (hover: hover) {
+    .btn--ghost:hover { transform: translateY(-1px); }
+  }
+  .btn:active, .btn--primary:active { transform: translateY(1px) scale(0.98); }
+  .social:active { transform: translateY(0) scale(0.99); transition-duration: var(--dur-fast, 140ms); }
+  .topnav a, .site-nav__item, footer.shell-footer .footer-socials a, .section-head__link, .pg-schema__name { transition-property: color, background, border-color, transform, opacity; transition-duration: var(--dur-fast, 140ms); transition-timing-function: var(--ease-out, ease-out); }
+  .topnav a:active, footer.shell-footer .footer-socials a:active { transform: scale(0.96); }
+  .site-nav__item:active { transform: scale(0.98); }
+  .section-head__link:active, .pg-schema__name:active { transform: translateY(1px); }
+}
+.project__link:active, .section-head__link:active { opacity: 0.72; }
+
+/* ── Copy email ── */
+.copy-email { position: relative; padding: 0.7rem; }
+.copy-email svg { display: block; width: 1em; height: 1em; }
+.copy-email__note { position: absolute; bottom: calc(100% + 8px); left: 50%; transform: translate(-50%, 4px); white-space: nowrap; font: 600 0.75rem/1.2 var(--font-text, system-ui, sans-serif); color: var(--ink-1, #3a281c); background: var(--surface-1, #f6eee2); border: 1px solid var(--hairline, #e4d5c0); border-radius: var(--r-pill, 999px); padding: 0.3rem 0.65rem; box-shadow: var(--shadow-sm, 0 1px 2px rgba(0,0,0,.1)); opacity: 0; pointer-events: none; transition: opacity 160ms ease, transform 160ms ease; }
+.copy-email__note:empty { display: none; }
+.copy-email.is-noted .copy-email__note { opacity: 1; transform: translate(-50%, 0); }
+.copy-scratch { position: fixed; top: 0; left: 0; width: 1px; height: 1px; opacity: 0; pointer-events: none; }
+
+/* ── Count-up numbers ──
+ * The final value keeps its place (transparent) so the width never changes;
+ * the aria-hidden runner draws over it while it counts. */
+.countup { position: relative; }
+.countup__final { color: transparent; }
+.countup__run { position: absolute; inset: 0; font-variant-numeric: tabular-nums; white-space: nowrap; }
+
+/* ── Live pulse ──
+ * Sits in the gap to the left of the link (absolutely placed), so the link
+ * text doesn't move when it appears. */
+.has-live-pulse { position: relative; }
+.live-pulse { position: absolute; left: -13px; top: 50%; width: 7px; height: 7px; margin-top: -3.5px; border-radius: 50%; background: var(--ink-3, #6f5945); opacity: 0.55; }
+.live-pulse.is-fresh { background: var(--success, #4d6b38); opacity: 1; }
+@media (prefers-reduced-motion: no-preference) {
+  .live-pulse.is-fresh { animation: live-breathe 2.8s ease-in-out infinite; }
+}
+@keyframes live-breathe { 0%, 100% { box-shadow: 0 0 0 0 color-mix(in srgb, var(--success, #4d6b38) 45%, transparent); transform: scale(1); } 50% { box-shadow: 0 0 0 4px color-mix(in srgb, var(--success, #4d6b38) 0%, transparent); transform: scale(0.86); } }
+
+@media print { .copy-email, .live-pulse { display: none; } .countup__final { color: inherit; } .countup__run { display: none; } }

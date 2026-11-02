@@ -10,8 +10,9 @@ editing source (esbuild is fine:
 Text colors must stay WCAG AA on every surface token: chestnut, the blue
 accent, and the ink tokens pass; tan and caramel are fills, not text.
 
-Motion extras (the walking Owl Park owl and scroll reveals) live only in
-`assets/motion.js` and `assets/motion.css` (the script loads the stylesheet
+Motion extras (the walking Owl Park owl, scroll reveals, button hover/press,
+the copy-email button, `data-countup` numbers and the `/live` freshness dot)
+live only in `assets/motion.js` and `assets/motion.css` (the script loads the stylesheet
 itself, never as an inline `<style>`, which the playground's CSP blocks), so a
 page opts in with one deferred script tag; `pages.css` is untouched and `shell.css` only carries
 the `@view-transition` opt-in (it must be render-blocking to work). Keep the owl
@@ -41,8 +42,10 @@ The `/live` page (`live.html`, `assets/live.*`) is fed by
 `data/fraud-snapshot.json`, which the `fraud-snapshot` GitHub Action
 regenerates daily from `scripts/fraud-snapshot.sql` and commits to `main`.
 Keep the SQL output, the workflow's `jq` allow-list, and `live.js` in step
-when fields change; the snapshot holds aggregates only and the page must
-never carry a database key. See the README's "Live fraud data" section.
+when fields change (`motion.js` also reads `generated_at` and
+`latest_event_at` for the freshness dot on Home and Projects); the snapshot
+holds aggregates only and the page must never carry a database key. See the
+README's "Live fraud data" section.
 
 ## Validate portfolio PRs through the `no-mistakes` gate
 
