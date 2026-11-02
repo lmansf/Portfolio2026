@@ -85,8 +85,11 @@
 
         tabs.forEach(function (tab, i) {
             tab.addEventListener('click', function () { stop(); select(i, false); });
-            tab.addEventListener('pointerenter', function (e) {
-                if (e.pointerType === 'mouse' && finePointer && finePointer.matches && !timer) select(i, false);
+            // pointermove, not pointerenter: scrolling the page under a resting
+            // mouse fires enter events, and the selection shouldn't jump then.
+            tab.addEventListener('pointermove', function (e) {
+                if (i === current || timer) return;
+                if (e.pointerType === 'mouse' && finePointer && finePointer.matches) select(i, false);
             });
             tab.addEventListener('keydown', function (e) {
                 var next = null;
