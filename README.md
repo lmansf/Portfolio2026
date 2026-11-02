@@ -85,9 +85,12 @@ soft and tappable things are pills.
   list, styled by a `<noscript>` copy of the stylesheet link. The page
   preloads the stylesheet; the script applies it, and adds it after an
   in-site swap from Home (which is why Home loads the script too).
-- `assets/motion.js` — the walking owl and scroll reveals. Self-contained
-  (it injects its own small stylesheet), loaded with one deferred tag on
-  Home, Projects, Live and 404. The owl walks in its own 60px lane
+- `assets/motion.js` / `assets/motion.css` — the walking owl and scroll
+  reveals, loaded with one deferred script tag on Home, Projects, Live,
+  Playground and 404. The script adds `motion.min.css` as an external
+  stylesheet (no inline `<style>`, so the playground's strict
+  `style-src 'self'` CSP allows it) and only mounts the owl and tags reveals
+  once it has loaded. The owl walks in its own 60px lane
   between `<main>` and the footer, so it never covers content; it links to
   exploreowlpark.com, has a "Hide owl" button remembered in localStorage
   (key `owl-walker-hidden`; the lane shrinks to 34px and keeps a "Show owl"
