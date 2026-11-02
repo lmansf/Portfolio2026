@@ -19,6 +19,7 @@ Markdown subset understood by this script:
   **bold** text     inline bold anywhere
   blank line        paragraph break (no extra space is added)
 """
+
 import os
 import re
 import sys
@@ -29,23 +30,39 @@ from reportlab.lib.styles import ParagraphStyle
 from reportlab.lib.units import inch
 from reportlab.pdfbase import pdfmetrics
 from reportlab.pdfbase.ttfonts import TTFont
-from reportlab.platypus import Flowable, ListFlowable, ListItem, Paragraph, SimpleDocTemplate, Spacer
+from reportlab.platypus import (
+    Flowable,
+    ListFlowable,
+    ListItem,
+    Paragraph,
+    SimpleDocTemplate,
+    Spacer,
+)
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 SRC = os.path.join(ROOT, "resume-src", "resume.md")
 PDF = os.path.join(ROOT, "assets", "loganmansfield.pdf")
 TXT = os.path.join(ROOT, "assets", "resume_ats.txt")
 
-FONT_DIRS = ["/usr/share/fonts/truetype/crosextra", os.path.expanduser("~/.fonts"), "/Library/Fonts"]
+FONT_DIRS = [
+    "/usr/share/fonts/truetype/crosextra",
+    os.path.expanduser("~/.fonts"),
+    "/Library/Fonts",
+]
 
 
 def register_fonts():
     for d in FONT_DIRS:
-        reg, bold = os.path.join(d, "Carlito-Regular.ttf"), os.path.join(d, "Carlito-Bold.ttf")
+        reg, bold = (
+            os.path.join(d, "Carlito-Regular.ttf"),
+            os.path.join(d, "Carlito-Bold.ttf"),
+        )
         if os.path.exists(reg) and os.path.exists(bold):
             pdfmetrics.registerFont(TTFont("Carlito", reg))
             pdfmetrics.registerFont(TTFont("Carlito-Bold", bold))
-            pdfmetrics.registerFontFamily("Carlito", normal="Carlito", bold="Carlito-Bold")
+            pdfmetrics.registerFontFamily(
+                "Carlito", normal="Carlito", bold="Carlito-Bold"
+            )
             return "Carlito", "Carlito-Bold"
     print("warning: Carlito not found, using Helvetica", file=sys.stderr)
     return "Helvetica", "Helvetica-Bold"
@@ -72,8 +89,15 @@ def build(base_size=10.0):
     body = ParagraphStyle("body", fontName=regular, fontSize=base_size, leading=lead)
     name = ParagraphStyle("name", parent=body, fontName=bold, fontSize=20, leading=23)
     sub = ParagraphStyle("sub", parent=body, fontSize=base_size + 1, leading=lead + 1)
-    section = ParagraphStyle("section", parent=body, fontName=bold, fontSize=base_size + 1,
-                             leading=lead + 1, spaceBefore=5, spaceAfter=1)
+    section = ParagraphStyle(
+        "section",
+        parent=body,
+        fontName=bold,
+        fontSize=base_size + 1,
+        leading=lead + 1,
+        spaceBefore=5,
+        spaceAfter=1,
+    )
     role = ParagraphStyle("role", parent=body, fontName=bold, spaceBefore=2)
     bullet = ParagraphStyle("bullet", parent=body)
 
@@ -92,10 +116,20 @@ def build(base_size=10.0):
 
     def flush_bullets():
         if bullets:
-            story.append(ListFlowable(
-                [ListItem(Paragraph(inline(b), bullet), leftIndent=11, value="•") for b in bullets],
-                bulletType="bullet", start="•", leftIndent=11, bulletFontName=regular,
-                bulletFontSize=base_size, bulletOffsetY=0))
+            story.append(
+                ListFlowable(
+                    [
+                        ListItem(Paragraph(inline(b), bullet), leftIndent=11, value="•")
+                        for b in bullets
+                    ],
+                    bulletType="bullet",
+                    start="•",
+                    leftIndent=11,
+                    bulletFontName=regular,
+                    bulletFontSize=base_size,
+                    bulletOffsetY=0,
+                )
+            )
             bullets.clear()
 
     for raw in lines:
@@ -144,11 +178,24 @@ def build(base_size=10.0):
 
     pages = []
     buf = BytesIO()
-    doc = SimpleDocTemplate(buf, pagesize=letter, leftMargin=margin_x, rightMargin=margin_x,
-                            topMargin=margin_y, bottomMargin=margin_y, invariant=1,
-                            title="Logan Mansfield - Résumé", author="Logan Mansfield",
-                            subject="Résumé", creator="resume-src/build.py")
-    doc.build(story, onLaterPages=lambda c, d: pages.append(d.page), onFirstPage=lambda c, d: pages.append(d.page))
+    doc = SimpleDocTemplate(
+        buf,
+        pagesize=letter,
+        leftMargin=margin_x,
+        rightMargin=margin_x,
+        topMargin=margin_y,
+        bottomMargin=margin_y,
+        invariant=1,
+        title="Logan Mansfield - Résumé",
+        author="Logan Mansfield",
+        subject="Résumé",
+        creator="resume-src/build.py",
+    )
+    doc.build(
+        story,
+        onLaterPages=lambda c, d: pages.append(d.page),
+        onFirstPage=lambda c, d: pages.append(d.page),
+    )
     return len(pages), buf.getvalue(), "\n".join(txt).strip() + "\n"
 
 
@@ -159,10 +206,16 @@ if __name__ == "__main__":
         if n == 1:
             break
     if n != 1:
-        sys.exit(f"résumé does not fit on one page ({n} pages at {size}pt); trim resume-src/resume.md "
-                 f"({os.path.relpath(PDF, ROOT)} and {os.path.relpath(TXT, ROOT)} left unchanged)")
+        sys.exit(
+            f"résumé does not fit on one page ({n} pages at {size}pt); "
+            f"trim resume-src/resume.md ({os.path.relpath(PDF, ROOT)} and "
+            f"{os.path.relpath(TXT, ROOT)} left unchanged)"
+        )
     with open(PDF, "wb") as f:
         f.write(pdf)
     with open(TXT, "w", encoding="utf-8") as f:
         f.write(ats)
-    print(f"Built {os.path.relpath(PDF, ROOT)} (1 page, {size}pt) and {os.path.relpath(TXT, ROOT)}")
+    print(
+        f"Built {os.path.relpath(PDF, ROOT)} (1 page, {size}pt) "
+        f"and {os.path.relpath(TXT, ROOT)}"
+    )
