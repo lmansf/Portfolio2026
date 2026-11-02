@@ -37,9 +37,9 @@ daily as (
     count(*) filter (where is_fraud) as fraud,
     count(*) filter (where is_fraud and decision <> 'approve') as fraud_caught,
     count(*) filter (where not is_fraud and decision = 'decline') as false_declines,
-    round(sum(total) filter (where is_fraud and decision <> 'approve'), 2) as fraud_dollars_stopped,
-    round(sum(total) filter (where is_fraud and decision = 'approve'), 2) as fraud_dollars_missed,
-    round((percentile_cont(0.95) within group (order by fraud_scoring_ms))::numeric, 1) as p95_scoring_ms
+    round(sum(total) filter (where is_fraud and decision <> 'approve'), 2)::float8 as fraud_dollars_stopped,
+    round(sum(total) filter (where is_fraud and decision = 'approve'), 2)::float8 as fraud_dollars_missed,
+    round((percentile_cont(0.95) within group (order by fraud_scoring_ms))::numeric, 1)::float8 as p95_scoring_ms
   from base
   group by day
 ),
@@ -53,11 +53,11 @@ totals as (
     count(*) filter (where is_fraud and decision <> 'approve') as fraud_caught,
     count(*) filter (where not is_fraud and decision = 'decline') as false_declines,
     count(*) filter (where not is_fraud) as legit,
-    round(sum(total) filter (where is_fraud and decision <> 'approve'), 2) as fraud_dollars_stopped,
-    round(sum(total) filter (where is_fraud and decision = 'approve'), 2) as fraud_dollars_missed,
-    round((percentile_cont(0.5) within group (order by fraud_scoring_ms))::numeric, 1) as p50_scoring_ms,
-    round((percentile_cont(0.95) within group (order by fraud_scoring_ms))::numeric, 1) as p95_scoring_ms,
-    round((percentile_cont(0.95) within group (order by total_latency_ms))::numeric, 0) as p95_checkout_ms,
+    round(sum(total) filter (where is_fraud and decision <> 'approve'), 2)::float8 as fraud_dollars_stopped,
+    round(sum(total) filter (where is_fraud and decision = 'approve'), 2)::float8 as fraud_dollars_missed,
+    round((percentile_cont(0.5) within group (order by fraud_scoring_ms))::numeric, 1)::float8 as p50_scoring_ms,
+    round((percentile_cont(0.95) within group (order by fraud_scoring_ms))::numeric, 1)::float8 as p95_scoring_ms,
+    round((percentile_cont(0.95) within group (order by total_latency_ms))::numeric, 0)::float8 as p95_checkout_ms,
     count(*) filter (where fraud_timeout) as scoring_timeouts,
     count(distinct day) as active_days
   from base
@@ -102,7 +102,7 @@ select json_build_object(
   'thresholds', (select row_to_json(thresholds) from thresholds),
   'daily', (select coalesce(json_agg(daily order by day), '[]'::json) from daily),
   'score_bins', (select coalesce(json_agg(json_build_object(
-                    'from', bin / 20.0, 'to', (bin + 1) / 20.0,
+                    'from', round(bin / 20.0, 2)::float8, 'to', round((bin + 1) / 20.0, 2)::float8,
                     'legit', legit, 'fraud', fraud) order by bin), '[]'::json) from bins),
   'patterns', (select coalesce(json_agg(patterns order by fraud desc), '[]'::json) from patterns)
 ) as snapshot;

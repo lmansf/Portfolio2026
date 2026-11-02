@@ -26,6 +26,7 @@
         stolen_card_resale: 'Stolen-card resale',
         account_takeover: 'Account takeover'
     };
+    const CROSS_ACCOUNT_PATTERNS = new Set(['fraud_ring', 'account_takeover']);
 
     /* ── Formatting ── */
     const nf = new Intl.NumberFormat('en-US');
@@ -196,7 +197,7 @@
         const step = iw / days.length;
         const barW = Math.max(3, Math.min(22, step - 2));
 
-        const svg = el('svg', { viewBox: `0 0 ${width} ${height}`, role: 'img', 'aria-hidden': 'true', focusable: 'false' }, host);
+        const svg = el('svg', { viewBox: `0 0 ${width} ${height}`, focusable: 'false' }, host);
         const grid = el('g', { class: 'grid' }, svg);
         const ticks = Math.round(yMax / scale.step);
         for (let i = 0; i <= ticks; i++) {
@@ -306,7 +307,7 @@
         const step = iw / NB;
         const barW = Math.max(2, Math.min(12, (step - 4) / 2));
 
-        const svg = el('svg', { viewBox: `0 0 ${width} ${height}`, role: 'img', 'aria-hidden': 'true', focusable: 'false' }, host);
+        const svg = el('svg', { viewBox: `0 0 ${width} ${height}`, focusable: 'false' }, host);
         const grid = el('g', { class: 'grid' }, svg);
         for (let i = 0; i <= 4; i++) {
             const v = (yMax / 4) * i;
@@ -353,15 +354,32 @@
 
         const caption = root.querySelector('[data-caption="scores"]');
         if (caption) {
+            const t = s.totals || {};
+            const eps = 1e-9;
+            const hasReview = Number.isFinite(th.review_from);
             const topLegit = bins.reduce((a, b) => (b.legit > 0 ? b.to : a), 0);
-            const fraudBelowReview = Number.isFinite(th.review_from)
-                ? bins.filter((b) => b.to <= th.review_from + 1e-9).reduce((a, b) => a + b.fraud, 0)
-                : NaN;
-            let text = `Every good customer scored below ${topLegit.toFixed(2)}, well under the review line, which is why none were declined.`;
-            if (Number.isFinite(fraudBelowReview)) {
-                text += ` The cost is the fraud that scores low too: ${fmtPct(ratio(fraudBelowReview, totFraud))} of fraudulent orders sat below ${th.review_from.toFixed(2)} and went through.`;
+            const legitFlagged = Number.isFinite(t.flagged) && Number.isFinite(t.fraud_caught)
+                ? Math.max(0, t.flagged - t.fraud_caught)
+                : hasReview ? bins.filter((b) => b.to > th.review_from + eps).reduce((a, b) => a + b.legit, 0) : NaN;
+            const falseDeclines = Number.isFinite(t.false_declines) ? t.false_declines : NaN;
+            const sentences = [];
+            if (totLegit > 0 && legitFlagged === 0) {
+                sentences.push(hasReview && topLegit <= th.review_from + eps
+                    ? `Every good customer scored below ${topLegit.toFixed(2)}, under the review line, so none were declined.`
+                    : `Every good customer scored below ${topLegit.toFixed(2)}, and none were sent to review or declined.`);
+            } else if (totLegit > 0 && Number.isFinite(legitFlagged)) {
+                let line = `${fmtInt(legitFlagged)} good ${legitFlagged === 1 ? 'customer' : 'customers'} (${fmtPct(ratio(legitFlagged, totLegit), 1)}) scored at or above the review line`;
+                if (hasReview) line += ` of ${th.review_from.toFixed(2)}`;
+                if (falseDeclines === 0) line += ', but none were declined.';
+                else if (Number.isFinite(falseDeclines)) line += `, and ${fmtInt(falseDeclines)} ${falseDeclines === 1 ? 'was' : 'were'} declined.`;
+                else line += '.';
+                sentences.push(line);
             }
-            caption.textContent = text;
+            if (hasReview && totFraud > 0) {
+                const fraudBelowReview = bins.filter((b) => b.to <= th.review_from + eps).reduce((a, b) => a + b.fraud, 0);
+                sentences.push(`The cost is the fraud that scores low too: ${fmtPct(ratio(fraudBelowReview, totFraud))} of fraudulent orders sat below ${th.review_from.toFixed(2)} and went through.`);
+            }
+            caption.textContent = sentences.join(' ');
         }
     }
 
@@ -387,7 +405,9 @@
         if (caption && rows.length > 1) {
             const best = rows[0];
             const worst = rows[rows.length - 1];
-            caption.textContent = `The rules catch ${best.name.toLowerCase()} best (${fmtPct(best.rate)}) and ${worst.name.toLowerCase()} worst (${fmtPct(worst.rate)}). Fraud spread across many accounts looks normal one order at a time.`;
+            let text = `The rules catch ${best.name.toLowerCase()} best (${fmtPct(best.rate)}) and ${worst.name.toLowerCase()} worst (${fmtPct(worst.rate)}).`;
+            if (CROSS_ACCOUNT_PATTERNS.has(worst.pattern)) text += ' Fraud spread across many accounts looks normal one order at a time.';
+            caption.textContent = text;
         }
     }
 
