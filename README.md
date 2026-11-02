@@ -14,12 +14,19 @@ live data page:
   featured projects, an experience timeline, credentials (B.S. Biology, Towson)
   and a toolkit grouped into data stack / forecasting & ML / platforms run at
   ZooTampa, a short about, and the fastest ways to connect.
-- **Projects** (`projects.html`, `/projects`) — featured: the Fraud Detection
-  Pipeline (running on a schedule; links to the branch that holds the code),
-  Owl Park (live at exploreowlpark.com), and Lighthouse; then Quack Query,
-  USL Attendance Forecasting, Roll Call, eFrog (live), Attendance Nowcast,
-  Member Segmentation (RFM), and the archived Owl Park data architecture.
-  Cards have anchor ids (`#fraud`, `#owl-park`, `#lighthouse`, …) so the home
+- **Projects** (`projects.html`, `/projects`) — featured: Quack Query (the
+  latest build, first), the Fraud Detection Pipeline (running on a schedule;
+  links to the branch that holds the code), and Owl Park (live at
+  exploreowlpark.com);
+  then Lighthouse, Attendance Forecasting, USL Attendance Forecasting, Roll
+  Call, Attendance Nowcast, Member Segmentation (RFM), and two retired cards:
+  eFrog (code only, no live link) and the archived Owl Park data architecture.
+  Between the featured cards and the rest, "How the data flows" holds a
+  clickable pipeline diagram for the Fraud Detection Pipeline (`#fraud-flow`)
+  and Owl Park (`#owl-park-flow`); those two featured cards link down to
+  their own. Every stage note is checked against that project's public repo,
+  so update the diagram when the pipeline changes.
+  Cards have anchor ids (`#fraud`, `#owl-park`, `#quack-query`, …) so the home
   page and legacy redirects can deep-link to them. The home page repeats the
   three featured cards in shorter form, so keep the two in step when editing
   card copy.
@@ -29,9 +36,9 @@ live data page:
   pipeline (see "Live fraud data" below).
 - **404** (`404.html`) — branded not-found page.
 
-Clean URLs (`/projects`, `/owl-park`, `/live`) and legacy redirects (e.g.
-`/fraud` → `/projects#fraud`, `/pipeline` → `/owl-park`) are configured in
-`vercel.json`.
+Clean URLs (`/projects`, `/owl-park`, `/live`), the `/resume` shortcut to
+the résumé PDF, and legacy redirects (e.g. `/fraud` → `/projects#fraud`,
+`/pipeline` → `/owl-park`) are configured in `vercel.json`.
 
 ## Design: "Barn Owl"
 
@@ -56,8 +63,20 @@ soft and tappable things are pills.
   experience timeline, chips and toolkit groups, about, connect cards, buttons.
 - `assets/transition.js` — SPA-style page transitions and the mobile nav.
   Only in-site page swaps fade; the first load paints immediately so the hero
-  is on screen at once. Dismissing the mobile nav (Escape, backdrop, burger)
-  returns focus to the burger, whose label toggles Open/Close navigation.
+  is on screen at once. In-page `#hash` links (the cards' "See how it flows")
+  are left to the browser rather than re-swapping `<main>`. Dismissing the
+  mobile nav (Escape, backdrop, burger) returns focus to the burger, whose
+  label toggles Open/Close navigation.
+- `assets/pipeline.css` / `assets/pipeline.js` — the clickable pipeline
+  diagrams (`[data-flow]` figures on Projects). The script turns each one into
+  a tabs widget: click, tap or hover a stage to read its note, arrow keys and
+  Home/End move between stages, and "Play the flow" steps through once
+  (choosing a stage pauses it; Play again carries on from there). Stages
+  before the selected one stay lit. Stages stack down a rail on phones and
+  tablets and sit in one row from 880px. Without JS every note shows as a
+  list, styled by a `<noscript>` copy of the stylesheet link. The page
+  preloads the stylesheet; the script applies it, and adds it after an
+  in-site swap from Home (which is why Home loads the script too).
 - `assets/theme.js` — optional per-company accent theming via `?ink=<company>`
   (see [`docs/referrers.md`](docs/referrers.md)).
 - `assets/live.css`, `assets/live.js` — styles and chart code for the live
@@ -74,6 +93,20 @@ soft and tappable things are pills.
 - `assets/loganmansfield.pdf` — résumé served from the site. Every résumé
   link opens it in a new tab (`target="_blank"`) rather than forcing a
   download.
+- `assets/resume_ats.txt` — plain-text copy of the résumé for ATS uploads,
+  generated from the same source as the PDF.
+- `resume-src/` — the résumé's source. Don't hand-edit the PDF or the ATS
+  text: edit `resume-src/resume.md` (a small Markdown subset, documented at
+  the top of `build.py`), then run `python3 resume-src/build.py` to rebuild
+  both (the script resolves paths from its own location, so any working
+  directory works). The build needs `reportlab` (`pip install reportlab`)
+  and the Carlito font (`fonts-crosextra-carlito` on Debian/Ubuntu; it falls
+  back to Helvetica with a warning). It steps the type down from 10pt to
+  9.25pt until the page fits and exits with an error, leaving `assets/`
+  untouched, if the résumé still spills past one page — trim the source
+  instead. The output is deterministic, so a rebuild from unchanged source
+  produces an identical PDF. `resume-src/` is kept out of the deployment by
+  `.vercelignore`.
 
 The pages load the minified `.min` variants. After editing any source asset,
 regenerate its minified file:

@@ -16,6 +16,13 @@ sharing metadata" section. When a page's head or facts change, bump that
 page's `<lastmod>` in `sitemap.xml` and keep `llms.txt` and the Person
 JSON-LD consistent with each other and with the résumé.
 
+The résumé (`assets/loganmansfield.pdf` and `assets/resume_ats.txt`) is
+generated, not hand-edited: change `resume-src/resume.md` and run
+`python3 resume-src/build.py` (reportlab + Carlito; see the README's
+"Assets" section). It must stay one Letter page. Content rules: B.S.
+Biology, Towson (2019) leads education; no dbt, CRM ownership, UAT, or
+M365/D365 admin; titles and dates unchanged; LinkedIn is `in/lmansf96`.
+
 The `/live` page (`live.html`, `assets/live.*`) is fed by
 `data/fraud-snapshot.json`, which the `fraud-snapshot` GitHub Action
 regenerates daily from `scripts/fraud-snapshot.sql` and commits to `main`.

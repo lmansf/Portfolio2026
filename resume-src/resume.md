@@ -1,0 +1,58 @@
+# LOGAN MANSFIELD
+
+IT Point of Sale Systems Analyst | Data Analyst moving into Analytics Engineering
+Tampa, FL | 443-929-5292 | lmansf96@gmail.com | linkedin.com/in/lmansf96 | github.com/lmansf | loganmansfield.org
+
+## Professional Summary
+
+IT systems analyst who owns the ticketing and webstore platforms behind ZooTampa's admissions revenue; three prior years as a data analyst; Microsoft PL-300 (Power BI) certified. Builds self-directed data projects end to end: a fraud-detection pipeline on Databricks and Supabase, natural-language-to-SQL on DuckDB, and attendance forecasting. Targeting analytics engineering and data analyst roles that turn source-system knowledge into trusted data models.
+
+## Skills
+
+**Analytics and Business Intelligence (BI):** SQL, Power BI, Tableau, Excel, dashboards and KPI reporting, data modeling, statistical modeling, forecasting
+**Data Engineering:** Python (pandas, scikit-learn, LightGBM, XGBoost), DuckDB, Databricks, Microsoft Fabric, PostgreSQL (Supabase), ETL/ELT pipelines
+**Systems and Platforms:** Gateway Galaxy 8 and eGalaxy ticketing/webstore, PAR Pixel point of sale (POS), HTML, CSS, JavaScript
+**Business Analysis:** requirements gathering, SOP documentation, stakeholder reporting, POS hardware inventory and maintenance
+
+## Professional Experience
+
+### IT Point of Sale Systems Analyst
+ZooTampa at Lowry Park | Tampa, FL | Nov 2024 - Present
+- Own the Gateway Galaxy 8 ticketing platform and eGalaxy webstores (product and pricing configuration, monitoring, vendor escalation), the systems behind the Zoo's admissions and membership revenue.
+- Built 9 new premium animal-experience products and an admission-inclusive bundle in the ticketing and webstore systems; all still on sale.
+- Designed, implemented, and monitored webstore upsells: add-on offers, a membership upsell tile, sticky navigation, and announcement ribbons built in custom HTML, CSS, and JavaScript.
+- Administer two POS platforms (PAR Pixel, Galaxy) and a fleet of about 90 terminals: inventory, maintenance, replacements.
+- Gather requirements from front-line departments for platform changes and provide tier 1-2 POS hardware and software support.
+
+### Guest Engagement Coordinator (started as Guide)
+ZooTampa at Lowry Park | Tampa, FL | Nov 2022 - Nov 2024
+- Overhauled the department's reporting system, saving about 4 coordinator hours per week (roughly 200 hours a year).
+- Produced weekly operational reports for leadership flagging risks and changes in department operations.
+- Co-wrote and revised education programs and their standard operating procedures (SOPs) with animal care staff.
+
+### Data Analyst
+Excel Esports | London, UK | Aug 2019 - Jul 2022
+- Designed and delivered a data-driven talent scouting system in Excel and Python within six months; the resulting academy roster became the most dominant in the organization's history by league performance.
+- Delivered weekly tactical, meta, and player-development analysis reports that produced direct advantages in official matches.
+
+## Projects (Self-Directed, Code on GitHub)
+
+**Fraud Detection Pipeline** | Databricks, Python, PostgreSQL (Supabase), SQL | github.com/lmansf/fraud-detection-pipeline
+- Built a scheduled Databricks job that simulates webstore checkouts (normal guests plus five fraud patterns), scores every order with a baseline rules model, and lands four raw tables in Supabase, with fraud labels arriving days to weeks later like chargebacks.
+- Across about 39,000 simulated orders, the baseline flagged about half the fraud and no legitimate orders: the bar a trained model has to clear.
+
+**Quack Query** | TypeScript, DuckDB-Wasm, Vercel serverless, LLM APIs | quack-query.vercel.app | github.com/lmansf/Quack-Query
+- Built a browser-based natural-language-to-SQL tool on in-browser DuckDB: an LLM writes one read-only query from automatic table profiles and join-key hints, validated on server and client; the public endpoint is rate-limited, locked against file and network access, and withholds personal-data columns from the model.
+
+**Attendance Forecasting** | Python, LightGBM, XGBoost, scikit-learn | github.com/lmansf/Attendance-Projections
+- Forecast daily theme park attendance from weather, calendar, and flight features; a LightGBM, ridge, and random forest blend selected by rolling-origin cross-validation beat a tuned XGBoost by about 6% MAE out of fold and cut mean bias from +90 to -7 guests per day.
+
+**Lighthouse** | Rust, Tauri, DataFusion, on-device OCR and embeddings | lhvault.app | github.com/lmansf/lighthouse
+- Shipped a local-first desktop app (v0.15) that answers questions about a small set of files with citations; a question over a spreadsheet becomes one read-only SQL query, shown verbatim and run by DataFusion.
+
+## Education and Certifications
+
+**Bachelor of Science (B.S.), Biology**, Towson University | 2019
+Coursework in biostatistics and field research methods at Towson University and the University of South Florida
+Microsoft Certified: Power BI Data Analyst Associate (PL-300)
+LearnSQL.com SQL Certification of Competency | Microsoft Fabric in a Day Workshop

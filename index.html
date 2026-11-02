@@ -104,7 +104,7 @@
                 "knowsAbout": ["SQL", "Data Modeling", "Power BI", "Microsoft Fabric", "Python", "Analytics Engineering", "ETL", "Data Warehousing", "DuckDB", "Databricks", "Ticketing Systems", "Point of Sale Systems"],
                 "hasCredential": [
                     { "@type": "EducationalOccupationalCredential", "credentialCategory": "certification", "name": "Microsoft Certified: Power BI Data Analyst Associate (PL-300)", "recognizedBy": { "@type": "Organization", "name": "Microsoft" } },
-                    { "@type": "EducationalOccupationalCredential", "credentialCategory": "certification", "name": "SQL Professional: Certificate of Competency", "recognizedBy": { "@type": "Organization", "name": "LearnSQL.com" } },
+                    { "@type": "EducationalOccupationalCredential", "credentialCategory": "certification", "name": "SQL Certification of Competency", "recognizedBy": { "@type": "Organization", "name": "LearnSQL.com" } },
                     { "@type": "EducationalOccupationalCredential", "credentialCategory": "degree", "name": "Bachelor of Science in Biology", "recognizedBy": { "@type": "CollegeOrUniversity", "name": "Towson University" } }
                 ],
                 "sameAs": ["https://www.linkedin.com/in/lmansf96/", "https://github.com/lmansf", "https://x.com/StatBird"]
@@ -175,7 +175,7 @@
                 </div>
                 <div class="now__row">
                     <span class="now__label">Latest</span>
-                    <span class="now__value"><a href="/projects#lighthouse">Lighthouse 0.15</a> — a local-first desktop app that answers questions about your files</span>
+                    <span class="now__value"><a href="/projects#quack-query">Quack Query</a> — ask a data file questions in plain English; an LLM writes the SQL and DuckDB runs it in your browser</span>
                 </div>
             </div>
         </section>
@@ -191,6 +191,22 @@
                 <a class="section-head__link" href="/projects">All projects →</a>
             </header>
             <div class="project-grid project-grid--featured">
+
+                <article class="project project--featured">
+                    <div class="project__body">
+                        <div class="project__head">
+                            <p class="project__eyebrow">Latest · LLM + SQL in the browser</p>
+                            <span class="project__date">2026</span>
+                        </div>
+                        <h3 class="project__title">Quack Query</h3>
+                        <p class="project__desc">Ask a data file questions in plain English. Files load into DuckDB running as WebAssembly and never leave the browser; an LLM writes one read-only SQL query from table profiles and join-key hints, checked on server and client and shown beside the results. Personal-data columns are withheld from the model.</p>
+                        <ul class="project__tags"><li>DuckDB-Wasm</li><li>SQL</li><li>TypeScript</li><li>LLM APIs</li></ul>
+                        <div class="project__links">
+                            <a class="project__link" href="https://quack-query.vercel.app" target="_blank" rel="noopener">Open the live app ↗</a>
+                            <a class="project__link" href="https://github.com/lmansf/Quack-Query" target="_blank" rel="noopener">GitHub ↗</a>
+                        </div>
+                    </div>
+                </article>
 
                 <article class="project project--featured">
                     <div class="project__body">
@@ -220,22 +236,6 @@
                         <div class="project__links">
                             <a class="project__link" href="https://exploreowlpark.com" target="_blank" rel="noopener">Visit the park ↗</a>
                             <a class="project__link" href="https://github.com/lmansf/Welcome-to-Owl-Park" target="_blank" rel="noopener">GitHub ↗</a>
-                        </div>
-                    </div>
-                </article>
-
-                <article class="project project--featured">
-                    <div class="project__body">
-                        <div class="project__head">
-                            <p class="project__eyebrow">Desktop app · v0.15</p>
-                            <span class="project__date">2026</span>
-                        </div>
-                        <h3 class="project__title">Lighthouse</h3>
-                        <p class="project__desc">A local-first desktop app that answers questions about a small set of files with citations. Rust engine in a Tauri shell: on-device embeddings and OCR, and a question over a spreadsheet becomes one read-only SQL query, shown verbatim and run by DataFusion.</p>
-                        <ul class="project__tags"><li>Rust</li><li>Tauri</li><li>DataFusion</li><li>Next.js</li></ul>
-                        <div class="project__links">
-                            <a class="project__link" href="https://lhvault.app" target="_blank" rel="noopener">lhvault.app ↗</a>
-                            <a class="project__link" href="https://github.com/lmansf/lighthouse" target="_blank" rel="noopener">GitHub ↗</a>
                         </div>
                     </div>
                 </article>
@@ -399,5 +399,6 @@
     </footer>
 
     <script defer src="/assets/transition.min.js"></script>
+    <script defer src="/assets/pipeline.min.js"></script>
 </body>
 </html>
