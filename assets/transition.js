@@ -2,7 +2,8 @@
  * transition.js — page transitions + nav for the 2-page site.
  *
  * Scope: Home + Projects. Handles the SPA-style page swap (with the
- * View Transitions API where supported), the burger / site-nav dropdown,
+ * View Transitions API where supported), the burger / site-nav dropdown
+ * (focus returns to the burger when the menu is dismissed),
  * scroll + focus on navigation (to the `#hash` target when the link names
  * one, e.g. /projects#fraud, otherwise the top of the page), and
  * back/forward (popstate, hash preserved).
@@ -173,6 +174,9 @@ function openSiteNav() {
     if (firstLink) setTimeout(() => firstLink.focus(), 50);
 }
 
+// options.restoreFocus: move focus back to the burger. Pass it when the menu
+// is dismissed in place (Escape, backdrop, burger); omit it when a link was
+// followed, since navigation moves focus itself.
 function closeSiteNav(options = {}) {
     const nav = getSiteNav();
     if (!nav) return;

@@ -8,9 +8,10 @@
  *   .project           project card (+ --featured, grid variants)
  *   .xp                experience timeline
  *   .chip-list / .chip skills, stack, credentials
+ *   .toolkit           chip lists grouped under small uppercase labels (Home)
  *   .about, .socials   about copy + connect cards
  *   .wf-divider        hairline divider with the crow mark
- *   .btn               pill buttons
+ *   .btn               pill buttons (+ .btn__meta small suffix, e.g. "PDF")
  * ───────────────────────────────────────────────────────────── */
 
 main.page {

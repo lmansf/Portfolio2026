@@ -1,15 +1,18 @@
 # loganmansfield.org — portfolio
 
-Personal portfolio for **Logan Mansfield, Data Analyst** (Tampa, FL — open to
-remote). Static HTML/CSS/JS, no build step, deployed on Vercel.
+Personal portfolio for **Logan Mansfield**, a data analyst moving into
+analytics engineering (Tampa, FL — open to remote and relocation). Static
+HTML/CSS/JS, no build step, deployed on Vercel.
 
 ## Site structure
 
 A deliberately lean two-page site, plus one archived project page:
 
-- **Home** (`index.html`, `/`) — intro and availability, a three-line "now"
-  strip, three featured projects, an experience timeline, credentials and
-  toolkit, a short about, and the fastest ways to connect.
+- **Home** (`index.html`, `/`) — intro, availability and contact buttons
+  (résumé PDF, email, LinkedIn, GitHub), a three-line "now" strip, three
+  featured projects, an experience timeline, credentials (B.S. Biology, Towson)
+  and a toolkit grouped into data stack / forecasting & ML / platforms run at
+  ZooTampa, a short about, and the fastest ways to connect.
 - **Projects** (`projects.html`, `/projects`) — featured: the Fraud Detection
   Pipeline, Owl Park, and Lighthouse; then Quack Query, USL Attendance
   Forecasting, Roll Call, eFrog (live), Attendance Nowcast, Member
@@ -43,8 +46,11 @@ soft and tappable things are pills.
 - `assets/shell.css` — ambient background, top bar, nav, footer, focus rings,
   view transitions.
 - `assets/pages.css` — page components: hero, now strip, project cards,
-  experience timeline, chips, about, connect cards, buttons.
+  experience timeline, chips and toolkit groups, about, connect cards, buttons.
 - `assets/transition.js` — SPA-style page transitions and the mobile nav.
+  Only in-site page swaps fade; the first load paints immediately so the hero
+  is on screen at once. Dismissing the mobile nav (Escape, backdrop, burger)
+  returns focus to the burger, whose label toggles Open/Close navigation.
 - `assets/theme.js` — optional per-company accent theming via `?ink=<company>`
   (see [`docs/referrers.md`](docs/referrers.md)).
 - `assets/profilepicture.webp` — circular hero avatar on the home page.
@@ -55,7 +61,9 @@ soft and tappable things are pills.
   Twitter cards.
 - `assets/apple-touch-icon.png`, `assets/icon-192.png`, `assets/icon-512.png`
   — home-screen icons referenced from `manifest.json`.
-- `assets/loganmansfield.pdf` — résumé served from the site.
+- `assets/loganmansfield.pdf` — résumé served from the site. Every résumé
+  link opens it in a new tab (`target="_blank"`) rather than forcing a
+  download.
 
 The pages load the minified `.min` variants. After editing any source asset,
 regenerate its minified file:
