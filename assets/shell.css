@@ -301,7 +301,15 @@ footer.shell-footer .footer-socials a:focus-visible { border-radius: var(--r-pil
  * View Transitions API — persistent shell stays put while the page
  * content cross-fades. Browsers without support use the fade in
  * transition.js.
+ *
+ * Full page loads between pages (e.g. to and from 404) fade too. The
+ * opt-in has to be in a render-blocking stylesheet: the inbound page is
+ * checked for it at its first render, before deferred scripts run.
  * ───────────────────────────────────────────────────────────── */
+@media (prefers-reduced-motion: no-preference) {
+    @view-transition { navigation: auto; }
+}
+
 @supports (view-transition-name: a) {
     header.topbar .topbar__brand { view-transition-name: nav-brand; }
     main                         { view-transition-name: page-main; }

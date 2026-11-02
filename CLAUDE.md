@@ -10,6 +10,14 @@ editing source (esbuild is fine:
 Text colors must stay WCAG AA on every surface token: chestnut, the blue
 accent, and the ink tokens pass; tan and caramel are fills, not text.
 
+Motion extras (the walking Owl Park owl and scroll reveals) live only in
+`assets/motion.js`, which injects its own CSS, so a page opts in with one
+deferred script tag; `pages.css` is untouched and `shell.css` only carries
+the `@view-transition` opt-in (it must be render-blocking to work). Keep the owl
+in its reserved lane above the footer (it must never cover content or
+buttons), keep every animation off or static under `prefers-reduced-motion`,
+and leave the "Hide owl" choice in localStorage working.
+
 Search/share metadata (head tags, JSON-LD, `sitemap.xml`, `robots.txt`,
 `llms.txt`, `assets/og-card.jpg`) is documented in the README's "Search and
 sharing metadata" section. When a page's head or facts change, bump that

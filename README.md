@@ -58,15 +58,19 @@ soft and tappable things are pills.
 - `assets/tokens.css` — design tokens (Day + Night palette, type, radii,
   shadows, motion). Imported first on every page.
 - `assets/shell.css` — ambient background, top bar, nav, footer, focus rings,
-  view transitions.
+  view transitions (including the `@view-transition` opt-in that fades full
+  page loads between pages).
 - `assets/pages.css` — page components: hero, now strip, project cards,
   experience timeline, chips and toolkit groups, about, connect cards, buttons.
-- `assets/transition.js` — SPA-style page transitions and the mobile nav.
-  Only in-site page swaps fade; the first load paints immediately so the hero
-  is on screen at once. In-page `#hash` links (the cards' "See how it flows")
-  are left to the browser rather than re-swapping `<main>`. Dismissing the
-  mobile nav (Escape, backdrop, burger) returns focus to the burger, whose
-  label toggles Open/Close navigation.
+- `assets/transition.js` — SPA-style page transitions and the mobile nav
+  (Home and Projects only). In-site page swaps fade here; full page loads
+  between pages that share `shell.css` (e.g. to and from 404) fade via the
+  cross-document `@view-transition` opt-in in `shell.css`, which has to sit in
+  a render-blocking stylesheet. The very first load from elsewhere paints
+  immediately so the hero is on screen at once. In-page `#hash` links (the
+  cards' "See how it flows") are left to the browser rather than re-swapping
+  `<main>`. Dismissing the mobile nav (Escape, backdrop, burger) returns focus
+  to the burger, whose label toggles Open/Close navigation.
 - `assets/pipeline.css` / `assets/pipeline.js` — the clickable pipeline
   diagrams (`[data-flow]` figures on Projects). The script turns each one into
   a tabs widget: click, tap or hover a stage to read its note, arrow keys and
@@ -77,6 +81,23 @@ soft and tappable things are pills.
   list, styled by a `<noscript>` copy of the stylesheet link. The page
   preloads the stylesheet; the script applies it, and adds it after an
   in-site swap from Home (which is why Home loads the script too).
+- `assets/motion.js` — the walking owl and scroll reveals. Self-contained
+  (it injects its own small stylesheet), loaded with one deferred tag on
+  Home, Projects, Live and 404. The owl walks in its own 60px lane
+  between `<main>` and the footer, so it never covers content; it links to
+  exploreowlpark.com, has a "Hide owl" button remembered in localStorage
+  (key `owl-walker-hidden`; the lane shrinks to 34px and keeps a "Show owl"
+  button), pauses off screen and in background tabs, and stands still under
+  `prefers-reduced-motion`. Its art (`assets/owl-walker.webp`,
+  `assets/owl-walker-blink.webp`, about 4 KB each) is the Owl Park barn owl,
+  composited from the game's layered sprites
+  (`apps/park/public/art/owl-barn-*@2x.png` in Welcome-to-Owl-Park, tinted
+  with the species' natural colours). Scroll reveals only touch cards and
+  section heads that start below the fold, drop their `reveal` classes once
+  shown so the cards' own hover styles take over, re-run after in-site page
+  swaps, and are off under reduced motion, for print, and without
+  `IntersectionObserver`. The Owl Park infographic page is standalone (no
+  `shell.css` or site footer), so it gets neither the owl nor the fades.
 - `assets/theme.js` — optional per-company accent theming via `?ink=<company>`
   (see [`docs/referrers.md`](docs/referrers.md)).
 - `assets/live.css`, `assets/live.js` — styles and chart code for the live
