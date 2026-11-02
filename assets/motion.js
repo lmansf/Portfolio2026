@@ -16,6 +16,13 @@
  *     fade up as they scroll into view. Off with reduced motion, without
  *     IntersectionObserver, and for print. Re-runs after transition.js
  *     swaps <main> on in-site navigation.
+ *  3. Copy email: a small copy button beside mailto buttons, with a
+ *     "Copied" note.
+ *  4. Count-up numbers ([data-countup]) the first time they scroll into view.
+ *  5. Live pulse: a dot beside "Live numbers" links showing how fresh the
+ *     /live snapshot is.
+ * Hover lift and press feedback on buttons and links are plain CSS in
+ * motion.css. Everything is off or static with prefers-reduced-motion.
  * Full page loads between pages (e.g. to and from 404) fade via the
  * cross-document `@view-transition` opt-in in shell.css, not here: the
  * inbound page is checked for it at first render, before deferred scripts
@@ -36,6 +43,7 @@
     /* ─── Styles ─── */
 
     var CSS_HREF = '/assets/motion.min.css';
+    var stylesReady = false;
 
     /* Load motion.css, then call done. External (not inline) so a strict
      * style-src 'self' CSP allows it; done runs once, also on error, so a
@@ -327,25 +335,275 @@
         });
     }
 
+    /* ─────────────────────────────────────────────────────────────
+     * 3. Copy email
+     * A small "Copy email" button in the row of each mailto button (.btn), so a
+     * visitor without a mail app can still grab the address. Added by script
+     * only, so without JavaScript the page is unchanged. The "Copied" note is a
+     * bubble over the button (no layout shift) and is also announced.
+     * ───────────────────────────────────────────────────────────── */
+    var COPY_ICON = '<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" ' +
+        'stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false">' +
+        '<rect x="9" y="9" width="11" height="11" rx="2"/><path d="M5 15V6a2 2 0 0 1 2-2h9"/></svg>';
+
+    var announcer = null;
+    function announce(text) {
+        if (!announcer) {
+            announcer = document.createElement('p');
+            announcer.className = 'sr-only';
+            announcer.setAttribute('role', 'status');
+            announcer.setAttribute('aria-live', 'polite');
+            document.body.appendChild(announcer);
+        }
+        announcer.textContent = '';
+        setTimeout(function () { announcer.textContent = text; }, 30);
+    }
+
+    function copyText(text) {
+        if (navigator.clipboard && window.isSecureContext) return navigator.clipboard.writeText(text);
+        return new Promise(function (resolve, reject) {
+            var ta = document.createElement('textarea');
+            ta.value = text;
+            ta.setAttribute('readonly', '');
+            ta.className = 'copy-scratch';
+            document.body.appendChild(ta);
+            ta.select();
+            var ok = false;
+            try { ok = document.execCommand('copy'); } catch (e) { ok = false; }
+            ta.remove();
+            if (ok) resolve(); else reject(new Error('copy failed'));
+        });
+    }
+
+    function mountCopyEmail() {
+        var links = document.querySelectorAll('main a.btn[href^="mailto:"]');
+        Array.prototype.forEach.call(links, function (link) {
+            var row = link.parentElement;
+            if (!row || row.querySelector('.copy-email')) return;
+            var address = decodeURIComponent(link.getAttribute('href').slice(7).split('?')[0]);
+            if (!address) return;
+            var btn = document.createElement('button');
+            btn.type = 'button';
+            btn.className = 'btn btn--ghost copy-email';
+            btn.setAttribute('aria-label', 'Copy email address');
+            btn.title = 'Copy ' + address;
+            btn.innerHTML = COPY_ICON + '<span class="copy-email__note" aria-hidden="true"></span>';
+            // At the end of the row, so the buttons already there don't move.
+            row.appendChild(btn);
+            var note = btn.querySelector('.copy-email__note');
+            var timer = 0;
+            btn.addEventListener('click', function () {
+                copyText(address).then(function () {
+                    note.textContent = 'Copied';
+                    announce('Email address copied');
+                }, function () {
+                    note.textContent = address;
+                    announce('Couldn’t copy. The address is ' + address);
+                }).then(function () {
+                    btn.classList.add('is-noted');
+                    clearTimeout(timer);
+                    timer = setTimeout(function () { btn.classList.remove('is-noted'); }, 1800);
+                });
+            });
+        });
+    }
+
+    /* ─────────────────────────────────────────────────────────────
+     * 4. Count-up numbers
+     * An element marked data-countup ticks up from zero once, the first time it
+     * scrolls into view. The real value stays in the page the whole time (kept
+     * in place, just transparent, under an aria-hidden runner), so screen
+     * readers, no-JS and print always get the exact final text and nothing
+     * shifts. Elements already on screen when the page opens are left alone, so
+     * a number never blinks back to zero; scripts that fill a value in later
+     * (live.js) dispatch `motion:countup` to run it right away.
+     * ───────────────────────────────────────────────────────────── */
+    var NUM_RE = /^(\D*?)(\d[\d,]*(?:\.\d+)?)(.*)$/;
+    var countObserver = null;
+
+    function parseCount(text) {
+        var m = NUM_RE.exec(text);
+        if (!m) return null;
+        var raw = m[2];
+        var value = parseFloat(raw.replace(/,/g, ''));
+        if (!isFinite(value) || value <= 0) return null;
+        var dot = raw.indexOf('.');
+        return {
+            prefix: m[1], suffix: m[3], value: value,
+            decimals: dot === -1 ? 0 : raw.length - dot - 1,
+            commas: raw.indexOf(',') !== -1
+        };
+    }
+
+    function formatCount(p, v) {
+        var s = p.commas
+            ? v.toLocaleString('en-US', { minimumFractionDigits: p.decimals, maximumFractionDigits: p.decimals })
+            : v.toFixed(p.decimals);
+        return p.prefix + s + p.suffix;
+    }
+
+    function runCount(el) {
+        if (el.hasAttribute('data-counted')) return;
+        el.setAttribute('data-counted', '');
+        var finalText = el.textContent;
+        var p = parseCount(finalText.trim());
+        if (!p || reduceMotion()) return;
+
+        var keep = document.createElement('span');
+        keep.className = 'countup__final';
+        keep.textContent = finalText;
+        var runner = document.createElement('span');
+        runner.className = 'countup__run';
+        runner.setAttribute('aria-hidden', 'true');
+        el.textContent = '';
+        el.appendChild(keep);
+        el.appendChild(runner);
+        el.classList.add('countup');
+
+        var dur = 1100;
+        var start = 0;
+        var step = Math.pow(10, -p.decimals);
+        function tick(t) {
+            if (!start) start = t;
+            var k = Math.min(1, (t - start) / dur);
+            var eased = 1 - Math.pow(1 - k, 3);
+            var v = Math.round((p.value * eased) / step) * step;
+            runner.textContent = formatCount(p, v);
+            if (k < 1) { requestAnimationFrame(tick); return; }
+            el.classList.remove('countup');
+            el.textContent = finalText;
+        }
+        runner.textContent = formatCount(p, 0);
+        requestAnimationFrame(tick);
+    }
+
+    function observeCount(el, force) {
+        if (el.hasAttribute('data-counted') || el.hasAttribute('data-count-watch')) return;
+        if (reduceMotion() || !('IntersectionObserver' in window)) return;
+        if (!force) {
+            var fold = window.innerHeight || document.documentElement.clientHeight;
+            if (el.getBoundingClientRect().top < fold) { el.setAttribute('data-counted', ''); return; }
+        }
+        if (!countObserver) {
+            countObserver = new IntersectionObserver(function (entries) {
+                entries.forEach(function (e) {
+                    if (!e.isIntersecting) return;
+                    countObserver.unobserve(e.target);
+                    runCount(e.target);
+                });
+            }, { threshold: 0.6 });
+        }
+        el.setAttribute('data-count-watch', '');
+        countObserver.observe(el);
+    }
+
+    function scanCounts() {
+        Array.prototype.forEach.call(document.querySelectorAll('[data-countup]'), function (el) { observeCount(el, false); });
+    }
+
+    /* ─────────────────────────────────────────────────────────────
+     * 5. Live pulse
+     * A small dot beside each "Live numbers" link that shows how fresh the
+     * /live snapshot is: a soft breathing dot when it was published in the last
+     * 36 hours and the checkout generator is running, a still, muted dot
+     * otherwise. Positioned in the gap beside the link, so nothing moves when
+     * it appears. Freshness is also in the link's title and accessible name.
+     * ───────────────────────────────────────────────────────────── */
+    var SNAPSHOT_URL = '/data/fraud-snapshot.json';
+    var STALE_HOURS = 36;
+    var PAUSED_HOURS = 6;
+    var snapshotPromise = null;
+
+    function getSnapshot() {
+        if (!snapshotPromise) {
+            snapshotPromise = window.fetch
+                ? fetch(SNAPSHOT_URL, { cache: 'no-cache' }).then(function (r) { return r.ok ? r.json() : null; }).catch(function () { return null; })
+                : Promise.resolve(null);
+        }
+        return snapshotPromise;
+    }
+
+    function ago(ms) {
+        var h = ms / 36e5;
+        if (h < 1) return 'less than an hour ago';
+        if (h < 36) { var n = Math.round(h); return n + (n === 1 ? ' hour ago' : ' hours ago'); }
+        var d = Math.round(h / 24);
+        return d + (d === 1 ? ' day ago' : ' days ago');
+    }
+
+    function mountLivePulse() {
+        var links = document.querySelectorAll('main a.project__link[href="/live"]');
+        if (!links.length) return;
+        getSnapshot().then(function (s) {
+            if (!s || typeof s.generated_at !== 'string') return;
+            var gen = Date.parse(s.generated_at);
+            if (!isFinite(gen)) return;
+            var age = Date.now() - gen;
+            var latest = s.latest_event_at ? Date.parse(s.latest_event_at) : gen;
+            var paused = isFinite(latest) && (gen - latest) / 36e5 > PAUSED_HOURS;
+            var fresh = age / 36e5 <= STALE_HOURS && !paused;
+            var label = 'updated ' + ago(Math.max(0, age));
+            Array.prototype.forEach.call(links, function (link) {
+                if (link.querySelector('.live-pulse')) return;
+                var dot = document.createElement('span');
+                dot.className = 'live-pulse ' + (fresh ? 'is-fresh' : 'is-stale');
+                dot.setAttribute('aria-hidden', 'true');
+                var sr = document.createElement('span');
+                sr.className = 'sr-only';
+                sr.textContent = ' (' + label + ')';
+                link.classList.add('has-live-pulse');
+                link.insertBefore(dot, link.firstChild);
+                link.appendChild(sr);
+                link.title = 'Live numbers, ' + label;
+            });
+        });
+    }
+
+    function enhanceMain() {
+        mountCopyEmail();
+        scanCounts();
+        mountLivePulse();
+    }
+
     function watchMainSwaps() {
         var main = document.querySelector('main');
         if (!main || !('MutationObserver' in window)) return;
         var pending = 0;
         new MutationObserver(function () {
             if (pending) return;
-            pending = requestAnimationFrame(function () { pending = 0; scanReveals(); });
+            pending = requestAnimationFrame(function () { pending = 0; scanReveals(); enhanceMain(); });
         }).observe(main, { childList: true });
     }
 
     function init() {
         loadStyles(function (ok) {
             if (!ok) return; // no stylesheet: leave the page as it is
+            stylesReady = true;
+            flushPendingCounts();
             mountOwl();
             // Let transition.js's first-paint fade settle before measuring the fold.
-            requestAnimationFrame(function () { scanReveals(); });
+            requestAnimationFrame(function () { scanReveals(); enhanceMain(); });
             watchMainSwaps();
         });
     }
+
+    // live.js fills its stat tiles after a fetch and asks for them to count up.
+    // If that lands before this stylesheet does, the request waits for it, but
+    // only briefly: a number that has been on screen a while is left as it is
+    // rather than blinking back to zero.
+    var pendingCounts = null;
+    function flushPendingCounts() {
+        if (!pendingCounts) return;
+        var fresh = Date.now() - pendingCounts.at < 400;
+        var els = pendingCounts.els;
+        pendingCounts = null;
+        if (fresh) Array.prototype.forEach.call(els, function (el) { observeCount(el, true); });
+    }
+    document.addEventListener('motion:countup', function (e) {
+        if (!(e.detail && e.detail.elements)) return;
+        if (!stylesReady) { pendingCounts = { els: e.detail.elements, at: Date.now() }; return; }
+        Array.prototype.forEach.call(e.detail.elements, function (el) { observeCount(el, true); });
+    });
 
     if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init);
     else init();
