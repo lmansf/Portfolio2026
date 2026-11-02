@@ -6,7 +6,8 @@ HTML/CSS/JS, no build step, deployed on Vercel.
 
 ## Site structure
 
-A deliberately lean two-page site, plus one archived project page:
+A deliberately lean two-page site, plus a SQL playground and one archived
+project page:
 
 - **Home** (`index.html`, `/`) — intro, availability and contact buttons
   (résumé PDF, email, LinkedIn, GitHub), a three-line "now" strip, three
@@ -22,11 +23,15 @@ A deliberately lean two-page site, plus one archived project page:
   page and legacy redirects can deep-link to them. The home page repeats the
   three featured cards in shorter form, so keep the two in step when editing
   card copy.
+- **SQL Playground** (`playground.html`, `/playground`) — an in-browser SQL
+  box: DuckDB-Wasm (pinned, from jsDelivr, loaded only on this page) over
+  synthetic Owl Park ticket and webstore data, with starter queries, a
+  results table, and CSV download. See "SQL playground data" below.
 - **Owl Park** (`owl-park-infographic.html`, `/owl-park`) — a standalone
   infographic of the archived end-to-end data pipeline.
 - **404** (`404.html`) — branded not-found page.
 
-Clean URLs (`/projects`, `/owl-park`) and legacy redirects (e.g. `/fraud` →
+Clean URLs (`/projects`, `/playground`, `/owl-park`) and legacy redirects (e.g. `/fraud` →
 `/projects#fraud`, `/pipeline` → `/owl-park`) are configured in `vercel.json`.
 
 ## Design: "Barn Owl"
@@ -72,6 +77,24 @@ The pages load the minified `.min` variants. After editing any source asset,
 regenerate its minified file:
 
     npx esbuild <src> --minify --outfile=<min> --allow-overwrite
+
+## SQL playground data
+
+`data/playground/` holds four gzipped CSVs (`park_days`, `products`,
+`orders`, `order_items`, about 550 KB in all) and the seeded script that
+writes them, `generate.py`. Owl Park is fictional and the data has no
+personal fields at all, real or simulated. To change the data, edit the
+script and rerun it (`python3 -m pip install duckdb numpy`, then
+`python3 data/playground/generate.py`); if you add or rename a column, update
+`SCHEMA` in `assets/playground.js` and the table reference in
+`playground.html`.
+
+`assets/playground.js` unzips the files in the browser, loads them into
+in-memory tables, then sets `enable_external_access = false` and
+`lock_configuration = true`, so visitor queries can only read those tables.
+CSV is used instead of Parquet because DuckDB-Wasm would otherwise fetch its
+Parquet extension from extensions.duckdb.org. On a Save-Data connection
+nothing downloads until the first Run.
 
 ## Search and sharing metadata
 

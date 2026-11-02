@@ -1,0 +1,244 @@
+/* ─────────────────────────────────────────────────────────────
+ * playground.css — the /playground page only.
+ *
+ *   .pg            query box: starter chips, editor, run bar, results
+ *   .pg-schema     table reference (details per table)
+ *
+ * Builds on tokens.css, shell.css, and pages.css (.btn, .section-head).
+ * ───────────────────────────────────────────────────────────── */
+
+/* ──────────────────── Starter queries ──────────────────── */
+.pg__starters {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    margin-bottom: 0.9rem;
+}
+.pg__starter {
+    font: inherit;
+    font-size: 0.84rem;
+    font-weight: 500;
+    color: var(--ink-1);
+    background: var(--surface-1);
+    border: 1px solid var(--hairline);
+    padding: 0.5rem 0.9rem;
+    min-height: 40px;
+    border-radius: var(--r-pill);
+    box-shadow: var(--shadow-sm);
+    cursor: pointer;
+    transition: background var(--dur-fast) var(--ease-out), border-color var(--dur-fast) var(--ease-out);
+}
+.pg__starter:hover { background: var(--surface-2); }
+.pg__starter[aria-pressed="true"] {
+    background: var(--accent-soft);
+    border-color: color-mix(in srgb, var(--accent) 45%, transparent);
+    font-weight: 600;
+}
+.pg__starter:focus-visible { border-radius: var(--r-pill); }
+/* The keyboard shortcut hint means nothing on a phone. */
+@media (hover: none) and (pointer: coarse) {
+    .pg__hint-keys { display: none; }
+}
+
+/* ──────────────────── Editor ──────────────────── */
+.pg__editor {
+    background: var(--surface-1);
+    border: 1px solid var(--hairline);
+    border-radius: var(--r-lg);
+    box-shadow: var(--shadow-sm);
+    overflow: hidden;
+}
+.pg__sql {
+    display: block;
+    width: 100%;
+    min-height: 12rem;
+    resize: vertical;
+    padding: 1rem 1.1rem;
+    border: 0;
+    border-bottom: 1px solid var(--hairline);
+    background: var(--bg);
+    color: var(--ink-1);
+    font-family: var(--font-mono);
+    font-size: 16px;              /* 16px keeps iOS from zooming on focus */
+    line-height: 1.55;
+    tab-size: 4;
+    white-space: pre;
+    overflow: auto;
+}
+@media (min-width: 720px) {
+    .pg__sql { font-size: 0.92rem; }
+}
+.pg__sql:focus-visible {
+    outline: 2px solid var(--focus-ring);
+    outline-offset: -2px;
+}
+.pg__bar {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.6rem 1rem;
+    padding: 0.8rem 1rem;
+}
+.pg__bar .btn[disabled] {
+    opacity: 0.55;
+    cursor: progress;
+    transform: none;
+}
+.pg__status {
+    font-size: 0.86rem;
+    color: var(--ink-3);
+    min-width: 0;
+}
+
+/* ──────────────────── Results ──────────────────── */
+.pg__result { margin-top: 1.1rem; }
+.pg__result-head {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.5rem 1rem;
+    margin-bottom: 0.6rem;
+}
+.pg__meta {
+    font-size: 0.86rem;
+    color: var(--ink-2);
+}
+.pg__csv { padding: 0.5rem 0.95rem; font-size: 0.84rem; }
+.pg__table-wrap {
+    max-height: 26rem;
+    overflow: auto;
+    border: 1px solid var(--hairline);
+    border-radius: var(--r-md);
+    background: var(--surface-1);
+    -webkit-overflow-scrolling: touch;
+}
+.pg__table-wrap:focus-visible {
+    outline: 2px solid var(--focus-ring);
+    outline-offset: 2px;
+}
+.pg__table {
+    border-collapse: separate;
+    border-spacing: 0;
+    width: 100%;
+    font-size: 0.86rem;
+    font-variant-numeric: tabular-nums;
+}
+.pg__table th,
+.pg__table td {
+    padding: 0.5rem 0.8rem;
+    text-align: left;
+    white-space: nowrap;
+    border-bottom: 1px solid var(--hairline);
+}
+.pg__table th {
+    position: sticky;
+    top: 0;
+    z-index: 1;
+    background: var(--surface-2);
+    color: var(--ink-1);
+    font-weight: 600;
+    font-family: var(--font-mono);
+    font-size: 0.8rem;
+}
+.pg__table td { color: var(--ink-1); }
+.pg__table td.is-num { text-align: right; }
+.pg__table th.is-num { text-align: right; }
+.pg__table td.is-null { color: var(--ink-3); font-style: italic; }
+.pg__table tbody tr:last-child td { border-bottom: 0; }
+.pg__table tbody tr:hover td { background: var(--accent-mist); }
+
+.pg__error {
+    margin-top: 1.1rem;
+    padding: 0.85rem 1rem;
+    border-radius: var(--r-md);
+    border: 1px solid color-mix(in srgb, var(--danger) 45%, transparent);
+    background: color-mix(in srgb, var(--danger) 9%, var(--surface-1));
+    color: var(--ink-1);
+    font-size: 0.9rem;
+}
+.pg__error strong { color: var(--danger); }
+.pg__error pre {
+    margin-top: 0.4rem;
+    font-family: var(--font-mono);
+    font-size: 0.82rem;
+    white-space: pre-wrap;
+    word-break: break-word;
+}
+
+/* ──────────────────── Table reference ──────────────────── */
+.pg-schema {
+    display: grid;
+    gap: 0.75rem;
+    grid-template-columns: minmax(0, 1fr);
+}
+@media (min-width: 720px) {
+    .pg-schema { grid-template-columns: repeat(2, minmax(0, 1fr)); align-items: start; }
+}
+.pg-schema__table {
+    background: var(--surface-1);
+    border: 1px solid var(--hairline);
+    border-radius: var(--r-lg);
+    padding: 0.85rem 1rem;
+    box-shadow: var(--shadow-sm);
+}
+.pg-schema__table summary {
+    cursor: pointer;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: 0.3rem 0.6rem;
+    list-style: none;
+}
+.pg-schema__table summary::-webkit-details-marker { display: none; }
+.pg-schema__table summary::after {
+    content: "";
+    margin-left: auto;
+    align-self: center;
+    width: 0.5rem;
+    height: 0.5rem;
+    border-right: 2px solid var(--ink-3);
+    border-bottom: 2px solid var(--ink-3);
+    transform: rotate(45deg) translateY(-2px);
+    transition: transform var(--dur-fast) var(--ease-out);
+}
+.pg-schema__table[open] summary::after { transform: rotate(-135deg) translateY(-2px); }
+.pg-schema__table summary:focus-visible {
+    outline: 2px solid var(--focus-ring);
+    outline-offset: 4px;
+    border-radius: var(--r-sm);
+}
+.pg-schema__name {
+    font: inherit;
+    font-family: var(--font-mono);
+    font-weight: 600;
+    font-size: 0.95rem;
+    color: var(--accent-ink);
+    background: none;
+    border: 0;
+    padding: 0.15rem 0;
+    cursor: pointer;
+    border-bottom: 1px solid color-mix(in srgb, var(--accent) 35%, transparent);
+}
+.pg-schema__name:hover { border-bottom-color: var(--accent); }
+.pg-schema__count {
+    font-size: 0.82rem;
+    color: var(--ink-3);
+}
+.pg-schema__cols {
+    list-style: none;
+    margin-top: 0.7rem;
+    display: grid;
+    gap: 0.35rem;
+    font-size: 0.86rem;
+    color: var(--ink-2);
+}
+.pg-schema__cols code,
+.pg-note code {
+    font-family: var(--font-mono);
+    font-size: 0.82rem;
+    color: var(--ink-1);
+}
+.pg-schema__cols li > span { color: var(--ink-3); }
+.pg-schema__cols li > span::before { content: "· "; }
+.pg-note { max-width: 70ch; }

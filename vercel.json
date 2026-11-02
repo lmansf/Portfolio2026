@@ -12,12 +12,19 @@
       "headers": [{ "key": "Cache-Control", "value": "no-cache, max-age=0, must-revalidate" }]
     },
     {
-      "source": "/(projects|owl-park)",
+      "source": "/(projects|owl-park|playground)",
       "headers": [{ "key": "Cache-Control", "value": "no-cache, max-age=0, must-revalidate" }]
     },
     {
       "source": "/(.*).(css|js|json|txt|xml)",
       "headers": [{ "key": "Cache-Control", "value": "public, max-age=0, must-revalidate" }]
+    },
+    {
+      "source": "/data/playground/(.*).gz",
+      "headers": [
+        { "key": "Cache-Control", "value": "public, max-age=0, must-revalidate" },
+        { "key": "Content-Type", "value": "application/gzip" }
+      ]
     },
     {
       "source": "/(.*).(avif|png|jpg|jpeg|svg|webp|ico|pdf|woff|woff2|ttf)",
@@ -42,6 +49,7 @@
   "rewrites": [
     { "source": "/", "destination": "/index.html" },
     { "source": "/projects", "destination": "/projects.html" },
-    { "source": "/owl-park", "destination": "/owl-park-infographic.html" }
+    { "source": "/owl-park", "destination": "/owl-park-infographic.html" },
+    { "source": "/playground", "destination": "/playground.html" }
   ]
 }
