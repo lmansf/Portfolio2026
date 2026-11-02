@@ -16,6 +16,13 @@ sharing metadata" section. When a page's head or facts change, bump that
 page's `<lastmod>` in `sitemap.xml` and keep `llms.txt` and the Person
 JSON-LD consistent with each other and with the résumé.
 
+The `/live` page (`live.html`, `assets/live.*`) is fed by
+`data/fraud-snapshot.json`, which the `fraud-snapshot` GitHub Action
+regenerates daily from `scripts/fraud-snapshot.sql` and commits to `main`.
+Keep the SQL output, the workflow's `jq` allow-list, and `live.js` in step
+when fields change; the snapshot holds aggregates only and the page must
+never carry a database key. See the README's "Live fraud data" section.
+
 ## Validate portfolio PRs through the `no-mistakes` gate
 
 Before opening a pull request for this portfolio, validate the change with the

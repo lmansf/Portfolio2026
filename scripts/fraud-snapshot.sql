@@ -5,6 +5,10 @@
 -- cards, IPs or names ever leave the database. The data itself is
 -- simulated theme-park webstore checkouts.
 --
+-- Fraud is judged against the generator's answer key (raw_fraud_truth),
+-- including labels whose label_available_at is still in the future; the
+-- page says so. Unlabeled checkouts count as legitimate.
+--
 -- Run read-only:  psql "$FRAUD_DB_URL" -X -q -A -t -v ON_ERROR_STOP=1 -f scripts/fraud-snapshot.sql
 -- Days are America/New_York calendar days; the window is the last 30 days.
 begin transaction read only;

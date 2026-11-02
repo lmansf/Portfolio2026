@@ -6,7 +6,8 @@ HTML/CSS/JS, no build step, deployed on Vercel.
 
 ## Site structure
 
-A deliberately lean two-page site, plus one archived project page:
+A deliberately lean two-page site, plus one archived project page and a
+live data page:
 
 - **Home** (`index.html`, `/`) — intro, availability and contact buttons
   (résumé PDF, email, LinkedIn, GitHub), a three-line "now" strip, three
@@ -28,8 +29,9 @@ A deliberately lean two-page site, plus one archived project page:
   pipeline (see "Live fraud data" below).
 - **404** (`404.html`) — branded not-found page.
 
-Clean URLs (`/projects`, `/owl-park`) and legacy redirects (e.g. `/fraud` →
-`/projects#fraud`, `/pipeline` → `/owl-park`) are configured in `vercel.json`.
+Clean URLs (`/projects`, `/owl-park`, `/live`) and legacy redirects (e.g.
+`/fraud` → `/projects#fraud`, `/pipeline` → `/owl-park`) are configured in
+`vercel.json`.
 
 ## Design: "Barn Owl"
 
@@ -58,6 +60,9 @@ soft and tappable things are pills.
   returns focus to the burger, whose label toggles Open/Close navigation.
 - `assets/theme.js` — optional per-company accent theming via `?ink=<company>`
   (see [`docs/referrers.md`](docs/referrers.md)).
+- `assets/live.css`, `assets/live.js` — styles and chart code for the live
+  data page only (see "Live fraud data" below); `data/fraud-snapshot.json`
+  is the aggregate snapshot it draws from, rewritten by a GitHub Action.
 - `assets/profilepicture.webp` — circular hero avatar on the home page.
 - `assets/crow.png`, `assets/favicon-crow.png`, `mini.jpg` — the crow mark
   (painted via CSS mask), favicon, and alternate (JPEG) icon.
@@ -84,7 +89,7 @@ part of it:
 
 - **Head tags** — every page (404 included) has a unique `<title>`, meta
   description, Open Graph tags, the shared `og:image` card, and
-  `summary_large_image` Twitter cards (`@StatBird`); the three content pages
+  `summary_large_image` Twitter cards (`@StatBird`); the four content pages
   also set `author`, `og:site_name` and `og:locale`. The home page is
   `og:type` `profile` (with `profile:first_name` / `profile:last_name`); the
   others are `website`.
@@ -93,8 +98,8 @@ part of it:
   (IT Point of Sale Systems Analyst at ZooTampa at Lowry Park, and Data
   Analyst), `worksFor`, `hasOccupation`, `alumniOf`, `hasCredential`
   (certifications and degree), `knowsAbout`, and `sameAs` profile links —
-  enough to disambiguate from other people with the same name. Projects
-  and Owl Park are `WebPage`s that reference the home `#person` /
+  enough to disambiguate from other people with the same name. Projects,
+  Owl Park and Live data are `WebPage`s that reference the home `#person` /
   `#website` ids and carry `BreadcrumbList`s.
 - **`sitemap.xml`** / **`robots.txt`** — the four public URLs; bump each
   `<lastmod>` when its page changes.
@@ -116,8 +121,11 @@ webstore checkouts). Nothing on the page talks to the database.
 
 - **`scripts/fraud-snapshot.sql`** — one query in a read-only transaction.
   It returns counts, rates, dollar totals, a 20-bin score histogram, and
-  per-pattern catch rates for the last 30 America/New_York days. It never
-  selects an id, email, card, IP, or name into the output.
+  per-pattern catch rates for the last 30 America/New_York days. Fraud is
+  measured against the generator's answer key in `raw_fraud_truth`,
+  including labels whose `label_available_at` is still in the future (the
+  page says so). It never selects an id, email, card, IP, or name into the
+  output.
 - **`.github/workflows/fraud-snapshot.yml`** — runs daily at 05:35 UTC (and
   on demand), checks the result against an allow-list of fields with `jq`,
   and commits the file on every run (the timestamp always moves, so the
@@ -128,10 +136,13 @@ webstore checkouts). Nothing on the page talks to the database.
 - **`assets/live.js` / `assets/live.css`** — plain SVG charts, stat tiles,
   and a table view. Series colors are validated separately for Day and
   Night. The page warns visitors when the snapshot is more than 36 hours
-  old or the generator has been paused.
+  old or the generator has been paused (no checkout for 6 hours before the
+  snapshot was taken).
 
 To add a field, change the SQL, add the field to the workflow's
-allow-list, then read it in `live.js`.
+allow-list, then read it in `live.js`. Don't hand-edit
+`data/fraud-snapshot.json` beyond regenerating it with the query: the next
+scheduled run overwrites it.
 
 ## Local development
 
