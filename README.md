@@ -130,9 +130,15 @@ webstore checkouts). Nothing on the page talks to the database.
   on demand), checks the result against an allow-list of fields with `jq`,
   and commits the file on every run (the timestamp always moves, so the
   page's staleness notice stays honest); the push redeploys the site. It
-  needs the repository secret `FRAUD_DB_URL` (the Supabase Session pooler
-  connection string). Without it, or when the last 30 days hold no
+  needs the repository secret `FRAUD_DB_URL`: the Supabase Session pooler
+  connection string for the `fraud_snapshot_reader` role, never the main
+  `postgres` user. Without it, or when the last 30 days hold no
   checkouts, the job skips and the page keeps the last committed snapshot.
+- **`supabase/fraud_snapshot_reader.sql`** — creates that login role, run
+  once by hand in the Supabase SQL editor (it is not applied by anything in
+  this repo). The role is read-only, may SELECT only the columns the
+  snapshot query reads from its four tables, and gets an RLS SELECT policy
+  that applies to it alone.
 - **`assets/live.js` / `assets/live.css`** — plain SVG charts, stat tiles,
   and a table view. Series colors are validated separately for Day and
   Night. The page warns visitors when the snapshot is more than 36 hours

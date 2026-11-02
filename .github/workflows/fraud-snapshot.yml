@@ -9,7 +9,9 @@
 #
 # Needs one repository secret, FRAUD_DB_URL: the Supabase "Session pooler"
 # connection string (IPv4; GitHub runners can't reach the IPv6-only direct
-# host). Until it is set, the job skips without failing and the page keeps
+# host) for the read-only fraud_snapshot_reader role created by
+# supabase/fraud_snapshot_reader.sql. Don't use the main postgres user.
+# Until it is set, the job skips without failing and the page keeps
 # showing the last committed snapshot. An empty 30-day window (generator
 # paused) also skips quietly, leaving the committed snapshot in place so the
 # page's stale and paused notices carry the message.
