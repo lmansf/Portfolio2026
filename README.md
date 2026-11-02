@@ -61,6 +61,14 @@ soft and tappable things are pills.
   returns focus to the burger, whose label toggles Open/Close navigation.
 - `assets/theme.js` — optional per-company accent theming via `?ink=<company>`
   (see [`docs/referrers.md`](docs/referrers.md)).
+- `assets/playground.css` — the `/playground` page only: starter chips,
+  editor, run bar, results table, and the table reference.
+- `assets/playground.js` — the SQL box (an ES module, loaded only by
+  `playground.html`): loads the pinned DuckDB-Wasm, attaches the data file,
+  runs and renders queries, and builds the CSV. It also keeps
+  `transition.js` from swapping `<main>` in place on in-site links, so
+  leaving the page is a full navigation that tears down the DuckDB worker.
+  Pinned version and limits are the constants at the top of the file.
 - `assets/profilepicture.webp` — circular hero avatar on the home page.
 - `assets/crow.png`, `assets/favicon-crow.png`, `mini.jpg` — the crow mark
   (painted via CSS mask), favicon, and alternate (JPEG) icon.
@@ -120,7 +128,7 @@ part of it:
 
 - **Head tags** — every page (404 included) has a unique `<title>`, meta
   description, Open Graph tags, the shared `og:image` card, and
-  `summary_large_image` Twitter cards (`@StatBird`); the three content pages
+  `summary_large_image` Twitter cards (`@StatBird`); the four content pages
   also set `author`, `og:site_name` and `og:locale`. The home page is
   `og:type` `profile` (with `profile:first_name` / `profile:last_name`); the
   others are `website`.
@@ -129,10 +137,10 @@ part of it:
   (IT Point of Sale Systems Analyst at ZooTampa at Lowry Park, and Data
   Analyst), `worksFor`, `hasOccupation`, `alumniOf`, `hasCredential`
   (certifications and degree), `knowsAbout`, and `sameAs` profile links —
-  enough to disambiguate from other people with the same name. Projects
-  and Owl Park are `WebPage`s that reference the home `#person` /
-  `#website` ids and carry `BreadcrumbList`s.
-- **`sitemap.xml`** / **`robots.txt`** — the three public URLs; bump each
+  enough to disambiguate from other people with the same name. Projects,
+  SQL Playground and Owl Park are `WebPage`s that reference the home
+  `#person` / `#website` ids and carry `BreadcrumbList`s.
+- **`sitemap.xml`** / **`robots.txt`** — the four public URLs; bump each
   `<lastmod>` when its page changes.
 - **`llms.txt`** — a short, factual plain-text summary (role, employer,
   education, certification, pages, profiles) for AI answer engines. Keep it
@@ -150,8 +158,11 @@ No build step — serve the folder and open it:
 
     python3 -m http.server 8000
 
-Note that `vercel.json` clean URLs/redirects aren't applied by a plain static
-server; `vercel dev` reproduces production routing if needed.
+Note that `vercel.json` clean URLs/redirects and headers (including the
+`/playground` Content-Security-Policy) aren't applied by a plain static
+server, so open `/playground.html` directly and expect the page to run
+without the CSP; `vercel dev` reproduces production routing and headers if
+needed.
 
 ## Validation gate
 

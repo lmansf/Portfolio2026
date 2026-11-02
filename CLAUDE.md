@@ -10,6 +10,11 @@ editing source (esbuild is fine:
 Text colors must stay WCAG AA on every surface token: chestnut, the blue
 accent, and the ink tokens pass; tan and caramel are fills, not text.
 
+`playground.html` (the DuckDB-Wasm SQL playground) is served with a
+Content-Security-Policy from `vercel.json`: no inline scripts, and any new
+origin the page loads from must be added to that header. Its data file and
+safety limits are described in the README's "SQL playground data" section.
+
 Search/share metadata (head tags, JSON-LD, `sitemap.xml`, `robots.txt`,
 `llms.txt`, `assets/og-card.jpg`) is documented in the README's "Search and
 sharing metadata" section. When a page's head or facts change, bump that
