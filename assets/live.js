@@ -73,6 +73,11 @@
         return `M${x},${y}H${x + w}V${y + h}H${x}Z`;
     }
 
+    // Round tick step (1, 2, 2.5 or 5 × 10^n) and a top value that is a whole number of steps.
+    function niceScale(v, ticks = 4) {
+        const step = niceMax(Math.max(v, 1e-9) / ticks);
+        return { step, max: Math.max(step, Math.ceil(v / step) * step) };
+    }
     function niceMax(v) {
         if (v <= 0) return 1;
         const p = Math.pow(10, Math.floor(Math.log10(v)));
@@ -185,16 +190,17 @@
         const m = { top: 12, right: 8, bottom: 28, left: 36 };
         const iw = width - m.left - m.right;
         const ih = height - m.top - m.bottom;
-        const yMax = niceMax(Math.max(...s.daily.map((d) => d.fraud)));
+        const scale = niceScale(Math.max(...s.daily.map((d) => d.fraud)));
+        const yMax = scale.max;
         const y = (v) => m.top + ih - (v / yMax) * ih;
         const step = iw / days.length;
         const barW = Math.max(3, Math.min(22, step - 2));
 
         const svg = el('svg', { viewBox: `0 0 ${width} ${height}`, role: 'img', 'aria-hidden': 'true', focusable: 'false' }, host);
         const grid = el('g', { class: 'grid' }, svg);
-        const ticks = 4;
+        const ticks = Math.round(yMax / scale.step);
         for (let i = 0; i <= ticks; i++) {
-            const v = (yMax / ticks) * i;
+            const v = scale.step * i;
             const yy = y(v);
             if (i > 0) el('line', { x1: m.left, x2: width - m.right, y1: yy, y2: yy }, grid);
             const t = el('text', { x: m.left - 6, y: yy + 4, 'text-anchor': 'end' }, svg);
@@ -315,11 +321,17 @@
         }
 
         const th = s.thresholds || {};
-        [['Review', th.review_from], ['Decline', th.decline_from]].forEach(([label, v]) => {
+        const narrow = width < 520;
+        [['Review', th.review_from], ['Decline', th.decline_from]].forEach(([label, v], i) => {
             if (!Number.isFinite(v)) return;
             el('line', { class: 'threshold', x1: x(v), x2: x(v), y1: m.top - 4, y2: y(0) }, svg);
-            const t = el('text', { x: x(v) + 4, y: m.top + 6, class: 'threshold-label' }, svg);
-            t.textContent = `${label} ≥ ${v.toFixed(2)}`;
+            // Stagger the two labels and flip a label left of its line near the right edge.
+            const flip = x(v) > width - (narrow ? 70 : 110);
+            const t = el('text', {
+                x: flip ? x(v) - 4 : x(v) + 4, y: m.top + 6 + i * 16,
+                'text-anchor': flip ? 'end' : 'start', class: 'threshold-label'
+            }, svg);
+            t.textContent = narrow ? label : `${label} ≥ ${v.toFixed(2)}`;
         });
 
         bins.forEach((b, i) => {
