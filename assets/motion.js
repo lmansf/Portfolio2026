@@ -380,7 +380,8 @@
         Array.prototype.forEach.call(links, function (link) {
             var row = link.parentElement;
             if (!row || row.querySelector('.copy-email')) return;
-            var address = decodeURIComponent(link.getAttribute('href').slice(7).split('?')[0]);
+            var address = '';
+            try { address = decodeURIComponent(link.getAttribute('href').slice(7).split('?')[0]); } catch (e) { return; }
             if (!address) return;
             var btn = document.createElement('button');
             btn.type = 'button';
@@ -480,9 +481,13 @@
     function observeCount(el, force) {
         if (el.hasAttribute('data-counted') || el.hasAttribute('data-count-watch')) return;
         if (reduceMotion() || !('IntersectionObserver' in window)) return;
+        var fold = window.innerHeight || document.documentElement.clientHeight;
+        var rect = el.getBoundingClientRect();
         if (!force) {
-            var fold = window.innerHeight || document.documentElement.clientHeight;
-            if (el.getBoundingClientRect().top < fold) { el.setAttribute('data-counted', ''); return; }
+            if (rect.top < fold) { el.setAttribute('data-counted', ''); return; }
+        } else if (rect.bottom > 0 && rect.top < fold) {
+            runCount(el);
+            return;
         }
         if (!countObserver) {
             countObserver = new IntersectionObserver(function (entries) {
@@ -527,7 +532,7 @@
         var h = ms / 36e5;
         if (h < 1) return 'less than an hour ago';
         if (h < 36) { var n = Math.round(h); return n + (n === 1 ? ' hour ago' : ' hours ago'); }
-        var d = Math.round(h / 24);
+        var d = Math.floor(h / 24);
         return d + (d === 1 ? ' day ago' : ' days ago');
     }
 
@@ -539,8 +544,8 @@
             var gen = Date.parse(s.generated_at);
             if (!isFinite(gen)) return;
             var age = Date.now() - gen;
-            var latest = s.latest_event_at ? Date.parse(s.latest_event_at) : gen;
-            var paused = isFinite(latest) && (gen - latest) / 36e5 > PAUSED_HOURS;
+            var latest = s.latest_event_at ? Date.parse(s.latest_event_at) : NaN;
+            var paused = !isFinite(latest) || (gen - latest) / 36e5 > PAUSED_HOURS;
             var fresh = age / 36e5 <= STALE_HOURS && !paused;
             var label = 'updated ' + ago(Math.max(0, age));
             Array.prototype.forEach.call(links, function (link) {
