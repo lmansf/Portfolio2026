@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Live fraud data · Logan Mansfield</title>
+    <meta name="description" content="Live daily numbers from Logan Mansfield's fraud-detection pipeline: simulated theme-park webstore checkouts scored by a rules model in Supabase. Catch rate, good customers declined, fraud dollars stopped, score distribution, and fraud patterns, refreshed every day.">
+    <meta name="author" content="Logan Mansfield">
+    <meta property="og:site_name" content="Logan Mansfield">
+    <meta property="og:locale" content="en_US">
+    <meta property="og:title" content="Live fraud data · Logan Mansfield">
+    <meta property="og:description" content="Daily numbers from a fraud-detection pipeline over simulated webstore checkouts, refreshed every day.">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://loganmansfield.org/live">
+    <meta property="og:image" content="https://loganmansfield.org/assets/og-card.jpg">
+    <meta property="og:image:width" content="1200">
+    <meta property="og:image:height" content="630">
+    <meta property="og:image:alt" content="Logan Mansfield, Data Analyst in Tampa, FL — loganmansfield.org">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:site" content="@StatBird">
+    <link rel="canonical" href="https://loganmansfield.org/live">
+    <link rel="icon" type="image/png" href="/assets/favicon-crow.png">
+    <link rel="alternate icon" type="image/jpeg" href="/mini.jpg">
+    <link rel="apple-touch-icon" href="/assets/apple-touch-icon.png">
+    <link rel="manifest" href="/manifest.json">
+    <meta name="theme-color" media="(prefers-color-scheme: light)" content="#fdf9f3">
+    <meta name="theme-color" media="(prefers-color-scheme: dark)" content="#1b140f">
+    <script src="/assets/theme.min.js"></script>
+    <link rel="stylesheet" href="/assets/tokens.min.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,600&amp;family=Figtree:wght@400;500;600&amp;display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/assets/shell.min.css">
+    <link rel="stylesheet" href="/assets/pages.min.css">
+    <link rel="stylesheet" href="/assets/live.min.css">
+    <link rel="preload" href="/data/fraud-snapshot.json" as="fetch" crossorigin>
+    <script>
+        window.va = window.va || function () { (window.vaq = window.vaq || []).push(arguments); };
+    </script>
+    <script defer src="/_vercel/insights/script.js"></script>
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "WebPage",
+        "@id": "https://loganmansfield.org/live#page",
+        "url": "https://loganmansfield.org/live",
+        "name": "Live fraud data · Logan Mansfield",
+        "author": { "@id": "https://loganmansfield.org/#person" },
+        "isPartOf": { "@id": "https://loganmansfield.org/#website" },
+        "about": { "@id": "https://loganmansfield.org/#person" },
+        "breadcrumb": {
+            "@type": "BreadcrumbList",
+            "itemListElement": [
+                { "@type": "ListItem", "position": 1, "name": "Logan Mansfield", "item": "https://loganmansfield.org/" },
+                { "@type": "ListItem", "position": 2, "name": "Projects", "item": "https://loganmansfield.org/projects" },
+                { "@type": "ListItem", "position": 3, "name": "Live fraud data", "item": "https://loganmansfield.org/live" }
+            ]
+        }
+    }
+    </script>
+</head>
+<body>
+    <a class="skip-link" href="#main-content">Skip to content</a>
+    <div class="shell-bg" aria-hidden="true"></div>
+
+    <header class="topbar">
+        <div class="topbar__brand">
+            <a href="/"><span class="brand-mark" aria-hidden="true"><span class="crow-mark"></span></span> L. Mansfield</a>
+        </div>
+        <nav class="topnav" aria-label="Primary">
+            <a href="/">Home</a>
+            <a href="/projects">Projects</a>
+            <a href="/assets/loganmansfield.pdf" target="_blank" rel="noopener">Résumé</a>
+        </nav>
+        <button class="burger" type="button" aria-label="Open navigation" aria-expanded="false" aria-controls="site-nav" data-burger>
+            <span class="burger__bar"></span><span class="burger__bar"></span><span class="burger__bar"></span>
+        </button>
+    </header>
+
+    <nav class="site-nav" id="site-nav" aria-label="Primary navigation" aria-hidden="true" inert>
+        <div class="site-nav__backdrop" data-nav-close aria-hidden="true"></div>
+        <div class="site-nav__panel">
+            <a class="site-nav__item" href="/">Home</a>
+            <a class="site-nav__item" href="/projects">Projects</a>
+            <a class="site-nav__item" href="/assets/loganmansfield.pdf" target="_blank" rel="noopener">Résumé</a>
+        </div>
+    </nav>
+
+    <main id="main-content" class="page page-live" data-live>
+        <section class="hero" aria-labelledby="live-title">
+            <div class="hero__main">
+                <p class="eyebrow">Live data · Fraud Detection Pipeline</p>
+                <h1 class="hero__name" id="live-title">Fraud, scored daily.</h1>
+                <p class="hero__role">These are the real outputs of my fraud-detection pipeline, refreshed every day. A generator plays out theme-park webstore checkouts, including five kinds of fraud; every order is scored by a rules model, and the results land in Postgres on Supabase. A daily job runs one read-only SQL query over those tables and publishes only the totals you see here.</p>
+                <div class="live-meta" aria-live="polite">
+                    <span class="live-pill live-pill--sim">Simulated data</span>
+                    <span class="live-pill" data-live-model>Model: rules-v0</span>
+                    <span class="live-meta__text" data-live-updated>Loading the latest numbers…</span>
+                </div>
+                <p class="live-stale" data-live-stale hidden></p>
+            </div>
+        </section>
+
+        <noscript>
+            <p class="section-note">The charts on this page need JavaScript. The same numbers are published as <a href="/data/fraud-snapshot.json">a JSON file</a>.</p>
+        </noscript>
+
+        <p class="live-error" data-live-error hidden>The latest numbers didn&rsquo;t load. Try refreshing, or read <a href="/data/fraud-snapshot.json">the JSON file</a> directly.</p>
+
+        <!-- Headline numbers -->
+        <section aria-labelledby="live-kpis" class="live-section">
+            <header class="section-head">
+                <h2 class="section-head__title" id="live-kpis">The last 30 days</h2>
+                <span class="section-head__hint" data-live-window>Every checkout the pipeline scored</span>
+            </header>
+            <div class="live-kpis">
+                <div class="live-kpi">
+                    <p class="live-kpi__label">Checkouts scored</p>
+                    <p class="live-kpi__value" data-kpi="checkouts">–</p>
+                    <p class="live-kpi__sub" data-kpi-sub="checkouts">&nbsp;</p>
+                </div>
+                <div class="live-kpi">
+                    <p class="live-kpi__label">Fraud caught</p>
+                    <p class="live-kpi__value" data-kpi="caught">–</p>
+                    <p class="live-kpi__sub" data-kpi-sub="caught">&nbsp;</p>
+                </div>
+                <div class="live-kpi">
+                    <p class="live-kpi__label">Good customers declined</p>
+                    <p class="live-kpi__value" data-kpi="false-declines">–</p>
+                    <p class="live-kpi__sub" data-kpi-sub="false-declines">&nbsp;</p>
+                </div>
+                <div class="live-kpi">
+                    <p class="live-kpi__label">Fraud dollars stopped</p>
+                    <p class="live-kpi__value" data-kpi="dollars">–</p>
+                    <p class="live-kpi__sub" data-kpi-sub="dollars">&nbsp;</p>
+                </div>
+                <div class="live-kpi">
+                    <p class="live-kpi__label">Scoring time, 95th percentile</p>
+                    <p class="live-kpi__value" data-kpi="latency">–</p>
+                    <p class="live-kpi__sub" data-kpi-sub="latency">&nbsp;</p>
+                </div>
+            </div>
+            <p class="section-note">&ldquo;Caught&rdquo; means the model sent the order to review or declined it. Fraud is measured against the generator&rsquo;s answer key; in production those labels arrive weeks later, as chargebacks.</p>
+        </section>
+
+        <!-- Daily trend -->
+        <section aria-labelledby="live-daily" class="live-section">
+            <header class="section-head">
+                <h2 class="section-head__title" id="live-daily">Fraud per day</h2>
+                <span class="section-head__hint">Caught versus missed</span>
+            </header>
+            <div class="live-card">
+                <ul class="live-legend" aria-label="Legend">
+                    <li><span class="live-swatch live-swatch--caught" aria-hidden="true"></span>Caught</li>
+                    <li><span class="live-swatch live-swatch--missed" aria-hidden="true"></span>Missed</li>
+                </ul>
+                <div class="live-chart" data-chart="daily" role="group" aria-label="Fraudulent checkouts per day, caught and missed"></div>
+                <p class="live-caption" data-caption="daily">&nbsp;</p>
+            </div>
+            <details class="live-table">
+                <summary>See the daily numbers as a table</summary>
+                <div class="live-table__scroll">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th scope="col">Day</th>
+                                <th scope="col">Checkouts</th>
+                                <th scope="col">Reviewed</th>
+                                <th scope="col">Declined</th>
+                                <th scope="col">Fraud</th>
+                                <th scope="col">Caught</th>
+                                <th scope="col">Good customers declined</th>
+                                <th scope="col">Fraud $ stopped</th>
+                            </tr>
+                        </thead>
+                        <tbody data-table="daily"></tbody>
+                    </table>
+                </div>
+            </details>
+        </section>
+
+        <!-- Score distribution -->
+        <section aria-labelledby="live-scores" class="live-section">
+            <header class="section-head">
+                <h2 class="section-head__title" id="live-scores">Where the model&rsquo;s scores fall</h2>
+                <span class="section-head__hint">Share of each group by risk score</span>
+            </header>
+            <div class="live-card">
+                <ul class="live-legend" aria-label="Legend">
+                    <li><span class="live-swatch live-swatch--legit" aria-hidden="true"></span>Good customers</li>
+                    <li><span class="live-swatch live-swatch--fraud" aria-hidden="true"></span>Fraud</li>
+                </ul>
+                <div class="live-chart" data-chart="scores" role="group" aria-label="Distribution of risk scores for good customers and for fraud"></div>
+                <p class="live-caption" data-caption="scores">&nbsp;</p>
+            </div>
+        </section>
+
+        <!-- Patterns -->
+        <section aria-labelledby="live-patterns" class="live-section">
+            <header class="section-head">
+                <h2 class="section-head__title" id="live-patterns">Catch rate by fraud pattern</h2>
+                <span class="section-head__hint">Where the next model should focus</span>
+            </header>
+            <div class="live-card">
+                <div class="live-bars" data-chart="patterns"></div>
+                <p class="live-caption" data-caption="patterns">&nbsp;</p>
+            </div>
+        </section>
+
+        <!-- How it works -->
+        <section aria-labelledby="live-how" class="live-section">
+            <header class="section-head">
+                <h2 class="section-head__title" id="live-how">How this page stays current</h2>
+            </header>
+            <ol class="live-steps">
+                <li><strong>Generate and score.</strong> The pipeline plays out webstore checkouts, scores each one, simulates the payment response with a fail-open timeout, and writes four raw tables to Postgres in a single transaction.</li>
+                <li><strong>Aggregate, read-only.</strong> Once a day a scheduled GitHub Action runs <a href="https://github.com/lmansf/Portfolio2026/blob/main/scripts/fraud-snapshot.sql" target="_blank" rel="noopener">one SQL query</a> inside a read-only transaction. It returns counts, rates, and a score histogram, never a single order, email, card, or IP address.</li>
+                <li><strong>Publish a snapshot.</strong> The Action checks the result against an allow-list of fields, commits it as <a href="/data/fraud-snapshot.json">fraud-snapshot.json</a>, and the site redeploys. This page draws its charts from that file in your browser; no database key ever reaches it.</li>
+            </ol>
+            <div class="live-links">
+                <a class="btn btn--ghost" href="/projects#fraud">About the project <span class="arrow" aria-hidden="true">→</span></a>
+                <a class="btn btn--ghost" href="https://github.com/lmansf/fraud-detection-pipeline/tree/claude/sweet-curie-3pzt7j" target="_blank" rel="noopener">Pipeline code on GitHub <span class="arrow" aria-hidden="true">↗</span></a>
+            </div>
+        </section>
+
+        <div class="live-tooltip" data-live-tooltip role="status" hidden></div>
+    </main>
+
+    <footer class="shell-footer">
+        <div class="footer-inner">
+            <div class="footer-brand"><span class="crow-mark" aria-hidden="true"></span> Logan Mansfield · Tampa, FL</div>
+            <div class="footer-socials">
+                <a href="https://www.linkedin.com/in/lmansf96/" target="_blank" rel="noopener">LinkedIn</a>
+                <a href="mailto:lmansf96@gmail.com">Email</a>
+                <a href="https://github.com/lmansf" target="_blank" rel="noopener">GitHub</a>
+                <a href="/assets/loganmansfield.pdf" target="_blank" rel="noopener">Résumé</a>
+            </div>
+        </div>
+    </footer>
+
+    <script defer src="/assets/transition.min.js"></script>
+    <script defer src="/assets/live.min.js"></script>
+</body>
+</html>

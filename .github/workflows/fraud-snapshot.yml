@@ -1,0 +1,91 @@
+# Refreshes data/fraud-snapshot.json for the /live page once a day.
+#
+# Runs scripts/fraud-snapshot.sql (aggregates only, read-only transaction)
+# against the fraud pipeline's Supabase Postgres, checks the result against
+# an allow-list of fields, and commits it if the numbers changed. The
+# commit to main makes Vercel redeploy the site with the new file.
+#
+# Needs one repository secret, FRAUD_DB_URL: the Supabase "Session pooler"
+# connection string (IPv4; GitHub runners can't reach the IPv6-only direct
+# host). Until it is set, the job skips without failing and the page keeps
+# showing the last committed snapshot.
+name: Fraud snapshot
+
+on:
+  schedule:
+    - cron: "35 5 * * *"   # 05:35 UTC, about half past midnight in Tampa
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: fraud-snapshot
+  cancel-in-progress: false
+
+jobs:
+  snapshot:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Check for the database secret
+        id: secret
+        env:
+          FRAUD_DB_URL: ${{ secrets.FRAUD_DB_URL }}
+        run: |
+          if [ -z "$FRAUD_DB_URL" ]; then
+            echo "::notice::FRAUD_DB_URL is not set; keeping the committed snapshot."
+            echo "ready=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "ready=true" >> "$GITHUB_OUTPUT"
+          fi
+
+      - uses: actions/checkout@v4
+        if: steps.secret.outputs.ready == 'true'
+
+      - name: Install the Postgres client
+        if: steps.secret.outputs.ready == 'true'
+        run: |
+          command -v psql >/dev/null || { sudo apt-get update -qq && sudo apt-get install -y -qq postgresql-client; }
+          psql --version
+
+      - name: Run the aggregate query
+        if: steps.secret.outputs.ready == 'true'
+        env:
+          FRAUD_DB_URL: ${{ secrets.FRAUD_DB_URL }}
+          PGCONNECT_TIMEOUT: "20"
+        run: |
+          psql "$FRAUD_DB_URL" -X -q -A -t -v ON_ERROR_STOP=1 \
+            -f scripts/fraud-snapshot.sql > "$RUNNER_TEMP/raw.json"
+
+      - name: Check the result holds aggregates only
+        if: steps.secret.outputs.ready == 'true'
+        run: |
+          set -euo pipefail
+          jq -e '
+            def only($keys): (keys - $keys) == [];
+            .simulated == true
+            and (.totals.checkouts | type == "number" and . > 0)
+            and only(["generated_at","timezone","window_days","simulated","model_versions","latest_event_at","totals","thresholds","daily","score_bins","patterns"])
+            and (.totals | only(["checkouts","flagged","declined","reviewed","fraud","fraud_caught","false_declines","legit","fraud_dollars_stopped","fraud_dollars_missed","p50_scoring_ms","p95_scoring_ms","p95_checkout_ms","scoring_timeouts","active_days"]))
+            and (.thresholds | only(["review_from","decline_from"]))
+            and all(.daily[]; only(["day","checkouts","approved","reviewed","declined","fraud","fraud_caught","false_declines","fraud_dollars_stopped","fraud_dollars_missed","p95_scoring_ms"]))
+            and all(.score_bins[]; only(["from","to","legit","fraud"]))
+            and all(.patterns[]; only(["pattern","fraud","caught"]))
+          ' "$RUNNER_TEMP/raw.json" > /dev/null
+          jq '.' "$RUNNER_TEMP/raw.json" > data/fraud-snapshot.json
+
+      - name: Commit the new snapshot
+        if: steps.secret.outputs.ready == 'true'
+        run: |
+          # generated_at always changes; commit only when the numbers did.
+          if git diff --quiet -- data/fraud-snapshot.json; then exit 0; fi
+          if [ "$(git diff -U0 -- data/fraud-snapshot.json | grep -E '^[+-] ' | grep -vc '"generated_at"')" = "0" ]; then
+            echo "Only the timestamp changed; nothing to publish."
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add data/fraud-snapshot.json
+          git commit -m "Refresh fraud snapshot for the live data page"
+          git push

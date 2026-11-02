@@ -24,6 +24,8 @@ A deliberately lean two-page site, plus one archived project page:
   card copy.
 - **Owl Park** (`owl-park-infographic.html`, `/owl-park`) — a standalone
   infographic of the archived end-to-end data pipeline.
+- **Live data** (`live.html`, `/live`) — daily numbers from the fraud
+  pipeline (see "Live fraud data" below).
 - **404** (`404.html`) — branded not-found page.
 
 Clean URLs (`/projects`, `/owl-park`) and legacy redirects (e.g. `/fraud` →
@@ -94,7 +96,7 @@ part of it:
   enough to disambiguate from other people with the same name. Projects
   and Owl Park are `WebPage`s that reference the home `#person` /
   `#website` ids and carry `BreadcrumbList`s.
-- **`sitemap.xml`** / **`robots.txt`** — the three public URLs; bump each
+- **`sitemap.xml`** / **`robots.txt`** — the four public URLs; bump each
   `<lastmod>` when its page changes.
 - **`llms.txt`** — a short, factual plain-text summary (role, employer,
   education, certification, pages, profiles) for AI answer engines. Keep it
@@ -105,6 +107,30 @@ ticketing, eGalaxy webstores, PAR Pixel POS, vendors, park-wide POS
 hardware); SQL/Python/Power BI are portfolio and analyst skills. Don't claim
 anything Logan hasn't confirmed (no CRM ownership, UAT, M365/D365
 admin, or dbt as a skill).
+
+## Live fraud data (`/live`)
+
+The page draws its charts in the browser from `data/fraud-snapshot.json`, an
+aggregates-only snapshot of the fraud pipeline's Supabase tables (simulated
+webstore checkouts). Nothing on the page talks to the database.
+
+- **`scripts/fraud-snapshot.sql`** — one query in a read-only transaction.
+  It returns counts, rates, dollar totals, a 20-bin score histogram, and
+  per-pattern catch rates for the last 30 America/New_York days. It never
+  selects an id, email, card, IP, or name into the output.
+- **`.github/workflows/fraud-snapshot.yml`** — runs daily at 05:35 UTC (and
+  on demand), checks the result against an allow-list of fields with `jq`,
+  and commits the file only when the numbers changed; the push redeploys
+  the site. It needs the repository secret `FRAUD_DB_URL` (the Supabase
+  Session pooler connection string). Without it the job skips and the page
+  keeps the last committed snapshot.
+- **`assets/live.js` / `assets/live.css`** — plain SVG charts, stat tiles,
+  and a table view. Series colors are validated separately for Day and
+  Night. The page warns visitors when the snapshot is more than 36 hours
+  old or the generator has been paused.
+
+To add a field, change the SQL, add the field to the workflow's
+allow-list, then read it in `live.js`.
 
 ## Local development
 

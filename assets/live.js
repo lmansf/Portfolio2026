@@ -1,0 +1,425 @@
+/* ─────────────────────────────────────────────────────────────
+ * live.js — draws the /live page from /data/fraud-snapshot.json.
+ *
+ * The snapshot holds aggregates only (counts, rates, dollar totals, a
+ * score histogram), produced once a day by scripts/fraud-snapshot.sql.
+ * Charts are plain SVG built here; no chart library, no database key.
+ * Every value is also reachable without hover: stat tiles, captions,
+ * and the daily table.
+ * ───────────────────────────────────────────────────────────── */
+(function () {
+    'use strict';
+
+    const root = document.querySelector('[data-live]');
+    if (!root) return;
+
+    const SNAPSHOT_URL = '/data/fraud-snapshot.json';
+    const TZ = 'America/New_York';
+    const SVG_NS = 'http://www.w3.org/2000/svg';
+    const STALE_HOURS = 36;
+    const PAUSED_HOURS = 6;
+
+    const PATTERN_NAMES = {
+        card_testing: 'Card testing',
+        fraud_ring: 'Fraud rings',
+        gift_card_cashout: 'Gift-card cash-out',
+        stolen_card_resale: 'Stolen-card resale',
+        account_takeover: 'Account takeover'
+    };
+
+    /* ── Formatting ── */
+    const nf = new Intl.NumberFormat('en-US');
+    const fmtInt = (n) => nf.format(Math.round(n));
+    const fmtPct = (n, digits = 0) => (Number.isFinite(n) ? `${(n * 100).toFixed(digits)}%` : '–');
+    const fmtMoney = (n) => {
+        if (!Number.isFinite(n)) return '–';
+        if (Math.abs(n) >= 1e6) return `$${(n / 1e6).toFixed(2)}M`;
+        if (Math.abs(n) >= 1e4) return `$${Math.round(n / 1e3)}K`;
+        return `$${fmtInt(n)}`;
+    };
+    const ratio = (a, b) => (b > 0 ? a / b : NaN);
+
+    // Calendar days arrive as YYYY-MM-DD (already America/New_York days).
+    const dayToDate = (day) => new Date(`${day}T12:00:00Z`);
+    const fmtDay = (day, opts = { month: 'short', day: 'numeric' }) =>
+        dayToDate(day).toLocaleDateString('en-US', { ...opts, timeZone: 'UTC' });
+    const etDay = (iso) => new Intl.DateTimeFormat('en-CA', { timeZone: TZ, year: 'numeric', month: '2-digit', day: '2-digit' }).format(new Date(iso));
+    const fmtStamp = (iso) => new Date(iso).toLocaleString('en-US', {
+        timeZone: TZ, month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit'
+    }) + ' ET';
+    const addDays = (day, n) => {
+        const d = dayToDate(day);
+        d.setUTCDate(d.getUTCDate() + n);
+        return d.toISOString().slice(0, 10);
+    };
+
+    const esc = (s) => String(s).replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+
+    function el(name, attrs = {}, parent) {
+        const node = document.createElementNS(SVG_NS, name);
+        for (const [k, v] of Object.entries(attrs)) node.setAttribute(k, v);
+        if (parent) parent.appendChild(node);
+        return node;
+    }
+
+    // A rect with only its data end rounded (4px), flat on the baseline side.
+    function topRoundedRect(x, y, w, h, r = 4) {
+        if (h <= 0 || w <= 0) return '';
+        const rr = Math.min(r, w / 2, h);
+        return `M${x},${y + h}V${y + rr}Q${x},${y} ${x + rr},${y}H${x + w - rr}Q${x + w},${y} ${x + w},${y + rr}V${y + h}Z`;
+    }
+    function flatRect(x, y, w, h) {
+        if (h <= 0 || w <= 0) return '';
+        return `M${x},${y}H${x + w}V${y + h}H${x}Z`;
+    }
+
+    function niceMax(v) {
+        if (v <= 0) return 1;
+        const p = Math.pow(10, Math.floor(Math.log10(v)));
+        const m = v / p;
+        const step = m <= 1 ? 1 : m <= 2 ? 2 : m <= 2.5 ? 2.5 : m <= 5 ? 5 : 10;
+        return step * p;
+    }
+
+    /* ── Tooltip ── */
+    const tooltip = root.querySelector('[data-live-tooltip]');
+    function showTip(html, anchor) {
+        if (!tooltip) return;
+        tooltip.innerHTML = html;
+        tooltip.hidden = false;
+        const r = anchor.getBoundingClientRect();
+        const tw = tooltip.offsetWidth;
+        const th = tooltip.offsetHeight;
+        let left = r.left + r.width / 2 - tw / 2;
+        left = Math.max(8, Math.min(left, window.innerWidth - tw - 8));
+        let top = r.top - th - 8;
+        if (top < 8) top = r.bottom + 8;
+        tooltip.style.left = `${left}px`;
+        tooltip.style.top = `${top}px`;
+    }
+    function hideTip() { if (tooltip) tooltip.hidden = true; }
+    window.addEventListener('scroll', hideTip, { passive: true });
+
+    function bindTip(target, html, group) {
+        const on = () => { group && group.classList.add('is-active'); showTip(html, target); };
+        const off = () => { group && group.classList.remove('is-active'); hideTip(); };
+        target.addEventListener('mouseenter', on);
+        target.addEventListener('mouseleave', off);
+        target.addEventListener('focus', on);
+        target.addEventListener('blur', off);
+    }
+    const ttRow = (key, value, swatch) =>
+        `<div class="tt-row"><span class="tt-key">${swatch ? `<span class="live-swatch live-swatch--${swatch}"></span>` : ''}${esc(key)}</span><span>${esc(value)}</span></div>`;
+
+    /* ── Validation: refuse anything that isn't the aggregate shape ── */
+    function isSnapshot(s) {
+        return s && s.simulated === true && s.totals && Array.isArray(s.daily) &&
+            Array.isArray(s.score_bins) && Array.isArray(s.patterns) &&
+            typeof s.generated_at === 'string';
+    }
+
+    /* ── Header ── */
+    function renderMeta(s) {
+        const updated = root.querySelector('[data-live-updated]');
+        if (updated) {
+            const latest = s.latest_event_at ? ` · latest checkout scored ${fmtStamp(s.latest_event_at)}` : '';
+            updated.textContent = `Updated ${fmtStamp(s.generated_at)}${latest}`;
+        }
+        const model = root.querySelector('[data-live-model]');
+        if (model && s.model_versions) model.textContent = `Model: ${s.model_versions}`;
+
+        const win = root.querySelector('[data-live-window]');
+        if (win && s.daily.length) {
+            win.textContent = `${fmtDay(s.daily[0].day)} to ${fmtDay(s.daily[s.daily.length - 1].day)} · ${fmtInt(s.totals.active_days)} days with checkouts`;
+        }
+
+        const stale = root.querySelector('[data-live-stale]');
+        if (!stale) return;
+        const ageH = (Date.now() - Date.parse(s.generated_at)) / 36e5;
+        const pausedH = s.latest_event_at ? (Date.parse(s.generated_at) - Date.parse(s.latest_event_at)) / 36e5 : 0;
+        const notes = [];
+        if (ageH > STALE_HOURS) notes.push(`This snapshot is from ${fmtStamp(s.generated_at)}; the daily refresh hasn't run since.`);
+        if (pausedH > PAUSED_HOURS) notes.push(`The checkout generator has been paused since ${fmtStamp(s.latest_event_at)}, so these numbers stop there.`);
+        if (notes.length) {
+            stale.textContent = notes.join(' ');
+            stale.hidden = false;
+        }
+    }
+
+    /* ── Stat tiles ── */
+    function renderKpis(s) {
+        const t = s.totals;
+        const set = (key, value, sub) => {
+            const v = root.querySelector(`[data-kpi="${key}"]`);
+            const d = root.querySelector(`[data-kpi-sub="${key}"]`);
+            if (v) v.textContent = value;
+            if (d) d.textContent = sub;
+        };
+        // A typical full day: the median, leaving out the first and last days (often partial).
+        const full = s.daily.slice(1, -1).map((d) => d.checkouts).filter((n) => n > 0).sort((a, b) => a - b);
+        const perDay = full.length ? full[Math.floor(full.length / 2)] : NaN;
+        set('checkouts', fmtInt(t.checkouts), Number.isFinite(perDay) ? `About ${fmtInt(Math.round(perDay / 100) * 100)} on a typical day` : `${fmtInt(t.active_days)} days with checkouts`);
+        set('caught', fmtPct(ratio(t.fraud_caught, t.fraud)), `${fmtInt(t.fraud_caught)} of ${fmtInt(t.fraud)} fraudulent orders`);
+        set('false-declines', fmtInt(t.false_declines), t.false_declines > 0
+            ? `${fmtPct(ratio(t.false_declines, t.legit), 2)} of ${fmtInt(t.legit)} legitimate orders`
+            : `Out of ${fmtInt(t.legit)} legitimate orders`);
+        const fraudDollars = (t.fraud_dollars_stopped || 0) + (t.fraud_dollars_missed || 0);
+        set('dollars', fmtMoney(t.fraud_dollars_stopped), `${fmtPct(ratio(t.fraud_dollars_stopped, fraudDollars))} of ${fmtMoney(fraudDollars)} attempted`);
+        set('latency', `${t.p95_scoring_ms} ms`, `${fmtInt(t.scoring_timeouts)} timeouts failed open (${fmtPct(ratio(t.scoring_timeouts, t.checkouts), 1)})`);
+    }
+
+    /* ── Daily stacked bars: caught (bottom) + missed (top) ── */
+    function renderDaily(s, todayEt) {
+        const host = root.querySelector('[data-chart="daily"]');
+        if (!host || !s.daily.length) return;
+        host.textContent = '';
+
+        const byDay = new Map(s.daily.map((d) => [d.day, d]));
+        const first = s.daily[0].day;
+        const last = s.daily[s.daily.length - 1].day;
+        const days = [];
+        for (let d = first; d <= last; d = addDays(d, 1)) days.push(d);
+
+        const width = Math.max(320, host.clientWidth || 640);
+        const height = width < 480 ? 220 : 260;
+        const m = { top: 12, right: 8, bottom: 28, left: 36 };
+        const iw = width - m.left - m.right;
+        const ih = height - m.top - m.bottom;
+        const yMax = niceMax(Math.max(...s.daily.map((d) => d.fraud)));
+        const y = (v) => m.top + ih - (v / yMax) * ih;
+        const step = iw / days.length;
+        const barW = Math.max(3, Math.min(22, step - 2));
+
+        const svg = el('svg', { viewBox: `0 0 ${width} ${height}`, role: 'img', 'aria-hidden': 'true', focusable: 'false' }, host);
+        const grid = el('g', { class: 'grid' }, svg);
+        const ticks = 4;
+        for (let i = 0; i <= ticks; i++) {
+            const v = (yMax / ticks) * i;
+            const yy = y(v);
+            if (i > 0) el('line', { x1: m.left, x2: width - m.right, y1: yy, y2: yy }, grid);
+            const t = el('text', { x: m.left - 6, y: yy + 4, 'text-anchor': 'end' }, svg);
+            t.textContent = fmtInt(v);
+        }
+        el('line', { class: 'baseline', x1: m.left, x2: width - m.right, y1: y(0), y2: y(0) }, svg);
+
+        // Label runs of missing days once, in the middle of the run.
+        let runStart = null;
+        days.forEach((day, i) => {
+            const missing = !byDay.has(day);
+            if (missing && runStart === null) runStart = i;
+            if ((!missing || i === days.length - 1) && runStart !== null) {
+                const end = missing ? i : i - 1;
+                const cx = m.left + step * ((runStart + end + 1) / 2);
+                const t = el('text', { x: cx, y: m.top + ih / 2, 'text-anchor': 'middle', class: 'gap-label' }, svg);
+                t.textContent = end - runStart >= 2 ? 'paused' : '';
+                runStart = null;
+            }
+        });
+
+        const labelEvery = days.length > 21 ? 7 : days.length > 10 ? 4 : 2;
+        days.forEach((day, i) => {
+            const x = m.left + step * i + (step - barW) / 2;
+            if (i % labelEvery === 0) {
+                const t = el('text', { x: x + barW / 2, y: height - 8, 'text-anchor': 'middle' }, svg);
+                t.textContent = fmtDay(day);
+            }
+        });
+
+        days.forEach((day, i) => {
+            const d = byDay.get(day);
+            if (!d) return;
+            const x = m.left + step * i + (step - barW) / 2;
+            const missed = d.fraud - d.fraud_caught;
+            const partial = day === todayEt;
+            const col = el('g', { class: `col${partial ? ' is-partial' : ''}` }, svg);
+            const hCaught = (d.fraud_caught / yMax) * ih;
+            const hMissed = (missed / yMax) * ih;
+            const gap = d.fraud_caught > 0 && missed > 0 ? 2 : 0;
+            const base = y(0);
+            if (d.fraud_caught > 0) {
+                el('path', { class: `bar bar--caught${partial ? ' bar--partial' : ''}`, d: missed > 0 ? flatRect(x, base - hCaught, barW, hCaught) : topRoundedRect(x, base - hCaught, barW, hCaught) }, col);
+            }
+            if (missed > 0) {
+                el('path', { class: `bar bar--missed${partial ? ' bar--partial' : ''}`, d: topRoundedRect(x, base - hCaught - gap - hMissed, barW, hMissed) }, col);
+            }
+            const hit = el('rect', {
+                class: 'hit', x: m.left + step * i, y: m.top, width: Math.max(step, 1), height: ih,
+                tabindex: '0', role: 'img',
+                'aria-label': `${fmtDay(day, { weekday: 'short', month: 'short', day: 'numeric' })}${partial ? ', so far' : ''}: ${fmtInt(d.fraud)} fraudulent orders, ${fmtInt(d.fraud_caught)} caught, ${fmtInt(missed)} missed, out of ${fmtInt(d.checkouts)} checkouts`
+            }, col);
+            const html = `<strong>${esc(fmtDay(day, { weekday: 'short', month: 'short', day: 'numeric' }))}${partial ? ' (so far)' : ''}</strong>` +
+                ttRow('Checkouts', fmtInt(d.checkouts)) +
+                ttRow('Fraud caught', fmtInt(d.fraud_caught), 'caught') +
+                ttRow('Fraud missed', fmtInt(missed), 'missed') +
+                ttRow('Catch rate', fmtPct(ratio(d.fraud_caught, d.fraud))) +
+                ttRow('Good customers declined', fmtInt(d.false_declines));
+            bindTip(hit, html, col);
+        });
+
+        const caption = root.querySelector('[data-caption="daily"]');
+        if (caption) {
+            const vols = s.daily.map((d) => d.checkouts).sort((a, b) => a - b);
+            const median = vols[Math.floor(vols.length / 2)] || 0;
+            // Full days only: skip today and any day the generator ran for part of.
+            const full = s.daily.filter((d) => d.day !== todayEt && d.checkouts >= median * 0.8);
+            const rates = full.map((d) => ratio(d.fraud_caught, d.fraud)).filter(Number.isFinite);
+            const missingDays = days.filter((d) => !byDay.has(d));
+            let text = rates.length
+                ? `On full days the model caught between ${fmtPct(Math.min(...rates))} and ${fmtPct(Math.max(...rates))} of fraud.`
+                : '';
+            if (missingDays.length) text += ` No checkouts ran ${fmtDay(missingDays[0])} to ${fmtDay(missingDays[missingDays.length - 1])} while the generator was paused.`;
+            if (byDay.has(todayEt)) text += ' The lighter bar is today, still in progress.';
+            caption.textContent = text.trim();
+        }
+    }
+
+    /* ── Score distribution: share of each group per score bin ── */
+    function renderScores(s) {
+        const host = root.querySelector('[data-chart="scores"]');
+        if (!host) return;
+        host.textContent = '';
+        const NB = 20;
+        const bins = Array.from({ length: NB }, (_, i) => ({ from: i / NB, to: (i + 1) / NB, legit: 0, fraud: 0 }));
+        s.score_bins.forEach((b) => {
+            const i = Math.min(NB - 1, Math.max(0, Math.round(b.from * NB)));
+            bins[i].legit += b.legit || 0;
+            bins[i].fraud += b.fraud || 0;
+        });
+        const totLegit = bins.reduce((a, b) => a + b.legit, 0);
+        const totFraud = bins.reduce((a, b) => a + b.fraud, 0);
+        bins.forEach((b) => { b.legitShare = ratio(b.legit, totLegit) || 0; b.fraudShare = ratio(b.fraud, totFraud) || 0; });
+
+        const width = Math.max(320, host.clientWidth || 640);
+        const height = width < 480 ? 220 : 260;
+        const m = { top: 22, right: 8, bottom: 30, left: 40 };
+        const iw = width - m.left - m.right;
+        const ih = height - m.top - m.bottom;
+        const yMax = Math.min(1, niceMax(Math.max(...bins.map((b) => Math.max(b.legitShare, b.fraudShare)))));
+        const y = (v) => m.top + ih - (v / yMax) * ih;
+        const x = (score) => m.left + score * iw;
+        const step = iw / NB;
+        const barW = Math.max(2, Math.min(12, (step - 4) / 2));
+
+        const svg = el('svg', { viewBox: `0 0 ${width} ${height}`, role: 'img', 'aria-hidden': 'true', focusable: 'false' }, host);
+        const grid = el('g', { class: 'grid' }, svg);
+        for (let i = 0; i <= 4; i++) {
+            const v = (yMax / 4) * i;
+            if (i > 0) el('line', { x1: m.left, x2: width - m.right, y1: y(v), y2: y(v) }, grid);
+            const t = el('text', { x: m.left - 6, y: y(v) + 4, 'text-anchor': 'end' }, svg);
+            t.textContent = fmtPct(v);
+        }
+        el('line', { class: 'baseline', x1: m.left, x2: width - m.right, y1: y(0), y2: y(0) }, svg);
+        for (let v = 0; v <= 1.0001; v += 0.25) {
+            const t = el('text', { x: x(v), y: height - 10, 'text-anchor': v === 0 ? 'start' : v >= 1 ? 'end' : 'middle' }, svg);
+            t.textContent = v.toFixed(2);
+        }
+
+        const th = s.thresholds || {};
+        [['Review', th.review_from], ['Decline', th.decline_from]].forEach(([label, v]) => {
+            if (!Number.isFinite(v)) return;
+            el('line', { class: 'threshold', x1: x(v), x2: x(v), y1: m.top - 4, y2: y(0) }, svg);
+            const t = el('text', { x: x(v) + 4, y: m.top + 6, class: 'threshold-label' }, svg);
+            t.textContent = `${label} ≥ ${v.toFixed(2)}`;
+        });
+
+        bins.forEach((b, i) => {
+            const cx = m.left + step * i + step / 2;
+            const col = el('g', { class: 'col' }, svg);
+            const hL = (b.legitShare / yMax) * ih;
+            const hF = (b.fraudShare / yMax) * ih;
+            if (hL > 0) el('path', { class: 'bar bar--legit', d: topRoundedRect(cx - barW - 1, y(0) - Math.max(hL, 1), barW, Math.max(hL, 1)) }, col);
+            if (hF > 0) el('path', { class: 'bar bar--fraud', d: topRoundedRect(cx + 1, y(0) - Math.max(hF, 1), barW, Math.max(hF, 1)) }, col);
+            const range = `${b.from.toFixed(2)} to ${b.to.toFixed(2)}`;
+            const hit = el('rect', {
+                class: 'hit', x: m.left + step * i, y: m.top, width: step, height: ih, tabindex: '0', role: 'img',
+                'aria-label': `Score ${range}: ${fmtPct(b.legitShare, 1)} of good customers, ${fmtPct(b.fraudShare, 1)} of fraud`
+            }, col);
+            bindTip(hit, `<strong>Score ${esc(range)}</strong>` +
+                ttRow('Good customers', `${fmtPct(b.legitShare, 1)} (${fmtInt(b.legit)})`, 'legit') +
+                ttRow('Fraud', `${fmtPct(b.fraudShare, 1)} (${fmtInt(b.fraud)})`, 'fraud'), col);
+        });
+
+        const caption = root.querySelector('[data-caption="scores"]');
+        if (caption) {
+            const topLegit = bins.reduce((a, b) => (b.legit > 0 ? b.to : a), 0);
+            const fraudBelowReview = Number.isFinite(th.review_from)
+                ? bins.filter((b) => b.to <= th.review_from + 1e-9).reduce((a, b) => a + b.fraud, 0)
+                : NaN;
+            let text = `Every good customer scored below ${topLegit.toFixed(2)}, well under the review line, which is why none were declined.`;
+            if (Number.isFinite(fraudBelowReview)) {
+                text += ` The cost is the fraud that scores low too: ${fmtPct(ratio(fraudBelowReview, totFraud))} of fraudulent orders sat below ${th.review_from.toFixed(2)} and went through.`;
+            }
+            caption.textContent = text;
+        }
+    }
+
+    /* ── Catch rate by pattern ── */
+    function renderPatterns(s) {
+        const host = root.querySelector('[data-chart="patterns"]');
+        if (!host) return;
+        host.textContent = '';
+        const rows = s.patterns
+            .filter((p) => p.fraud > 0)
+            .map((p) => ({ ...p, rate: ratio(p.caught, p.fraud), name: PATTERN_NAMES[p.pattern] || String(p.pattern).replace(/_/g, ' ') }))
+            .sort((a, b) => b.rate - a.rate);
+        rows.forEach((p) => {
+            const row = document.createElement('div');
+            row.className = 'live-bar';
+            row.innerHTML =
+                `<div class="live-bar__head"><span class="live-bar__name">${esc(p.name)}</span>` +
+                `<span class="live-bar__value">${fmtPct(p.rate)} · ${fmtInt(p.caught)} of ${fmtInt(p.fraud)}</span></div>` +
+                `<div class="live-bar__track" role="img" aria-label="${esc(p.name)}: ${fmtPct(p.rate)} caught"><div class="live-bar__fill" style="width:${(p.rate * 100).toFixed(1)}%"></div></div>`;
+            host.appendChild(row);
+        });
+        const caption = root.querySelector('[data-caption="patterns"]');
+        if (caption && rows.length > 1) {
+            const best = rows[0];
+            const worst = rows[rows.length - 1];
+            caption.textContent = `The rules catch ${best.name.toLowerCase()} best (${fmtPct(best.rate)}) and ${worst.name.toLowerCase()} worst (${fmtPct(worst.rate)}). Fraud spread across many accounts looks normal one order at a time.`;
+        }
+    }
+
+    /* ── Table view ── */
+    function renderTable(s, todayEt) {
+        const body = root.querySelector('[data-table="daily"]');
+        if (!body) return;
+        body.innerHTML = s.daily.slice().reverse().map((d) =>
+            `<tr><td>${esc(fmtDay(d.day, { weekday: 'short', month: 'short', day: 'numeric' }))}${d.day === todayEt ? ' (so far)' : ''}</td>` +
+            `<td>${fmtInt(d.checkouts)}</td><td>${fmtInt(d.reviewed)}</td><td>${fmtInt(d.declined)}</td>` +
+            `<td>${fmtInt(d.fraud)}</td><td>${fmtInt(d.fraud_caught)}</td><td>${fmtInt(d.false_declines)}</td>` +
+            `<td>${fmtMoney(d.fraud_dollars_stopped || 0)}</td></tr>`
+        ).join('');
+    }
+
+    function renderAll(s) {
+        const todayEt = etDay(s.generated_at);
+        renderMeta(s);
+        renderKpis(s);
+        renderDaily(s, todayEt);
+        renderScores(s);
+        renderPatterns(s);
+        renderTable(s, todayEt);
+    }
+
+    function fail() {
+        const err = root.querySelector('[data-live-error]');
+        if (err) err.hidden = false;
+        const updated = root.querySelector('[data-live-updated]');
+        if (updated) updated.textContent = 'Latest numbers unavailable right now';
+    }
+
+    fetch(SNAPSHOT_URL, { cache: 'no-cache' })
+        .then((r) => (r.ok ? r.json() : Promise.reject(new Error(`HTTP ${r.status}`))))
+        .then((s) => {
+            if (!isSnapshot(s)) throw new Error('Unexpected snapshot shape');
+            renderAll(s);
+            let lastW = window.innerWidth;
+            let t = 0;
+            window.addEventListener('resize', () => {
+                if (Math.abs(window.innerWidth - lastW) < 24) return;
+                clearTimeout(t);
+                t = setTimeout(() => { lastW = window.innerWidth; hideTip(); renderDaily(s, etDay(s.generated_at)); renderScores(s); }, 150);
+            });
+        })
+        .catch(fail);
+})();
