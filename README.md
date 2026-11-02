@@ -20,6 +20,11 @@ A deliberately lean two-page site, plus one archived project page:
   then Lighthouse, Attendance Forecasting, USL Attendance Forecasting, Roll
   Call, Attendance Nowcast, Member Segmentation (RFM), and two retired cards:
   eFrog (code only, no live link) and the archived Owl Park data architecture.
+  Between the featured cards and the rest, "How the data flows" holds a
+  clickable pipeline diagram for the Fraud Detection Pipeline (`#fraud-flow`)
+  and Owl Park (`#owl-park-flow`); those two featured cards link down to
+  their own. Every stage note is checked against that project's public repo,
+  so update the diagram when the pipeline changes.
   Cards have anchor ids (`#fraud`, `#owl-park`, `#quack-query`, …) so the home
   page and legacy redirects can deep-link to them. The home page repeats the
   three featured cards in shorter form, so keep the two in step when editing
@@ -55,8 +60,20 @@ soft and tappable things are pills.
   experience timeline, chips and toolkit groups, about, connect cards, buttons.
 - `assets/transition.js` — SPA-style page transitions and the mobile nav.
   Only in-site page swaps fade; the first load paints immediately so the hero
-  is on screen at once. Dismissing the mobile nav (Escape, backdrop, burger)
-  returns focus to the burger, whose label toggles Open/Close navigation.
+  is on screen at once. In-page `#hash` links (the cards' "See how it flows")
+  are left to the browser rather than re-swapping `<main>`. Dismissing the
+  mobile nav (Escape, backdrop, burger) returns focus to the burger, whose
+  label toggles Open/Close navigation.
+- `assets/pipeline.css` / `assets/pipeline.js` — the clickable pipeline
+  diagrams (`[data-flow]` figures on Projects). The script turns each one into
+  a tabs widget: click, tap or hover a stage to read its note, arrow keys and
+  Home/End move between stages, and "Play the flow" steps through once
+  (choosing a stage pauses it; Play again carries on from there). Stages
+  before the selected one stay lit. Stages stack down a rail on phones and
+  tablets and sit in one row from 880px. Without JS every note shows as a
+  list, styled by a `<noscript>` copy of the stylesheet link. The page
+  preloads the stylesheet; the script applies it, and adds it after an
+  in-site swap from Home (which is why Home loads the script too).
 - `assets/theme.js` — optional per-company accent theming via `?ink=<company>`
   (see [`docs/referrers.md`](docs/referrers.md)).
 - `assets/profilepicture.webp` — circular hero avatar on the home page.

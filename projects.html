@@ -32,6 +32,8 @@
     <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,600&amp;family=Figtree:wght@400;500;600&amp;display=swap" rel="stylesheet">
     <link rel="stylesheet" href="/assets/shell.min.css">
     <link rel="stylesheet" href="/assets/pages.min.css">
+    <link rel="preload" href="/assets/pipeline.min.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
+    <noscript><link rel="stylesheet" href="/assets/pipeline.min.css"></noscript>
     <script>
         window.va = window.va || function () { (window.vaq = window.vaq || []).push(arguments); };
     </script>
@@ -126,6 +128,7 @@
                         <p class="project__desc">Fraud caught and good customers turned away pull against each other; this pipeline measures both. A scheduled Databricks job simulates Owl Park webstore checkouts, normal guests plus five fraud patterns, scores every order with a baseline rules model, and lands four raw tables in Supabase, with fraud labels arriving days to weeks later like chargebacks. In its first weeks (mid-October to early November 2026), across about 39,000 simulated orders, the baseline flagged about half the fraud and no legitimate orders. That is the bar a trained model has to clear.</p>
                         <ul class="project__tags"><li>Databricks</li><li>Python</li><li>PostgreSQL (Supabase)</li><li>SQL</li></ul>
                         <div class="project__links">
+                            <a class="project__link" href="#fraud-flow">See how it flows ↓</a>
                             <a class="project__link" href="https://github.com/lmansf/fraud-detection-pipeline/tree/claude/sweet-curie-3pzt7j" target="_blank" rel="noopener">View on GitHub ↗</a>
                         </div>
                     </div>
@@ -142,11 +145,143 @@
                         <ul class="project__tags"><li>TypeScript</li><li>Cloudflare Workers</li><li>Shopify</li><li>PostgreSQL (Supabase)</li><li>SQL</li></ul>
                         <div class="project__links">
                             <a class="project__link" href="https://exploreowlpark.com" target="_blank" rel="noopener">Visit the park ↗</a>
+                            <a class="project__link" href="#owl-park-flow">See how it flows ↓</a>
                             <a class="project__link" href="https://github.com/lmansf/Welcome-to-Owl-Park" target="_blank" rel="noopener">GitHub ↗</a>
                         </div>
                     </div>
                 </article>
 
+            </div>
+        </section>
+
+        <!-- How the data flows: clickable pipeline diagrams (assets/pipeline.css, pipeline.js) -->
+        <section aria-labelledby="projects-flows">
+            <header class="section-head">
+                <h2 class="section-head__title" id="projects-flows">How the data flows</h2>
+                <span class="section-head__hint">Tap a stage to see what happens there and what runs it</span>
+            </header>
+            <div class="flows">
+                <figure class="flow" id="fraud-flow" data-flow aria-labelledby="fraud-flow-title">
+                    <div class="flow__head">
+                        <h3 class="flow__title" id="fraud-flow-title">Fraud Detection Pipeline</h3>
+                        <button class="flow__play" type="button" data-flow-play aria-pressed="false" hidden><span class="flow__play-icon" aria-hidden="true"></span><span data-flow-play-label>Play the flow</span></button>
+                        <p class="flow__sub">One run of the generator, from seed tables to four raw tables in Supabase. Every stage is in the repo.</p>
+                    </div>
+                    <ol class="flow__stages" data-flow-stages aria-label="Fraud Detection Pipeline stages">
+                        <li class="flow__stage">
+                            <button class="flow__node" type="button" id="fraud-flow-tab-1" data-flow-tab aria-controls="fraud-flow-panel-1"><span class="flow__num" aria-hidden="true">1</span><span class="flow__kind">Source</span><span class="flow__name">Seed tables</span></button>
+                        </li>
+                        <li class="flow__stage">
+                            <button class="flow__node" type="button" id="fraud-flow-tab-2" data-flow-tab aria-controls="fraud-flow-panel-2"><span class="flow__num" aria-hidden="true">2</span><span class="flow__kind">Ingest</span><span class="flow__name">Simulated checkouts</span></button>
+                        </li>
+                        <li class="flow__stage">
+                            <button class="flow__node" type="button" id="fraud-flow-tab-3" data-flow-tab aria-controls="fraud-flow-panel-3"><span class="flow__num" aria-hidden="true">3</span><span class="flow__kind">Transform</span><span class="flow__name">Order features</span></button>
+                        </li>
+                        <li class="flow__stage">
+                            <button class="flow__node" type="button" id="fraud-flow-tab-4" data-flow-tab aria-controls="fraud-flow-panel-4"><span class="flow__num" aria-hidden="true">4</span><span class="flow__kind">Score</span><span class="flow__name">Rules model and checkout</span></button>
+                        </li>
+                        <li class="flow__stage">
+                            <button class="flow__node" type="button" id="fraud-flow-tab-5" data-flow-tab aria-controls="fraud-flow-panel-5"><span class="flow__num" aria-hidden="true">5</span><span class="flow__kind">Load</span><span class="flow__name">Four raw tables</span></button>
+                        </li>
+                        <li class="flow__stage">
+                            <button class="flow__node" type="button" id="fraud-flow-tab-6" data-flow-tab aria-controls="fraud-flow-panel-6"><span class="flow__num" aria-hidden="true">6</span><span class="flow__kind">Label</span><span class="flow__name">Late fraud labels</span></button>
+                        </li>
+                    </ol>
+                    <div class="flow__panels">
+                        <section class="flow__panel" id="fraud-flow-panel-1" aria-labelledby="fraud-flow-tab-1">
+                            <p class="flow__panel-title"><span class="flow__panel-kind">1 · Source</span> Seed tables</p>
+                            <p class="flow__note">Products, a pool of real guest profiles and a separate pool of fraudster identities, each tagged with the fraud pattern it plays, sit in Databricks seed tables. A Python script makes the identity pools; each run reads them once.</p>
+                            <ul class="flow__tools" aria-label="Tools"><li>Databricks</li><li>Python</li></ul>
+                        </section>
+                        <section class="flow__panel" id="fraud-flow-panel-2" aria-labelledby="fraud-flow-tab-2">
+                            <p class="flow__panel-title"><span class="flow__panel-kind">2 · Ingest</span> Simulated checkouts</p>
+                            <p class="flow__note">A Databricks notebook job simulates a window of Owl Park webstore traffic, by default an hour: about 120 normal orders plus fraud episodes worth about 3% of orders. The five patterns are card testing, stolen-card resale, gift-card cash-out, account takeover and fraud rings.</p>
+                            <ul class="flow__tools" aria-label="Tools"><li>Databricks Jobs</li><li>Python</li></ul>
+                        </section>
+                        <section class="flow__panel" id="fraud-flow-panel-3" aria-labelledby="fraud-flow-tab-3">
+                            <p class="flow__panel-title"><span class="flow__panel-kind">3 · Transform</span> Order features</p>
+                            <p class="flow__note">Orders are scored in time order so velocity counts are honest. Each one gets features such as cards seen on its device in the last hour, a headless browser, the gift-card share of the cart, an IP and billing country mismatch, and the account's age.</p>
+                            <ul class="flow__tools" aria-label="Tools"><li>Python</li></ul>
+                        </section>
+                        <section class="flow__panel" id="fraud-flow-panel-4" aria-labelledby="fraud-flow-tab-4">
+                            <p class="flow__panel-title"><span class="flow__panel-kind">4 · Score</span> Rules model and checkout</p>
+                            <p class="flow__note">Weighted rules turn the features into a 0 to 1 score with reason codes: approve, send to an identity check, or decline. The checkout is simulated too, with issuer declines and latency. If scoring takes over 150 ms the order fails open and is approved, so real guests are never stuck waiting.</p>
+                            <ul class="flow__tools" aria-label="Tools"><li>Python</li><li>Rules model v0</li></ul>
+                        </section>
+                        <section class="flow__panel" id="fraud-flow-panel-5" aria-labelledby="fraud-flow-tab-5">
+                            <p class="flow__panel-title"><span class="flow__panel-kind">5 · Load</span> Four raw tables</p>
+                            <p class="flow__note">Transactions, fraud decisions, checkout responses and fraud truth land in Supabase in one transaction, so a run arrives whole or not at all. Every column except the id and timestamp is nullable, so a partial row is kept for inspection instead of lost, and row-level security keeps the tables private.</p>
+                            <ul class="flow__tools" aria-label="Tools"><li>PostgreSQL (Supabase)</li><li>psycopg2</li></ul>
+                        </section>
+                        <section class="flow__panel" id="fraud-flow-panel-6" aria-labelledby="fraud-flow-tab-6">
+                            <p class="flow__panel-title"><span class="flow__panel-kind">6 · Label</span> Late fraud labels</p>
+                            <p class="flow__note">Each order's truth row carries its real fraud flag, but the label only becomes available 5 to 60 days later, and only for fraud that got through, the way chargebacks do. With decisions, checkout responses and labels side by side, a query can measure the trade-off: how much fraud was flagged, how many good guests were turned away, and how many orders failed open.</p>
+                            <ul class="flow__tools" aria-label="Tools"><li>Python</li><li>PostgreSQL (Supabase)</li></ul>
+                        </section>
+                    </div>
+                    <p class="flow__source"><a href="https://github.com/lmansf/fraud-detection-pipeline/tree/claude/sweet-curie-3pzt7j" target="_blank" rel="noopener">Read the generator and table definitions on GitHub ↗</a></p>
+                </figure>
+                <figure class="flow" id="owl-park-flow" data-flow aria-labelledby="owl-park-flow-title">
+                    <div class="flow__head">
+                        <h3 class="flow__title" id="owl-park-flow-title">Owl Park</h3>
+                        <button class="flow__play" type="button" data-flow-play aria-pressed="false" hidden><span class="flow__play-icon" aria-hidden="true"></span><span data-flow-play-label>Play the flow</span></button>
+                        <p class="flow__sub">From a ticket sale to the analytics views, as the park runs today.</p>
+                    </div>
+                    <ol class="flow__stages" data-flow-stages aria-label="Owl Park data flow stages">
+                        <li class="flow__stage">
+                            <button class="flow__node" type="button" id="owl-park-flow-tab-1" data-flow-tab aria-controls="owl-park-flow-panel-1"><span class="flow__num" aria-hidden="true">1</span><span class="flow__kind">Source</span><span class="flow__name">Shopify store</span></button>
+                        </li>
+                        <li class="flow__stage">
+                            <button class="flow__node" type="button" id="owl-park-flow-tab-2" data-flow-tab aria-controls="owl-park-flow-panel-2"><span class="flow__num" aria-hidden="true">2</span><span class="flow__kind">Ingest</span><span class="flow__name">Signed webhooks</span></button>
+                        </li>
+                        <li class="flow__stage">
+                            <button class="flow__node" type="button" id="owl-park-flow-tab-3" data-flow-tab aria-controls="owl-park-flow-panel-3"><span class="flow__num" aria-hidden="true">3</span><span class="flow__kind">Capture</span><span class="flow__name">The park itself</span></button>
+                        </li>
+                        <li class="flow__stage">
+                            <button class="flow__node" type="button" id="owl-park-flow-tab-4" data-flow-tab aria-controls="owl-park-flow-panel-4"><span class="flow__num" aria-hidden="true">4</span><span class="flow__kind">Load</span><span class="flow__name">Outbox to Supabase</span></button>
+                        </li>
+                        <li class="flow__stage">
+                            <button class="flow__node" type="button" id="owl-park-flow-tab-5" data-flow-tab aria-controls="owl-park-flow-panel-5"><span class="flow__num" aria-hidden="true">5</span><span class="flow__kind">Model</span><span class="flow__name">Analytics schema</span></button>
+                        </li>
+                        <li class="flow__stage">
+                            <button class="flow__node" type="button" id="owl-park-flow-tab-6" data-flow-tab aria-controls="owl-park-flow-panel-6"><span class="flow__num" aria-hidden="true">6</span><span class="flow__kind">Serve</span><span class="flow__name">Views for product questions</span></button>
+                        </li>
+                    </ol>
+                    <div class="flow__panels">
+                        <section class="flow__panel" id="owl-park-flow-panel-1" aria-labelledby="owl-park-flow-tab-1">
+                            <p class="flow__panel-title"><span class="flow__panel-kind">1 · Source</span> Shopify store</p>
+                            <p class="flow__note">Day Tickets and Annual Passes sell through a Shopify store. The buyer checks out in the store's own window, and Shopify keeps the buyer's details.</p>
+                            <ul class="flow__tools" aria-label="Tools"><li>Shopify</li></ul>
+                        </section>
+                        <section class="flow__panel" id="owl-park-flow-panel-2" aria-labelledby="owl-park-flow-tab-2">
+                            <p class="flow__panel-title"><span class="flow__panel-kind">2 · Ingest</span> Signed webhooks</p>
+                            <p class="flow__note">Shopify posts each paid order to a Cloudflare Worker, which checks the webhook's signature before reading anything, so a forged order never reaches the tickets, and a repeated webhook changes nothing. It then issues one ticket per unit into a ticket book kept in a Durable Object.</p>
+                            <p class="flow__planned"><span class="flow__badge">Planned</span>Score every paid order with the fraud pipeline before its tickets release, waiting up to 2 seconds and failing open.</p>
+                            <ul class="flow__tools" aria-label="Tools"><li>Cloudflare Workers</li><li>Durable Objects (SQLite)</li></ul>
+                        </section>
+                        <section class="flow__panel" id="owl-park-flow-panel-3" aria-labelledby="owl-park-flow-tab-3">
+                            <p class="flow__panel-title"><span class="flow__panel-kind">3 · Capture</span> The park itself</p>
+                            <p class="flow__note">Visitors walk the rooms as owls. An authoritative room server keeps every owl in sync over hibernating WebSockets, and the turnstiles let an owl in once its ticket scans. Visits, room stays, collectibles and ticket events all become rows.</p>
+                            <ul class="flow__tools" aria-label="Tools"><li>TypeScript</li><li>Phaser 3</li><li>WebSockets</li></ul>
+                        </section>
+                        <section class="flow__panel" id="owl-park-flow-panel-4" aria-labelledby="owl-park-flow-tab-4">
+                            <p class="flow__panel-title"><span class="flow__panel-kind">4 · Load</span> Outbox to Supabase</p>
+                            <p class="flow__note">Each event is written to an outbox in the same step as the action it records, then sent in batches. A failed send retries later, and event ids make a row sent twice land once. Visitors leave as salted hashes, never names or emails.</p>
+                            <ul class="flow__tools" aria-label="Tools"><li>Durable Objects</li><li>Supabase Edge Functions</li></ul>
+                        </section>
+                        <section class="flow__panel" id="owl-park-flow-panel-5" aria-labelledby="owl-park-flow-tab-5">
+                            <p class="flow__panel-title"><span class="flow__panel-kind">5 · Model</span> Analytics schema</p>
+                            <p class="flow__note">Rows land in a <code>game</code> schema shaped for analysis: a type 2 player dimension, where each change to an owl's kind or color opens a new version, beside session, room-visit and purchase fact tables.</p>
+                            <ul class="flow__tools" aria-label="Tools"><li>PostgreSQL (Supabase)</li><li>SQL</li></ul>
+                        </section>
+                        <section class="flow__panel" id="owl-park-flow-panel-6" aria-labelledby="owl-park-flow-tab-6">
+                            <p class="flow__panel-title"><span class="flow__panel-kind">6 · Serve</span> Views for product questions</p>
+                            <p class="flow__note">SQL views answer the questions a park owner asks: minutes and bounce rate per room, free versus paid visitors and when a free visitor converts, each order's status, and lifetime value per owl.</p>
+                            <ul class="flow__tools" aria-label="Tools"><li>SQL views</li></ul>
+                        </section>
+                    </div>
+                    <p class="flow__source"><a href="https://github.com/lmansf/Welcome-to-Owl-Park/blob/main/docs/ARCHITECTURE.md" target="_blank" rel="noopener">Read the architecture doc on GitHub ↗</a></p>
+                </figure>
             </div>
         </section>
 
@@ -304,5 +439,6 @@
     </footer>
 
     <script defer src="/assets/transition.min.js"></script>
+    <script defer src="/assets/pipeline.min.js"></script>
 </body>
 </html>

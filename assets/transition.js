@@ -6,7 +6,8 @@
  * (focus returns to the burger when the menu is dismissed),
  * scroll + focus on navigation (to the `#hash` target when the link names
  * one, e.g. /projects#fraud, otherwise the top of the page), and
- * back/forward (popstate, hash preserved).
+ * back/forward (popstate, hash preserved; hash-only changes are left to the
+ * browser so in-page links do not re-swap the page).
  * ───────────────────────────────────────────────────────────── */
 
 function normalizeInternalPath(url) {
@@ -102,6 +103,7 @@ async function navigateTo(url, options = {}) {
             }
 
             document.title = newTitle;
+            navigateTo.renderedPath = normalizeInternalPath(url);
 
             if (updateHistory) {
                 history.pushState({}, newTitle, url);
@@ -205,6 +207,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     closeSiteNav();
+    navigateTo.renderedPath = normalizeInternalPath(window.location.pathname);
 
     document.body.addEventListener('click', (e) => {
         // Burger toggle
@@ -258,6 +261,12 @@ document.addEventListener('DOMContentLoaded', () => {
 
     window.addEventListener('popstate', async () => {
         const path = normalizeInternalPath(window.location.pathname);
+        // Hash-only changes (in-page links such as "See how it flows", or
+        // back/forward between hashes on the same page) also fire popstate.
+        // The page is already rendered, so leave the browser's native hash
+        // scroll (and the target's scroll-margin) to do the work instead of
+        // re-fetching and re-swapping <main>, which would reset its state.
+        if (path === navigateTo.renderedPath) return;
         if (isTransitionPage(path)) {
             await navigateTo(path + window.location.hash, { updateHistory: false });
             return;
