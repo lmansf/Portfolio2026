@@ -103,14 +103,14 @@
                 <article class="project project--featured" id="fraud">
                     <div class="project__body">
                         <div class="project__head">
-                            <p class="project__eyebrow">Data engineering</p>
+                            <p class="project__eyebrow">Data engineering · Fraud analytics</p>
                             <span class="project__date">2026</span>
                         </div>
-                        <h3 class="project__title">Fraud Detection Pipeline</h3>
-                        <p class="project__desc">A scheduled Databricks job simulates an hour of Owl Park webstore checkouts, normal guests plus five kinds of fraud episode (card testing, stolen-card resale, gift-card cash-out, account takeover, fraud rings), scores every order with a rules model, simulates the issuer&rsquo;s response with a fail-open timeout, and writes four raw tables to Supabase in one transaction. Ground-truth labels arrive days later, like a chargeback. A daily dashboard tracks catch rate, false positives, decline rate, and fail-open exposure.</p>
-                        <ul class="project__tags"><li>Databricks</li><li>Python</li><li>Supabase / Postgres</li><li>SQL</li></ul>
+                        <h3 class="project__title">Fraud Detection Pipeline <span class="project__badge project__badge--live">Running</span></h3>
+                        <p class="project__desc">Fraud teams live between two numbers that pull against each other: fraud caught and good customers turned away. This pipeline makes both measurable. A scheduled Databricks job simulates a window of Owl Park webstore checkouts, normal guests plus five fraud patterns (card testing, stolen-card resale, gift-card cash-out, account takeover, fraud rings), scores every order with a baseline rules model, simulates the checkout response with a 150&nbsp;ms fail-open timeout, and writes four raw landing tables to Supabase Postgres in one transaction. Fraud labels arrive 5 to 60 days later, the way chargebacks do. It has run on a schedule since mid-October; by early November, across about 39,000 simulated orders, the baseline flagged about half of the fraud without flagging a single legitimate order. That is the bar a trained model has to clear.</p>
+                        <ul class="project__tags"><li>Databricks</li><li>Python</li><li>PostgreSQL (Supabase)</li><li>SQL</li></ul>
                         <div class="project__links">
-                            <a class="project__link" href="https://github.com/lmansf/fraud-detection-pipeline" target="_blank" rel="noopener">View on GitHub ↗</a>
+                            <a class="project__link" href="https://github.com/lmansf/fraud-detection-pipeline/tree/claude/sweet-curie-3pzt7j" target="_blank" rel="noopener">View on GitHub ↗</a>
                         </div>
                     </div>
                 </article>
@@ -118,14 +118,15 @@
                 <article class="project project--featured" id="owl-park">
                     <div class="project__body">
                         <div class="project__head">
-                            <p class="project__eyebrow">Multiplayer web app</p>
+                            <p class="project__eyebrow">Product analytics · Multiplayer web app</p>
                             <span class="project__date">2026</span>
                         </div>
-                        <h3 class="project__title">Owl Park</h3>
-                        <p class="project__desc">A virtual owl park you visit online. Every visitor is an owl: tap to walk through 2D rooms and see everyone else there in real time. A Vite + TypeScript + Phaser client talks to an authoritative room server on Cloudflare Workers and Durable Objects (hibernating WebSockets), with quests, collectibles, a shop, and ticketing on top. Unit tests, Playwright end-to-end runs on desktop and phone, and a bot swarm for load.</p>
-                        <ul class="project__tags"><li>TypeScript</li><li>Phaser 3</li><li>Cloudflare Workers</li><li>Durable Objects</li><li>Playwright</li></ul>
+                        <h3 class="project__title">Owl Park <span class="project__badge project__badge--live">Live</span></h3>
+                        <p class="project__desc">A live online owl park, built so its sales and visitor behavior are real data to model. Visitors walk 2D rooms as owls and see each other in real time: a TypeScript and Phaser client talks to an authoritative room server on Cloudflare Workers and Durable Objects. Tickets sell through Shopify at the park&rsquo;s turnstiles; a signed webhook issues each ticket and its first scan starts the clock. Every visit, room stay, collectible and ticket event lands in a Supabase analytics schema: a type 2 player dimension, session, room-visit and purchase facts, and views for time per room, bounce rate, spectator-to-paid conversion and lifetime value. Built with AI coding and QA agents working from a ticket board, with every merge, deploy and price change signed off by hand.</p>
+                        <ul class="project__tags"><li>TypeScript</li><li>Cloudflare Workers</li><li>Shopify</li><li>PostgreSQL (Supabase)</li><li>SQL</li></ul>
                         <div class="project__links">
-                            <a class="project__link" href="https://github.com/lmansf/Welcome-to-Owl-Park" target="_blank" rel="noopener">View on GitHub ↗</a>
+                            <a class="project__link" href="https://exploreowlpark.com" target="_blank" rel="noopener">Visit the park ↗</a>
+                            <a class="project__link" href="https://github.com/lmansf/Welcome-to-Owl-Park" target="_blank" rel="noopener">GitHub ↗</a>
                         </div>
                     </div>
                 </article>
