@@ -24,6 +24,7 @@ from __future__ import annotations
 import argparse
 import base64
 import io
+import os
 import pathlib
 import tempfile
 import urllib.request
@@ -50,9 +51,10 @@ TAN = "#c4a07c"
 CHESTNUT = "#7a3f1f"
 FAWN = "#dcc8b2"
 
+GOOGLE_FONTS_SHA = "2fe1e8c6b137fb13041a7cfca6fdcd8a910ea4dc"
 FONT_URLS = {
-    "Fraunces.ttf": "https://raw.githubusercontent.com/google/fonts/main/ofl/fraunces/Fraunces%5BSOFT,WONK,opsz,wght%5D.ttf",
-    "Figtree.ttf": "https://raw.githubusercontent.com/google/fonts/main/ofl/figtree/Figtree%5Bwght%5D.ttf",
+    "Fraunces.ttf": f"https://raw.githubusercontent.com/google/fonts/{GOOGLE_FONTS_SHA}/ofl/fraunces/Fraunces%5BSOFT,WONK,opsz,wght%5D.ttf",
+    "Figtree.ttf": f"https://raw.githubusercontent.com/google/fonts/{GOOGLE_FONTS_SHA}/ofl/figtree/Figtree%5Bwght%5D.ttf",
 }
 
 
@@ -106,7 +108,12 @@ def load_fonts(font_dir: pathlib.Path | None):
         for name, url in FONT_URLS.items():
             dest = font_dir / name
             if not dest.exists():
-                urllib.request.urlretrieve(url, dest)
+                part = dest.with_name(f"{name}.{os.getpid()}.part")
+                try:
+                    urllib.request.urlretrieve(url, part)
+                    os.replace(part, dest)
+                finally:
+                    part.unlink(missing_ok=True)
     fr = font_dir / "Fraunces.ttf"
     fg = font_dir / "Figtree.ttf"
     plain = {"SOFT": 0, "WONK": 0}
@@ -130,7 +137,7 @@ def monogram(f, cx: float, cy: float, box: float, small: bool = False) -> str:
     """Cream 'LM' centred on (cx, cy), sized to sit inside a `box`-wide area."""
     face = f["mark_small"] if small else f["mark"]
     tracking = 0.0 if small else -0.02
-    size = box * (0.62 if small else 0.50)
+    size = box * 0.50
     w = face.width("LM", size, tracking)
     cap = face.cap_height(size)
     rule = not small
