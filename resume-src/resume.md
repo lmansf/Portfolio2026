@@ -9,8 +9,8 @@ IT systems analyst who owns the ticketing and webstore platforms behind ZooTampa
 
 ## Skills
 
-**Analytics and Business Intelligence (BI):** SQL, Power BI, Tableau, Excel, dashboards and KPI reporting, data modeling, statistical modeling, forecasting
-**Data Engineering:** Python (pandas, scikit-learn, LightGBM, XGBoost), DuckDB, Databricks, Microsoft Fabric, PostgreSQL (Supabase), ETL/ELT pipelines
+**Analytics and Business Intelligence (BI):** SQL, Power BI, Excel, dashboards and KPI reporting, data modeling, statistical modeling, forecasting
+**Data Engineering:** Python (pandas, scikit-learn, XGBoost), DuckDB, Databricks, Spark SQL / PySpark, Microsoft Fabric, PostgreSQL (Supabase), ETL/ELT pipelines
 **Systems and Platforms:** Gateway Galaxy 8 and eGalaxy ticketing/webstore, PAR Pixel point of sale (POS), HTML, CSS, JavaScript
 **Business Analysis:** requirements gathering, SOP documentation, stakeholder reporting, POS hardware inventory and maintenance
 
@@ -44,8 +44,8 @@ Excel Esports | London, UK | Aug 2019 - Jul 2022
 **Quack Query** | DuckDB-Wasm, Vercel serverless, LLM APIs | quack-query.vercel.app | github.com/lmansf/Quack-Query
 - Built a browser-based natural-language-to-SQL tool on in-browser DuckDB: an LLM writes one read-only query from automatic table profiles and join-key hints, validated on server and client; the public endpoint is rate-limited, locked against file and network access, and withholds personal-data columns from the model.
 
-**Attendance Forecasting** | Python, LightGBM, XGBoost, scikit-learn | github.com/lmansf/Attendance-Projections
-- Forecast daily theme park attendance from weather, calendar, and flight features; a LightGBM, ridge, and random forest blend selected by rolling-origin cross-validation beat a tuned XGBoost by about 6% MAE out of fold and cut mean bias from +90 to -7 guests per day.
+**Attendance Forecasting** | Python, XGBoost, scikit-learn | github.com/lmansf/Attendance-Projections
+- Forecast daily theme park attendance from weather, calendar, and flight features; a gradient-boosted tree, ridge, and random forest blend selected by rolling-origin cross-validation beat a tuned XGBoost by about 6% MAE out of fold and cut mean bias from +90 to -7 guests per day.
 
 **Lighthouse** | Rust, Tauri, DataFusion, on-device OCR and embeddings | lhvault.app | github.com/lmansf/lighthouse
 - Shipped a local-first desktop app (v0.15) that answers questions about a small set of files with citations; a question over a spreadsheet becomes one read-only SQL query, shown verbatim and run by DataFusion.
