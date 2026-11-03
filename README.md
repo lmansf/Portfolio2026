@@ -225,6 +225,10 @@ part of it:
 - **`llms.txt`** — a short, factual plain-text summary (role, employer,
   education, certification, pages, profiles) for AI answer engines. Keep it
   in sync with the structured data and the résumé.
+- **`google5a7a5bd196df69a0.html`** — Google Search Console's HTML-file
+  ownership check for the `https://loganmansfield.org/` URL-prefix property.
+  Google re-checks it, so keep it at the root, byte-for-byte as downloaded,
+  and out of `sitemap.xml`.
 
 Framing rule for all of the above: the day job is systems ownership (Galaxy
 ticketing, eGalaxy webstores, PAR Pixel POS, vendors, park-wide POS
