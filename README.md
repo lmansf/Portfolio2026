@@ -9,7 +9,7 @@ HTML/CSS/JS, no build step, deployed on Vercel.
 A deliberately lean two-page site, plus a SQL playground, a live data page,
 and one archived project page:
 
-- **Home** (`index.html`, `/`) — intro, availability and contact buttons
+- **Home** (`index.html`, `/`) — intro and contact buttons
   (résumé PDF, email, LinkedIn, GitHub), a three-line "now" strip, three
   featured projects, an experience timeline, credentials (B.S. Biology, Towson)
   and a toolkit grouped into data stack / forecasting & ML / platforms run at
