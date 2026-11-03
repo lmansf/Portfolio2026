@@ -194,7 +194,7 @@
                             <span class="project__date">2026</span>
                         </div>
                         <h3 class="project__title">Quack Query</h3>
-                        <p class="project__desc">Ask a data file questions in plain English. Files load into DuckDB running as WebAssembly and never leave the browser; an LLM writes one read-only SQL query from table profiles and join-key hints, checked on server and client and shown beside the results. Personal-data columns are withheld from the model.</p>
+                        <p class="project__desc">Ask a data file questions in plain English: an LLM writes one read-only SQL query and DuckDB runs it in your browser.</p>
                         <ul class="project__tags"><li>DuckDB-Wasm</li><li>SQL</li><li>LLM APIs</li></ul>
                         <div class="project__links">
                             <a class="project__link" href="https://quack-query.vercel.app" target="_blank" rel="noopener">Open the live app ↗</a>
@@ -210,9 +210,10 @@
                             <span class="project__date">2026</span>
                         </div>
                         <h3 class="project__title">Fraud Detection Pipeline</h3>
-                        <p class="project__desc">A scheduled Databricks job simulates webstore checkouts, normal guests plus five fraud patterns, scores every order, and lands four raw tables in Supabase in one transaction, with fraud labels arriving days later like chargebacks. In its first weeks (mid-October to early November 2026), the baseline rules model flagged about half the fraud and no legitimate orders.</p>
+                        <p class="project__desc">Scores simulated webstore checkouts into Supabase. Its baseline rules flagged about half the fraud and no legitimate orders.</p>
                         <ul class="project__tags"><li>Databricks</li><li>Python</li><li>Supabase</li><li>SQL</li></ul>
                         <div class="project__links">
+                            <a class="project__link" href="/projects#fraud-flow" data-flow-open="fraud-flow">How the data flows</a>
                             <a class="project__link" href="/live">Live numbers →</a>
                             <a class="project__link" href="https://github.com/lmansf/fraud-detection-pipeline/tree/claude/sweet-curie-3pzt7j" target="_blank" rel="noopener">GitHub ↗</a>
                         </div>
@@ -226,10 +227,11 @@
                             <span class="project__date">2026</span>
                         </div>
                         <h3 class="project__title">Owl Park</h3>
-                        <p class="project__desc">A live online owl park where visitors walk 2D rooms as owls and see each other in real time, on a room server at the edge (Cloudflare Workers). Tickets sell through Shopify, and every visit and ticket event lands in a Supabase analytics schema with views for time per room, conversion and lifetime value.</p>
+                        <p class="project__desc">A live multiplayer owl park with Shopify tickets; every visit and sale lands in Supabase for analysis.</p>
                         <ul class="project__tags"><li>Cloudflare Workers</li><li>Shopify</li><li>Supabase</li></ul>
                         <div class="project__links">
                             <a class="project__link" href="https://exploreowlpark.com" target="_blank" rel="noopener">Visit the park ↗</a>
+                            <a class="project__link" href="/projects#owl-park-flow" data-flow-open="owl-park-flow">How the data flows</a>
                             <a class="project__link" href="https://github.com/lmansf/Welcome-to-Owl-Park" target="_blank" rel="noopener">GitHub ↗</a>
                         </div>
                     </div>
