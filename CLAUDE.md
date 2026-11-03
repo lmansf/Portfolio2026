@@ -26,7 +26,7 @@ origin the page loads from must be added to that header. Its data file and
 safety limits are described in the README's "SQL playground data" section.
 
 Search/share metadata (head tags, JSON-LD, `sitemap.xml`, `robots.txt`,
-`llms.txt`, `assets/og-card.jpg`) is documented in the README's "Search and
+`llms.txt`, `assets/share-card.jpg`, the favicon set) is documented in the README's "Search and
 sharing metadata" section. When a page's head or facts change, bump that
 page's `<lastmod>` in `sitemap.xml` and keep `llms.txt` and the Person
 JSON-LD consistent with each other and with the résumé.

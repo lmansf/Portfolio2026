@@ -137,13 +137,22 @@ soft and tappable things are pills.
   data page only (see "Live fraud data" below); `data/fraud-snapshot.json`
   is the aggregate snapshot it draws from, rewritten by a GitHub Action.
 - `assets/profilepicture.webp` — circular hero avatar on the home page.
-- `assets/crow.png`, `assets/favicon-crow.png`, `mini.jpg` — the crow mark
-  (painted via CSS mask), favicon, and alternate (JPEG) icon.
-- `assets/og-card.jpg` — 1200×630 share card (generated from the profile
-  picture) used as `og:image` on every page, with `summary_large_image`
-  Twitter cards.
-- `assets/apple-touch-icon.png`, `assets/icon-192.png`, `assets/icon-512.png`
-  — home-screen icons referenced from `manifest.json`.
+- `assets/crow.png` — the crow mark in the top bar and footer (painted via
+  CSS mask).
+- Site icon and share card, all built by `scripts/build_brand_images.py`
+  (Fraunces + Figtree text drawn as outlines, Barn Owl palette; see the
+  script's docstring for its pip packages). Rerun it rather than editing
+  the images by hand:
+  - `favicon.ico` (16/32/48 px, at the root because crawlers ask for
+    `/favicon.ico`), `assets/favicon.svg` — the "LM" monogram on a
+    creamy-blue tile.
+  - `assets/apple-touch-icon.png` (180 px), `assets/icon-192.png`,
+    `assets/icon-512.png`, `assets/icon-maskable-512.png` — home-screen
+    icons referenced from `manifest.json`.
+  - `assets/share-card.jpg` — 1200×627 (LinkedIn's size) share card with
+    the profile picture, used as `og:image` and `twitter:image` on every
+    page, with `summary_large_image` Twitter cards. LinkedIn caches
+    previews; refresh one with LinkedIn's Post Inspector after a change.
 - `assets/loganmansfield.pdf` — résumé served from the site. Every résumé
   link opens it in a new tab (`target="_blank"`) rather than forcing a
   download.
@@ -208,7 +217,7 @@ Everything lives in the page `<head>` and a few root files — body copy is not
 part of it:
 
 - **Head tags** — every page (404 included) has a unique `<title>`, meta
-  description, Open Graph tags, the shared `og:image` card, and
+  description, Open Graph tags, the shared `og:image` / `twitter:image` card (`assets/share-card.jpg`), and
   `summary_large_image` Twitter cards (`@StatBird`); the four content pages
   also set `author`, `og:site_name` and `og:locale`. The home page is
   `og:type` `profile` (with `profile:first_name` / `profile:last_name`); the
