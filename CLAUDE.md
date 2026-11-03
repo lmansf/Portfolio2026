@@ -34,8 +34,9 @@ JSON-LD consistent with each other and with the résumé.
 The résumé (`assets/loganmansfield.pdf` and `assets/resume_ats.txt`) is
 generated, not hand-edited: change `resume-src/resume.md` and run
 `python3 resume-src/build.py` (reportlab + Carlito; see the README's
-"Assets" section). It must stay one Letter page. Content rules: B.S.
-Biology, Towson (2019) leads education; no dbt, CRM ownership, UAT, or
+"Assets" section). It must stay one Letter page. Content rules: the B.S.
+Biology (Towson, 2019) is hidden for now at Logan's request (restore steps in
+the README's "Hidden for now" section); no sticky-navigation claim; no dbt, CRM ownership, UAT, or
 M365/D365 admin; titles and dates unchanged; LinkedIn is `in/lmansf96`.
 
 The `/live` page (`live.html`, `assets/live.*`) is fed by

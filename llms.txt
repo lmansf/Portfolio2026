@@ -9,7 +9,6 @@ This is Logan Mansfield's own site. There are other people named Logan Mansfield
 - Current role: IT Point of Sale Systems Analyst, ZooTampa at Lowry Park (since November 2024)
 - Earlier roles: Guest Engagement Guide, then Coordinator, ZooTampa (2022 to 2024); Data Analyst, Excel Esports (2019 to 2022)
 - Certifications: Microsoft Certified: Power BI Data Analyst Associate (PL-300); LearnSQL.com SQL Certification of Competency
-- Education: Bachelor of Science in Biology, Towson University
 - Portfolio tools: SQL, Python, Power BI, Microsoft Fabric, DuckDB, Databricks, Spark SQL / PySpark
 - Location: Tampa, Florida, USA
 

@@ -11,7 +11,8 @@ and one archived project page:
 
 - **Home** (`index.html`, `/`) — intro and contact buttons
   (résumé PDF, email, LinkedIn, GitHub), a three-line "now" strip, three
-  featured projects, an experience timeline, credentials (B.S. Biology, Towson)
+  featured projects, an experience timeline, credentials (certifications; the
+  degree line is hidden for now, see "Hidden for now" below)
   and a toolkit grouped into data stack / forecasting & ML / platforms run at
   ZooTampa, a short about, and the fastest ways to connect.
 - **Projects** (`projects.html`, `/projects`) — featured: Quack Query (the
@@ -215,15 +216,15 @@ part of it:
 - **Structured data (JSON-LD)** — the home page carries a `WebSite`,
   `ProfilePage`, and `Person` graph: given/family name, both job titles
   (IT Point of Sale Systems Analyst at ZooTampa at Lowry Park, and Data
-  Analyst), `worksFor`, `hasOccupation`, `alumniOf`, `hasCredential`
-  (certifications and degree), `knowsAbout`, and `sameAs` profile links —
+  Analyst), `worksFor`, `hasOccupation`, `hasCredential`
+  (certifications; `alumniOf` and the degree are hidden for now), `knowsAbout`, and `sameAs` profile links —
   enough to disambiguate from other people with the same name. Projects,
   SQL Playground, Owl Park and Live data are `WebPage`s that reference the
   home `#person` / `#website` ids and carry `BreadcrumbList`s.
 - **`sitemap.xml`** / **`robots.txt`** — the four public URLs; bump each
   `<lastmod>` when its page changes.
 - **`llms.txt`** — a short, factual plain-text summary (role, employer,
-  education, certification, pages, profiles) for AI answer engines. Keep it
+  certification, pages, profiles) for AI answer engines. Keep it
   in sync with the structured data and the résumé.
 - **`google5a7a5bd196df69a0.html`** — Google Search Console's HTML-file
   ownership check for the `https://loganmansfield.org/` URL-prefix property.
@@ -235,6 +236,24 @@ ticketing, eGalaxy webstores, PAR Pixel POS, vendors, park-wide POS
 hardware); SQL/Python/Power BI are portfolio and analyst skills. Don't claim
 anything Logan hasn't confirmed (no CRM ownership, UAT, M365/D365
 admin, or dbt as a skill).
+
+### Hidden for now: the degree
+
+At Logan's request (Nov 2026) the B.S. in Biology (Towson University, 2019)
+is hidden everywhere it showed. To bring it back:
+
+1. **Résumé** — in `resume-src/resume.md`, delete the `<!--` and `-->`
+   lines around the degree, move its two lines under the heading, rename the
+   heading back to `## Education and Certifications`, and run
+   `python3 resume-src/build.py`.
+2. **Home page** — in `index.html`, uncomment the `section-note` line under
+   Credentials, and add back to the Person JSON-LD:
+   `"alumniOf": { "@type": "CollegeOrUniversity", "name": "Towson University", "url": "https://www.towson.edu/" },`
+   and, last in `hasCredential`:
+   `{ "@type": "EducationalOccupationalCredential", "credentialCategory": "degree", "name": "Bachelor of Science in Biology", "recognizedBy": { "@type": "CollegeOrUniversity", "name": "Towson University" } }`
+3. **`llms.txt`** — add `- Education: Bachelor of Science in Biology, Towson University`
+   back under Key facts, after Certifications.
+4. Bump the home `<lastmod>` in `sitemap.xml`.
 
 ## Live fraud data (`/live`)
 
