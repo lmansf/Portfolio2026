@@ -258,6 +258,17 @@ left exactly as it was.
   DuckDB's working memory is capped at 256 MB. On a Save-Data connection
   opening the console doesn't download DuckDB (about 7 MB); the first Run
   does.
+- **Tables panel.** The Tables button lists every table with a one-line note
+  and its columns (read from `information_schema` once DuckDB is up); tapping
+  a name previews ten rows. Notes live in `TABLE_NOTES` in `console.js`, and
+  any table in `HIDDEN_TABLES` stays out of the list.
+- **Friendly errors.** DuckDB's message is turned into a plain title, a hint
+  (a near-miss table, column, function or keyword, or the clause order) and,
+  where it helps, a working example with a "Try this instead" button. The raw
+  message stays one tap away under "DuckDB's own message".
+- **Skip SQL.** The bar's Skip SQL button hides the console entirely and
+  remembers it (`sqlc-off`); a "Show the SQL console" link in the footer
+  brings it back.
 
 Files: `assets/console.js` (UI; imports `assets/sql-engine.js`, the DuckDB
 loader, and is bundled with it into `console.min.js`) and
