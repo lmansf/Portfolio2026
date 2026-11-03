@@ -148,11 +148,17 @@ soft and tappable things are pills.
     creamy-blue tile.
   - `assets/apple-touch-icon.png` (180 px), `assets/icon-192.png`,
     `assets/icon-512.png`, `assets/icon-maskable-512.png` — home-screen
-    icons referenced from `manifest.json`.
+    icons referenced from `manifest.json` (which also lists
+    `favicon.svg`; the PNGs are `any` icons and the maskable one keeps
+    the mark inside the safe zone). Every page links `/favicon.ico`,
+    `favicon.svg`, the apple-touch icon and the manifest in its `<head>`.
   - `assets/share-card.jpg` — 1200×627 (LinkedIn's size) share card with
     the profile picture, used as `og:image` and `twitter:image` on every
-    page, with `summary_large_image` Twitter cards. LinkedIn caches
-    previews; refresh one with LinkedIn's Post Inspector after a change.
+    page, with `summary_large_image` Twitter cards. The pages also state
+    its type, width, height and alt text, and the home page's JSON-LD
+    names it as `primaryImageOfPage`, so update those if the card's size
+    or wording changes. LinkedIn caches previews; refresh one with
+    LinkedIn's Post Inspector after a change.
 - `assets/loganmansfield.pdf` — résumé served from the site. Every résumé
   link opens it in a new tab (`target="_blank"`) rather than forcing a
   download.
@@ -217,11 +223,14 @@ Everything lives in the page `<head>` and a few root files — body copy is not
 part of it:
 
 - **Head tags** — every page (404 included) has a unique `<title>`, meta
-  description, Open Graph tags, the shared `og:image` / `twitter:image` card (`assets/share-card.jpg`), and
-  `summary_large_image` Twitter cards (`@StatBird`); the four content pages
-  also set `author`, `og:site_name` and `og:locale`. The home page is
-  `og:type` `profile` (with `profile:first_name` / `profile:last_name`); the
-  others are `website`.
+  description, Open Graph tags, the shared `og:image` / `twitter:image`
+  card (`assets/share-card.jpg`, with `og:image:type` / `width` / `height`
+  / `alt` and `twitter:image:alt`), `summary_large_image` Twitter cards
+  (`@StatBird`), and the icon links (`/favicon.ico`, `assets/favicon.svg`,
+  apple-touch icon, `manifest.json`); the content pages (all but 404) also
+  set `author`, `og:site_name` and `og:locale`. The home page is `og:type`
+  `profile` (with `profile:first_name` / `profile:last_name`); the others
+  are `website`.
 - **Structured data (JSON-LD)** — the home page carries a `WebSite`,
   `ProfilePage`, and `Person` graph: given/family name, both job titles
   (IT Point of Sale Systems Analyst at ZooTampa at Lowry Park, and Data
@@ -229,8 +238,10 @@ part of it:
   (certifications; `alumniOf` and the degree are hidden for now), `knowsAbout`, and `sameAs` profile links —
   enough to disambiguate from other people with the same name. Projects,
   SQL Playground, Owl Park and Live data are `WebPage`s that reference the
-  home `#person` / `#website` ids and carry `BreadcrumbList`s.
-- **`sitemap.xml`** / **`robots.txt`** — the four public URLs; bump each
+  home `#person` / `#website` ids and carry `BreadcrumbList`s. The home
+  `ProfilePage` points `primaryImageOfPage` at the share card and carries
+  a `dateModified` to bump alongside `sitemap.xml`.
+- **`sitemap.xml`** / **`robots.txt`** — the five public URLs; bump each
   `<lastmod>` when its page changes.
 - **`llms.txt`** — a short, factual plain-text summary (role, employer,
   certification, pages, profiles) for AI answer engines. Keep it
