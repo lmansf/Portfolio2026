@@ -354,7 +354,7 @@
 /* Hidden once pipeline.js has moved the diagrams into modals. */
 [data-flow-fallback][hidden] { display: none; }
 
-html:has(dialog.flow-dialog[open]) { overflow: hidden; }
+html:has(dialog.flow-dialog[open]) { overflow: hidden; scrollbar-gutter: stable; }
 
 .flow-dialog {
     position: fixed;
@@ -382,6 +382,7 @@ html:has(dialog.flow-dialog[open]) { overflow: hidden; }
 .flow-dialog[open]::backdrop { animation: flow-backdrop-in var(--dur-base) var(--ease-out); }
 
 .flow-dialog__body {
+    flex: 1 1 auto;
     overflow-y: auto;
     overscroll-behavior: contain;
     padding: clamp(1.15rem, 3vw, 1.6rem);

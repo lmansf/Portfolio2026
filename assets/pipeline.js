@@ -21,7 +21,8 @@
  * The native modal dialog makes the page behind it inert (focus stays in
  * it) and closes on Esc; a click on the backdrop closes it too, and focus
  * goes back to the button that opened it. A /projects#<figure id> address
- * opens that diagram's modal on load.
+ * opens that diagram's modal on load; closing that one moves focus to the
+ * diagram's card (or the page heading) instead.
  *
  * transition.js swaps the contents of <main> on in-site navigation (it
  * does not bring the new page's <head>), so this script is loaded on
@@ -180,7 +181,12 @@
             }
             var back = opener;
             opener = null;
-            if (back && document.documentElement.contains(back)) back.focus();
+            if (back && document.documentElement.contains(back)) { back.focus(); return; }
+            var card = document.getElementById(id.replace(/-flow$/, '')) || document.querySelector('main h1');
+            if (!card) return;
+            if (!card.hasAttribute('tabindex')) card.setAttribute('tabindex', '-1');
+            card.focus({ preventScroll: true });
+            card.scrollIntoView({ block: 'start' });
         });
         main.appendChild(dialog);
         return dialog;
@@ -210,16 +216,28 @@
         if (!dialog || typeof dialog.showModal !== 'function') return Promise.reject(new Error('no dialog'));
         if (dialog.open) return Promise.resolve();
         var body = dialog.querySelector('.flow-dialog__body');
-        var ready = body.querySelector('[data-flow]') ? Promise.resolve() : findFigure(id).then(function (fig) {
-            body.appendChild(fig);
-            ensureStyles();
-            setup(fig);
-        });
+        var ready;
+        if (body.querySelector('[data-flow]')) {
+            ready = Promise.resolve();
+        } else if (dialog.flowLoading) {
+            ready = dialog.flowLoading;
+        } else {
+            ready = dialog.flowLoading = findFigure(id).then(function (fig) {
+                dialog.flowLoading = null;
+                if (body.querySelector('[data-flow]')) return;
+                body.appendChild(fig);
+                ensureStyles();
+                setup(fig);
+            }, function (err) {
+                dialog.flowLoading = null;
+                throw err;
+            });
+        }
         if (from) from.setAttribute('aria-busy', 'true');
         return ready.then(function () {
             if (from) from.removeAttribute('aria-busy');
             if (!document.documentElement.contains(dialog) || dialog.open) return;
-            opener = from || document.activeElement;
+            opener = from || null;
             dialog.showModal();
             var close = dialog.querySelector('.flow-dialog__close');
             if (close) close.focus();
