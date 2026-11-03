@@ -44,6 +44,9 @@ and one archived project page:
 - **Live data** (`live.html`, `/live`) — daily numbers from the fraud
   pipeline (see "Live fraud data" below).
 - **404** (`404.html`) — branded not-found page.
+- **SQL console** (`assets/console.js`, on Home and Projects) — a slim bar
+  docked along the bottom of the page that opens into a DuckDB SQL editor
+  over the site's own data. See "SQL console" below.
 
 Clean URLs (`/projects`, `/playground`, `/owl-park`, `/live`), the `/resume`
 shortcut to the résumé PDF, and legacy redirects (e.g. `/fraud` →
@@ -196,6 +199,52 @@ The pages load the minified `.min` variants. After editing any source asset,
 regenerate its minified file:
 
     npx esbuild <src> --minify --outfile=<min> --allow-overwrite
+
+## SQL console
+
+The site doubles as a small database. A bar docked along the bottom of Home
+and Projects ("SQL console · This site is a database. Query it.") opens into
+an editor; nothing loads until a visitor opens it, so the default view is the
+same fast static page, and every card and link works with the console closed
+or without JavaScript.
+
+- **Nav as queries.** While the console is open, the top nav's Home and
+  Projects links type that page's query (`SELECT * FROM resume;`,
+  `SELECT * FROM projects ORDER BY featured DESC, sort_order;`) and run it
+  instead of swapping the page. The Résumé link always opens the PDF.
+- **Results as cards.** A result is drawn with the site's own components
+  when its columns fit one (`title` + `summary`/`eyebrow`/`tags` → project
+  cards, `role` + `org` → the experience timeline, `name` + `headline` → a
+  profile card, `skill` → toolkit chips, `credential` → credential chips),
+  with a Table view, CSV download, and a link to the full page. Anything else
+  is a table. Values are written with `textContent`, and card links are only
+  ever `https://` addresses, `mailto:` or this site's own paths.
+- **Tables.** `projects`, `experience`, `skills`, `credentials`, `resume`
+  (built from the pages, below) plus the playground's synthetic `park_days`,
+  `orders`, `order_items`, `products`.
+- **Open state** is remembered in `localStorage` (`sqlc-open`), so a visitor
+  who opened it keeps it open from page to page.
+
+Files: `assets/console.js` (UI; imports `assets/sql-engine.js`, the DuckDB
+loader, and is bundled with it into `console.min.js`) and
+`assets/console.css` (loaded by the script itself). Rebuild after editing:
+
+    esbuild assets/console.js --bundle --format=esm --minify --outfile=assets/console.min.js --allow-overwrite
+    esbuild assets/console.css --minify --outfile=assets/console.min.css --allow-overwrite
+
+The site tables live in `data/console/site.sql`, generated from
+`index.html` and `projects.html` so the console never says something the
+pages don't. After changing a project card, the experience timeline, the
+toolkit, credentials or the hero, rerun:
+
+    python3 scripts/build_console_data.py          # rewrite site.sql
+    python3 scripts/build_console_data.py --check  # fails if it's stale
+
+`sql-engine.js` attaches the playground file READ_ONLY, runs `site.sql` into
+the tab's memory, puts both on the search path, then switches off
+extensions and external access and locks the configuration (the same lock
+as the playground). Visitors can change the site tables in their own tab;
+a reload restores them.
 
 ## SQL playground data
 

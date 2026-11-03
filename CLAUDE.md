@@ -37,6 +37,14 @@ Content-Security-Policy from `vercel.json`: no inline scripts, and any new
 origin the page loads from must be added to that header. Its data file and
 safety limits are described in the README's "SQL playground data" section.
 
+The docked SQL console (`assets/console.js` + `assets/sql-engine.js`,
+bundled into `console.min.js`; `assets/console.css`) runs DuckDB in the
+browser over `data/console/site.sql`, which `scripts/build_console_data.py`
+generates from `index.html` and `projects.html`: rerun it whenever card,
+timeline, toolkit or hero copy changes (`--check` fails when it's stale). The
+console must stay collapsed by default and never block or replace the static
+pages: everything works with it closed. See the README's "SQL console".
+
 Search/share metadata (head tags, JSON-LD, `sitemap.xml`, `robots.txt`,
 `llms.txt`, `assets/share-card.jpg`, the favicon set) is documented in the README's "Search and
 sharing metadata" section. When a page's head or facts change, bump that
