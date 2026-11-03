@@ -261,8 +261,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
     window.addEventListener('popstate', async () => {
         const path = normalizeInternalPath(window.location.pathname);
-        // Hash-only changes (in-page links such as "See how it flows", or
-        // back/forward between hashes on the same page) also fire popstate.
+        // Hash-only changes (in-page #hash links, such as the no-JS "How the
+        // data flows" links, or back/forward between hashes on the same
+        // page) also fire popstate.
         // The page is already rendered, so leave the browser's native hash
         // scroll (and the target's scroll-margin) to do the work instead of
         // re-fetching and re-swapping <main>, which would reset its state.

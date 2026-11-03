@@ -33,8 +33,8 @@ and one archived project page:
   repo, so update the diagram when the pipeline changes.
   Cards have anchor ids (`#fraud`, `#owl-park`, `#quack-query`, …) so the home
   page and legacy redirects can deep-link to them. The home page repeats the
-  three featured cards in shorter form, so keep the two in step when editing
-  card copy.
+  three featured cards with the same synopses (minus the status badges), so
+  keep the two in step when editing card copy.
 - **SQL Playground** (`playground.html`, `/playground`) — an in-browser SQL
   box: DuckDB-Wasm (pinned, from jsDelivr, loaded only on this page) over
   synthetic Owl Park ticket and webstore data, with starter queries, a
@@ -76,8 +76,9 @@ soft and tappable things are pills.
   between pages that share `shell.css` (e.g. to and from 404) fade via the
   cross-document `@view-transition` opt-in in `shell.css`, which has to sit in
   a render-blocking stylesheet. The very first load from elsewhere paints
-  immediately so the hero is on screen at once. In-page `#hash` links are left to the browser rather than re-swapping
-  `<main>`. Dismissing the mobile nav (Escape, backdrop, burger) returns focus
+  immediately so the hero is on screen at once. In-page `#hash` links are
+  left to the browser rather than re-swapping `<main>`. Dismissing the
+  mobile nav (Escape, backdrop, burger) returns focus
   to the burger, whose label toggles Open/Close navigation.
 - `assets/pipeline.css` / `assets/pipeline.js` — the clickable pipeline
   diagrams (`[data-flow]` figures on Projects). The script turns each one into
@@ -94,8 +95,11 @@ soft and tappable things are pills.
   returns to the button), a full-screen sheet under 640px, no animation under
   reduced motion. On Home it fetches the diagram from `/projects.html` the
   first time a button is pressed, so the diagram markup lives in one place;
-  if that fails the button goes to the Projects anchor instead. The button
-  style (`.project__link--button`) is in `pages.css` so it never flashes
+  if that fails the button goes to the Projects anchor instead. Closing a
+  modal stops "Play the flow" and drops a `#fraud-flow` / `#owl-park-flow`
+  hash from the address. In a browser without `<dialog>` the links and the
+  fallback section stay as they are. The button style
+  (`.project__link--button`) is in `pages.css` so it never flashes
   unstyled.
 - `assets/motion.js` / `assets/motion.css` — the walking owl and scroll
   reveals, loaded with one deferred script tag on Home, Projects, Live,

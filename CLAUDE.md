@@ -20,6 +20,18 @@ in its reserved lane above the footer (it must never cover content or
 buttons), keep every animation off or static under `prefers-reduced-motion`,
 and leave the "Hide owl" choice in localStorage working.
 
+The three featured project synopses (Quack Query, Fraud Detection Pipeline,
+Owl Park) are the same text on Home and `/projects` and stay at about two
+short lines each; the detail lives in the "How the data flows" diagrams.
+Their markup exists once, in the fallback section at the end of
+`projects.html`'s `<main>`: `assets/pipeline.js` opens each diagram in a
+modal `<dialog>` from the card's "How the data flows" link (Home fetches the
+figure from `/projects.html`), hides the section, and leaves the plain links
+and section for no-JS and browsers without `<dialog>`. Keep each link's
+`data-flow-open` equal to its figure id, keep the modal keyboard- and
+reduced-motion-safe, and edit the diagrams only in `projects.html`. See the
+README's "Site structure" and "Assets" sections.
+
 `playground.html` (the DuckDB-Wasm SQL playground) is served with a
 Content-Security-Policy from `vercel.json`: no inline scripts, and any new
 origin the page loads from must be added to that header. Its data file and

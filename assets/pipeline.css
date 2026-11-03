@@ -1,10 +1,12 @@
 /* ─────────────────────────────────────────────────────────────
- * pipeline.css — clickable pipeline diagrams on /projects.
+ * pipeline.css — clickable pipeline diagrams on /projects (and, in their
+ * modals, on Home).
  *
  *   .flow            one diagram (a <figure>)
  *   .flow__stages    the stages, in order (becomes a tablist via pipeline.js)
  *   .flow__node      one stage's button
  *   .flow__panel     what happens at a stage, and the tools used
+ *   .flow-dialog     the modal <dialog> a diagram opens in (end of file)
  *
  * Phone and tablet: stages stack down a rail. 880px and up: one row, left to right.
  * Stages before the selected one stay lit, so the data reads as having
