@@ -242,10 +242,10 @@ admin, or dbt as a skill).
 At Logan's request (Nov 2026) the B.S. in Biology (Towson University, 2019)
 is hidden everywhere it showed. To bring it back:
 
-1. **Résumé** — in `resume-src/resume.md`, delete the `<!--` and `-->`
-   lines around the degree, move its two lines under the heading, rename the
-   heading back to `## Education and Certifications`, and run
-   `python3 resume-src/build.py`.
+1. **Résumé** — in `resume-src/resume.md`, delete the three-line `<!--`
+   note above the degree and the `-->` line below it, move the two degree
+   lines under the heading, rename the heading back to
+   `## Education and Certifications`, and run `python3 resume-src/build.py`.
 2. **Home page** — in `index.html`, uncomment the `section-note` line under
    Credentials, and add back to the Person JSON-LD:
    `"alumniOf": { "@type": "CollegeOrUniversity", "name": "Towson University", "url": "https://www.towson.edu/" },`
