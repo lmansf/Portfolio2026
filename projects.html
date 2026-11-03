@@ -112,7 +112,7 @@
                         </div>
                         <h3 class="project__title">Quack Query <span class="project__badge project__badge--live">Live</span></h3>
                         <p class="project__desc">Ask a data file questions in plain English. CSV, Excel, Parquet, or JSON files load into DuckDB running as WebAssembly, so files never leave the browser. A serverless function has an LLM write one read-only SQL query from automatic table profiles and join-key hints; the query is checked on server and client, run locally, and shown beside the results. Personal-data columns are withheld from the model, and the public endpoint has a request guard, per-IP rate limiting, and a locked-down engine. A 50/50 A/B test compares a single-query prompt with a multi-step variant on thumbs-up rate, success rate, and latency.</p>
-                        <ul class="project__tags"><li>DuckDB-Wasm</li><li>SQL</li><li>TypeScript</li><li>LLM APIs</li></ul>
+                        <ul class="project__tags"><li>DuckDB-Wasm</li><li>SQL</li><li>LLM APIs</li></ul>
                         <div class="project__links">
                             <a class="project__link" href="https://quack-query.vercel.app" target="_blank" rel="noopener">Open the live app ↗</a>
                             <a class="project__link" href="https://github.com/lmansf/Quack-Query" target="_blank" rel="noopener">GitHub ↗</a>
@@ -145,7 +145,7 @@
                         </div>
                         <h3 class="project__title">Owl Park <span class="project__badge project__badge--live">Live</span></h3>
                         <p class="project__desc">A live online owl park, built so its sales and visitor behavior are real data to model. Visitors walk 2D rooms as owls and see each other in real time through an authoritative room server on Cloudflare Workers and Durable Objects. Tickets sell through Shopify, and every visit, room stay and ticket event lands in a Supabase analytics schema with views for time per room, conversion and lifetime value. Built with AI coding and QA agents, with every merge, deploy and price change signed off by hand.</p>
-                        <ul class="project__tags"><li>TypeScript</li><li>Cloudflare Workers</li><li>Shopify</li><li>PostgreSQL (Supabase)</li><li>SQL</li></ul>
+                        <ul class="project__tags"><li>Cloudflare Workers</li><li>Shopify</li><li>PostgreSQL (Supabase)</li><li>SQL</li></ul>
                         <div class="project__links">
                             <a class="project__link" href="https://exploreowlpark.com" target="_blank" rel="noopener">Visit the park ↗</a>
                             <a class="project__link" href="#owl-park-flow">See how it flows ↓</a>
@@ -265,7 +265,7 @@
                         <section class="flow__panel" id="owl-park-flow-panel-3" aria-labelledby="owl-park-flow-tab-3">
                             <p class="flow__panel-title"><span class="flow__panel-kind">3 · Capture</span> The park itself</p>
                             <p class="flow__note">Visitors walk the rooms as owls. An authoritative room server keeps every owl in sync over hibernating WebSockets, and the turnstiles let an owl in once its ticket scans. Visits, room stays, collectibles and ticket events all become rows.</p>
-                            <ul class="flow__tools" aria-label="Tools"><li>TypeScript</li><li>Phaser 3</li><li>WebSockets</li></ul>
+                            <ul class="flow__tools" aria-label="Tools"><li>Phaser 3</li><li>WebSockets</li></ul>
                         </section>
                         <section class="flow__panel" id="owl-park-flow-panel-4" aria-labelledby="owl-park-flow-tab-4">
                             <p class="flow__panel-title"><span class="flow__panel-kind">4 · Load</span> Outbox to Supabase</p>

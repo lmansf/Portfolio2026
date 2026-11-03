@@ -36,7 +36,7 @@ Fraud Detection Pipeline | Databricks, Python, PostgreSQL (Supabase), SQL | gith
 - Built a scheduled Databricks job that simulates webstore checkouts (normal guests plus five fraud patterns), scores every order with a baseline rules model, and lands four raw tables in Supabase, with fraud labels arriving days to weeks later like chargebacks.
 - Across about 39,000 simulated orders, the baseline flagged about half the fraud and no legitimate orders: the bar a trained model has to clear.
 
-Quack Query | TypeScript, DuckDB-Wasm, Vercel serverless, LLM APIs | quack-query.vercel.app | github.com/lmansf/Quack-Query
+Quack Query | DuckDB-Wasm, Vercel serverless, LLM APIs | quack-query.vercel.app | github.com/lmansf/Quack-Query
 - Built a browser-based natural-language-to-SQL tool on in-browser DuckDB: an LLM writes one read-only query from automatic table profiles and join-key hints, validated on server and client; the public endpoint is rate-limited, locked against file and network access, and withholds personal-data columns from the model.
 
 Attendance Forecasting | Python, LightGBM, XGBoost, scikit-learn | github.com/lmansf/Attendance-Projections
