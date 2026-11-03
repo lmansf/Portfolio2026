@@ -18,6 +18,8 @@ Markdown subset understood by this script:
   - text            bullet
   **bold** text     inline bold anywhere
   blank line        paragraph break (no extra space is added)
+  <!-- ... -->       comment, may span lines; skipped entirely (used to hide
+                    content for now while keeping it in the source)
 """
 
 import os
@@ -109,6 +111,7 @@ def build(base_size=10.0):
     seen_name = False
     header_lines = 0
     after_section = False
+    in_comment = False
 
     def txt_break():
         if txt and txt[-1] and not after_section:
@@ -134,6 +137,9 @@ def build(base_size=10.0):
 
     for raw in lines:
         line = raw.rstrip()
+        if in_comment or line.lstrip().startswith("<!--"):
+            in_comment = "-->" not in line
+            continue
         if not line:
             flush_bullets()
             continue

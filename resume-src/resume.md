@@ -20,7 +20,7 @@ IT systems analyst who owns the ticketing and webstore platforms behind ZooTampa
 ZooTampa at Lowry Park | Tampa, FL | Nov 2024 - Present
 - Own the Gateway Galaxy 8 ticketing platform and eGalaxy webstores (product and pricing configuration, monitoring, vendor escalation), the systems behind the Zoo's admissions and membership revenue.
 - Built 9 new premium animal-experience products and an admission-inclusive bundle in the ticketing and webstore systems; all still on sale.
-- Designed, implemented, and monitored webstore upsells: add-on offers, a membership upsell tile, sticky navigation, and announcement ribbons built in custom HTML, CSS, and JavaScript.
+- Designed, implemented, and monitored webstore upsells: add-on offers, a membership upsell tile, and announcement ribbons built in custom HTML, CSS, and JavaScript.
 - Administer two POS platforms (PAR Pixel, Galaxy) and a fleet of about 90 terminals: inventory, maintenance, replacements.
 - Gather requirements from front-line departments for platform changes and provide tier 1-2 POS hardware and software support.
 
@@ -50,9 +50,13 @@ Excel Esports | London, UK | Aug 2019 - Jul 2022
 **Lighthouse** | Rust, Tauri, DataFusion, on-device OCR and embeddings | lhvault.app | github.com/lmansf/lighthouse
 - Shipped a local-first desktop app (v0.15) that answers questions about a small set of files with citations; a question over a spreadsheet becomes one read-only SQL query, shown verbatim and run by DataFusion.
 
-## Education and Certifications
-
+<!-- Degree hidden for now (Nov 2026). To restore: delete these three note
+lines and the closing arrow line, move the two degree lines under the heading,
+and rename it back to "## Education and Certifications" (see README).
 **Bachelor of Science (B.S.), Biology**, Towson University | 2019
 Coursework in biostatistics and field research methods at Towson University and the University of South Florida
+-->
+## Certifications
+
 Microsoft Certified: Power BI Data Analyst Associate (PL-300)
 LearnSQL.com SQL Certification of Competency | Microsoft Fabric in a Day Workshop
