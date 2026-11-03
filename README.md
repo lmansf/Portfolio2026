@@ -22,11 +22,15 @@ and one archived project page:
   then Lighthouse, Attendance Forecasting, USL Attendance Forecasting, Roll
   Call, Attendance Nowcast, Member Segmentation (RFM), and two retired cards:
   eFrog (code only, no live link) and the archived Owl Park data architecture.
-  Between the featured cards and the rest, "How the data flows" holds a
-  clickable pipeline diagram for the Fraud Detection Pipeline (`#fraud-flow`)
-  and Owl Park (`#owl-park-flow`); those two featured cards link down to
-  their own. Every stage note is checked against that project's public repo,
-  so update the diagram when the pipeline changes.
+  Featured synopses are kept to about two short lines; the detail lives in
+  the diagrams. The clickable pipeline diagrams for the Fraud Detection
+  Pipeline (`#fraud-flow`) and Owl Park (`#owl-park-flow`) sit in a "How the
+  data flows" section at the end of `<main>`, and each of those two featured
+  cards (on Home too) has a "How the data flows" link that `pipeline.js`
+  turns into a button opening its diagram in a modal; with JS the section is
+  hidden, without JS the links jump to it. `/projects#fraud-flow` opens that
+  modal on load. Every stage note is checked against that project's public
+  repo, so update the diagram when the pipeline changes.
   Cards have anchor ids (`#fraud`, `#owl-park`, `#quack-query`, …) so the home
   page and legacy redirects can deep-link to them. The home page repeats the
   three featured cards in shorter form, so keep the two in step when editing
@@ -72,8 +76,7 @@ soft and tappable things are pills.
   between pages that share `shell.css` (e.g. to and from 404) fade via the
   cross-document `@view-transition` opt-in in `shell.css`, which has to sit in
   a render-blocking stylesheet. The very first load from elsewhere paints
-  immediately so the hero is on screen at once. In-page `#hash` links (the
-  cards' "See how it flows") are left to the browser rather than re-swapping
+  immediately so the hero is on screen at once. In-page `#hash` links are left to the browser rather than re-swapping
   `<main>`. Dismissing the mobile nav (Escape, backdrop, burger) returns focus
   to the burger, whose label toggles Open/Close navigation.
 - `assets/pipeline.css` / `assets/pipeline.js` — the clickable pipeline
@@ -86,6 +89,14 @@ soft and tappable things are pills.
   list, styled by a `<noscript>` copy of the stylesheet link. The page
   preloads the stylesheet; the script applies it, and adds it after an
   in-site swap from Home (which is why Home loads the script too).
+  The same script runs the "How the data flows" modals: a native modal
+  `<dialog>` (page behind inert, Esc closes, a backdrop click closes, focus
+  returns to the button), a full-screen sheet under 640px, no animation under
+  reduced motion. On Home it fetches the diagram from `/projects.html` the
+  first time a button is pressed, so the diagram markup lives in one place;
+  if that fails the button goes to the Projects anchor instead. The button
+  style (`.project__link--button`) is in `pages.css` so it never flashes
+  unstyled.
 - `assets/motion.js` / `assets/motion.css` — the walking owl and scroll
   reveals, loaded with one deferred script tag on Home, Projects, Live,
   Playground and 404. The script adds `motion.min.css` as an external

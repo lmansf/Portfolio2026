@@ -397,6 +397,22 @@ main.page > * { min-width: 0; }
     transition: border-color var(--dur-fast) var(--ease-out);
 }
 .project__link:hover { border-bottom-color: var(--accent); }
+/* "How the data flows": a link that pipeline.js turns into a modal button. */
+.project__link--button {
+    appearance: none;
+    background: none;
+    border: 0;
+    border-bottom: 1px solid color-mix(in srgb, var(--accent) 30%, transparent);
+    border-radius: 0;
+    padding: 0;
+    font: inherit;
+    font-weight: 600;
+    font-size: 0.9rem;
+    line-height: inherit;
+    color: var(--accent-ink);
+    cursor: pointer;
+}
+.project__link--button[aria-busy="true"] { cursor: progress; opacity: 0.7; }
 .project__badge {
     display: inline-block;
     font-family: var(--font-text);

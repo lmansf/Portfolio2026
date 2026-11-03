@@ -12,6 +12,17 @@
  * Stages before the selected one are marked data-state="past" so the CSS
  * lights the path the data has taken.
  *
+ * Each diagram opens in a modal <dialog> from its card's "How the data
+ * flows" link ([data-flow-open="<figure id>"]), which this script turns
+ * into a button. On Projects the diagrams sit in a fallback section at the
+ * end of <main> ([data-flow-fallback]) that is hidden here; on Home the
+ * diagram is fetched from /projects.html the first time it is opened.
+ * Without JS the links still work: they jump to the fallback section.
+ * The native modal dialog makes the page behind it inert (focus stays in
+ * it) and closes on Esc; a click on the backdrop closes it too, and focus
+ * goes back to the button that opened it. A /projects#<figure id> address
+ * opens that diagram's modal on load.
+ *
  * transition.js swaps the contents of <main> on in-site navigation (it
  * does not bring the new page's <head>), so this script is loaded on
  * Home as well as Projects (the two pages it swaps between), adds
@@ -130,11 +141,143 @@
         document.head.appendChild(link);
     }
 
+    /* ── Modals ── */
+    var opener = null;
+
+    function stopPlaying(flow) {
+        var btn = flow && flow.querySelector('[data-flow-play][aria-pressed="true"]');
+        if (btn) btn.click();
+    }
+
+    function dialogFor(id) {
+        var dialog = document.getElementById(id + '-dialog');
+        if (dialog) return dialog;
+        var main = document.querySelector('main');
+        if (!main) return null;
+        dialog = document.createElement('dialog');
+        dialog.className = 'flow-dialog';
+        dialog.id = id + '-dialog';
+        dialog.setAttribute('aria-modal', 'true');
+        dialog.setAttribute('aria-labelledby', id + '-title');
+        var close = document.createElement('button');
+        close.type = 'button';
+        close.className = 'flow-dialog__close';
+        close.setAttribute('aria-label', 'Close');
+        close.setAttribute('autofocus', '');
+        close.innerHTML = '<span aria-hidden="true">&times;</span>';
+        close.addEventListener('click', function () { dialog.close(); });
+        var body = document.createElement('div');
+        body.className = 'flow-dialog__body';
+        dialog.appendChild(close);
+        dialog.appendChild(body);
+        // A click that lands on the <dialog> itself, not on its contents, is
+        // a click on the backdrop.
+        dialog.addEventListener('click', function (e) { if (e.target === dialog) dialog.close(); });
+        dialog.addEventListener('close', function () {
+            stopPlaying(dialog.querySelector('[data-flow]'));
+            if (location.hash === '#' + id && history.replaceState) {
+                history.replaceState(history.state, '', location.pathname + location.search);
+            }
+            var back = opener;
+            opener = null;
+            if (back && document.documentElement.contains(back)) back.focus();
+        });
+        main.appendChild(dialog);
+        return dialog;
+    }
+
+    // The figure, from this page or (on Home) from /projects.html.
+    var fetched = null;
+    function findFigure(id) {
+        var here = document.getElementById(id);
+        if (here) return Promise.resolve(here);
+        if (!window.fetch || !window.DOMParser) return Promise.reject(new Error('no fetch'));
+        if (!fetched) {
+            fetched = fetch('/projects.html', { credentials: 'same-origin' })
+                .then(function (r) { if (!r.ok) throw new Error(r.status); return r.text(); })
+                .then(function (html) { return new DOMParser().parseFromString(html, 'text/html'); })
+                .catch(function (err) { fetched = null; throw err; });
+        }
+        return fetched.then(function (doc) {
+            var fig = doc.getElementById(id);
+            if (!fig || !fig.hasAttribute('data-flow')) throw new Error('missing ' + id);
+            return document.importNode(fig, true);
+        });
+    }
+
+    function openFlow(id, from) {
+        var dialog = dialogFor(id);
+        if (!dialog || typeof dialog.showModal !== 'function') return Promise.reject(new Error('no dialog'));
+        if (dialog.open) return Promise.resolve();
+        var body = dialog.querySelector('.flow-dialog__body');
+        var ready = body.querySelector('[data-flow]') ? Promise.resolve() : findFigure(id).then(function (fig) {
+            body.appendChild(fig);
+            ensureStyles();
+            setup(fig);
+        });
+        if (from) from.setAttribute('aria-busy', 'true');
+        return ready.then(function () {
+            if (from) from.removeAttribute('aria-busy');
+            if (!document.documentElement.contains(dialog) || dialog.open) return;
+            opener = from || document.activeElement;
+            dialog.showModal();
+            var close = dialog.querySelector('.flow-dialog__close');
+            if (close) close.focus();
+            body.scrollTop = 0;
+        }, function (err) {
+            if (from) from.removeAttribute('aria-busy');
+            throw err;
+        });
+    }
+
+    // Swap each "How the data flows" link for a real button (it opens a
+    // dialog, it doesn't go anywhere); if the diagram can't be shown, go to
+    // the link's address after all.
+    function upgradeTriggers() {
+        Array.prototype.forEach.call(document.querySelectorAll('a[data-flow-open]'), function (link) {
+            var id = link.getAttribute('data-flow-open');
+            var href = link.getAttribute('href');
+            var btn = document.createElement('button');
+            btn.type = 'button';
+            btn.className = link.className + ' project__link--button';
+            btn.setAttribute('data-flow-open', id);
+            btn.setAttribute('aria-haspopup', 'dialog');
+            btn.textContent = link.textContent;
+            btn.addEventListener('click', function () {
+                openFlow(id, btn).catch(function () { window.location.href = href; });
+            });
+            link.parentNode.replaceChild(btn, link);
+        });
+    }
+
+    function hideFallback() {
+        if (typeof HTMLDialogElement !== 'function') return;
+        Array.prototype.forEach.call(document.querySelectorAll('[data-flow-fallback]'), function (s) { s.hidden = true; });
+    }
+
+    function openFromHash() {
+        var id = location.hash.slice(1);
+        if (!id || !/^[a-z0-9-]+$/i.test(id)) return;
+        var fig = document.getElementById(id);
+        if (!fig || !fig.hasAttribute('data-flow') || fig.hasAttribute('data-flow-shown')) return;
+        if (!fig.closest('[data-flow-fallback]')) return;
+        fig.setAttribute('data-flow-shown', '');
+        var dialog = dialogFor(id);
+        if (!dialog) return;
+        dialog.querySelector('.flow-dialog__body').appendChild(fig);
+        openFlow(id, null).catch(function () {});
+    }
+
     function init() {
         var flows = document.querySelectorAll('[data-flow]');
-        if (!flows.length) return;
+        var triggers = document.querySelectorAll('[data-flow-open]');
+        if (!flows.length && !triggers.length) return;
         ensureStyles();
         Array.prototype.forEach.call(flows, setup);
+        if (typeof HTMLDialogElement !== 'function') return;
+        upgradeTriggers();
+        hideFallback();
+        openFromHash();
     }
 
     if (wide && wide.addEventListener) wide.addEventListener('change', orientAll);

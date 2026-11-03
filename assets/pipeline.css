@@ -345,3 +345,105 @@
     .flow__stage::before { transition: none; }
     .flow.is-ready .flow__panel { animation: none; }
 }
+
+/* ─────────────────────────────────────────────────────────────
+ * The diagrams open in a modal <dialog> from each featured card's
+ * "How the data flows" button (pipeline.js). Phones get a full-screen
+ * sheet; wider screens a centered panel. The page behind can't scroll.
+ * ───────────────────────────────────────────────────────────── */
+/* Hidden once pipeline.js has moved the diagrams into modals. */
+[data-flow-fallback][hidden] { display: none; }
+
+html:has(dialog.flow-dialog[open]) { overflow: hidden; }
+
+.flow-dialog {
+    position: fixed;
+    inset: 0;
+    margin: auto;
+    width: min(1040px, calc(100vw - 2rem));
+    max-width: none;
+    max-height: calc(100dvh - 2rem);
+    padding: 0;
+    border: 1px solid var(--hairline);
+    border-radius: var(--r-lg);
+    background: var(--surface-1);
+    color: var(--ink-1);
+    box-shadow: var(--shadow-lg);
+    overflow: hidden;
+}
+.flow-dialog[open] {
+    display: flex;
+    flex-direction: column;
+    animation: flow-dialog-in var(--dur-base) var(--ease-out);
+}
+.flow-dialog::backdrop {
+    background: rgba(27, 20, 15, 0.55);
+}
+.flow-dialog[open]::backdrop { animation: flow-backdrop-in var(--dur-base) var(--ease-out); }
+
+.flow-dialog__body {
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    padding: clamp(1.15rem, 3vw, 1.6rem);
+}
+
+/* Inside the dialog the diagram drops its own card. */
+.flow-dialog .flow {
+    background: transparent;
+    border: 0;
+    box-shadow: none;
+    padding: 0;
+}
+.flow-dialog .flow__head { padding-right: 3rem; }
+
+.flow-dialog__close {
+    position: absolute;
+    top: 0.6rem;
+    right: 0.6rem;
+    z-index: 2;
+    display: grid;
+    place-items: center;
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    border: 1px solid var(--hairline-strong);
+    background: var(--surface-1);
+    color: var(--ink-1);
+    font: inherit;
+    font-size: 1.5rem;
+    line-height: 1;
+    cursor: pointer;
+    transition: background var(--dur-fast) var(--ease-out);
+}
+.flow-dialog__close:hover { background: var(--surface-2); }
+.flow-dialog__close:focus-visible { border-radius: 50%; }
+
+@keyframes flow-dialog-in {
+    from { opacity: 0; transform: translateY(10px) scale(0.985); }
+    to   { opacity: 1; transform: none; }
+}
+@keyframes flow-backdrop-in {
+    from { opacity: 0; }
+    to   { opacity: 1; }
+}
+
+/* Phones: a full-screen sheet that slides up. */
+@media (max-width: 639px) {
+    .flow-dialog {
+        width: 100vw;
+        height: 100dvh;
+        max-height: 100dvh;
+        border: 0;
+        border-radius: 0;
+    }
+    @keyframes flow-dialog-in {
+        from { transform: translateY(24px); opacity: 0; }
+        to   { transform: none; opacity: 1; }
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .flow-dialog[open],
+    .flow-dialog[open]::backdrop { animation: none; }
+    .flow-dialog__close { transition: none; }
+}
