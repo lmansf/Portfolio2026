@@ -182,7 +182,7 @@ def share_card_svg(f, photo_png: bytes) -> str:
             "pipelines, models, and dashboards that turn raw",
             "operational data into decisions."]
     body_size = 26
-    while max(f["text"].width(l, body_size) for l in body) > maxw:
+    while max(f["text"].width(line, body_size) for line in body) > maxw:
         body_size -= 0.5
     url, url_size = "loganmansfield.org", 32
 
@@ -208,8 +208,8 @@ def share_card_svg(f, photo_png: bytes) -> str:
         # photo with the site's creamy-blue avatar ring
         f'<circle cx="{pcx}" cy="{pcy}" r="{pr + 16}" fill="{SURFACE_1}"/>',
         f'<circle cx="{pcx}" cy="{pcy}" r="{pr + 12}" fill="{ACCENT_SOFT}"/>',
-        f'<image x="{pcx - pr}" y="{pcy - pr}" width="{2 * pr}" height="{2 * pr}" clip-path="url(#pc)" '
-        f'preserveAspectRatio="xMidYMid slice" xlink:href="data:image/png;base64,{photo}"/>',
+        (f'<image x="{pcx - pr}" y="{pcy - pr}" width="{2 * pr}" height="{2 * pr}" clip-path="url(#pc)" '
+         f'preserveAspectRatio="xMidYMid slice" xlink:href="data:image/png;base64,{photo}"/>'),
         # text column
         f'<path fill="{INK_1}" d="{f["display"].path(name, x, y_name, name_size, -0.01)}"/>',
         f'<rect x="{x}" y="{y_rule}" width="92" height="6" rx="3" fill="{TAN}"/>',
