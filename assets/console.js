@@ -13,14 +13,25 @@
  *     cards (project cards, the experience timeline, chips), with a Table
  *     view and a link to the full page.
  *   - Editable: change any query and run it again (Ctrl or ⌘ + Enter).
+ *   - Tables: a button in the editor bar lists every table with a one-line
+ *     note (TABLE_NOTES) and its columns, read from information_schema once
+ *     DuckDB is up; tapping a name previews ten rows. HIDDEN_TABLES keeps a
+ *     table out of the list (the Easter egg hunt will use it).
+ *   - Friendly errors: friendlyError() turns DuckDB's message into a plain
+ *     title, a hint and, where it helps, a working example with a "Try this
+ *     instead" button; the raw message stays under a <details>.
+ *   - Skip SQL: a button on the bar hides the console entirely (the pages
+ *     don't need it); a "Show the SQL console" button in the footer brings
+ *     it back, and is put back whenever transition.js swaps the footer.
  *   - Everything runs on the visitor's device; nothing they type is sent
  *     anywhere. Results are written with textContent, and card links only
  *     ever point at https:// addresses, mailto: or this site's own paths.
  *     A card's "How the data flows" link opens the diagram's modal through
  *     the page's own trigger (pipeline.js), as the page's card does.
  *
- * Whether the console is open is remembered in localStorage (per visitor,
- * best effort: it starts collapsed when storage is unavailable).
+ * Whether the console is open (sqlc-open) or skipped (sqlc-off) is
+ * remembered in localStorage (per visitor, best effort: it starts collapsed
+ * and shown when storage is unavailable).
  * ───────────────────────────────────────────────────────────── */
 
 import { createEngine, toObjects, eachRow, getCell, formatValue, isNumericType, cleanError, formatMs, csvCell, MAX_ROWS_KEPT, QUERY_TIMEOUT_MS } from './sql-engine.js';
@@ -699,6 +710,13 @@ function editDistance(a, b) {
     return dp[a.length][b.length];
 }
 
+/**
+ * Turn DuckDB's error text into { title, hint, example? } for the error box.
+ * `tables` and `columns` are the names read from information_schema (lower
+ * case columns), used to confirm DuckDB's own "Did you mean" and to keep a
+ * typo hint from flagging a real name; `sqlText` is the query, scanned for a
+ * misspelled keyword when the parser trips one word later (FORM projects).
+ */
 export function friendlyError(raw, tables = [], sqlText = '', columns = []) {
     const listTables = tables.length ? `Tables you can use: ${tables.join(', ')}.` : 'Open Tables to see what you can query.';
     let m;

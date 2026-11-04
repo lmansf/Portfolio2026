@@ -47,7 +47,13 @@ copy changes (`--check` fails when it's stale, and the `Console data`
 workflow runs that check in CI). `sql-engine.js` pins the same DuckDB-Wasm
 version as `playground.js`; bump both together. The console must stay
 collapsed by default and never block or replace the static pages:
-everything works with it closed. See the README's "SQL console".
+everything works with it closed, and with it hidden by the bar's Skip SQL
+button (`sqlc-off` in localStorage; the footer's "Show the SQL console"
+link brings it back and must keep working, so leave `.footer-socials` in
+the footer markup). A table added to the console data (the generator or
+`extra.sql`) gets a one-line note in `TABLE_NOTES` or goes in
+`HIDDEN_TABLES` (the Easter egg hook) in `console.js`. See the README's
+"SQL console".
 
 Search/share metadata (head tags, JSON-LD, `sitemap.xml`, `robots.txt`,
 `llms.txt`, `assets/share-card.jpg`, the favicon set) is documented in the README's "Search and
