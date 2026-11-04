@@ -7,7 +7,9 @@
 # an allow-list of fields, and commits it whenever the file changed (it
 # always does, because generated_at moves, so each run publishes a fresh
 # timestamp and the page's staleness notice stays truthful). The commit to
-# main makes Vercel redeploy the site with the new file.
+# main makes Vercel redeploy the site with the new file. The nightly Data
+# run (data-run.yml) reads the committed file at 06:15 UTC and fails its
+# freshness checks on /status when it is more than 36 hours old.
 #
 # Needs one repository secret, FRAUD_DB_URL: the Supabase "Session pooler"
 # connection string (IPv4; GitHub runners can't reach the IPv6-only direct

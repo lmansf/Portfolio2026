@@ -1,7 +1,7 @@
 # The site's nightly data run (scripts/data_run.py): pulls every source (the
 # site pages, the fraud snapshot, public GitHub activity), rebuilds the site
 # tables, runs every data test in data/pipeline/models.json, and writes the
-# run log that /status and the SQL source trust badges read.
+# run log that /status reads.
 #
 # Nightly and after a merge that touches the pipeline it commits what it
 # wrote to main (the push redeploys the site). A failed check is data, not a

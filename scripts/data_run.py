@@ -29,8 +29,7 @@ writes; a pull request runs it as a dry run.
    caption's default query still returns what its page shows.
 4. Log. data/pipeline/run-log.json keeps the latest run in full (sources,
    tables, every check, and which checks each caption's piece depends on)
-   and a short history of the last 30 runs. /status and the trust badges
-   beside each SQL source read it.
+   and a short history of the last 30 runs. /status reads it.
 
 Exit status: 0 when the run finished, whatever its checks found (failures
 are data, logged and shown on /status); 1 when a definition is broken (a
@@ -471,7 +470,7 @@ def main():
                 "failed": [c["id"] for c in checks if c["status"] != "pass"]}]
     history += [h for h in previous.get("history", []) if h.get("id") != run["id"]][:HISTORY - 1]
     log = {"_about": "Written by scripts/data_run.py on every data run. latest is the newest run in full; "
-                     "history is the last 30 runs, newest first. /status and the SQL source trust badges read it.",
+                     "history is the last 30 runs, newest first. /status reads it.",
            "latest": run, "history": history}
 
     out = summary_markdown(run)
