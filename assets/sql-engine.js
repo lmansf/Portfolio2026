@@ -13,6 +13,9 @@
  *     from /data/fraud-snapshot.json, the same aggregates-only file the /live
  *     page draws (totals, one row per day, the score histogram, catch rate
  *     by pattern; never an order, card or person),
+ *   - builds github_activity and github_repos (data/pipeline/github-tables.json)
+ *     from /data/pipeline/github.json, the nightly data run's pull of public
+ *     GitHub activity,
  *   - puts both on the search path, so `FROM projects` and `FROM orders`
  *     both work,
  *   - switches off extension install/autoload and all external access
@@ -28,6 +31,7 @@
  * ───────────────────────────────────────────────────────────── */
 
 import snapshotTables from '../data/console/snapshot-tables.json';
+import githubTables from '../data/pipeline/github-tables.json';
 
 export const DUCKDB_VERSION = '1.29.0';
 const DUCKDB_ESM = `https://cdn.jsdelivr.net/npm/@duckdb/duckdb-wasm@${DUCKDB_VERSION}/+esm`;
@@ -35,6 +39,7 @@ const PARK_FILE = 'owl_park.duckdb';
 const PARK_URL = `/data/playground/${PARK_FILE}.gz`;
 const SITE_SQL_URL = '/data/console/site.sql';
 const FRAUD_URL = '/data/fraud-snapshot.json';
+const GITHUB_URL = '/data/pipeline/github.json';
 
 /**
  * The fraud_* tables: exactly the snapshot fields named in
@@ -42,9 +47,10 @@ const FRAUD_URL = '/data/fraud-snapshot.json';
  * from the file. scripts/build_sql_sources.py builds the same tables to check
  * the /live default queries.
  */
-export const SNAPSHOT_TABLES = Object.fromEntries(
-    Object.entries(snapshotTables).filter(([name]) => !name.startsWith('_'))
-);
+const tableSpecs = (specs) => Object.fromEntries(Object.entries(specs).filter(([name]) => !name.startsWith('_')));
+export const SNAPSHOT_TABLES = tableSpecs(snapshotTables);
+// The public GitHub activity tables, built the same way from the data run's github.json.
+export const GITHUB_TABLES = tableSpecs(githubTables);
 
 // One snapshot value as a SQL literal, or undefined if it isn't the type
 // its column says (that row is then left out).
@@ -52,15 +58,17 @@ function literal(v, type) {
     if (v === null || v === undefined) return 'NULL';
     if (type === 'DATE') return typeof v === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(v) ? `DATE '${v}'` : undefined;
     if (type === 'VARCHAR') return typeof v === 'string' && v.length <= 80 ? `'${v.replace(/'/g, "''")}'` : undefined;
+    if (type === 'BOOLEAN') return typeof v === 'boolean' ? String(v) : undefined;
     if (typeof v !== 'number' || !Number.isFinite(v)) return undefined;
     if (type === 'INTEGER' && !Number.isInteger(v)) return undefined;
     return String(v);
 }
 
-/** SQL that creates the fraud_* tables from a parsed snapshot (empty tables for anything missing). */
-export function snapshotTablesSql(snapshot) {
+/** SQL that creates the tables in `specs` (the fraud_* tables by default) from a parsed
+ * JSON file (empty tables for anything missing). */
+export function snapshotTablesSql(snapshot, specs = SNAPSHOT_TABLES) {
     const out = [];
-    for (const [name, spec] of Object.entries(SNAPSHOT_TABLES)) {
+    for (const [name, spec] of Object.entries(specs)) {
         const part = snapshot ? snapshot[spec.snapshot] : null;
         const items = spec.one_row ? (part && typeof part === 'object' ? [part] : []) : (Array.isArray(part) ? part : []);
         const rows = [];
@@ -125,7 +133,7 @@ export function createEngine({ onStatus = () => {} } = {}) {
             });
 
             onStatus('Loading the data…');
-            const [parkBytes, siteSql, snapshot] = await Promise.all([
+            const [parkBytes, siteSql, snapshot, github] = await Promise.all([
                 fetch(PARK_URL).then((r) => {
                     if (!r.ok) throw new Error(`Couldn’t fetch the sample data (${r.status})`);
                     return r.arrayBuffer();
@@ -136,7 +144,8 @@ export function createEngine({ onStatus = () => {} } = {}) {
                 }),
                 // The live numbers are a nice extra: if they don't load, the
                 // table is just empty and everything else still works.
-                fetch(FRAUD_URL).then((r) => (r.ok ? r.json() : null)).catch(() => null)
+                fetch(FRAUD_URL).then((r) => (r.ok ? r.json() : null)).catch(() => null),
+                fetch(GITHUB_URL).then((r) => (r.ok ? r.json() : null)).catch(() => null)
             ]);
             await db.registerFileBuffer(PARK_FILE, await gunzip(new Uint8Array(parkBytes)));
 
@@ -148,6 +157,12 @@ export function createEngine({ onStatus = () => {} } = {}) {
             } catch {
                 for (const name of Object.keys(SNAPSHOT_TABLES)) await conn.query(`DROP TABLE IF EXISTS ${name}`);
                 await conn.query(snapshotTablesSql(null));
+            }
+            try {
+                await conn.query(snapshotTablesSql(github, GITHUB_TABLES));
+            } catch {
+                for (const name of Object.keys(GITHUB_TABLES)) await conn.query(`DROP TABLE IF EXISTS ${name}`);
+                await conn.query(snapshotTablesSql(null, GITHUB_TABLES));
             }
             await conn.query("SET search_path = 'memory.main,owl_park.main'");
             // Lock it down: from here a query can read the tables (and make

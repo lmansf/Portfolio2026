@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Data status · Logan Mansfield</title>
+    <meta name="description" content="How the data behind loganmansfield.org is doing: the nightly run that pulls its sources, rebuilds its tables and tests them, with every check and its result, failures included.">
+    <meta name="author" content="Logan Mansfield">
+    <meta property="og:site_name" content="Logan Mansfield">
+    <meta property="og:locale" content="en_US">
+    <meta property="og:title" content="Data status · Logan Mansfield">
+    <meta property="og:description" content="The nightly run behind this site's data: sources, tests and results, failures included.">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://loganmansfield.org/status">
+    <meta property="og:image" content="https://loganmansfield.org/assets/share-card.jpg">
+    <meta property="og:image:type" content="image/jpeg">
+    <meta property="og:image:width" content="1200">
+    <meta property="og:image:height" content="627">
+    <meta property="og:image:alt" content="Logan Mansfield, Data Analyst in Tampa, FL, moving into analytics engineering. loganmansfield.org">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:image" content="https://loganmansfield.org/assets/share-card.jpg">
+    <meta name="twitter:image:alt" content="Logan Mansfield, Data Analyst in Tampa, FL, moving into analytics engineering. loganmansfield.org">
+    <meta name="twitter:site" content="@StatBird">
+    <link rel="canonical" href="https://loganmansfield.org/status">
+    <link rel="icon" href="/favicon.ico" sizes="48x48">
+    <link rel="icon" href="/assets/favicon.svg" type="image/svg+xml">
+    <link rel="apple-touch-icon" href="/assets/apple-touch-icon.png">
+    <link rel="manifest" href="/manifest.json">
+    <meta name="theme-color" media="(prefers-color-scheme: light)" content="#fdf9f3">
+    <meta name="theme-color" media="(prefers-color-scheme: dark)" content="#1b140f">
+    <script src="/assets/theme.min.js"></script>
+    <link rel="stylesheet" href="/assets/tokens.min.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,600&amp;family=Figtree:wght@400;500;600&amp;display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/assets/shell.min.css">
+    <link rel="stylesheet" href="/assets/pages.min.css">
+    <link rel="stylesheet" href="/assets/status.min.css">
+    <link rel="preload" href="/data/pipeline/run-log.json" as="fetch" crossorigin>
+        <script>
+        window.va = window.va || function () { (window.vaq = window.vaq || []).push(arguments); };
+    </script>
+    <script defer src="/_vercel/insights/script.js"></script>
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "WebPage",
+        "@id": "https://loganmansfield.org/status#page",
+        "url": "https://loganmansfield.org/status",
+        "name": "Data status · Logan Mansfield",
+        "author": { "@id": "https://loganmansfield.org/#person" },
+        "isPartOf": { "@id": "https://loganmansfield.org/#website" },
+        "about": { "@id": "https://loganmansfield.org/#person" },
+        "breadcrumb": {
+            "@type": "BreadcrumbList",
+            "itemListElement": [
+                { "@type": "ListItem", "position": 1, "name": "Logan Mansfield", "item": "https://loganmansfield.org/" },
+                { "@type": "ListItem", "position": 2, "name": "Data status", "item": "https://loganmansfield.org/status" }
+            ]
+        }
+    }
+    </script>
+</head>
+<body>
+    <a class="skip-link" href="#main-content">Skip to content</a>
+    <div class="shell-bg" aria-hidden="true"></div>
+
+    <header class="topbar">
+        <div class="topbar__brand">
+            <a href="/"><span class="brand-mark" aria-hidden="true"><span class="crow-mark"></span></span> L. Mansfield</a>
+        </div>
+        <nav class="topnav" aria-label="Primary">
+            <a href="/">Home</a>
+            <a href="/projects">Projects</a>
+            <a href="/assets/loganmansfield.pdf" target="_blank" rel="noopener">Résumé</a>
+        </nav>
+        <button class="burger" type="button" aria-label="Open navigation" aria-expanded="false" aria-controls="site-nav" data-burger>
+            <span class="burger__bar"></span><span class="burger__bar"></span><span class="burger__bar"></span>
+        </button>
+    </header>
+
+    <nav class="site-nav" id="site-nav" aria-label="Primary navigation" aria-hidden="true" inert>
+        <div class="site-nav__backdrop" data-nav-close aria-hidden="true"></div>
+        <div class="site-nav__panel">
+            <a class="site-nav__item" href="/">Home</a>
+            <a class="site-nav__item" href="/projects">Projects</a>
+            <a class="site-nav__item" href="/assets/loganmansfield.pdf" target="_blank" rel="noopener">Résumé</a>
+        </div>
+    </nav>
+
+    <main id="main-content" class="page page-status" data-status>
+        <section class="hero" aria-labelledby="status-title">
+            <div class="hero__main">
+                <p class="eyebrow">Data status</p>
+                <h1 class="hero__name" id="status-title">The site&rsquo;s data, tested nightly.</h1>
+                <p class="hero__role">Every night one job pulls this site&rsquo;s sources, rebuilds its tables and tests them: row counts, blanks, unique keys, allowed values, totals that must add up, and how fresh each source is. This page shows the last run as it happened, failures included.</p>
+                <p class="status-summary" data-status-summary aria-live="polite">Loading the last run&hellip;</p>
+            </div>
+        </section>
+
+        <noscript>
+            <p class="section-note">This page needs JavaScript. The same results are published as <a href="/data/pipeline/run-log.json">a JSON file</a>.</p>
+        </noscript>
+        <p class="status-error" data-status-error hidden>The run log didn&rsquo;t load. Try refreshing, or read <a href="/data/pipeline/run-log.json">the JSON file</a> directly.</p>
+
+        <section aria-labelledby="status-sources" class="status-section" data-status-only hidden>
+            <header class="section-head">
+                <h2 class="section-head__title" id="status-sources">Sources</h2>
+            </header>
+            <ul class="status-sources" data-status-sources></ul>
+        </section>
+
+        <section aria-labelledby="status-checks" class="status-section" data-status-only hidden>
+            <header class="section-head">
+                <h2 class="section-head__title" id="status-checks">Checks by table</h2>
+                <span class="section-head__hint" data-status-checks-hint></span>
+            </header>
+            <div class="status-tables" data-status-tables></div>
+        </section>
+
+        <section aria-labelledby="status-history" class="status-section" data-status-only hidden>
+            <header class="section-head">
+                <h2 class="section-head__title" id="status-history">Recent runs</h2>
+            </header>
+            <ol class="status-history" data-status-history></ol>
+        </section>
+
+        <section aria-labelledby="status-how" class="status-section">
+            <header class="section-head">
+                <h2 class="section-head__title" id="status-how">How the run works</h2>
+            </header>
+            <ol class="status-steps">
+                <li><strong>Extract.</strong> Rebuild the site&rsquo;s tables from its own pages, read the fraud pipeline&rsquo;s published snapshot, and pull public activity from the GitHub API. A source that can&rsquo;t be reached keeps its last good data and fails its freshness check here.</li>
+                <li><strong>Test.</strong> Hold every table to the tests <a href="https://github.com/lmansf/Portfolio2026/blob/main/data/pipeline/models.json" target="_blank" rel="noopener">written down once</a>, check every column is described, and rerun each &ldquo;SQL source&rdquo; query to prove it still returns what its page shows.</li>
+                <li><strong>Log.</strong> <a href="https://github.com/lmansf/Portfolio2026/blob/main/.github/workflows/data-run.yml" target="_blank" rel="noopener">A scheduled GitHub Action</a> commits the results, the site redeploys, and this page reads them.</li>
+            </ol>
+        </section>
+    </main>
+
+    <footer class="shell-footer">
+        <div class="footer-inner">
+            <div class="footer-brand"><span class="crow-mark" aria-hidden="true"></span> Logan Mansfield · Tampa, FL</div>
+            <div class="footer-socials">
+                <a href="https://www.linkedin.com/in/lmansf96/" target="_blank" rel="noopener">LinkedIn</a>
+                <a href="mailto:lmansf96@gmail.com">Email</a>
+                <a href="https://github.com/lmansf" target="_blank" rel="noopener">GitHub</a>
+                <a href="/assets/loganmansfield.pdf" target="_blank" rel="noopener">Résumé</a>
+            </div>
+        </div>
+    </footer>
+
+    <script defer src="/assets/transition.min.js"></script>
+    <script defer src="/assets/motion.min.js"></script>
+    <script defer src="/assets/status.min.js"></script>
+</body>
+</html>

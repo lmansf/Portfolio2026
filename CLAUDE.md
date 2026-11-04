@@ -96,6 +96,16 @@ when fields change (`motion.js` also reads `generated_at` and
 holds aggregates only and the page must never carry a database key. See the
 README's "Live fraud data" section.
 
+The nightly data run (README, "The nightly data run") is
+`scripts/data_run.py`, driven by `data/pipeline/models.json` (nodes, column
+descriptions, tests, and the tables each caption reads) and the `Data run`
+workflow; `/status` draws its `data/pipeline/run-log.json`. When a site
+table or snapshot field gains or loses a column, describe it in
+`models.json` (an undescribed column fails a check). Every SQL source
+caption needs a `pieces` entry. Keep the hunt table out of `models.json`,
+`/status` and anything else that lists tables. `run-log.json`, `github.json`
+and `stg_github_events.json` are written by the run: don't hand-edit them.
+
 ## Validate portfolio PRs through the `no-mistakes` gate
 
 Before opening a pull request for this portfolio, validate the change with the

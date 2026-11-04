@@ -1,0 +1,317 @@
+{
+    "_about": "The site's data, described once. Every table the SQL source captions query, where it comes from (raw → staging → mart), who owns it, what each column means, and the tests the nightly run (scripts/data_run.py) holds it to. Pieces map each SQL source caption to the tables it reads. The hidden hunt table is left out on purpose.",
+    "owner": "Logan Mansfield",
+    "nodes": {
+        "site_pages": {
+            "layer": "raw",
+            "label": "Page markup",
+            "where": "index.html, projects.html",
+            "description": "The Home and Projects pages as published. They are the source of truth for the site's own tables, so a table can never say something the pages don't."
+        },
+        "stg_site_rows": {
+            "layer": "staging",
+            "label": "Parsed page rows",
+            "upstream": ["site_pages"],
+            "where": "scripts/build_console_data.py",
+            "description": "Each card, role, skill, credential and the hero, read out of the page markup into typed rows (dates parsed, badges split from titles)."
+        },
+        "fraud_supabase": {
+            "layer": "raw",
+            "label": "Supabase checkout tables",
+            "where": "raw_transactions, raw_fraud_decisions, raw_fraud_truth, raw_checkout_responses",
+            "description": "The fraud pipeline's four raw Postgres tables of simulated webstore checkouts. They stay in Supabase: nothing row-level ever reaches this site."
+        },
+        "stg_fraud_base": {
+            "layer": "staging",
+            "label": "Scored checkouts, last 30 days",
+            "upstream": ["fraud_supabase"],
+            "where": "the base CTE in scripts/fraud-snapshot.sql",
+            "description": "One row per scored checkout in the last 30 America/New_York days, joined to the generator's answer key. Built inside a read-only transaction on Supabase; only the aggregates below leave it, as data/fraud-snapshot.json."
+        },
+        "github_api": {
+            "layer": "raw",
+            "label": "GitHub public API",
+            "where": "api.github.com /users/lmansf/events/public and /users/lmansf/repos",
+            "description": "Public activity and public repositories for github.com/lmansf. Private work never appears here."
+        },
+        "stg_github_events": {
+            "layer": "staging",
+            "label": "Public GitHub events",
+            "upstream": ["github_api"],
+            "where": "data/pipeline/stg_github_events.json, written by scripts/data_run.py",
+            "description": "One row per public event in the last 30 days, keeping only its id, type, repository and time (no commit messages, names or emails)."
+        },
+        "projects": {
+            "layer": "mart",
+            "label": "projects",
+            "upstream": ["stg_site_rows"],
+            "where": "data/console/site.sql",
+            "description": "One row per project card on /projects; Home's featured cards are the featured rows.",
+            "columns": {
+                "slug": "The card's anchor id on /projects (#fraud, #owl-park...).",
+                "title": "Project name as the card shows it.",
+                "badge": "Status badge on the card (Live, Running, Retired...), or null.",
+                "eyebrow": "The small line above the title: kind of project.",
+                "year": "Year shown on the card.",
+                "featured": "True for the three featured projects shown on Home too.",
+                "status": "active, or archived for retired cards.",
+                "summary": "The card's synopsis.",
+                "tags": "The card's tags, in order.",
+                "links": "The card's links as (label, url) pairs.",
+                "sort_order": "Position on /projects."
+            },
+            "tests": [
+                {"type": "row_count", "min": 3},
+                {"type": "not_null", "columns": ["slug", "title", "eyebrow", "year", "summary"]},
+                {"type": "unique", "columns": ["slug"]},
+                {"type": "unique", "columns": ["title"]},
+                {"type": "accepted_values", "column": "status", "values": ["active", "archived"]},
+                {"type": "expression", "name": "exactly three featured projects", "sql": "(SELECT count(*) FROM projects WHERE featured) = 3", "scalar": true}
+            ]
+        },
+        "experience": {
+            "layer": "mart",
+            "label": "experience",
+            "upstream": ["stg_site_rows"],
+            "where": "data/console/site.sql",
+            "description": "One row per role on the Home experience timeline.",
+            "columns": {
+                "role": "Job title.",
+                "note": "A short aside after the title (where a role started), or null.",
+                "org": "Employer.",
+                "location": "Where the role was based.",
+                "started": "First month in the role.",
+                "ended": "Month the role ended; null while it's current.",
+                "is_current": "True for the role held now.",
+                "summary": "One-line description of the work.",
+                "sort_order": "Position on the timeline."
+            },
+            "tests": [
+                {"type": "row_count", "min": 1},
+                {"type": "not_null", "columns": ["role", "org", "started", "summary"]},
+                {"type": "expression", "name": "a role ends after it starts", "sql": "ended IS NULL OR ended >= started"},
+                {"type": "expression", "name": "exactly one current role", "sql": "(SELECT count(*) FROM experience WHERE is_current) = 1", "scalar": true}
+            ]
+        },
+        "skills": {
+            "layer": "mart",
+            "label": "skills",
+            "upstream": ["stg_site_rows"],
+            "where": "data/console/site.sql",
+            "description": "The Home toolkit, one row per skill.",
+            "columns": {
+                "skill": "The skill as its chip reads.",
+                "category": "The toolkit group it sits in.",
+                "sort_order": "Position in the toolkit."
+            },
+            "tests": [
+                {"type": "row_count", "min": 3},
+                {"type": "not_null", "columns": ["skill", "category"]},
+                {"type": "unique", "columns": ["skill"]},
+                {"type": "accepted_values", "column": "category", "values": ["Data stack", "Forecasting & ML", "Platforms I run at ZooTampa"]}
+            ]
+        },
+        "credentials": {
+            "layer": "mart",
+            "label": "credentials",
+            "upstream": ["stg_site_rows"],
+            "where": "data/console/site.sql",
+            "description": "Certifications and workshops listed on Home.",
+            "columns": {
+                "credential": "Name of the certification or workshop.",
+                "detail": "Exam code, issuer or kind.",
+                "sort_order": "Position in the list."
+            },
+            "tests": [
+                {"type": "row_count", "min": 1},
+                {"type": "not_null", "columns": ["credential"]},
+                {"type": "unique", "columns": ["credential"]}
+            ]
+        },
+        "resume": {
+            "layer": "mart",
+            "label": "resume",
+            "upstream": ["stg_site_rows"],
+            "where": "data/console/site.sql",
+            "description": "One row: who I am, the Home \"now\" strip, and where to reach me.",
+            "columns": {
+                "name": "Full name.",
+                "headline": "The hero's first clause.",
+                "now": "The \"Now\" row of the strip.",
+                "building": "The \"Building\" row of the strip.",
+                "latest": "The \"Latest\" row of the strip.",
+                "location": "Home base, from the footer.",
+                "email": "Contact email from the Email button.",
+                "linkedin": "LinkedIn profile URL.",
+                "github": "GitHub profile URL.",
+                "resume_pdf": "Résumé PDF URL.",
+                "site": "This site's URL."
+            },
+            "tests": [
+                {"type": "row_count", "min": 1, "max": 1},
+                {"type": "not_null", "columns": ["name", "headline", "now", "building", "latest", "email"]}
+            ]
+        },
+        "fraud_totals": {
+            "layer": "mart",
+            "label": "fraud_totals",
+            "upstream": ["stg_fraud_base"],
+            "where": "data/fraud-snapshot.json → totals",
+            "freshness": {"from": "fraud_snapshot", "max_hours": 36},
+            "description": "One row: the fraud pipeline's last 30 days in total.",
+            "columns": {
+                "checkouts": "Checkouts scored.",
+                "flagged": "Checkouts sent to review or declined.",
+                "declined": "Checkouts declined.",
+                "reviewed": "Checkouts sent to manual review.",
+                "fraud": "Checkouts the answer key marks as fraud.",
+                "fraud_caught": "Fraudulent checkouts that were flagged.",
+                "false_declines": "Legitimate checkouts that were declined.",
+                "legit": "Checkouts the answer key marks as legitimate.",
+                "fraud_dollars_stopped": "Dollars of fraud that were flagged.",
+                "fraud_dollars_approved": "Dollars of fraud that got through.",
+                "p50_scoring_ms": "Median time to score a checkout, in milliseconds.",
+                "p95_scoring_ms": "95th-percentile scoring time, in milliseconds.",
+                "p95_checkout_ms": "95th-percentile time for the whole checkout, in milliseconds.",
+                "scoring_timeouts": "Checkouts approved because scoring timed out (fail open).",
+                "active_days": "Days in the window with at least one checkout."
+            },
+            "tests": [
+                {"type": "row_count", "min": 1, "max": 1},
+                {"type": "not_null", "columns": ["checkouts", "fraud", "fraud_caught", "legit"]},
+                {"type": "expression", "name": "fraud plus legit equals checkouts", "sql": "fraud + legit = checkouts"},
+                {"type": "expression", "name": "flagged equals reviewed plus declined", "sql": "flagged = reviewed + declined"},
+                {"type": "expression", "name": "caught fraud is no more than all fraud", "sql": "fraud_caught <= fraud"},
+                {"type": "freshness"}
+            ]
+        },
+        "fraud_daily": {
+            "layer": "mart",
+            "label": "fraud_daily",
+            "upstream": ["stg_fraud_base"],
+            "where": "data/fraud-snapshot.json → daily",
+            "freshness": {"from": "fraud_snapshot", "max_hours": 36},
+            "description": "One row per America/New_York day with checkouts in the last 30 days.",
+            "columns": {
+                "day": "Calendar day, America/New_York.",
+                "checkouts": "Checkouts scored that day.",
+                "approved": "Checkouts approved.",
+                "reviewed": "Checkouts sent to manual review.",
+                "declined": "Checkouts declined.",
+                "fraud": "Checkouts the answer key marks as fraud.",
+                "fraud_caught": "Fraudulent checkouts that were flagged.",
+                "false_declines": "Legitimate checkouts that were declined.",
+                "fraud_dollars_stopped": "Dollars of fraud that were flagged.",
+                "fraud_dollars_approved": "Dollars of fraud that got through.",
+                "p95_scoring_ms": "95th-percentile scoring time that day, in milliseconds."
+            },
+            "tests": [
+                {"type": "row_count", "min": 1},
+                {"type": "not_null", "columns": ["day", "checkouts", "fraud", "fraud_caught"]},
+                {"type": "unique", "columns": ["day"]},
+                {"type": "expression", "name": "approved, reviewed and declined add up to checkouts", "sql": "approved + reviewed + declined = checkouts"},
+                {"type": "expression", "name": "the days add up to the 30-day totals", "scalar": true,
+                 "sql": "(SELECT sum(d.checkouts) = any_value(t.checkouts) AND sum(d.fraud) = any_value(t.fraud) AND sum(d.fraud_caught) = any_value(t.fraud_caught) FROM fraud_daily d, fraud_totals t)"},
+                {"type": "freshness"}
+            ]
+        },
+        "fraud_score_bins": {
+            "layer": "mart",
+            "label": "fraud_score_bins",
+            "upstream": ["stg_fraud_base"],
+            "where": "data/fraud-snapshot.json → score_bins",
+            "freshness": {"from": "fraud_snapshot", "max_hours": 36},
+            "description": "The model's score histogram: checkouts per 0.05-wide score bin, split by the answer key.",
+            "columns": {
+                "score_from": "Bottom of the bin (inclusive).",
+                "score_to": "Top of the bin.",
+                "legit": "Legitimate checkouts scored in the bin.",
+                "fraud": "Fraudulent checkouts scored in the bin."
+            },
+            "tests": [
+                {"type": "row_count", "min": 1, "max": 20},
+                {"type": "unique", "columns": ["score_from"]},
+                {"type": "expression", "name": "bins sit between 0 and 1", "sql": "score_from >= 0 AND score_to <= 1 AND score_from < score_to"},
+                {"type": "expression", "name": "the bins add up to the 30-day totals", "scalar": true,
+                 "sql": "(SELECT sum(b.fraud) = any_value(t.fraud) AND sum(b.legit) = any_value(t.legit) FROM fraud_score_bins b, fraud_totals t)"},
+                {"type": "freshness"}
+            ]
+        },
+        "fraud_patterns": {
+            "layer": "mart",
+            "label": "fraud_patterns",
+            "upstream": ["stg_fraud_base"],
+            "where": "data/fraud-snapshot.json → patterns",
+            "freshness": {"from": "fraud_snapshot", "max_hours": 36},
+            "description": "Fraud and the share caught, by the generator's fraud pattern.",
+            "columns": {
+                "pattern": "The kind of fraud the generator played out.",
+                "fraud": "Fraudulent checkouts of that pattern.",
+                "caught": "Of those, how many were flagged."
+            },
+            "tests": [
+                {"type": "row_count", "min": 1},
+                {"type": "unique", "columns": ["pattern"]},
+                {"type": "accepted_values", "column": "pattern", "values": ["card_testing", "stolen_card_resale", "gift_card_cashout", "account_takeover", "fraud_ring"]},
+                {"type": "expression", "name": "the patterns add up to all fraud", "scalar": true,
+                 "sql": "(SELECT sum(p.fraud) = any_value(t.fraud) AND sum(p.caught) = any_value(t.fraud_caught) FROM fraud_patterns p, fraud_totals t)"},
+                {"type": "freshness"}
+            ]
+        },
+        "github_activity": {
+            "layer": "mart",
+            "label": "github_activity",
+            "upstream": ["stg_github_events"],
+            "where": "data/pipeline/github.json → activity",
+            "freshness": {"from": "github", "max_hours": 30},
+            "description": "Public GitHub activity per day and repository, last 30 days.",
+            "columns": {
+                "day": "Calendar day, America/New_York.",
+                "repo": "Public repository (owner/name).",
+                "events": "Public events that day (pushes, pull requests, reviews...).",
+                "pushes": "Of those, pushes."
+            },
+            "tests": [
+                {"type": "row_count", "min": 1},
+                {"type": "not_null", "columns": ["day", "repo", "events"]},
+                {"type": "unique", "columns": ["day", "repo"]},
+                {"type": "expression", "name": "pushes are no more than events", "sql": "pushes <= events"},
+                {"type": "freshness"}
+            ]
+        },
+        "github_repos": {
+            "layer": "mart",
+            "label": "github_repos",
+            "upstream": ["github_api"],
+            "where": "data/pipeline/github.json → repos",
+            "freshness": {"from": "github", "max_hours": 30},
+            "description": "Public repositories on github.com/lmansf (forks left out).",
+            "columns": {
+                "repo": "Repository (owner/name).",
+                "language": "GitHub's main language for it, or null.",
+                "stars": "Stargazers.",
+                "pushed_on": "Day of the last push, UTC.",
+                "archived": "True if the repository is archived."
+            },
+            "tests": [
+                {"type": "row_count", "min": 1},
+                {"type": "not_null", "columns": ["repo", "pushed_on"]},
+                {"type": "unique", "columns": ["repo"]},
+                {"type": "freshness"}
+            ]
+        }
+    },
+    "pieces": {
+        "now": {"page": "Home", "label": "the now strip", "tables": ["resume"]},
+        "featured": {"page": "Home", "label": "the featured projects", "tables": ["projects"]},
+        "experience": {"page": "Home", "label": "the experience timeline", "tables": ["experience"]},
+        "credentials": {"page": "Home", "label": "the credentials", "tables": ["credentials"]},
+        "toolkit": {"page": "Home", "label": "the toolkit", "tables": ["skills"]},
+        "projects-featured": {"page": "Projects", "label": "the featured projects", "tables": ["projects"]},
+        "projects-more": {"page": "Projects", "label": "the more builds", "tables": ["projects"]},
+        "live-totals": {"page": "Live data", "label": "the last 30 days totals", "tables": ["fraud_totals"]},
+        "live-daily": {"page": "Live data", "label": "the fraud per day chart", "tables": ["fraud_daily"]},
+        "live-scores": {"page": "Live data", "label": "the score distribution chart", "tables": ["fraud_score_bins"]},
+        "live-patterns": {"page": "Live data", "label": "the catch rate by fraud pattern table", "tables": ["fraud_patterns"]}
+    }
+}

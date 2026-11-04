@@ -39,13 +39,16 @@ project page:
   infographic of the archived end-to-end data pipeline.
 - **Live data** (`live.html`, `/live`) — daily numbers from the fraud
   pipeline (see "Live fraud data" below).
+- **Data status** (`status.html`, `/status`) — the nightly data run's
+  latest results: each source, every check grouped by table (failures
+  first), and recent runs (see "The nightly data run" below).
 - **404** (`404.html`) — branded not-found page.
 - **SQL source captions** — under each data-backed piece on Home, Projects
   and `/live`, a quiet "SQL source" caret that opens the query producing it.
   Visitors can edit and run the query in the browser and the piece redraws
   from the result. See "SQL source captions" below.
 
-Clean URLs (`/projects`, `/owl-park`, `/live`), the `/resume`
+Clean URLs (`/projects`, `/owl-park`, `/live`, `/status`), the `/resume`
 shortcut to the résumé PDF, and legacy redirects (e.g. `/fraud` →
 `/projects#fraud`, `/pipeline` → `/owl-park`, and the retired `/playground` →
 `/`) are configured in `vercel.json`.
@@ -426,6 +429,53 @@ see it). `assets/motion.js` also reads
 reshaping the file. Don't hand-edit
 `data/fraud-snapshot.json` beyond regenerating it with the query: the next
 scheduled run overwrites it.
+
+## The nightly data run (`/status`)
+
+The site treats its own data like a small data product: sourced, tested,
+automated, and honest about when it last ran. Everything is described once,
+in **`data/pipeline/models.json`**: every node from raw to staging to mart
+(where it lives, what it's for, its owner), each mart's columns with a
+description, the tests it's held to, and which tables each "SQL source"
+caption reads (`pieces`). The hidden hunt table is left out on purpose.
+
+**`scripts/data_run.py`** is the one orchestrated run:
+
+1. **Extract** three sources. The site pages rebuild `data/console/site.sql`
+   (via `build_console_data.py`); the fraud snapshot is read as the
+   `Fraud snapshot` job published it; and the GitHub public API gives public
+   events and repositories for `lmansf`, staged as
+   `data/pipeline/stg_github_events.json` (id, type, repo, time only) and
+   modelled by `data/pipeline/sql/github_activity.sql` into
+   `data/pipeline/github.json`. A source that can't be reached keeps its
+   last good files and fails its freshness check; the site never breaks.
+2. **Load** every mart into DuckDB, the same tables the SQL source editors
+   query (the editors also get `github_activity` and `github_repos`, built
+   from `github.json` with the columns in `data/pipeline/github-tables.json`).
+3. **Test**: each mart's tests in `models.json` (`row_count`, `not_null`,
+   `unique`, `accepted_values`, `expression` that must hold per row or as a
+   `scalar`, and `freshness` against the table's `freshness.max_hours`), plus
+   two the run adds: every column is described, and every caption's default
+   query still returns what its page shows.
+4. **Log** to `data/pipeline/run-log.json`: the latest run in full and a
+   30-run history. `/status` (`assets/status.js`) draws it.
+
+    python3 scripts/data_run.py              # run and write
+    python3 scripts/data_run.py --dry-run    # run, print, write nothing
+    python3 scripts/data_run.py --offline    # skip the GitHub API
+
+The **`Data run`** workflow (`.github/workflows/data-run.yml`) runs it at
+06:15 UTC every night, on demand, and after a merge that changes the
+pipeline, then commits what changed to `main` (which redeploys the site). A
+failed check is data, not a broken build: it's logged, shown on `/status`
+and raised as a workflow warning. The job fails only when a definition is
+broken (a test's SQL errors, or `models.json` names a table or caption that
+doesn't exist). Pull requests get a dry run. It needs no secrets: the
+GitHub calls use the workflow's own token against public endpoints.
+
+To test a new table, add it to `models.json` with its columns and tests; to
+add a caption, give it a `pieces` entry too (the run fails if a caption has
+none).
 
 ## Local development
 

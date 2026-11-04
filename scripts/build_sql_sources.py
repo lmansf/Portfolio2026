@@ -251,28 +251,30 @@ def build_live_tables(con, snapshot, tables):
                         [r.get(c[2] if len(c) > 2 else c[0]) for c in cols])
 
 
+def check_live_source(con, snapshot, tables, name):
+    """None if the /live caption's default query returns the snapshot's numbers, else why not."""
+    key = LIVE_SOURCES[name][1]
+    spec = next((s for s in tables.values() if s["snapshot"] == key), None)
+    if spec is None:
+        return f"{name}: no table in data/console/snapshot-tables.json reads the snapshot's {key!r}"
+    rename = {c[0]: (c[2] if len(c) > 2 else c[0]) for c in spec["columns"]}
+    cur = con.execute((SOURCES / f"{name}.sql").read_text(encoding="utf-8"))
+    cols = [rename.get(d[0], d[0]) for d in cur.description]
+    got = [dict(zip(cols, r)) for r in cur.fetchall()]
+    part = snapshot.get(key)
+    if part is None:
+        return (f"{name}: data/fraud-snapshot.json has no {key!r}; the fraud-snapshot workflow's "
+                f"jq allow-list and data/console/snapshot-tables.json must name the same fields")
+    want = [{c: r.get(c) for c in cols} for r in ([part] if spec.get("one_row") else part)]
+    got = [{c: (v.isoformat() if hasattr(v, "isoformat") else v) for c, v in r.items()} for r in got]
+    if got != want:
+        return (f"data/sql-sources/{name}.sql doesn't return the snapshot's {key}:\n"
+                f"  query:    {got[:3]!r}\n  snapshot: {want[:3]!r}")
+    return None
+
+
 def check_live_sources(con, snapshot, tables):
-    errors = []
-    for name, (_, key) in LIVE_SOURCES.items():
-        spec = next((s for s in tables.values() if s["snapshot"] == key), None)
-        if spec is None:
-            errors.append(f"{name}: no table in data/console/snapshot-tables.json reads the snapshot's {key!r}")
-            continue
-        rename = {c[0]: (c[2] if len(c) > 2 else c[0]) for c in spec["columns"]}
-        cur = con.execute((SOURCES / f"{name}.sql").read_text(encoding="utf-8"))
-        cols = [rename.get(d[0], d[0]) for d in cur.description]
-        got = [dict(zip(cols, r)) for r in cur.fetchall()]
-        part = snapshot.get(key)
-        if part is None:
-            errors.append(f"{name}: data/fraud-snapshot.json has no {key!r}; the fraud-snapshot workflow's "
-                          f"jq allow-list and data/console/snapshot-tables.json must name the same fields")
-            continue
-        want = [{c: r.get(c) for c in cols} for r in ([part] if spec.get("one_row") else part)]
-        got = [{c: (v.isoformat() if hasattr(v, "isoformat") else v) for c, v in r.items()} for r in got]
-        if got != want:
-            errors.append(f"data/sql-sources/{name}.sql doesn't return the snapshot's {key}:\n"
-                          f"  query:    {got[:3]!r}\n  snapshot: {want[:3]!r}")
-    return errors
+    return [e for e in (check_live_source(con, snapshot, tables, n) for n in LIVE_SOURCES) if e]
 
 
 # ── Site tables: run each query and compare with the page ──
@@ -282,16 +284,20 @@ def norm(v):
     return v
 
 
+def check_table_source(con, pages, name):
+    """None if the caption's default query returns exactly what its page shows, else why not."""
+    page, shown = TABLE_SOURCES[name]
+    sql = (SOURCES / f"{name}.sql").read_text(encoding="utf-8")
+    got = norm(con.execute(sql).fetchall())
+    want = norm(shown(pages[page]))
+    if got != want:
+        return (f"data/sql-sources/{name}.sql doesn't return what {page} shows:\n"
+                f"  query: {got!r}\n  page:  {want!r}")
+    return None
+
+
 def check_table_sources(con, pages):
-    errors = []
-    for name, (page, shown) in TABLE_SOURCES.items():
-        sql = (SOURCES / f"{name}.sql").read_text(encoding="utf-8")
-        got = norm(con.execute(sql).fetchall())
-        want = norm(shown(pages[page]))
-        if got != want:
-            errors.append(f"data/sql-sources/{name}.sql doesn't return what {page} shows:\n"
-                          f"  query: {got!r}\n  page:  {want!r}")
-    return errors
+    return [e for e in (check_table_source(con, pages, n) for n in TABLE_SOURCES) if e]
 
 
 # ── HTML ──
