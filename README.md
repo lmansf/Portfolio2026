@@ -216,9 +216,9 @@ or without JavaScript.
   when its columns fit one (`title` + `summary`/`eyebrow`/`tags` → project
   cards, `role` + `org` → the experience timeline, `name` + `headline` → a
   profile card, `skill` → toolkit chips, `credential` → credential chips),
-  with a Table view, CSV download, and a link to the full page. Anything else
-  is a table. Values are written with `textContent`, and card links are only
-  ever `https://` addresses, `mailto:` or this site's own paths (a single
+  with a Table view, CSV download, and a link to the full page (hidden when
+  that page is the one you're on). Anything else is a table. Values are
+  written with `textContent`, and card links are only ever `https://` addresses, `mailto:` or this site's own paths (a single
   leading slash, no backslashes or control characters). A project card's
   "How the data flows" link opens the diagram's modal through the page's
   own `[data-flow-open]` trigger (`pipeline.js`), and on a page without one
@@ -244,6 +244,10 @@ experience timeline, the toolkit, credentials, the hero or the footer, rerun:
 
     python3 scripts/build_console_data.py          # rewrite site.sql
     python3 scripts/build_console_data.py --check  # fails if it's stale
+
+The `Console data` workflow (`.github/workflows/console-data.yml`) runs that
+`--check` on every pull request and push to `main`, so a stale `site.sql`
+fails the build instead of showing old cards.
 
 If `data/console/extra.sql` exists, the script appends it verbatim after the
 generated tables. It is the one place for hand-written console SQL (tables

@@ -116,8 +116,14 @@ function linkEl(label, url, cls) {
             e.preventDefault();
             e.stopPropagation();
             const t = flowTrigger(href);
-            if (t) t.click();
-            else window.location.assign(href);
+            if (!t) { window.location.assign(href); return; }
+            t.click();
+            const dialog = document.getElementById(FLOW_LINK.exec(href)[1].toLowerCase() + '-dialog');
+            if (dialog) {
+                dialog.addEventListener('close', () => {
+                    if (document.documentElement.contains(a)) a.focus({ preventScroll: true });
+                }, { once: true });
+            }
         });
     }
     return a;
@@ -131,6 +137,7 @@ function init() {
     let view = 'cards';
     let typing = null;
     let busy = false;
+    let pendingRoute = null;
 
     // ── Markup ──
     const toggle = el('button', {
@@ -324,7 +331,12 @@ function init() {
     }, true);
 
     async function runRoute(key) {
-        if (busy) return;
+        if (busy) {
+            pendingRoute = key;
+            setStatus(`Running… the ${ROUTES[key].name} query runs next.`);
+            return;
+        }
+        pendingRoute = null;
         lastRoute = key;
         sql.focus({ preventScroll: true });
         const typed = await typeInto(ROUTES[key].sql);
@@ -373,6 +385,11 @@ function init() {
             }
         } finally {
             busy = false;
+            if (pendingRoute) {
+                const next = pendingRoute;
+                pendingRoute = null;
+                runRoute(next);
+            }
         }
     }
 
@@ -409,7 +426,7 @@ function init() {
             : `${total.toLocaleString('en-US')} ${rowWord}`;
         meta.textContent = `${count} · ${formatMs(ms)}`;
         csvBtn.hidden = total === 0 || res.fields.length === 0;
-        if (route && ROUTES[route]) {
+        if (route && ROUTES[route] && route !== routeFor(window.location.pathname)) {
             pageLink.hidden = false;
             pageLink.href = route;
             pageLink.textContent = `Open the ${ROUTES[route].name} page →`;
