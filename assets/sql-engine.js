@@ -1,15 +1,18 @@
 /* ─────────────────────────────────────────────────────────────
- * sql-engine.js — DuckDB-Wasm for the site's SQL console.
+ * sql-engine.js — DuckDB-Wasm for the site's "SQL source" editors.
  *
- * One engine per page, shared by the docked console (console.js). It loads
- * the pinned DuckDB-Wasm from jsDelivr, then:
+ * One engine per page, shared by every caption editor (sql-source.js) and
+ * started only when a visitor first presses Run. It loads the pinned
+ * DuckDB-Wasm from jsDelivr, then:
  *   - attaches the synthetic Owl Park sample data
  *     (/data/playground/owl_park.duckdb.gz) READ_ONLY as `owl_park`,
  *   - runs /data/console/site.sql to build the site tables (projects,
- *     experience, skills, credentials, resume) in this tab's memory,
- *   - builds `fraud_daily` from /data/fraud-snapshot.json, the same
- *     aggregates-only file the /live page draws (one row per day: counts,
- *     dollar totals, p95 scoring time; never an order, card or person),
+ *     experience, skills, credentials, resume, and the nest box) in this
+ *     tab's memory,
+ *   - builds the fraud_* tables listed in data/console/snapshot-tables.json
+ *     from /data/fraud-snapshot.json, the same aggregates-only file the /live
+ *     page draws (totals, one row per day, the score histogram, catch rate
+ *     by pattern; never an order, card or person),
  *   - puts both on the search path, so `FROM projects` and `FROM orders`
  *     both work,
  *   - switches off extension install/autoload and all external access
@@ -24,6 +27,8 @@
  * a fresh one. At most MAX_ROWS_KEPT rows of a result are kept.
  * ───────────────────────────────────────────────────────────── */
 
+import snapshotTables from '../data/console/snapshot-tables.json';
+
 export const DUCKDB_VERSION = '1.29.0';
 const DUCKDB_ESM = `https://cdn.jsdelivr.net/npm/@duckdb/duckdb-wasm@${DUCKDB_VERSION}/+esm`;
 const PARK_FILE = 'owl_park.duckdb';
@@ -31,33 +36,43 @@ const PARK_URL = `/data/playground/${PARK_FILE}.gz`;
 const SITE_SQL_URL = '/data/console/site.sql';
 const FRAUD_URL = '/data/fraud-snapshot.json';
 
-// fraud_daily's columns: exactly these fields of each `daily` entry, nothing
-// else from the file, typed and checked before they reach DuckDB.
-const FRAUD_COLUMNS = [
-    ['day', 'DATE'],
-    ['checkouts', 'INTEGER'], ['approved', 'INTEGER'], ['reviewed', 'INTEGER'], ['declined', 'INTEGER'],
-    ['fraud', 'INTEGER'], ['fraud_caught', 'INTEGER'], ['false_declines', 'INTEGER'],
-    ['fraud_dollars_stopped', 'DOUBLE'], ['fraud_dollars_approved', 'DOUBLE'], ['p95_scoring_ms', 'DOUBLE']
-];
+/**
+ * The fraud_* tables: exactly the snapshot fields named in
+ * data/console/snapshot-tables.json (bundled in at build time), nothing else
+ * from the file. scripts/build_sql_sources.py builds the same tables to check
+ * the /live default queries.
+ */
+export const SNAPSHOT_TABLES = Object.fromEntries(
+    Object.entries(snapshotTables).filter(([name]) => !name.startsWith('_'))
+);
 
-/** SQL that creates fraud_daily from a parsed snapshot (an empty table if it has no usable days). */
-export function fraudDailySql(snapshot) {
-    const days = snapshot && Array.isArray(snapshot.daily) ? snapshot.daily : [];
-    const rows = [];
-    for (const d of days) {
-        if (!d || typeof d.day !== 'string' || !/^\d{4}-\d{2}-\d{2}$/.test(d.day)) continue;
-        const vals = [`DATE '${d.day}'`];
-        let ok = true;
-        for (const [col, type] of FRAUD_COLUMNS.slice(1)) {
-            const v = d[col];
-            if (v === null || v === undefined) { vals.push('NULL'); continue; }
-            if (typeof v !== 'number' || !Number.isFinite(v) || (type === 'INTEGER' && !Number.isInteger(v))) { ok = false; break; }
-            vals.push(String(v));
+// One snapshot value as a SQL literal, or undefined if it isn't the type
+// its column says (that row is then left out).
+function literal(v, type) {
+    if (v === null || v === undefined) return 'NULL';
+    if (type === 'DATE') return typeof v === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(v) ? `DATE '${v}'` : undefined;
+    if (type === 'VARCHAR') return typeof v === 'string' && v.length <= 80 ? `'${v.replace(/'/g, "''")}'` : undefined;
+    if (typeof v !== 'number' || !Number.isFinite(v)) return undefined;
+    if (type === 'INTEGER' && !Number.isInteger(v)) return undefined;
+    return String(v);
+}
+
+/** SQL that creates the fraud_* tables from a parsed snapshot (empty tables for anything missing). */
+export function snapshotTablesSql(snapshot) {
+    const out = [];
+    for (const [name, spec] of Object.entries(SNAPSHOT_TABLES)) {
+        const part = snapshot ? snapshot[spec.snapshot] : null;
+        const items = spec.one_row ? (part && typeof part === 'object' ? [part] : []) : (Array.isArray(part) ? part : []);
+        const rows = [];
+        for (const item of items) {
+            if (!item || typeof item !== 'object') continue;
+            const vals = spec.columns.map(([col, type, key]) => literal(item[key || col], type));
+            if (!vals.includes(undefined)) rows.push(`(${vals.join(', ')})`);
         }
-        if (ok) rows.push(`(${vals.join(', ')})`);
+        out.push(`CREATE TABLE ${name} (${spec.columns.map(([c, t]) => `${c} ${t}`).join(', ')});`);
+        if (rows.length) out.push(`INSERT INTO ${name} VALUES\n${rows.join(',\n')};`);
     }
-    const create = `CREATE TABLE fraud_daily (${FRAUD_COLUMNS.map(([c, t]) => `${c} ${t}`).join(', ')});`;
-    return rows.length ? `${create}\nINSERT INTO fraud_daily VALUES\n${rows.join(',\n')};` : create;
+    return out.join('\n');
 }
 export const MAX_ROWS_KEPT = 200000;
 export const QUERY_TIMEOUT_MS = 30000;
@@ -129,10 +144,10 @@ export function createEngine({ onStatus = () => {} } = {}) {
             await conn.query(`ATTACH '${PARK_FILE}' AS owl_park (READ_ONLY)`);
             await conn.query(siteSql);
             try {
-                await conn.query(fraudDailySql(snapshot));
+                await conn.query(snapshotTablesSql(snapshot));
             } catch {
-                await conn.query('DROP TABLE IF EXISTS fraud_daily');
-                await conn.query(fraudDailySql(null));
+                for (const name of Object.keys(SNAPSHOT_TABLES)) await conn.query(`DROP TABLE IF EXISTS ${name}`);
+                await conn.query(snapshotTablesSql(null));
             }
             await conn.query("SET search_path = 'memory.main,owl_park.main'");
             // Lock it down: from here a query can read the tables (and make
@@ -258,14 +273,17 @@ export function eachRow(result, limit, fn) {
 }
 
 // Rows as plain objects of display-ready JS values (lists → arrays,
-// structs → objects, dates → strings). For the card views.
-export function toObjects(result, limit) {
+// structs → objects, dates → strings). With { numbers: true }, numeric
+// columns stay JS numbers (for the /live charts) instead of display text.
+export function toObjects(result, limit, { numbers = false } = {}) {
     const out = [];
     eachRow(result, limit, (cols, i) => {
         const row = {};
         result.fields.forEach((f, j) => {
             const v = getCell(cols[j], i, f.type);
-            row[f.name] = v === null ? null : plain(v, f.type);
+            if (v === null) row[f.name] = null;
+            else if (numbers && isNumericType(f.type) && (typeof v === 'number' || typeof v === 'bigint')) row[f.name] = Number(v);
+            else row[f.name] = plain(v, f.type);
         });
         out.push(row);
     });

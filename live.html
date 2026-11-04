@@ -116,7 +116,7 @@
                 <h2 class="section-head__title" id="live-kpis">The last 30 days</h2>
                 <span class="section-head__hint" data-live-window>Every checkout the pipeline scored</span>
             </header>
-            <div class="live-kpis">
+            <div class="live-kpis" data-sql-piece="live-totals">
                 <div class="live-kpi">
                     <p class="live-kpi__label">Checkouts scored</p>
                     <p class="live-kpi__value" data-kpi="checkouts">–</p>
@@ -145,10 +145,18 @@
             </div>
             <p class="section-note">&ldquo;Caught&rdquo; means the model sent the order to review or declined it. Fraud is measured against the generator&rsquo;s answer key; in production those labels arrive weeks later, as chargebacks.</p>
             <!-- sql-source: live-totals -->
-            <details class="sql-src">
+            <details class="sql-src" data-sql-source="live-totals" data-sql-label="the last 30 days totals">
                 <summary class="sql-src__toggle" aria-label="SQL source for the last 30 days totals">SQL source</summary>
                 <div class="sql-src__panel">
-                    <pre class="sql-src__code" tabindex="0"><code>with base as (
+                    <pre class="sql-src__code" tabindex="0"><code>SELECT
+    checkouts, flagged, fraud, fraud_caught, legit, false_declines,
+    fraud_dollars_stopped, fraud_dollars_approved,
+    p95_scoring_ms, scoring_timeouts, active_days
+FROM fraud_totals;</code></pre>
+                    <p class="sql-src__note">This query writes what&rsquo;s shown above, from the same aggregates-only snapshot the page draws; a check fails the build if it ever stops matching.</p>
+                    <details class="sql-src__upstream">
+                        <summary>Where the numbers come from</summary>
+                        <pre class="sql-src__code" tabindex="0"><code>with base as (
   select
     (x.event_ts at time zone 'America/New_York')::date as day,
     d.decision,
@@ -185,7 +193,8 @@ totals as (
   from base
 )
 select row_to_json(totals) as totals from totals;</code></pre>
-                    <p class="sql-src__note">Part of <a href="https://github.com/lmansf/Portfolio2026/blob/main/scripts/fraud-snapshot.sql" target="_blank" rel="noopener">the read-only query</a> that runs once a day on Supabase and publishes this page&rsquo;s totals.</p>
+                        <p class="sql-src__note">Part of <a href="https://github.com/lmansf/Portfolio2026/blob/main/scripts/fraud-snapshot.sql" target="_blank" rel="noopener">the read-only query</a> that runs once a day on Supabase and publishes the snapshot.</p>
+                    </details>
                 </div>
             </details>
             <!-- /sql-source -->
@@ -197,7 +206,7 @@ select row_to_json(totals) as totals from totals;</code></pre>
                 <h2 class="section-head__title" id="live-daily">Fraud per day</h2>
                 <span class="section-head__hint">Caught versus missed</span>
             </header>
-            <div class="live-card">
+            <div class="live-card" data-sql-piece="live-daily">
                 <ul class="live-legend" aria-label="Legend">
                     <li><span class="live-swatch live-swatch--caught" aria-hidden="true"></span>Caught</li>
                     <li><span class="live-swatch live-swatch--missed" aria-hidden="true"></span>Missed</li>
@@ -226,10 +235,18 @@ select row_to_json(totals) as totals from totals;</code></pre>
                 </div>
             </details>
             <!-- sql-source: live-daily -->
-            <details class="sql-src">
+            <details class="sql-src" data-sql-source="live-daily" data-sql-label="the fraud per day chart">
                 <summary class="sql-src__toggle" aria-label="SQL source for the fraud per day chart">SQL source</summary>
                 <div class="sql-src__panel">
-                    <pre class="sql-src__code" tabindex="0"><code>with base as (
+                    <pre class="sql-src__code" tabindex="0"><code>SELECT
+    day, checkouts, reviewed, declined,
+    fraud, fraud_caught, false_declines, fraud_dollars_stopped
+FROM fraud_daily
+ORDER BY day;</code></pre>
+                    <p class="sql-src__note">This query writes what&rsquo;s shown above, from the same aggregates-only snapshot the page draws; a check fails the build if it ever stops matching.</p>
+                    <details class="sql-src__upstream">
+                        <summary>Where the numbers come from</summary>
+                        <pre class="sql-src__code" tabindex="0"><code>with base as (
   select
     (x.event_ts at time zone 'America/New_York')::date as day,
     d.decision,
@@ -263,7 +280,8 @@ daily as (
   group by day
 )
 select coalesce(json_agg(daily order by day), '[]'::json) as daily from daily;</code></pre>
-                    <p class="sql-src__note">Part of <a href="https://github.com/lmansf/Portfolio2026/blob/main/scripts/fraud-snapshot.sql" target="_blank" rel="noopener">the read-only query</a> that runs once a day on Supabase and publishes this page&rsquo;s totals.</p>
+                        <p class="sql-src__note">Part of <a href="https://github.com/lmansf/Portfolio2026/blob/main/scripts/fraud-snapshot.sql" target="_blank" rel="noopener">the read-only query</a> that runs once a day on Supabase and publishes the snapshot.</p>
+                    </details>
                 </div>
             </details>
             <!-- /sql-source -->
@@ -275,7 +293,7 @@ select coalesce(json_agg(daily order by day), '[]'::json) as daily from daily;</
                 <h2 class="section-head__title" id="live-scores">Where the model&rsquo;s scores fall</h2>
                 <span class="section-head__hint">Share of each group by risk score</span>
             </header>
-            <div class="live-card">
+            <div class="live-card" data-sql-piece="live-scores">
                 <ul class="live-legend" aria-label="Legend">
                     <li><span class="live-swatch live-swatch--legit" aria-hidden="true"></span>Good customers</li>
                     <li><span class="live-swatch live-swatch--fraud" aria-hidden="true"></span>Fraud</li>
@@ -284,10 +302,16 @@ select coalesce(json_agg(daily order by day), '[]'::json) as daily from daily;</
                 <p class="live-caption" data-caption="scores">&nbsp;</p>
             </div>
             <!-- sql-source: live-scores -->
-            <details class="sql-src">
+            <details class="sql-src" data-sql-source="live-scores" data-sql-label="the score distribution chart">
                 <summary class="sql-src__toggle" aria-label="SQL source for the score distribution chart">SQL source</summary>
                 <div class="sql-src__panel">
-                    <pre class="sql-src__code" tabindex="0"><code>with base as (
+                    <pre class="sql-src__code" tabindex="0"><code>SELECT score_from, score_to, legit, fraud
+FROM fraud_score_bins
+ORDER BY score_from;</code></pre>
+                    <p class="sql-src__note">This query writes what&rsquo;s shown above, from the same aggregates-only snapshot the page draws; a check fails the build if it ever stops matching.</p>
+                    <details class="sql-src__upstream">
+                        <summary>Where the numbers come from</summary>
+                        <pre class="sql-src__code" tabindex="0"><code>with base as (
   select
     (x.event_ts at time zone 'America/New_York')::date as day,
     d.decision,
@@ -316,7 +340,8 @@ select coalesce(json_agg(json_build_object(
          'from', round(bin / 20.0, 2)::float8, 'to', round((bin + 1) / 20.0, 2)::float8,
          'legit', legit, 'fraud', fraud) order by bin), '[]'::json) as score_bins
 from bins;</code></pre>
-                    <p class="sql-src__note">Part of <a href="https://github.com/lmansf/Portfolio2026/blob/main/scripts/fraud-snapshot.sql" target="_blank" rel="noopener">the read-only query</a> that runs once a day on Supabase and publishes this page&rsquo;s totals.</p>
+                        <p class="sql-src__note">Part of <a href="https://github.com/lmansf/Portfolio2026/blob/main/scripts/fraud-snapshot.sql" target="_blank" rel="noopener">the read-only query</a> that runs once a day on Supabase and publishes the snapshot.</p>
+                    </details>
                 </div>
             </details>
             <!-- /sql-source -->
@@ -328,15 +353,21 @@ from bins;</code></pre>
                 <h2 class="section-head__title" id="live-patterns">Catch rate by fraud pattern</h2>
                 <span class="section-head__hint">Where the next model should focus</span>
             </header>
-            <div class="live-card">
+            <div class="live-card" data-sql-piece="live-patterns">
                 <div class="live-bars" data-chart="patterns"></div>
                 <p class="live-caption" data-caption="patterns">&nbsp;</p>
             </div>
             <!-- sql-source: live-patterns -->
-            <details class="sql-src">
+            <details class="sql-src" data-sql-source="live-patterns" data-sql-label="the catch rate by fraud pattern table">
                 <summary class="sql-src__toggle" aria-label="SQL source for the catch rate by fraud pattern table">SQL source</summary>
                 <div class="sql-src__panel">
-                    <pre class="sql-src__code" tabindex="0"><code>with base as (
+                    <pre class="sql-src__code" tabindex="0"><code>SELECT pattern, fraud, caught
+FROM fraud_patterns
+ORDER BY fraud DESC;</code></pre>
+                    <p class="sql-src__note">This query writes what&rsquo;s shown above, from the same aggregates-only snapshot the page draws; a check fails the build if it ever stops matching.</p>
+                    <details class="sql-src__upstream">
+                        <summary>Where the numbers come from</summary>
+                        <pre class="sql-src__code" tabindex="0"><code>with base as (
   select
     (x.event_ts at time zone 'America/New_York')::date as day,
     d.decision,
@@ -364,7 +395,8 @@ patterns as (
 )
 select coalesce(json_agg(patterns order by fraud desc), '[]'::json) as patterns
 from patterns;</code></pre>
-                    <p class="sql-src__note">Part of <a href="https://github.com/lmansf/Portfolio2026/blob/main/scripts/fraud-snapshot.sql" target="_blank" rel="noopener">the read-only query</a> that runs once a day on Supabase and publishes this page&rsquo;s totals.</p>
+                        <p class="sql-src__note">Part of <a href="https://github.com/lmansf/Portfolio2026/blob/main/scripts/fraud-snapshot.sql" target="_blank" rel="noopener">the read-only query</a> that runs once a day on Supabase and publishes the snapshot.</p>
+                    </details>
                 </div>
             </details>
             <!-- /sql-source -->
@@ -404,5 +436,6 @@ from patterns;</code></pre>
     <script defer src="/assets/transition.min.js"></script>
     <script defer src="/assets/motion.min.js"></script>
     <script defer src="/assets/live.min.js"></script>
+    <script type="module" src="/assets/sql-source.min.js"></script>
 </body>
 </html>

@@ -103,7 +103,7 @@
                 <h2 class="section-head__title" id="projects-featured">Featured</h2>
                 <span class="section-head__hint">The three I&rsquo;d show first</span>
             </header>
-            <div class="project-grid project-grid--featured">
+            <div class="project-grid project-grid--featured" data-sql-piece="projects-featured">
 
                 <article class="project project--featured" id="quack-query">
                     <div class="project__body">
@@ -157,14 +157,14 @@
 
             </div>
             <!-- sql-source: projects-featured -->
-            <details class="sql-src">
+            <details class="sql-src" data-sql-source="projects-featured" data-sql-label="the featured projects">
                 <summary class="sql-src__toggle" aria-label="SQL source for the featured projects">SQL source</summary>
                 <div class="sql-src__panel">
                     <pre class="sql-src__code" tabindex="0"><code>SELECT title, badge, eyebrow, year, summary, tags
 FROM projects
 WHERE featured
 ORDER BY sort_order;</code></pre>
-                    <p class="sql-src__note">Runs against <a href="https://github.com/lmansf/Portfolio2026/blob/main/data/console/site.sql" target="_blank" rel="noopener">the site&rsquo;s own tables</a>, built from these pages; a check fails the build if it stops returning what&rsquo;s shown.</p>
+                    <p class="sql-src__note">This query writes what&rsquo;s shown above, from <a href="https://github.com/lmansf/Portfolio2026/blob/main/data/console/site.sql" target="_blank" rel="noopener">the site&rsquo;s own tables</a>; a check fails the build if it ever stops matching.</p>
                 </div>
             </details>
             <!-- /sql-source -->
@@ -180,7 +180,7 @@ ORDER BY sort_order;</code></pre>
                 <h2 class="section-head__title" id="projects-more">More builds</h2>
                 <span class="section-head__hint">Analytics, forecasting, and tools</span>
             </header>
-            <div class="project-grid">
+            <div class="project-grid" data-sql-piece="projects-more">
 
                 <article class="project" id="lighthouse">
                     <div class="project__body">
@@ -305,14 +305,14 @@ ORDER BY sort_order;</code></pre>
 
             </div>
             <!-- sql-source: projects-more -->
-            <details class="sql-src">
+            <details class="sql-src" data-sql-source="projects-more" data-sql-label="the more builds">
                 <summary class="sql-src__toggle" aria-label="SQL source for the more builds">SQL source</summary>
                 <div class="sql-src__panel">
                     <pre class="sql-src__code" tabindex="0"><code>SELECT title, badge, eyebrow, year, summary, tags
 FROM projects
 WHERE NOT featured
 ORDER BY sort_order;</code></pre>
-                    <p class="sql-src__note">Runs against <a href="https://github.com/lmansf/Portfolio2026/blob/main/data/console/site.sql" target="_blank" rel="noopener">the site&rsquo;s own tables</a>, built from these pages; a check fails the build if it stops returning what&rsquo;s shown.</p>
+                    <p class="sql-src__note">This query writes what&rsquo;s shown above, from <a href="https://github.com/lmansf/Portfolio2026/blob/main/data/console/site.sql" target="_blank" rel="noopener">the site&rsquo;s own tables</a>; a check fails the build if it ever stops matching.</p>
                 </div>
             </details>
             <!-- /sql-source -->
@@ -472,5 +472,6 @@ ORDER BY sort_order;</code></pre>
     <script defer src="/assets/transition.min.js"></script>
     <script defer src="/assets/pipeline.min.js"></script>
     <script defer src="/assets/motion.min.js"></script>
+    <script type="module" src="/assets/sql-source.min.js"></script>
 </body>
 </html>

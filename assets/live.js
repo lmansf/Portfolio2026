@@ -11,6 +11,11 @@
  * marked data-countup and a `motion:countup` event asks motion.js to count
  * them up. motion.js owns that animation; this file only sets the final
  * text, which is what screen readers, no-JS and print get.
+ *
+ * The "SQL source" editors (sql-source.js) can redraw the page from a
+ * visitor's query: this file keeps the published snapshot in
+ * window.__liveSnapshot and redraws from whatever a `live:render` event
+ * carries, falling back to the published numbers if that doesn't draw.
  * ───────────────────────────────────────────────────────────── */
 (function () {
     'use strict';
@@ -178,7 +183,7 @@
     }
 
     /* ── Stat tiles ── */
-    function renderKpis(s) {
+    function renderKpis(s, quiet) {
         const t = s.totals;
         const set = (key, value, sub) => {
             const v = root.querySelector(`[data-kpi="${key}"]`);
@@ -200,6 +205,7 @@
 
         // Ask motion.js to count these up once (it skips zeros, and does
         // nothing under reduced motion). The text set above is the final value.
+        if (quiet) return;
         const counted = ['checkouts', 'caught', 'dollars']
             .map((key) => root.querySelector(`[data-kpi="${key}"]`))
             .filter(Boolean);
@@ -458,10 +464,10 @@
         ).join('');
     }
 
-    function renderAll(s) {
+    function renderAll(s, quiet) {
         const todayEt = etDay(s.generated_at);
         renderMeta(s);
-        renderKpis(s);
+        renderKpis(s, quiet);
         renderDaily(s, todayEt);
         renderScores(s);
         renderPatterns(s);
@@ -480,12 +486,30 @@
         .then((s) => {
             if (!isSnapshot(s)) throw new Error('Unexpected snapshot shape');
             renderAll(s);
+            window.__liveSnapshot = s;
+            let shown = s;
+            // A visitor's query from a SQL source editor: draw it, or put the
+            // published numbers back if it won't draw.
+            document.addEventListener('live:render', (e) => {
+                const next = e.detail && e.detail.snapshot;
+                hideTip();
+                try {
+                    if (!isSnapshot(next)) throw new Error('Unexpected snapshot shape');
+                    renderAll(next, true);
+                    shown = next;
+                    e.detail.ok = true;
+                } catch (err) {
+                    console.error(err);
+                    renderAll(s, true);
+                    shown = s;
+                }
+            });
             let lastW = window.innerWidth;
             let t = 0;
             window.addEventListener('resize', () => {
                 if (Math.abs(window.innerWidth - lastW) < 24) return;
                 clearTimeout(t);
-                t = setTimeout(() => { lastW = window.innerWidth; hideTip(); renderDaily(s, etDay(s.generated_at)); renderScores(s); }, 150);
+                t = setTimeout(() => { lastW = window.innerWidth; hideTip(); renderDaily(shown, etDay(shown.generated_at)); renderScores(shown); }, 150);
             });
         })
         .catch(fail);

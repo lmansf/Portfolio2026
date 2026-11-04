@@ -6,4 +6,4 @@ SELECT
         || coalesce(strftime(ended, '%b %Y'), 'present') AS dates,
     summary
 FROM experience
-ORDER BY started DESC;
+ORDER BY started DESC, sort_order;

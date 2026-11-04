@@ -41,8 +41,9 @@ project page:
   pipeline (see "Live fraud data" below).
 - **404** (`404.html`) — branded not-found page.
 - **SQL source captions** — under each data-backed piece on Home, Projects
-  and `/live`, a quiet "SQL source" caret that opens the query behind it.
-  See "SQL source captions" below.
+  and `/live`, a quiet "SQL source" caret that opens the query producing it.
+  Visitors can edit and run the query in the browser and the piece redraws
+  from the result. See "SQL source captions" below.
 
 Clean URLs (`/projects`, `/owl-park`, `/live`), the `/resume`
 shortcut to the résumé PDF, and legacy redirects (e.g. `/fraud` →
@@ -140,9 +141,10 @@ soft and tappable things are pills.
   (the `/live` tiles, filled after a fetch, count as soon as they land).
 - `assets/theme.js` — optional per-company accent theming via `?ink=<company>`
   (see [`docs/referrers.md`](docs/referrers.md)).
-- `assets/sql-engine.js` — the DuckDB-Wasm loader the retired SQL console
-  ran on (pin, lockdown, row cap, watchdog). Nothing loads it today; it is
-  parked for the nest-box hunt (see "Parked: the nest-box hunt" below).
+- `assets/sql-source.js` + `assets/sql-engine.js` — the runnable "SQL
+  source" captions and the DuckDB-Wasm engine they share (pin, lockdown, row
+  cap, watchdog), bundled into `assets/sql-source.min.js`. See "SQL source
+  captions" below.
 - `assets/live.css`, `assets/live.js` — styles and chart code for the live
   data page only (see "Live fraud data" below); `data/fraud-snapshot.json`
   is the aggregate snapshot it draws from, rewritten by a GitHub Action.
@@ -195,10 +197,9 @@ regenerate its minified file:
 ## SQL source captions
 
 Under each data-backed piece sits a collapsed caption, "SQL source", with a
-caret. Opening it shows the SQL behind that piece and one line on where it
-runs. It's a native `<details>` (collapsed by default, keyboard and
-screen-reader friendly, no JavaScript), styled as `.sql-src` in
-`pages.css`, and hidden in print.
+caret. Opening it shows the query that produces that piece's text. Edit it,
+press Run (or Ctrl/⌘ Enter) and the piece redraws from the result; Reset, or
+a reload, puts back the default query and the page as published.
 
 | Page | Pieces with a caption |
 |---|---|
@@ -206,34 +207,76 @@ screen-reader friendly, no JavaScript), styled as `.sql-src` in
 | Projects | featured, more builds |
 | `/live` | the 30-day totals, fraud per day, the score distribution, catch rate by pattern |
 
+How it works:
+
+- **The HTML is the default query's result.** Every piece is written in the
+  page as plain HTML, so crawlers, print and no-JS visitors get the real
+  text, and the caption is a native `<details>` with the query in a `<pre>`.
+  `scripts/build_sql_sources.py` proves the two agree: it runs each default
+  query in DuckDB and fails unless it returns exactly what the piece shows
+  (see below).
+- **The editor loads on demand.** `assets/sql-source.js` (bundled with
+  `assets/sql-engine.js` into `sql-source.min.js`) swaps the `<pre>` for a
+  textarea the first time a caption opens. DuckDB-Wasm (pinned, from
+  jsDelivr, several megabytes) loads only on the first Run, then every editor on the
+  page shares it. It runs over the site's own tables plus the Owl Park sample
+  tables (`owl_park`, read-only), with file, URL, extension and settings
+  access switched off. Nothing a visitor types leaves the tab.
+- **Redrawing never breaks the page.** If the result has the columns the
+  piece needs (a `title` for cards, a `category` and `skills` for the
+  toolkit, one row for the now strip, `day`, `checkouts`, `fraud` and
+  `fraud_caught` for the daily chart...), the piece is redrawn from it.
+  Anything else (an error, no rows, columns that don't fit) leaves the piece
+  as it was and shows a plain-words message or the result as a small table.
+  Redrawing reuses the page's own elements: a row whose title or category
+  matches an existing card refills that card, so its links and "How the data
+  flows" button keep working; other rows get a copy of a card without links.
+  Text goes in through `textContent` only, and links from a `links` column
+  only accept `https://` and same-site paths. A piece drawn from the
+  visitor's own query gets a faint dashed frame until Reset.
+- **`/live`** draws from `data/fraud-snapshot.json` as before. Its editors
+  query `fraud_totals`, `fraud_daily`, `fraud_score_bins` and
+  `fraud_patterns`, which the engine builds in the browser from that same
+  snapshot (the columns are listed once, in
+  `data/console/snapshot-tables.json`). A result becomes a changed snapshot
+  that `live.js` redraws (the `live:render` event), falling back to the
+  published numbers if it won't draw. Each `/live` caption also has a nested
+  "Where the numbers come from" with the part of
+  `scripts/fraud-snapshot.sql` (the read-only Supabase query that writes the
+  snapshot) behind that chart.
+
 The captions are generated, not hand-edited. Each one's place is marked in
-the page with `<!-- sql-source: <name> -->` … `<!-- /sql-source -->`, and
-`scripts/build_sql_sources.py` fills it in:
+the page with `<!-- sql-source: <name> -->` … `<!-- /sql-source -->`, the
+piece it redraws carries `data-sql-piece="<name>"`, and the default query is
+`data/sql-sources/<name>.sql`:
 
     python3 -m pip install duckdb==1.5.6
     python3 scripts/build_sql_sources.py          # rewrite the captions
     python3 scripts/build_sql_sources.py --check  # fail if stale or wrong
 
-- **Home and Projects** captions are queries in `data/sql-sources/<name>.sql`
-  over the site's own tables, `data/console/site.sql`. The script runs each
-  query in DuckDB and fails unless it returns exactly what the page shows
+- **Home and Projects** queries run over the site's own tables,
+  `data/console/site.sql`, and must return exactly what the page shows
   (titles, eyebrows, years, synopses and tags of the cards; role, note, org,
-  dates and summary of each job; the toolkit's groups in order; and so on),
-  so a caption can't drift from what it sits under. That's why the Home
-  featured cards carry the same tags as their `/projects` cards: one
-  `projects` table feeds both.
-- **`/live`** captions are excerpts of `scripts/fraud-snapshot.sql`, the
-  read-only query that feeds the page: the shared `base` CTE, the chart's
-  own CTE, and the entry of the final `json_build_object` that publishes it,
-  rewritten as a select of its own. All three are cut from the file as
-  written, so edit it, rerun the script, and the captions follow; the run
-  fails if a CTE or entry it quotes is gone (`LIVE_SOURCES` in the script).
-  Each caption's `<summary>` also carries an `aria-label` naming its piece
-  (`LABELS` in the script), and nothing is written unless every check passes.
+  dates and summary of each job; the toolkit's groups in order; and so on).
+  That's why the Home featured cards carry the same tags as their
+  `/projects` cards: one `projects` table feeds both.
+- **`/live`** queries run over the `fraud_*` tables built from
+  `data/fraud-snapshot.json` and must return the snapshot's numbers. The
+  nested upstream excerpt is cut from `scripts/fraud-snapshot.sql` as
+  written: the shared `base` CTE, the chart's own CTE, and the entry of the
+  final `json_build_object` that publishes it (`LIVE_SOURCES` in the
+  script); the run fails if one is gone.
+- Each caption needs exactly one `data-sql-piece` with its name on its page,
+  and each `<summary>` carries an `aria-label` naming its piece (`LABELS` in
+  the script). Nothing is written unless every check passes.
 
-To caption a new piece: add the marker pair under it, add its query to
-`data/sql-sources/` with a matching entry in `TABLE_SOURCES` (the function
-that reads what the page shows), and rerun the script.
+To caption a new piece: add the marker pair and `data-sql-piece` under it,
+add its query to `data/sql-sources/` with a matching entry in
+`TABLE_SOURCES` (the function that reads what the page shows), teach
+`PIECES` in `assets/sql-source.js` how to draw it, and rerun the script.
+After editing `sql-source.js` or `sql-engine.js`, rebuild the bundle:
+
+    npx esbuild assets/sql-source.js --bundle --format=esm --minify --outfile=assets/sql-source.min.js --allow-overwrite
 
 ### The site tables
 
@@ -250,26 +293,26 @@ buttons or the footer brand, rerun both scripts:
 The `Console data` workflow (`.github/workflows/console-data.yml`) runs both
 `--check`s on every pull request and push to `main`. If
 `data/console/extra.sql` exists, the table script appends it verbatim after
-the generated tables (today it holds the parked hunt's `nest_box`). The
-`console` in the path is left over from the retired SQL console.
+the generated tables (it holds the hunt's `nest_box`). The `console` in the
+path is left over from the retired SQL console.
 
-### Parked: the nest-box hunt
+### The nest-box hunt
 
-The docked SQL console and the `/playground` page are retired (`/playground`
-redirects to Home). The hunt they hosted is parked, not removed, so it can
-come back in a new form or be retired cleanly:
+The hidden `nest_box` table is queryable from every "SQL source" editor.
+The Home toolkit's default query opens with a comment that not every table
+makes it onto a page; `SHOW ALL TABLES` turns it up, and its riddle spells a
+`claim_egg('…')` call. Running that in any editor asks `/api/egg/claim` for
+a one-time egg code, shown with a Copy button and kept in `localStorage`.
 
-- `api/egg/claim.js` and `api/egg/verify.js` still work (Owl Park calls
-  `/api/egg/verify`), with `EGG_CODE_SECRET` in Vercel. The trail, the code
-  format and the endpoints are in [`docs/egg-codes.md`](docs/egg-codes.md).
-- `data/console/extra.sql` (the `nest_box` table and the `claim_egg` macro),
-  `data/playground/owl_park.duckdb.gz` (the synthetic Owl Park tables whose
-  list prices order the shards, written by `data/playground/generate.py`)
-  and `assets/sql-engine.js` stay in the repo, but no page loads them.
-- Nothing points to the trail, but it is still in plain sight: `nest_box` is
-  part of the public `data/console/site.sql` that the "SQL source" captions
-  link to, and `/api/egg/claim` still issues codes to anyone who posts the
-  answer. That is deliberate while the hunt waits for its next form.
+- `api/egg/claim.js` and `api/egg/verify.js` (Owl Park calls
+  `/api/egg/verify`) use `EGG_CODE_SECRET`, which lives only in Vercel. The
+  trail, the code format and the endpoints are in
+  [`docs/egg-codes.md`](docs/egg-codes.md).
+- `data/console/extra.sql` holds the table and the `claim_egg` macro, and
+  `data/playground/owl_park.duckdb.gz` the synthetic Owl Park tables whose
+  list prices order the shards (written by `data/playground/generate.py`).
+  The docked console and the `/playground` page are retired (`/playground`
+  redirects to Home); the `playground` folder name is left over from it.
 
 ## Search and sharing metadata
 
@@ -364,7 +407,9 @@ webstore checkouts). Nothing on the page talks to the database.
   snapshot was taken).
 
 To add a field, change the SQL, add the field to the workflow's
-allow-list, then read it in `live.js`. `assets/motion.js` also reads
+allow-list, then read it in `live.js` (and list it in
+`data/console/snapshot-tables.json` if the page's SQL source editors should
+see it). `assets/motion.js` also reads
 `generated_at` and `latest_event_at` (for the freshness dot beside the
 `Live numbers` links on Home and Projects), so keep those two when
 reshaping the file. Don't hand-edit

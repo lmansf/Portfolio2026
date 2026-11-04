@@ -1,0 +1,31 @@
+{
+    "_about": "The /live tables the SQL source captions query, built in the browser from data/fraud-snapshot.json. Each table lists its columns as [name, DuckDB type] or [name, type, snapshot key] when the snapshot calls it something else. assets/sql-engine.js builds them from this file and scripts/build_sql_sources.py checks the /live default queries against the same tables.",
+    "fraud_totals": {
+        "snapshot": "totals",
+        "one_row": true,
+        "columns": [
+            ["checkouts", "INTEGER"], ["flagged", "INTEGER"], ["declined", "INTEGER"], ["reviewed", "INTEGER"],
+            ["fraud", "INTEGER"], ["fraud_caught", "INTEGER"], ["false_declines", "INTEGER"], ["legit", "INTEGER"],
+            ["fraud_dollars_stopped", "DOUBLE"], ["fraud_dollars_approved", "DOUBLE"],
+            ["p50_scoring_ms", "DOUBLE"], ["p95_scoring_ms", "DOUBLE"], ["p95_checkout_ms", "DOUBLE"],
+            ["scoring_timeouts", "INTEGER"], ["active_days", "INTEGER"]
+        ]
+    },
+    "fraud_daily": {
+        "snapshot": "daily",
+        "columns": [
+            ["day", "DATE"],
+            ["checkouts", "INTEGER"], ["approved", "INTEGER"], ["reviewed", "INTEGER"], ["declined", "INTEGER"],
+            ["fraud", "INTEGER"], ["fraud_caught", "INTEGER"], ["false_declines", "INTEGER"],
+            ["fraud_dollars_stopped", "DOUBLE"], ["fraud_dollars_approved", "DOUBLE"], ["p95_scoring_ms", "DOUBLE"]
+        ]
+    },
+    "fraud_score_bins": {
+        "snapshot": "score_bins",
+        "columns": [["score_from", "DOUBLE", "from"], ["score_to", "DOUBLE", "to"], ["legit", "INTEGER"], ["fraud", "INTEGER"]]
+    },
+    "fraud_patterns": {
+        "snapshot": "patterns",
+        "columns": [["pattern", "VARCHAR"], ["fraud", "INTEGER"], ["caught", "INTEGER"]]
+    }
+}

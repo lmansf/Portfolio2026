@@ -1,8 +1,10 @@
 # Fails when data/console/site.sql (the site's own tables) is out of step with
 # index.html, projects.html or data/console/extra.sql, or when a "SQL source"
-# caption is stale or its query no longer returns what its page shows.
-# Fix: python3 scripts/build_console_data.py && python3 scripts/build_sql_sources.py,
-# then commit the results.
+# caption is stale or its query no longer returns what its page shows, or
+# when assets/sql-source.min.js wasn't rebuilt after its sources changed.
+# Fix: python3 scripts/build_console_data.py && python3 scripts/build_sql_sources.py
+# (and the esbuild line in the README's "SQL source captions"), then commit
+# the results.
 name: Console data
 
 on:
@@ -28,3 +30,7 @@ jobs:
         run: python3 scripts/build_console_data.py --check
       - name: Check the SQL source captions
         run: python3 scripts/build_sql_sources.py --check
+      - name: Check the SQL source bundle is current
+        run: |
+          npx --yes esbuild@0.24.2 assets/sql-source.js --bundle --format=esm --minify --outfile="$RUNNER_TEMP/sql-source.min.js" --log-level=warning
+          cmp "$RUNNER_TEMP/sql-source.min.js" assets/sql-source.min.js || { echo "assets/sql-source.min.js is stale: rebuild it with esbuild (see the README)"; exit 1; }

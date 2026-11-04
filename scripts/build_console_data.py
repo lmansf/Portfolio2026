@@ -181,6 +181,7 @@ def experience(doc):
             "ended": None if current else month_start(end_txt),
             "is_current": current,
             "summary": item.find(cls="xp__desc").clean_text(),
+            "sort_order": len(rows) + 1,
         })
     return rows
 
@@ -274,7 +275,8 @@ SCHEMAS = {
         ("tags", "VARCHAR[]"), ("links", "STRUCT(label VARCHAR, url VARCHAR)[]"), ("sort_order", "INTEGER")]),
     "experience": ("One row per role, newest first on the page.", [
         ("role", "VARCHAR"), ("note", "VARCHAR"), ("org", "VARCHAR"), ("location", "VARCHAR"),
-        ("started", "DATE"), ("ended", "DATE"), ("is_current", "BOOLEAN"), ("summary", "VARCHAR")]),
+        ("started", "DATE"), ("ended", "DATE"), ("is_current", "BOOLEAN"), ("summary", "VARCHAR"),
+        ("sort_order", "INTEGER")]),
     "skills": ("The toolkit on the home page, one row per skill.", [
         ("skill", "VARCHAR"), ("category", "VARCHAR"), ("sort_order", "INTEGER")]),
     "credentials": ("Certifications and workshops.", [

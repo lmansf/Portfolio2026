@@ -1,9 +1,13 @@
 """Fill in the "SQL source" captions under the site's data-backed pieces.
 
 Each caption is a collapsed <details> under a visual (the project cards, the
-experience timeline, the toolkit, the /live charts...) that shows the SQL
-behind it. The pages mark each caption's place with a pair of comments:
+experience timeline, the toolkit, the /live charts...) holding the query
+that produces that piece's text. assets/sql-source.js turns it into an
+editor: a visitor can change the query, run it in the browser with DuckDB,
+and the piece redraws from the result. The pages mark each caption's place
+with a pair of comments, and the piece itself with data-sql-piece:
 
+    <div class="toolkit" data-sql-piece="toolkit">...</div>
     <!-- sql-source: toolkit -->
     ...generated <details>...
     <!-- /sql-source -->
@@ -12,26 +16,31 @@ behind it. The pages mark each caption's place with a pair of comments:
     python3 scripts/build_sql_sources.py --check  # fail if a caption is stale
                                                   # or a query is wrong
 
-Two kinds of source:
+The default query for each caption is data/sql-sources/<name>.sql, and the
+page's own HTML is that query's result, rendered ahead of time so it reads
+the same for crawlers and without JavaScript. This script proves it:
 
-* Site tables. data/sql-sources/<name>.sql is a query over the site's own
-  tables (data/console/site.sql, which scripts/build_console_data.py builds
-  from index.html and projects.html). This script runs every query in DuckDB
-  and fails unless it returns exactly the text the page shows, so a caption
-  can never drift from what it sits under.
-* /live. Each chart's caption is an excerpt of scripts/fraud-snapshot.sql,
-  the read-only query that feeds data/fraud-snapshot.json: the shared `base`
-  CTE, the chart's own CTE, and the entry of the final json_build_object
-  that publishes it, rewritten as a select of its own. All three are cut
-  from that file, so editing it and rerunning this script keeps the captions
-  honest; the run fails if a CTE or entry it quotes is no longer there.
+* Site tables. The query runs over the site's own tables
+  (data/console/site.sql, which scripts/build_console_data.py builds from
+  index.html and projects.html) and must return exactly the text the page
+  shows.
+* /live. The query runs over the fraud_* tables described in
+  data/console/snapshot-tables.json, built from data/fraud-snapshot.json the
+  same way the browser builds them, and must return that snapshot's numbers.
+  Each /live caption also quotes, in a nested <details>, the part of
+  scripts/fraud-snapshot.sql (the read-only Supabase query that writes the
+  snapshot) behind the piece: the shared `base` CTE, the piece's own CTE,
+  and the entry of the final json_build_object that publishes it. Those are
+  cut from that file, and the run fails if one is no longer there.
 
+Each caption also needs exactly one data-sql-piece with its name on its page.
 Nothing is written unless every query and excerpt checks out.
 
 Needs the duckdb Python package (pip install duckdb).
 """
 
 import html
+import json
 import re
 import sys
 from pathlib import Path
@@ -44,17 +53,22 @@ import build_console_data as site  # noqa: E402  (the page parser and table buil
 ROOT = site.ROOT
 SOURCES = ROOT / "data" / "sql-sources"
 SNAPSHOT_SQL = ROOT / "scripts" / "fraud-snapshot.sql"
+SNAPSHOT_JSON = ROOT / "data" / "fraud-snapshot.json"
+SNAPSHOT_TABLES = ROOT / "data" / "console" / "snapshot-tables.json"
 REPO = "https://github.com/lmansf/Portfolio2026/blob/main"
 MARKER = re.compile(
     r"(?P<indent>[ \t]*)<!-- sql-source: (?P<name>[a-z0-9-]+) -->\n.*?<!-- /sql-source -->",
     re.S)
 
-TABLES_NOTE = (f'Runs against <a href="{REPO}/data/console/site.sql" target="_blank" '
-               'rel="noopener">the site&rsquo;s own tables</a>, built from these pages; '
-               'a check fails the build if it stops returning what&rsquo;s shown.')
-LIVE_NOTE = (f'Part of <a href="{REPO}/scripts/fraud-snapshot.sql" target="_blank" '
-             'rel="noopener">the read-only query</a> that runs once a day on Supabase '
-             'and publishes this page&rsquo;s totals.')
+TABLES_NOTE = (f'This query writes what&rsquo;s shown above, from <a href="{REPO}/data/console/site.sql" '
+               'target="_blank" rel="noopener">the site&rsquo;s own tables</a>; a check fails the '
+               'build if it ever stops matching.')
+LIVE_NOTE = ('This query writes what&rsquo;s shown above, from the same aggregates-only snapshot '
+             'the page draws; a check fails the build if it ever stops matching.')
+UPSTREAM_SUMMARY = "Where the numbers come from"
+UPSTREAM_NOTE = (f'Part of <a href="{REPO}/scripts/fraud-snapshot.sql" target="_blank" '
+                 'rel="noopener">the read-only query</a> that runs once a day on Supabase '
+                 'and publishes the snapshot.')
 
 
 # ── What each page piece shows, read straight from the page ──
@@ -109,8 +123,9 @@ TABLE_SOURCES = {
     "projects-more": ("projects.html", lambda d: project_cards(d, False)),
 }
 
-# name -> (CTEs to quote, the key of the final json_build_object entry that
-# publishes the last of them)
+# name -> (the upstream CTEs to quote, the key of the final json_build_object
+# entry that publishes the last of them). The key is also the snapshot field
+# the default query has to reproduce.
 LIVE_SOURCES = {
     "live-totals": (["base", "totals"], "totals"),
     "live-daily": (["base", "daily"], "daily"),
@@ -218,6 +233,44 @@ def live_sql(name, text, ctes):
     return "with " + body + "\n" + final
 
 
+# ── /live: the fraud_* tables, built from the snapshot like the browser does ──
+def snapshot_tables():
+    return {k: v for k, v in json.loads(SNAPSHOT_TABLES.read_text(encoding="utf-8")).items()
+            if not k.startswith("_")}
+
+
+def build_live_tables(con, snapshot, tables):
+    for name, spec in tables.items():
+        cols = spec["columns"]
+        con.execute(f"CREATE TABLE {name} ("
+                    + ", ".join(f"{c[0]} {c[1]}" for c in cols) + ")")
+        part = snapshot.get(spec["snapshot"])
+        rows = [part] if spec.get("one_row") else part
+        for r in rows:
+            con.execute(f"INSERT INTO {name} VALUES (" + ", ".join("?" * len(cols)) + ")",
+                        [r.get(c[2] if len(c) > 2 else c[0]) for c in cols])
+
+
+def check_live_sources(con, snapshot, tables):
+    errors = []
+    for name, (_, key) in LIVE_SOURCES.items():
+        spec = next((s for s in tables.values() if s["snapshot"] == key), None)
+        if spec is None:
+            errors.append(f"{name}: no table in data/console/snapshot-tables.json reads the snapshot's {key!r}")
+            continue
+        rename = {c[0]: (c[2] if len(c) > 2 else c[0]) for c in spec["columns"]}
+        cur = con.execute((SOURCES / f"{name}.sql").read_text(encoding="utf-8"))
+        cols = [rename.get(d[0], d[0]) for d in cur.description]
+        got = [dict(zip(cols, r)) for r in cur.fetchall()]
+        part = snapshot[key]
+        want = [{c: r.get(c) for c in cols} for r in ([part] if spec.get("one_row") else part)]
+        got = [{c: (v.isoformat() if hasattr(v, "isoformat") else v) for c, v in r.items()} for r in got]
+        if got != want:
+            errors.append(f"data/sql-sources/{name}.sql doesn't return the snapshot's {key}:\n"
+                          f"  query:    {got[:3]!r}\n  snapshot: {want[:3]!r}")
+    return errors
+
+
 # ── Site tables: run each query and compare with the page ──
 def norm(v):
     if isinstance(v, (list, tuple)):
@@ -238,18 +291,26 @@ def check_table_sources(con, pages):
 
 
 # ── HTML ──
-def caption(name, sql, note, indent):
+def caption(name, sql, note, indent, upstream=None):
     code = html.escape(sql.strip("\n"), quote=False)
     label = html.escape(f"SQL source for {LABELS[name]}")
     lines = [
-        '<details class="sql-src">',
+        f'<details class="sql-src" data-sql-source="{name}" data-sql-label="{html.escape(LABELS[name])}">',
         f'    <summary class="sql-src__toggle" aria-label="{label}">SQL source</summary>',
         '    <div class="sql-src__panel">',
         f'        <pre class="sql-src__code" tabindex="0"><code>{code}</code></pre>',
         f'        <p class="sql-src__note">{note}</p>',
-        '    </div>',
-        '</details>',
     ]
+    if upstream:
+        up = html.escape(upstream.strip("\n"), quote=False)
+        lines += [
+            '        <details class="sql-src__upstream">',
+            f'            <summary>{UPSTREAM_SUMMARY}</summary>',
+            f'            <pre class="sql-src__code" tabindex="0"><code>{up}</code></pre>',
+            f'            <p class="sql-src__note">{UPSTREAM_NOTE}</p>',
+            '        </details>',
+        ]
+    lines += ['    </div>', '</details>']
     # Only the tag lines get the indent: the <pre> content must stay verbatim.
     out, in_pre = [], False
     for ln in "\n".join(lines).split("\n"):
@@ -269,8 +330,8 @@ def render(page_text, sources):
         if name not in sources:
             sys.exit(f"unknown sql-source {name!r}")
         seen.append(name)
-        sql, note = sources[name]
-        return (f"{indent}<!-- sql-source: {name} -->\n{caption(name, sql, note, indent)}\n"
+        sql, note, upstream = sources[name]
+        return (f"{indent}<!-- sql-source: {name} -->\n{caption(name, sql, note, indent, upstream)}\n"
                 f"{indent}<!-- /sql-source -->")
 
     return MARKER.sub(sub, page_text), seen
@@ -283,11 +344,15 @@ def main():
     con.execute(site.build())
     errors = check_table_sources(con, pages)
 
+    tables = snapshot_tables()
+    build_live_tables(con, json.loads(SNAPSHOT_JSON.read_text(encoding="utf-8")), tables)
+    errors += check_live_sources(con, json.loads(SNAPSHOT_JSON.read_text(encoding="utf-8")), tables)
+
     snap = SNAPSHOT_SQL.read_text(encoding="utf-8")
     ctes = snapshot_ctes(snap)
-    sources = {n: ((SOURCES / f"{n}.sql").read_text(encoding="utf-8"), TABLES_NOTE)
-               for n in TABLE_SOURCES}
-    sources.update({n: (live_sql(n, snap, ctes), LIVE_NOTE) for n in LIVE_SOURCES})
+    query = lambda n: (SOURCES / f"{n}.sql").read_text(encoding="utf-8")  # noqa: E731
+    sources = {n: (query(n), TABLES_NOTE, None) for n in TABLE_SOURCES}
+    sources.update({n: (query(n), LIVE_NOTE, live_sql(n, snap, ctes)) for n in LIVE_SOURCES})
     unlabeled = sorted(set(sources) - set(LABELS))
     if unlabeled:
         sys.exit("no LABELS entry in scripts/build_sql_sources.py for: " + ", ".join(unlabeled))
@@ -298,6 +363,11 @@ def main():
         before = path.read_text(encoding="utf-8")
         after, seen = render(before, sources)
         used += seen
+        for name in seen:
+            pieces = len(re.findall(rf'data-sql-piece="{re.escape(name)}"', before))
+            if pieces != 1:
+                errors.append(f"{page}: the {name} caption needs exactly one data-sql-piece=\"{name}\" "
+                              f"to redraw (found {pieces})")
         if after != before:
             rendered[path] = after
     unused = sorted(set(sources) - set(used))
@@ -314,7 +384,7 @@ def main():
         if stale:
             sys.exit("SQL source captions are out of date in " + ", ".join(stale)
                      + ": run python3 scripts/build_sql_sources.py")
-        print(f"{len(used)} SQL source captions are current, and every site-table query returns what its page shows")
+        print(f"{len(used)} SQL source captions are current, and every default query returns what its piece shows")
     else:
         for path, after in rendered.items():
             path.write_text(after, encoding="utf-8")

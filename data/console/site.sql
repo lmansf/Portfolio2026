@@ -37,12 +37,13 @@ CREATE TABLE experience (
     started DATE,
     ended DATE,
     is_current BOOLEAN,
-    summary VARCHAR
+    summary VARCHAR,
+    sort_order INTEGER
 );
 INSERT INTO experience VALUES
-    ('IT Point of Sale Systems Analyst', NULL, 'ZooTampa at Lowry Park', 'Tampa, FL', DATE '2024-11-01', NULL, true, 'I own the Gateway Galaxy 8 ticketing platform and eGalaxy webstores, the systems behind the Zoo’s admissions and membership revenue: product and pricing configuration, monitoring, and vendor escalation. I built nine new premium animal-experience products and an admission-inclusive bundle, all still on sale, and designed and monitored the webstore upsells (add-on offers, a membership upsell tile, announcement ribbons) in custom HTML, CSS, and JavaScript. I also administer two POS platforms and a fleet of about 90 terminals, and gather requirements from front-line departments for platform changes.'),
-    ('Guest Engagement Coordinator', 'started as Guide', 'ZooTampa at Lowry Park', 'Tampa, FL', DATE '2022-11-01', DATE '2024-11-01', false, 'Overhauled the department’s reporting system, saving about four coordinator hours a week (roughly 200 hours a year). Produced weekly operational reports for leadership flagging risks and changes, and co-wrote education programs and their SOPs with animal care staff.'),
-    ('Data Analyst', NULL, 'Excel Esports', 'London, UK', DATE '2019-08-01', DATE '2022-07-01', false, 'Designed and delivered a data-driven talent scouting system in Excel and Python within six months; the resulting academy roster became the most dominant in the organization’s history by league performance. Delivered weekly tactical, meta, and player-development analysis that produced direct advantages in official matches.');
+    ('IT Point of Sale Systems Analyst', NULL, 'ZooTampa at Lowry Park', 'Tampa, FL', DATE '2024-11-01', NULL, true, 'I own the Gateway Galaxy 8 ticketing platform and eGalaxy webstores, the systems behind the Zoo’s admissions and membership revenue: product and pricing configuration, monitoring, and vendor escalation. I built nine new premium animal-experience products and an admission-inclusive bundle, all still on sale, and designed and monitored the webstore upsells (add-on offers, a membership upsell tile, announcement ribbons) in custom HTML, CSS, and JavaScript. I also administer two POS platforms and a fleet of about 90 terminals, and gather requirements from front-line departments for platform changes.', 1),
+    ('Guest Engagement Coordinator', 'started as Guide', 'ZooTampa at Lowry Park', 'Tampa, FL', DATE '2022-11-01', DATE '2024-11-01', false, 'Overhauled the department’s reporting system, saving about four coordinator hours a week (roughly 200 hours a year). Produced weekly operational reports for leadership flagging risks and changes, and co-wrote education programs and their SOPs with animal care staff.', 2),
+    ('Data Analyst', NULL, 'Excel Esports', 'London, UK', DATE '2019-08-01', DATE '2022-07-01', false, 'Designed and delivered a data-driven talent scouting system in Excel and Python within six months; the resulting academy roster became the most dominant in the organization’s history by league performance. Delivered weekly tactical, meta, and player-development analysis that produced direct advantages in official matches.', 3);
 
 -- The toolkit on the home page, one row per skill.
 CREATE TABLE skills (
@@ -96,9 +97,10 @@ INSERT INTO resume VALUES
 
 -- ── The nest box: a small hunt for people who poke around ──
 -- Hand-written (not built from the pages); build_console_data.py appends it
--- to site.sql. The console's Tables list leaves nest_box out on purpose
--- (HIDDEN_TABLES in assets/console.js), so it turns up only for someone who
--- looks: SHOW TABLES, information_schema, or the hint on the Home query.
+-- to site.sql. No page draws it, and the SQL source editors leave it out of
+-- the table names they suggest (HIDDEN_TABLES in assets/sql-source.js), so it
+-- turns up only for someone who looks: SHOW ALL TABLES, information_schema,
+-- or the comment on the Home toolkit's default query.
 --
 -- Solving it: join each shard_key to products.product_id, order the shards
 -- by list_price (cheapest first), and string them together. They spell a
@@ -121,8 +123,8 @@ INSERT INTO nest_box VALUES
     (8, 'laim', NULL),
     (9, 'SELE', NULL);
 
--- The query the shards spell calls this. The console sees the found line
--- and asks /api/egg/claim for this visitor's one-time egg code.
+-- The query the shards spell calls this. The editor that runs it sees the
+-- found line and asks /api/egg/claim for this visitor's one-time egg code.
 CREATE MACRO claim_egg(word) AS
     CASE WHEN lower(trim(word)) = 'speckled-robin'
          THEN 'You found the nest.'

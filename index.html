@@ -157,7 +157,7 @@
                 </div>
             </div>
 
-            <div class="now" role="group" aria-label="What I'm doing now">
+            <div class="now" role="group" aria-label="What I'm doing now" data-sql-piece="now">
                 <div class="now__row">
                     <span class="now__label">Now</span>
                     <span class="now__value">IT Point of Sale Systems Analyst at ZooTampa at Lowry Park</span>
@@ -172,12 +172,12 @@
                 </div>
             </div>
             <!-- sql-source: now -->
-            <details class="sql-src">
+            <details class="sql-src" data-sql-source="now" data-sql-label="the now strip">
                 <summary class="sql-src__toggle" aria-label="SQL source for the now strip">SQL source</summary>
                 <div class="sql-src__panel">
                     <pre class="sql-src__code" tabindex="0"><code>SELECT now, building, latest
 FROM resume;</code></pre>
-                    <p class="sql-src__note">Runs against <a href="https://github.com/lmansf/Portfolio2026/blob/main/data/console/site.sql" target="_blank" rel="noopener">the site&rsquo;s own tables</a>, built from these pages; a check fails the build if it stops returning what&rsquo;s shown.</p>
+                    <p class="sql-src__note">This query writes what&rsquo;s shown above, from <a href="https://github.com/lmansf/Portfolio2026/blob/main/data/console/site.sql" target="_blank" rel="noopener">the site&rsquo;s own tables</a>; a check fails the build if it ever stops matching.</p>
                 </div>
             </details>
             <!-- /sql-source -->
@@ -193,7 +193,7 @@ FROM resume;</code></pre>
                 <h2 class="section-head__title" id="home-featured">Featured projects</h2>
                 <a class="section-head__link" href="/projects">All projects →</a>
             </header>
-            <div class="project-grid project-grid--featured">
+            <div class="project-grid project-grid--featured" data-sql-piece="featured">
 
                 <article class="project project--featured">
                     <div class="project__body">
@@ -247,14 +247,14 @@ FROM resume;</code></pre>
 
             </div>
             <!-- sql-source: featured -->
-            <details class="sql-src">
+            <details class="sql-src" data-sql-source="featured" data-sql-label="the featured projects">
                 <summary class="sql-src__toggle" aria-label="SQL source for the featured projects">SQL source</summary>
                 <div class="sql-src__panel">
                     <pre class="sql-src__code" tabindex="0"><code>SELECT title, eyebrow, year, summary, tags
 FROM projects
 WHERE featured
 ORDER BY sort_order;</code></pre>
-                    <p class="sql-src__note">Runs against <a href="https://github.com/lmansf/Portfolio2026/blob/main/data/console/site.sql" target="_blank" rel="noopener">the site&rsquo;s own tables</a>, built from these pages; a check fails the build if it stops returning what&rsquo;s shown.</p>
+                    <p class="sql-src__note">This query writes what&rsquo;s shown above, from <a href="https://github.com/lmansf/Portfolio2026/blob/main/data/console/site.sql" target="_blank" rel="noopener">the site&rsquo;s own tables</a>; a check fails the build if it ever stops matching.</p>
                 </div>
             </details>
             <!-- /sql-source -->
@@ -270,7 +270,7 @@ ORDER BY sort_order;</code></pre>
                 <h2 class="section-head__title" id="home-experience">Experience</h2>
                 <a class="section-head__link" href="/assets/loganmansfield.pdf" target="_blank" rel="noopener">Full résumé (PDF) <span aria-hidden="true">↗</span></a>
             </header>
-            <ol class="xp">
+            <ol class="xp" data-sql-piece="experience">
                 <li class="xp__item xp__item--now">
                     <div class="xp__rail"><span class="xp__dot" aria-hidden="true"></span></div>
                     <div class="xp__card">
@@ -306,7 +306,7 @@ ORDER BY sort_order;</code></pre>
                 </li>
             </ol>
             <!-- sql-source: experience -->
-            <details class="sql-src">
+            <details class="sql-src" data-sql-source="experience" data-sql-label="the experience timeline">
                 <summary class="sql-src__toggle" aria-label="SQL source for the experience timeline">SQL source</summary>
                 <div class="sql-src__panel">
                     <pre class="sql-src__code" tabindex="0"><code>SELECT
@@ -317,8 +317,8 @@ ORDER BY sort_order;</code></pre>
         || coalesce(strftime(ended, '%b %Y'), 'present') AS dates,
     summary
 FROM experience
-ORDER BY started DESC;</code></pre>
-                    <p class="sql-src__note">Runs against <a href="https://github.com/lmansf/Portfolio2026/blob/main/data/console/site.sql" target="_blank" rel="noopener">the site&rsquo;s own tables</a>, built from these pages; a check fails the build if it stops returning what&rsquo;s shown.</p>
+ORDER BY started DESC, sort_order;</code></pre>
+                    <p class="sql-src__note">This query writes what&rsquo;s shown above, from <a href="https://github.com/lmansf/Portfolio2026/blob/main/data/console/site.sql" target="_blank" rel="noopener">the site&rsquo;s own tables</a>; a check fails the build if it ever stops matching.</p>
                 </div>
             </details>
             <!-- /sql-source -->
@@ -330,19 +330,19 @@ ORDER BY started DESC;</code></pre>
                 <header class="section-head">
                     <h2 class="section-head__title">Credentials</h2>
                 </header>
-                <ul class="chip-list">
+                <ul class="chip-list" data-sql-piece="credentials">
                     <li class="chip chip--cred">Microsoft Certified: Power BI Data Analyst Associate <span class="chip__sub">PL-300</span></li>
                     <li class="chip chip--cred">SQL Certification of Competency <span class="chip__sub">LearnSQL.com</span></li>
                     <li class="chip chip--cred">Microsoft Fabric in a Day <span class="chip__sub">workshop</span></li>
                 </ul>
                 <!-- sql-source: credentials -->
-                <details class="sql-src">
+                <details class="sql-src" data-sql-source="credentials" data-sql-label="the credentials">
                     <summary class="sql-src__toggle" aria-label="SQL source for the credentials">SQL source</summary>
                     <div class="sql-src__panel">
                         <pre class="sql-src__code" tabindex="0"><code>SELECT credential, detail
 FROM credentials
 ORDER BY sort_order;</code></pre>
-                        <p class="sql-src__note">Runs against <a href="https://github.com/lmansf/Portfolio2026/blob/main/data/console/site.sql" target="_blank" rel="noopener">the site&rsquo;s own tables</a>, built from these pages; a check fails the build if it stops returning what&rsquo;s shown.</p>
+                        <p class="sql-src__note">This query writes what&rsquo;s shown above, from <a href="https://github.com/lmansf/Portfolio2026/blob/main/data/console/site.sql" target="_blank" rel="noopener">the site&rsquo;s own tables</a>; a check fails the build if it ever stops matching.</p>
                     </div>
                 </details>
                 <!-- /sql-source -->
@@ -355,7 +355,7 @@ ORDER BY sort_order;</code></pre>
                 <header class="section-head">
                     <h2 class="section-head__title">Toolkit</h2>
                 </header>
-                <div class="toolkit">
+                <div class="toolkit" data-sql-piece="toolkit">
                     <div class="toolkit__group">
                         <h3 class="toolkit__label" id="tk-data">Data stack</h3>
                         <ul class="chip-list" aria-labelledby="tk-data">
@@ -387,14 +387,15 @@ ORDER BY sort_order;</code></pre>
                     </div>
                 </div>
                 <!-- sql-source: toolkit -->
-                <details class="sql-src">
+                <details class="sql-src" data-sql-source="toolkit" data-sql-label="the toolkit">
                     <summary class="sql-src__toggle" aria-label="SQL source for the toolkit">SQL source</summary>
                     <div class="sql-src__panel">
-                        <pre class="sql-src__code" tabindex="0"><code>SELECT category, list(skill ORDER BY sort_order) AS skills
+                        <pre class="sql-src__code" tabindex="0"><code>-- Not every table here makes it onto a page. SHOW ALL TABLES lists them.
+SELECT category, list(skill ORDER BY sort_order) AS skills
 FROM skills
 GROUP BY category
 ORDER BY min(sort_order);</code></pre>
-                        <p class="sql-src__note">Runs against <a href="https://github.com/lmansf/Portfolio2026/blob/main/data/console/site.sql" target="_blank" rel="noopener">the site&rsquo;s own tables</a>, built from these pages; a check fails the build if it stops returning what&rsquo;s shown.</p>
+                        <p class="sql-src__note">This query writes what&rsquo;s shown above, from <a href="https://github.com/lmansf/Portfolio2026/blob/main/data/console/site.sql" target="_blank" rel="noopener">the site&rsquo;s own tables</a>; a check fails the build if it ever stops matching.</p>
                     </div>
                 </details>
                 <!-- /sql-source -->
@@ -460,5 +461,6 @@ ORDER BY min(sort_order);</code></pre>
     <script defer src="/assets/transition.min.js"></script>
     <script defer src="/assets/pipeline.min.js"></script>
     <script defer src="/assets/motion.min.js"></script>
+    <script type="module" src="/assets/sql-source.min.js"></script>
 </body>
 </html>
