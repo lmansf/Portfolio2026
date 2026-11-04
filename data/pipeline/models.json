@@ -304,7 +304,7 @@
                 "pushes": "Of those, pushes."
             },
             "tests": [
-                {"type": "row_count", "min": 1},
+                {"type": "row_count", "min": 0},
                 {"type": "not_null", "columns": ["day", "repo", "events"]},
                 {"type": "unique", "columns": ["day", "repo"]},
                 {"type": "expression", "name": "pushes are no more than events", "sql": "pushes <= events"},

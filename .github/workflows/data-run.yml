@@ -10,7 +10,8 @@
 # good files. The job fails only when a definition is broken (a test whose
 # SQL errors, or models.json naming a table or caption that doesn't exist).
 #
-# On a pull request it runs the same steps as a dry run and writes nothing.
+# On a pull request it runs the same steps as a dry run and writes nothing
+# (that job gets a read-only token; only the commit path can write).
 # No secrets: the GitHub API calls use the workflow's own token, read-only,
 # against public endpoints.
 name: Data run
@@ -32,14 +33,15 @@ on:
   pull_request:
 
 permissions:
-  contents: write
+  contents: read
 
 concurrency:
   group: data-run-${{ github.event_name == 'pull_request' && github.ref || 'main' }}
   cancel-in-progress: false
 
 jobs:
-  run:
+  dry-run:
+    if: github.event_name == 'pull_request'
     runs-on: ubuntu-latest
     timeout-minutes: 10
     steps:
@@ -49,21 +51,31 @@ jobs:
           python-version: "3.12"
       - name: Install DuckDB
         run: python3 -m pip install duckdb==1.5.6
-
       - name: Dry run (pull request)
-        if: github.event_name == 'pull_request'
         env:
           GITHUB_TOKEN: ${{ github.token }}
         run: python3 scripts/data_run.py --dry-run
 
+  run:
+    if: github.event_name != 'pull_request'
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Install DuckDB
+        run: python3 -m pip install duckdb==1.5.6
+
       - name: Run, test and log
-        if: github.event_name != 'pull_request'
         env:
           GITHUB_TOKEN: ${{ github.token }}
         run: python3 scripts/data_run.py
 
       - name: Commit the run
-        if: github.event_name != 'pull_request'
         run: |
           set -euo pipefail
           git add data/pipeline data/console/site.sql
@@ -75,8 +87,11 @@ jobs:
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git commit -m "Data run: rebuild, test and log the site data"
           for attempt in 1 2 3; do
-            git pull --rebase origin main && git push origin HEAD:main && exit 0
+            if git fetch origin main && git rebase origin/main && git push origin HEAD:main; then
+              exit 0
+            fi
+            git rebase --abort 2>/dev/null || true
             sleep $((attempt * 5))
           done
-          echo "::error::Couldn't push the run log after three tries."
+          echo "::error::Couldn't push the run log after three tries (a conflict with main, or a push race that never settled)."
           exit 1
