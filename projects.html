@@ -164,6 +164,7 @@
 FROM projects
 WHERE featured
 ORDER BY sort_order;</code></pre>
+                    <ol class="sql-src__lineage" aria-label="Lineage, from raw source to the table this query reads"><li class="sql-src__step"><span class="sql-src__layer">raw</span> <span class="sql-src__node" title="index.html, projects.html">Page markup</span></li><li class="sql-src__step"><span class="sql-src__layer">staging</span> <span class="sql-src__node" title="scripts/build_console_data.py">Parsed page rows</span></li><li class="sql-src__step"><span class="sql-src__layer">mart</span> <span class="sql-src__node" title="data/console/site.sql"><code>projects</code></span></li></ol>
                     <p class="sql-src__note">This query writes what&rsquo;s shown above, from <a href="https://github.com/lmansf/Portfolio2026/blob/main/data/console/site.sql" target="_blank" rel="noopener">the site&rsquo;s own tables</a>; a check fails the build if it ever stops matching. <a href="/status#t-projects">See its checks</a>.</p>
                 </div>
             </details>
@@ -312,6 +313,7 @@ ORDER BY sort_order;</code></pre>
 FROM projects
 WHERE NOT featured
 ORDER BY sort_order;</code></pre>
+                    <ol class="sql-src__lineage" aria-label="Lineage, from raw source to the table this query reads"><li class="sql-src__step"><span class="sql-src__layer">raw</span> <span class="sql-src__node" title="index.html, projects.html">Page markup</span></li><li class="sql-src__step"><span class="sql-src__layer">staging</span> <span class="sql-src__node" title="scripts/build_console_data.py">Parsed page rows</span></li><li class="sql-src__step"><span class="sql-src__layer">mart</span> <span class="sql-src__node" title="data/console/site.sql"><code>projects</code></span></li></ol>
                     <p class="sql-src__note">This query writes what&rsquo;s shown above, from <a href="https://github.com/lmansf/Portfolio2026/blob/main/data/console/site.sql" target="_blank" rel="noopener">the site&rsquo;s own tables</a>; a check fails the build if it ever stops matching. <a href="/status#t-projects">See its checks</a>.</p>
                 </div>
             </details>

@@ -134,21 +134,15 @@ LIVE_SOURCES = {
     "live-patterns": (["base", "patterns"], "patterns"),
 }
 
-# What each caption's accessible name says it belongs to (the visible text
-# stays "SQL source").
-LABELS = {
-    "now": "the now strip",
-    "featured": "the featured projects",
-    "experience": "the experience timeline",
-    "credentials": "the credentials",
-    "toolkit": "the toolkit",
-    "projects-featured": "the featured projects",
-    "projects-more": "the more builds",
-    "live-totals": "the last 30 days totals",
-    "live-daily": "the fraud per day chart",
-    "live-scores": "the score distribution chart",
-    "live-patterns": "the catch rate by fraud pattern table",
-}
+# Every caption's piece, as data/pipeline/models.json describes it: the
+# tables it reads (for its lineage and its /status link) and what its
+# accessible name says it belongs to (the visible text stays "SQL source").
+def load_models():
+    return json.loads(MODELS.read_text(encoding="utf-8"))
+
+
+MODEL = load_models()
+LABELS = {name: spec["label"] for name, spec in MODEL["pieces"].items()}
 
 
 # ── /live: cut CTEs and final-select entries out of fraud-snapshot.sql ──
@@ -304,11 +298,36 @@ def check_table_sources(con, pages):
 # ── HTML ──
 def status_link(name):
     """A link to the /status group holding this caption's checks (its first table in models.json)."""
-    pieces = json.loads(MODELS.read_text(encoding="utf-8"))["pieces"]
-    if name not in pieces:
-        sys.exit(f"{name}: no entry under pieces in data/pipeline/models.json")
-    table = pieces[name]["tables"][0]
+    table = MODEL["pieces"][name]["tables"][0]
     return f' <a href="/status#t-{html.escape(table)}">See its checks</a>.'
+
+
+def lineage(name):
+    """The piece's path from raw to mart, from models.json: every node upstream of
+    its tables, grouped by layer, as a small ordered list."""
+    nodes = MODEL["nodes"]
+    seen, stack = [], list(MODEL["pieces"][name]["tables"])
+    while stack:
+        n = stack.pop(0)
+        if n in seen:
+            continue
+        if n not in nodes:
+            sys.exit(f"{name}: lineage names {n!r}, which isn't a node in data/pipeline/models.json")
+        seen.append(n)
+        stack.extend(nodes[n].get("upstream", []))
+    steps = []
+    for layer in ("raw", "staging", "mart"):
+        for n in reversed(seen):
+            node = nodes[n]
+            if node["layer"] != layer:
+                continue
+            text = (f'<code>{html.escape(n)}</code>' if layer == "mart"
+                    else html.escape(node["label"]))
+            where = html.escape(node.get("where", ""))
+            steps.append(f'<li class="sql-src__step"><span class="sql-src__layer">{layer}</span> '
+                         f'<span class="sql-src__node" title="{where}">{text}</span></li>')
+    return ('<ol class="sql-src__lineage" aria-label="Lineage, from raw source to the table this query reads">'
+            + "".join(steps) + '</ol>')
 
 
 def caption(name, sql, note, indent, upstream=None):
@@ -323,6 +342,7 @@ def caption(name, sql, note, indent, upstream=None):
         '<span class="sql-src__trust" data-sql-trust hidden></span></summary>',
         '    <div class="sql-src__panel">',
         f'        <pre class="sql-src__code" tabindex="0"><code>{code}</code></pre>',
+        f'        {lineage(name)}',
         f'        <p class="sql-src__note">{note}{status_link(name)}</p>',
     ]
     if upstream:
@@ -379,7 +399,7 @@ def main():
     sources.update({n: (query(n), LIVE_NOTE, live_sql(n, snap, ctes)) for n in LIVE_SOURCES})
     unlabeled = sorted(set(sources) - set(LABELS))
     if unlabeled:
-        sys.exit("no LABELS entry in scripts/build_sql_sources.py for: " + ", ".join(unlabeled))
+        sys.exit("no entry under pieces in data/pipeline/models.json for: " + ", ".join(unlabeled))
 
     used, rendered = [], {}
     for page in ("index.html", "projects.html", "live.html"):

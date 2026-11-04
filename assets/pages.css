@@ -734,6 +734,30 @@ main.page > * { min-width: 0; }
     outline: 2px solid var(--focus-ring);
     outline-offset: -2px;
 }
+/* Lineage: raw → staging → mart for the piece (from data/pipeline/models.json). */
+.sql-src__lineage {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: 0.2rem 0.45rem;
+    margin: 0;
+    padding: 0.5rem 0.95rem;
+    border-top: 1px solid var(--hairline);
+    list-style: none;
+    font-size: 0.76rem;
+    line-height: 1.4;
+    color: var(--ink-2);
+}
+.sql-src__step { display: inline-flex; align-items: baseline; gap: 0.3rem; min-width: 0; }
+.sql-src__step + .sql-src__step::before { content: "→"; color: var(--ink-3); margin-right: 0.15rem; }
+.sql-src__layer {
+    font-size: 0.66rem;
+    font-weight: 600;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    color: var(--ink-3);
+}
+.sql-src__node code { font-family: var(--font-mono); font-size: 0.74rem; color: var(--ink-1); }
 .sql-src__note {
     margin: 0;
     padding: 0.55rem 0.95rem 0.65rem;
