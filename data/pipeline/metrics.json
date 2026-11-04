@@ -1,0 +1,78 @@
+{
+    "_about": "The site's metrics, defined once. Each is numerator / denominator, written as columns joined by + or -, over the table it's defined on (fraud_totals unless a table says otherwise). assets/metrics.js computes them for the /live page; scripts/build_metrics.py turns them into data/pipeline/metrics.sql (a DuckDB macro per metric and the fraud_metrics view), which the SQL source editors and the nightly data run both load; the catalog lists them. claims tie a sentence of site copy to a metric, and the data run fails a check when the sentence and the number stop agreeing.",
+    "metrics": {
+        "catch_rate": {
+            "label": "Catch rate",
+            "description": "Share of fraudulent orders the rules flagged (sent to review or declined).",
+            "numerator": "fraud_caught",
+            "denominator": "fraud",
+            "tables": {
+                "fraud_totals": {},
+                "fraud_daily": {},
+                "fraud_patterns": { "numerator": "caught" }
+            }
+        },
+        "miss_rate": {
+            "label": "Fraud approved",
+            "description": "Share of fraudulent orders the rules approved: the fraud that got through.",
+            "numerator": "fraud - fraud_caught",
+            "denominator": "fraud",
+            "tables": {
+                "fraud_totals": {},
+                "fraud_daily": {},
+                "fraud_patterns": { "numerator": "fraud - caught" }
+            }
+        },
+        "false_decline_rate": {
+            "label": "Good customers declined",
+            "description": "Share of legitimate orders the rules declined outright.",
+            "numerator": "false_declines",
+            "denominator": "legit",
+            "tables": { "fraud_totals": {} }
+        },
+        "legit_flag_rate": {
+            "label": "Good customers flagged",
+            "description": "Share of legitimate orders the rules sent to review or declined.",
+            "numerator": "flagged - fraud_caught",
+            "denominator": "legit",
+            "tables": { "fraud_totals": {} }
+        },
+        "dollars_stopped_share": {
+            "label": "Fraud dollars stopped",
+            "description": "Share of attempted fraud dollars on orders the rules flagged.",
+            "numerator": "fraud_dollars_stopped",
+            "denominator": "fraud_dollars_stopped + fraud_dollars_approved",
+            "tables": { "fraud_totals": {}, "fraud_daily": {} }
+        },
+        "fraud_rate": {
+            "label": "Fraud rate",
+            "description": "Share of all checkouts that were fraudulent.",
+            "numerator": "fraud",
+            "denominator": "checkouts",
+            "tables": { "fraud_totals": {}, "fraud_daily": {} }
+        },
+        "timeout_rate": {
+            "label": "Scoring timeouts",
+            "description": "Share of checkouts whose fraud score timed out and failed open (approved unscored).",
+            "numerator": "scoring_timeouts",
+            "denominator": "checkouts",
+            "tables": { "fraud_totals": {} }
+        }
+    },
+    "claims": [
+        {
+            "pages": ["index.html", "projects.html"],
+            "quote": "flagged about half the fraud",
+            "metric": "catch_rate",
+            "min": 0.4,
+            "max": 0.6
+        },
+        {
+            "pages": ["index.html", "projects.html"],
+            "quote": "and no legitimate orders",
+            "metric": "legit_flag_rate",
+            "min": 0,
+            "max": 0
+        }
+    ]
+}

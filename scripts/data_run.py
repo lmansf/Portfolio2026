@@ -56,6 +56,7 @@ import duckdb
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 import build_console_data as site  # noqa: E402
+import build_metrics as metric_defs  # noqa: E402
 import build_sql_sources as captions  # noqa: E402
 
 ROOT = site.ROOT
@@ -218,6 +219,8 @@ def load(data):
     captions.build_live_tables(con, data["snapshot"] or {}, captions.snapshot_tables())
     gh_tables = {k: v for k, v in read_json(GITHUB_TABLES, {}).items() if not k.startswith("_")}
     captions.build_live_tables(con, data["github"] or {}, gh_tables)
+    # The site's metrics: a macro each and the fraud_metrics view (metrics.json).
+    con.execute(metric_defs.OUT.read_text(encoding="utf-8"))
     return con
 
 
@@ -361,6 +364,9 @@ def run_checks(con, models, sources, started, pages, snapshot):
                 add(check_id, name, label, False, f"the test itself failed: {err}", status="error")
                 broken.append(f"{check_id}: {err}")
 
+    if "fraud_metrics" in tables:
+        metric_checks(con, add, broken)
+
     # The captions: each default query still returns what its page shows.
     snapshot_tables = captions.snapshot_tables()
     pieces = {}
@@ -394,6 +400,48 @@ def run_checks(con, models, sources, started, pages, snapshot):
     for piece in sorted(captioned - set(models["pieces"])):
         broken.append(f"SQL source caption {piece} has no entry under pieces in models.json")
     return checks, tables, pieces, broken
+
+
+PAGE_NAMES = {"index.html": "Home", "projects.html": "Projects"}
+
+
+def pct(v):
+    return f"{v * 100:.1f}".rstrip("0").rstrip(".") + "%"
+
+
+def metric_checks(con, add, broken):
+    """fraud_metrics has a row for every metric in metrics.json, and each
+    sentence of site copy that quotes a metric (metrics.json claims) is still
+    on its page and still true of the number."""
+    defs = metric_defs.load()
+    broken += [f"metrics.json: {p}" for p in metric_defs.problems(defs)]
+    rows = {r[0]: (r[1], r[2], r[3]) for r in con.execute(
+        "SELECT metric, value, numerator, denominator FROM fraud_metrics").fetchall()}
+    want = list(defs["metrics"])
+    missing = [m for m in want if m not in rows]
+    add("fraud_metrics.every_metric", "fraud_metrics", "a row for every metric in metrics.json",
+        not missing and len(rows) == len(want),
+        ("missing: " + ", ".join(missing)) if missing else f"{len(rows)} metrics")
+    for claim in defs.get("claims", []):
+        m = defs["metrics"].get(claim["metric"])
+        if not m:
+            continue
+        where = " and ".join(PAGE_NAMES.get(pg, pg) for pg in claim["pages"])
+        lo, hi = claim["min"], claim["max"]
+        bound = f"is {pct(lo)}" if lo == hi else f"is between {pct(lo)} and {pct(hi)}"
+        say = "say" if len(claim["pages"]) > 1 else "says"
+        name = f'{where} {say} "{claim["quote"]}": {m["label"].lower()} {bound}'
+        gone = [pg for pg in claim["pages"]
+                if claim["quote"] not in " ".join((ROOT / pg).read_text(encoding="utf-8").split())]
+        value, num, den = rows.get(claim["metric"], (None, None, None))
+        if gone:
+            passed, detail = False, f"{', '.join(gone)} no longer {'say' if len(gone) > 1 else 'says'} it: update the claim in metrics.json"
+        elif value is None:
+            passed, detail = False, "no value to check (the snapshot is empty)"
+        else:
+            passed = lo - 1e-9 <= value <= hi + 1e-9
+            detail = f"{pct(value)} ({num:,.0f} of {den:,.0f})" + ("" if passed else ": the copy needs updating")
+        add(f"fraud_metrics.claim_{slug(claim['quote'])}", "fraud_metrics", name, passed, detail)
 
 
 def validate(models):

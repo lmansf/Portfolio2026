@@ -25,6 +25,8 @@ on:
       - "data/pipeline/models.json"
       - "data/pipeline/sql/**"
       - "data/pipeline/github-tables.json"
+      - "data/pipeline/metrics.json"
+      - "data/pipeline/metrics.sql"
       - "scripts/data_run.py"
       - ".github/workflows/data-run.yml"
   pull_request:

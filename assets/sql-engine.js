@@ -16,6 +16,9 @@
  *   - builds github_activity and github_repos (data/pipeline/github-tables.json)
  *     from /data/pipeline/github.json, the nightly data run's pull of public
  *     GitHub activity,
+ *   - runs /data/pipeline/metrics.sql (scripts/build_metrics.py): a macro per
+ *     site metric, like catch_rate(fraud_caught, fraud), and the fraud_metrics
+ *     view, the same definitions the /live page and the data run use,
  *   - puts both on the search path, so `FROM projects` and `FROM orders`
  *     both work,
  *   - switches off extension install/autoload and all external access
@@ -40,6 +43,7 @@ const PARK_URL = `/data/playground/${PARK_FILE}.gz`;
 const SITE_SQL_URL = '/data/console/site.sql';
 const FRAUD_URL = '/data/fraud-snapshot.json';
 const GITHUB_URL = '/data/pipeline/github.json';
+const METRICS_SQL_URL = '/data/pipeline/metrics.sql';
 
 /**
  * The fraud_* tables: exactly the snapshot fields named in
@@ -133,7 +137,7 @@ export function createEngine({ onStatus = () => {} } = {}) {
             });
 
             onStatus('Loading the data…');
-            const [parkBytes, siteSql, snapshot, github] = await Promise.all([
+            const [parkBytes, siteSql, snapshot, github, metricsSql] = await Promise.all([
                 fetch(PARK_URL).then((r) => {
                     if (!r.ok) throw new Error(`Couldn’t fetch the sample data (${r.status})`);
                     return r.arrayBuffer();
@@ -145,7 +149,8 @@ export function createEngine({ onStatus = () => {} } = {}) {
                 // The live numbers are a nice extra: if they don't load, the
                 // table is just empty and everything else still works.
                 fetch(FRAUD_URL).then((r) => (r.ok ? r.json() : null)).catch(() => null),
-                fetch(GITHUB_URL).then((r) => (r.ok ? r.json() : null)).catch(() => null)
+                fetch(GITHUB_URL).then((r) => (r.ok ? r.json() : null)).catch(() => null),
+                fetch(METRICS_SQL_URL).then((r) => (r.ok ? r.text() : null)).catch(() => null)
             ]);
             await db.registerFileBuffer(PARK_FILE, await gunzip(new Uint8Array(parkBytes)));
 
@@ -163,6 +168,11 @@ export function createEngine({ onStatus = () => {} } = {}) {
             } catch {
                 for (const name of Object.keys(GITHUB_TABLES)) await conn.query(`DROP TABLE IF EXISTS ${name}`);
                 await conn.query(snapshotTablesSql(null, GITHUB_TABLES));
+            }
+            // The metric macros and fraud_metrics: an extra too, so a failure
+            // here leaves the tables as they are.
+            if (metricsSql) {
+                try { await conn.query(metricsSql); } catch { /* the tables still work */ }
             }
             await conn.query("SET search_path = 'memory.main,owl_park.main'");
             // Lock it down: from here a query can read the tables (and make
