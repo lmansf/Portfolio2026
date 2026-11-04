@@ -794,14 +794,15 @@ main.page > * { min-width: 0; }
     border-radius: var(--r-pill);
     cursor: pointer;
 }
-.sql-src__btn:hover:not(:disabled) { background: var(--surface-3); }
-.sql-src__btn:disabled { opacity: 0.55; cursor: default; }
+.sql-src__btn:hover:not(:disabled):not([aria-disabled="true"]) { background: var(--surface-3); }
+.sql-src__btn:disabled,
+.sql-src__btn[aria-disabled="true"] { opacity: 0.55; cursor: default; }
 .sql-src__btn--run {
     color: var(--on-accent);
     background: var(--accent);
     border-color: var(--accent);
 }
-.sql-src__btn--run:hover:not(:disabled) { background: var(--accent); filter: brightness(1.08); }
+.sql-src__btn--run:hover:not(:disabled):not([aria-disabled="true"]) { background: var(--accent); filter: brightness(1.08); }
 .sql-src__keys {
     margin-left: auto;
     font-size: 0.72rem;

@@ -245,7 +245,7 @@ def build_live_tables(con, snapshot, tables):
         con.execute(f"CREATE TABLE {name} ("
                     + ", ".join(f"{c[0]} {c[1]}" for c in cols) + ")")
         part = snapshot.get(spec["snapshot"])
-        rows = [part] if spec.get("one_row") else part
+        rows = ([part] if part else []) if spec.get("one_row") else (part or [])
         for r in rows:
             con.execute(f"INSERT INTO {name} VALUES (" + ", ".join("?" * len(cols)) + ")",
                         [r.get(c[2] if len(c) > 2 else c[0]) for c in cols])
@@ -262,7 +262,11 @@ def check_live_sources(con, snapshot, tables):
         cur = con.execute((SOURCES / f"{name}.sql").read_text(encoding="utf-8"))
         cols = [rename.get(d[0], d[0]) for d in cur.description]
         got = [dict(zip(cols, r)) for r in cur.fetchall()]
-        part = snapshot[key]
+        part = snapshot.get(key)
+        if part is None:
+            errors.append(f"{name}: data/fraud-snapshot.json has no {key!r}; the fraud-snapshot workflow's "
+                          f"jq allow-list and data/console/snapshot-tables.json must name the same fields")
+            continue
         want = [{c: r.get(c) for c in cols} for r in ([part] if spec.get("one_row") else part)]
         got = [{c: (v.isoformat() if hasattr(v, "isoformat") else v) for c, v in r.items()} for r in got]
         if got != want:

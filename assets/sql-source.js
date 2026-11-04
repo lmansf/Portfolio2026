@@ -252,7 +252,7 @@ let statusTarget = null;
 let schema = null; // { tables: [...], columns: [...] } for friendlier errors
 
 function getEngine() {
-    if (!engine) engine = createEngine({ onStatus: (msg) => { if (statusTarget && msg !== 'Ready.') statusTarget(msg); } });
+    if (!engine) engine = createEngine({ onStatus: (msg) => { if (statusTarget && msg !== 'Ready.') setStatus(statusTarget, msg); } });
     return engine;
 }
 
@@ -319,6 +319,7 @@ function hydrate(details) {
         if (e.key === 'Enter' && (e.metaKey || e.ctrlKey)) { e.preventDefault(); runQuery(state); }
     });
     run.addEventListener('click', () => {
+        if (run.getAttribute('aria-disabled') === 'true') return;
         if (state.running) stopRun(state);
         else runQuery(state);
     });
@@ -341,7 +342,7 @@ async function runQuery(state) {
     state.running = true;
     state.abandoned = false;
     setRunButton(state, 'Loading…', true);
-    statusTarget = (msg) => setStatus(state, msg);
+    if (!statusTarget) statusTarget = state;
     setStatus(state, eng.loaded ? 'Running…' : 'Loading DuckDB (first run only)…');
     state.out.replaceChildren();
     const check = () => {
@@ -388,12 +389,13 @@ async function runQuery(state) {
 function finish(state) {
     state.running = false;
     setRunButton(state, 'Run', false);
-    statusTarget = null;
+    if (statusTarget === state) statusTarget = null;
 }
 
 function setRunButton(state, label, disabled) {
     state.run.textContent = label;
-    state.run.disabled = disabled;
+    if (disabled) state.run.setAttribute('aria-disabled', 'true');
+    else state.run.removeAttribute('aria-disabled');
 }
 
 function stopRun(state) {
@@ -416,7 +418,7 @@ function draw(state, result, ms, sql) {
     const rows = plural(n, 'row');
     if (verdict.ok) {
         // The dashed frame marks a piece drawn from the visitor's own query.
-        state.edited = sql !== state.defaultSql;
+        state.edited = sql !== state.defaultSql || state.wrote;
         if (state.piece) state.piece.classList.toggle('is-sql-edited', state.edited);
         setStatus(state, `Redrew ${state.label} from ${rows} · ${took}.${verdict.note ? ' ' + verdict.note : ''}`);
     } else {
