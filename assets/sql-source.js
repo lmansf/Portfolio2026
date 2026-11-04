@@ -268,8 +268,8 @@ async function loadSchema(eng) {
             columns: new Set(rows.map((r) => r.c))
         };
     } catch (err) {
-        if (err && err.message === 'busy') throw err;
-        schema = { tables: [], all: new Set(), columns: new Set() };
+        if (err && (err.message === 'busy' || err.cancelled)) throw err;
+        return { tables: [], all: new Set(), columns: new Set() };
     }
     return schema;
 }
@@ -319,7 +319,7 @@ function hydrate(details) {
         if (e.key === 'Enter' && (e.metaKey || e.ctrlKey)) { e.preventDefault(); runQuery(state); }
     });
     run.addEventListener('click', () => {
-        if (state.running) getEngine().cancel('user');
+        if (state.running) stopRun(state);
         else runQuery(state);
     });
     reset.addEventListener('click', () => resetEditor(state));
@@ -337,18 +337,24 @@ async function runQuery(state) {
     const eng = getEngine();
     const sql = state.input.value;
     if (!sql.trim()) { setStatus(state, 'Type a query first.'); return; }
-    if (eng.running) { setStatus(state, BUSY); return; }
+    if (state.running || eng.running) { setStatus(state, BUSY); return; }
     state.running = true;
-    state.run.textContent = 'Stop';
+    state.abandoned = false;
+    setRunButton(state, 'Loading…', true);
     statusTarget = (msg) => setStatus(state, msg);
     setStatus(state, eng.loaded ? 'Running…' : 'Loading DuckDB (first run only)…');
     state.out.replaceChildren();
+    const check = () => {
+        if (state.abandoned) { const e = new Error('cancelled'); e.cancelled = 'user'; throw e; }
+        if (eng.running) throw new Error('busy');
+    };
     let res;
     try {
         await eng.ready();
-        if (eng.running) throw new Error('busy');
+        check();
         await loadSchema(eng);
-        if (eng.running) throw new Error('busy');
+        check();
+        setRunButton(state, 'Stop', false);
         setStatus(state, 'Running…');
         res = await eng.run(sql);
     } catch (err) {
@@ -381,8 +387,18 @@ async function runQuery(state) {
 
 function finish(state) {
     state.running = false;
-    state.run.textContent = 'Run';
+    setRunButton(state, 'Run', false);
     statusTarget = null;
+}
+
+function setRunButton(state, label, disabled) {
+    state.run.textContent = label;
+    state.run.disabled = disabled;
+}
+
+function stopRun(state) {
+    state.abandoned = true;
+    getEngine().cancel('user');
 }
 
 /* ── Results ── */
@@ -650,7 +666,7 @@ function restorePiece(state) {
 }
 
 function resetEditor(state) {
-    if (state.running) getEngine().cancel('user');
+    if (state.running) stopRun(state);
     restorePiece(state);
     state.input.value = state.defaultSql;
     state.input.dispatchEvent(new Event('input'));

@@ -393,7 +393,7 @@ patterns as (
   where is_fraud and fraud_pattern is not null
   group by 1
 )
-select coalesce(json_agg(patterns order by fraud desc, pattern), '[]'::json) as patterns
+select coalesce(json_agg(patterns order by fraud desc, pattern collate "C"), '[]'::json) as patterns
 from patterns;</code></pre>
                         <p class="sql-src__note">Part of <a href="https://github.com/lmansf/Portfolio2026/blob/main/scripts/fraud-snapshot.sql" target="_blank" rel="noopener">the read-only query</a> that runs once a day on Supabase and publishes the snapshot.</p>
                     </details>

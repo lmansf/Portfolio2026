@@ -109,7 +109,7 @@ select json_build_object(
   'score_bins', (select coalesce(json_agg(json_build_object(
                     'from', round(bin / 20.0, 2)::float8, 'to', round((bin + 1) / 20.0, 2)::float8,
                     'legit', legit, 'fraud', fraud) order by bin), '[]'::json) from bins),
-  'patterns', (select coalesce(json_agg(patterns order by fraud desc, pattern), '[]'::json) from patterns)
+  'patterns', (select coalesce(json_agg(patterns order by fraud desc, pattern collate "C"), '[]'::json) from patterns)
 ) as snapshot;
 
 commit;
