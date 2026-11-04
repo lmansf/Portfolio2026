@@ -8,8 +8,8 @@ the pages themselves, so the console can never say something the pages don't:
     python3 scripts/build_console_data.py --check  # fail if site.sql is stale
 
 Sources: projects.html (every project card) and index.html (hero, "Now" rows,
-experience timeline, credentials, toolkit, footer brand). Rerun after editing
-either page. Standard library only.
+contact buttons, experience timeline, credentials, toolkit, footer brand).
+Rerun after editing either page. Standard library only.
 
 If data/console/extra.sql exists, its statements are appended verbatim after
 the generated tables: that is the hook for tables that don't come from the

@@ -15,9 +15,9 @@
  *   - Editable: change any query and run it again (Ctrl or ⌘ + Enter).
  *   - Everything runs on the visitor's device; nothing they type is sent
  *     anywhere. Results are written with textContent, and card links only
- *     ever point at https:// addresses or this site's own paths. A card's
- *     "How the data flows" link opens the diagram's modal through the
- *     page's own trigger (pipeline.js), as the page's card does.
+ *     ever point at https:// addresses, mailto: or this site's own paths.
+ *     A card's "How the data flows" link opens the diagram's modal through
+ *     the page's own trigger (pipeline.js), as the page's card does.
  *
  * Whether the console is open is remembered in localStorage (per visitor,
  * best effort: it starts collapsed when storage is unavailable).
