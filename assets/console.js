@@ -101,7 +101,7 @@ function flowTrigger(href) {
 function linkEl(label, url, cls) {
     const href = safeHref(url);
     if (!href) return el('span', { class: cls, text: label });
-    const external = href.startsWith('https://');
+    const external = /^https:\/\//i.test(href);
     const a = el('a', {
         class: cls,
         href,
@@ -201,6 +201,7 @@ function init() {
         toggle.setAttribute('aria-expanded', 'true');
         if (remember) store.set(OPEN_KEY, '1');
         if (!sql.value) loadRouteQuery(routeFor(window.location.pathname));
+        updatePageLink();
         if (focus) sql.focus({ preventScroll: true });
         const saveData = navigator.connection && navigator.connection.saveData;
         if (saveData && !engine.loaded) {
@@ -212,6 +213,12 @@ function init() {
 
     function close({ remember = true } = {}) {
         if (!isOpen()) return;
+        if (typing) {
+            const { text } = typing;
+            stopTyping();
+            sql.value = text;
+            fit();
+        }
         root.classList.remove('is-open');
         panel.hidden = true;
         toggle.setAttribute('aria-expanded', 'false');
@@ -415,8 +422,22 @@ function init() {
         if (lastResult) drawBody(lastResult.res);
     }
 
+    pageLink.addEventListener('click', () => { pageLink.hidden = true; });
+    window.addEventListener('popstate', updatePageLink);
+
+    function updatePageLink() {
+        const route = lastResult && lastResult.route;
+        if (route && ROUTES[route] && route !== routeFor(window.location.pathname)) {
+            pageLink.hidden = false;
+            pageLink.href = route;
+            pageLink.textContent = `Open the ${ROUTES[route].name} page →`;
+        } else {
+            pageLink.hidden = true;
+        }
+    }
+
     function render(res, ms, route) {
-        lastResult = { res, ms };
+        lastResult = { res, ms, route };
         error.hidden = true;
         result.hidden = false;
         const total = res.numRows;
@@ -426,13 +447,7 @@ function init() {
             : `${total.toLocaleString('en-US')} ${rowWord}`;
         meta.textContent = `${count} · ${formatMs(ms)}`;
         csvBtn.hidden = total === 0 || res.fields.length === 0;
-        if (route && ROUTES[route] && route !== routeFor(window.location.pathname)) {
-            pageLink.hidden = false;
-            pageLink.href = route;
-            pageLink.textContent = `Open the ${ROUTES[route].name} page →`;
-        } else {
-            pageLink.hidden = true;
-        }
+        updatePageLink();
         drawBody(res);
         out.scrollTop = 0;
     }
