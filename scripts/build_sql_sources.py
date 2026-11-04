@@ -55,6 +55,7 @@ SOURCES = ROOT / "data" / "sql-sources"
 SNAPSHOT_SQL = ROOT / "scripts" / "fraud-snapshot.sql"
 SNAPSHOT_JSON = ROOT / "data" / "fraud-snapshot.json"
 SNAPSHOT_TABLES = ROOT / "data" / "console" / "snapshot-tables.json"
+MODELS = ROOT / "data" / "pipeline" / "models.json"
 REPO = "https://github.com/lmansf/Portfolio2026/blob/main"
 MARKER = re.compile(
     r"(?P<indent>[ \t]*)<!-- sql-source: (?P<name>[a-z0-9-]+) -->\n.*?<!-- /sql-source -->",
@@ -301,15 +302,28 @@ def check_table_sources(con, pages):
 
 
 # ── HTML ──
+def status_link(name):
+    """A link to the /status group holding this caption's checks (its first table in models.json)."""
+    pieces = json.loads(MODELS.read_text(encoding="utf-8"))["pieces"]
+    if name not in pieces:
+        sys.exit(f"{name}: no entry under pieces in data/pipeline/models.json")
+    table = pieces[name]["tables"][0]
+    return f' <a href="/status#t-{html.escape(table)}">See its checks</a>.'
+
+
 def caption(name, sql, note, indent, upstream=None):
     code = html.escape(sql.strip("\n"), quote=False)
     label = html.escape(f"SQL source for {LABELS[name]}")
+    # The trust badge is filled in the browser from data/pipeline/trust.json
+    # (it says how long ago the nightly run checked this piece), so the page
+    # HTML doesn't change from one night to the next.
     lines = [
         f'<details class="sql-src" data-sql-source="{name}" data-sql-label="{html.escape(LABELS[name])}">',
-        f'    <summary class="sql-src__toggle" aria-label="{label}">SQL source</summary>',
+        f'    <summary class="sql-src__toggle" aria-label="{label}">SQL source'
+        '<span class="sql-src__trust" data-sql-trust hidden></span></summary>',
         '    <div class="sql-src__panel">',
         f'        <pre class="sql-src__code" tabindex="0"><code>{code}</code></pre>',
-        f'        <p class="sql-src__note">{note}</p>',
+        f'        <p class="sql-src__note">{note}{status_link(name)}</p>',
     ]
     if upstream:
         up = html.escape(upstream.strip("\n"), quote=False)

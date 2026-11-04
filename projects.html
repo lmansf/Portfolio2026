@@ -158,13 +158,13 @@
             </div>
             <!-- sql-source: projects-featured -->
             <details class="sql-src" data-sql-source="projects-featured" data-sql-label="the featured projects">
-                <summary class="sql-src__toggle" aria-label="SQL source for the featured projects">SQL source</summary>
+                <summary class="sql-src__toggle" aria-label="SQL source for the featured projects">SQL source<span class="sql-src__trust" data-sql-trust hidden></span></summary>
                 <div class="sql-src__panel">
                     <pre class="sql-src__code" tabindex="0"><code>SELECT title, badge, eyebrow, year, summary, tags
 FROM projects
 WHERE featured
 ORDER BY sort_order;</code></pre>
-                    <p class="sql-src__note">This query writes what&rsquo;s shown above, from <a href="https://github.com/lmansf/Portfolio2026/blob/main/data/console/site.sql" target="_blank" rel="noopener">the site&rsquo;s own tables</a>; a check fails the build if it ever stops matching.</p>
+                    <p class="sql-src__note">This query writes what&rsquo;s shown above, from <a href="https://github.com/lmansf/Portfolio2026/blob/main/data/console/site.sql" target="_blank" rel="noopener">the site&rsquo;s own tables</a>; a check fails the build if it ever stops matching. <a href="/status#t-projects">See its checks</a>.</p>
                 </div>
             </details>
             <!-- /sql-source -->
@@ -306,13 +306,13 @@ ORDER BY sort_order;</code></pre>
             </div>
             <!-- sql-source: projects-more -->
             <details class="sql-src" data-sql-source="projects-more" data-sql-label="the more builds">
-                <summary class="sql-src__toggle" aria-label="SQL source for the more builds">SQL source</summary>
+                <summary class="sql-src__toggle" aria-label="SQL source for the more builds">SQL source<span class="sql-src__trust" data-sql-trust hidden></span></summary>
                 <div class="sql-src__panel">
                     <pre class="sql-src__code" tabindex="0"><code>SELECT title, badge, eyebrow, year, summary, tags
 FROM projects
 WHERE NOT featured
 ORDER BY sort_order;</code></pre>
-                    <p class="sql-src__note">This query writes what&rsquo;s shown above, from <a href="https://github.com/lmansf/Portfolio2026/blob/main/data/console/site.sql" target="_blank" rel="noopener">the site&rsquo;s own tables</a>; a check fails the build if it ever stops matching.</p>
+                    <p class="sql-src__note">This query writes what&rsquo;s shown above, from <a href="https://github.com/lmansf/Portfolio2026/blob/main/data/console/site.sql" target="_blank" rel="noopener">the site&rsquo;s own tables</a>; a check fails the build if it ever stops matching. <a href="/status#t-projects">See its checks</a>.</p>
                 </div>
             </details>
             <!-- /sql-source -->

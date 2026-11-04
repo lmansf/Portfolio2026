@@ -872,6 +872,77 @@ function showEggCode(card, saved, again) {
         saved.issued ? el('p', { class: 'sql-egg__meta', text: `Issued ${saved.issued}` }) : null);
 }
 
+/* ── Trust badges: how fresh each piece is and how its checks did ── */
+// The nightly data run (scripts/data_run.py) writes one line per caption to
+// trust.json; the badge in each caption's <summary> shows it as written,
+// failures and staleness included. No file (before the first run, or
+// offline) leaves the badges hidden.
+const TRUST_URL = '/data/pipeline/trust.json';
+let trustPromise = null;
+
+function loadTrust() {
+    if (!trustPromise) {
+        trustPromise = fetch(TRUST_URL, { cache: 'no-cache' })
+            .then((r) => (r.ok ? r.json() : null))
+            .catch(() => null);
+    }
+    return trustPromise;
+}
+
+function ageText(hours) {
+    if (hours < 1) return `${Math.max(1, Math.round(hours * 60))}m`;
+    if (hours < 48) return `${Math.round(hours)}h`;
+    return `${Math.round(hours / 24)}d`;
+}
+
+function trustText(info, now = Date.now()) {
+    if (!info || !Number.isInteger(info.total) || info.total < 1 || !Number.isInteger(info.passed)) return null;
+    const checks = `${info.passed} of ${info.total} checks passed`;
+    const when = Date.parse(info.as_of);
+    if (!Number.isFinite(when)) return { text: `no data yet · ${checks}`, ok: false };
+    const hours = Math.max(0, (now - when) / 36e5);
+    const fresh = hours <= (Number.isFinite(info.max_hours) ? info.max_hours : 36);
+    return {
+        text: `${fresh ? `fresh ${ageText(hours)} ago` : `stale, ${ageText(hours)} old`} · ${checks}`,
+        ok: fresh && info.passed === info.total
+    };
+}
+
+function fillTrust() {
+    const badges = document.querySelectorAll('details.sql-src[data-sql-source] [data-sql-trust]:not([data-sql-trust-done])');
+    if (!badges.length) return;
+    badges.forEach((b) => b.setAttribute('data-sql-trust-done', ''));
+    loadTrust().then((trust) => {
+        const pieces = trust && trust.pieces && typeof trust.pieces === 'object' ? trust.pieces : null;
+        if (!pieces) return;
+        badges.forEach((badge) => {
+            const details = badge.closest('details.sql-src');
+            const name = details && details.getAttribute('data-sql-source');
+            const info = name && Object.prototype.hasOwnProperty.call(pieces, name) ? pieces[name] : null;
+            const t = trustText(info);
+            if (!t) return;
+            badge.textContent = t.text;
+            badge.classList.toggle('sql-src__trust--warn', !t.ok);
+            const failed = Array.isArray(info.failed) ? info.failed.filter((f) => typeof f === 'string').slice(0, 5) : [];
+            if (failed.length) badge.title = `Failing: ${failed.join('; ')}`;
+            badge.hidden = false;
+            const summary = badge.closest('summary');
+            const label = details.getAttribute('data-sql-label');
+            if (summary && label) summary.setAttribute('aria-label', `SQL source for ${label}, ${t.text}`);
+        });
+    });
+}
+
+// Home and Projects swap <main> on in-site navigation (transition.js), so
+// fill badges that arrive later too.
+fillTrust();
+let trustQueued = false;
+new MutationObserver(() => {
+    if (trustQueued) return;
+    trustQueued = true;
+    requestAnimationFrame(() => { trustQueued = false; fillTrust(); });
+}).observe(document.body, { childList: true, subtree: true });
+
 /* ── Start: hydrate a caption the first time it opens ── */
 // `toggle` doesn't bubble, so listen in the capture phase; this also covers
 // captions that transition.js swaps in when Home and Projects change page.

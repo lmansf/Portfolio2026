@@ -29,7 +29,10 @@ writes; a pull request runs it as a dry run.
    caption's default query still returns what its page shows.
 4. Log. data/pipeline/run-log.json keeps the latest run in full (sources,
    tables, every check, and which checks each caption's piece depends on)
-   and a short history of the last 30 runs. /status reads it.
+   and a short history of the last 30 runs, which /status draws.
+   data/pipeline/trust.json is the one-line-per-caption summary the trust
+   badge beside each SQL source reads ("fresh 3h ago · 8 of 8 checks
+   passed").
 
 Exit status: 0 when the run finished, whatever its checks found (failures
 are data, logged and shown on /status); 1 when a definition is broken (a
@@ -59,6 +62,7 @@ ROOT = site.ROOT
 PIPE = ROOT / "data" / "pipeline"
 MODELS = PIPE / "models.json"
 RUN_LOG = PIPE / "run-log.json"
+TRUST = PIPE / "trust.json"
 STG_GITHUB = PIPE / "stg_github_events.json"
 GITHUB_DATA = PIPE / "github.json"
 GITHUB_TABLES = PIPE / "github-tables.json"
@@ -70,7 +74,9 @@ GITHUB_USER = "lmansf"
 GITHUB_API = "https://api.github.com"
 WINDOW_DAYS = 30
 HISTORY = 30
-SITE_MARTS = ("projects", "experience", "skills", "credentials", "resume")
+# The site tables are rebuilt by every run, so they're as fresh as the last
+# run; a run more than this late (one missed night and change) reads as stale.
+SITE_MAX_HOURS = 36
 
 
 def now_utc():
@@ -391,8 +397,10 @@ def run_checks(con, models, sources, started, pages, snapshot):
             "matches" if err is None else err.split("\n")[0], piece=piece)
         ids = [c["id"] for c in checks if c["node"] in spec["tables"] and c.get("piece") in (None, piece)]
         as_ofs = [tables[t]["as_of"] for t in spec["tables"]]
+        limits = [nodes[t]["freshness"]["max_hours"] for t in spec["tables"] if nodes[t].get("freshness")]
         pieces[piece] = {"as_of": min((a for a in as_ofs if a), default=None)
-                         if all(as_ofs) else None, "checks": ids}
+                         if all(as_ofs) else None,
+                         "max_hours": min(limits, default=SITE_MAX_HOURS), "checks": ids}
     captioned = set(captions.TABLE_SOURCES) | set(captions.LIVE_SOURCES)
     for piece in sorted(captioned - set(models["pieces"])):
         broken.append(f"SQL source caption {piece} has no entry under pieces in models.json")
@@ -427,6 +435,21 @@ def commit_sha():
 def trigger():
     return {"schedule": "nightly", "workflow_dispatch": "manual", "push": "after a merge",
             "pull_request": "pull request"}.get(os.environ.get("GITHUB_EVENT_NAME", ""), "local")
+
+
+def trust_badges(run):
+    """Per caption: how fresh its data is and how many of its checks passed."""
+    by_id = {c["id"]: c for c in run["checks"]}
+    out = {}
+    for piece, info in run["pieces"].items():
+        mine = [by_id[i] for i in info["checks"] if i in by_id]
+        out[piece] = {
+            "as_of": info["as_of"], "max_hours": info["max_hours"],
+            "passed": sum(c["status"] == "pass" for c in mine), "total": len(mine),
+            "table": mine[0]["node"] if mine else None,
+            "failed": [c["name"] for c in mine if c["status"] != "pass"],
+        }
+    return out
 
 
 def summary_markdown(run):
@@ -470,8 +493,12 @@ def main():
                 "failed": [c["id"] for c in checks if c["status"] != "pass"]}]
     history += [h for h in previous.get("history", []) if h.get("id") != run["id"]][:HISTORY - 1]
     log = {"_about": "Written by scripts/data_run.py on every data run. latest is the newest run in full; "
-                     "history is the last 30 runs, newest first. /status reads it.",
+                     "history is the last 30 runs, newest first. /status and the SQL source trust badges read it.",
            "latest": run, "history": history}
+
+    trust = {"_about": "Written by scripts/data_run.py: one line per SQL source caption, for the trust "
+                       "badge beside it (assets/sql-source.js). Full detail is in run-log.json.",
+             "run_at": run["finished_at"], "pieces": trust_badges(run)}
 
     out = summary_markdown(run)
     print(out)
@@ -489,6 +516,7 @@ def main():
         print("dry run: nothing written")
         return
     writes[RUN_LOG] = dump(log)
+    writes[TRUST] = dump(trust)
     for path, text in writes.items():
         path.parent.mkdir(parents=True, exist_ok=True)
         path.write_text(text, encoding="utf-8")
