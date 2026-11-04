@@ -44,6 +44,9 @@ and one archived project page:
 - **Live data** (`live.html`, `/live`) — daily numbers from the fraud
   pipeline (see "Live fraud data" below).
 - **404** (`404.html`) — branded not-found page.
+- **SQL console** (`assets/console.js`, on Home and Projects) — a slim bar
+  docked along the bottom of the page that opens into a DuckDB SQL editor
+  over the site's own data. See "SQL console" below.
 
 Clean URLs (`/projects`, `/playground`, `/owl-park`, `/live`), the `/resume`
 shortcut to the résumé PDF, and legacy redirects (e.g. `/fraud` →
@@ -148,6 +151,14 @@ soft and tappable things are pills.
   `transition.js` from swapping `<main>` in place on in-site links, so
   leaving the page is a full navigation that tears down the DuckDB worker.
   Pinned version and limits are the constants at the top of the file.
+- `assets/console.css`, `assets/console.js`, `assets/sql-engine.js` — the
+  docked SQL console on Home and Projects (see "SQL console" below).
+  `console.js` is the bar, editor, nav-as-queries and card rendering;
+  `sql-engine.js` is the playground's DuckDB-Wasm loader lifted into a
+  module (pin, lockdown, row cap, watchdog, Arrow formatting) that
+  `console.js` imports; `playground.js` keeps its own copy for now, so the
+  pinned version and limits live in both. The two scripts are bundled into
+  `console.min.js`, and the script adds `console.min.css` itself.
 - `assets/live.css`, `assets/live.js` — styles and chart code for the live
   data page only (see "Live fraud data" below); `data/fraud-snapshot.json`
   is the aggregate snapshot it draws from, rewritten by a GitHub Action.
@@ -197,6 +208,93 @@ regenerate its minified file:
 
     npx esbuild <src> --minify --outfile=<min> --allow-overwrite
 
+The one exception is `console.min.js`, which is a bundle of `console.js` and
+`sql-engine.js`; its commands are under "SQL console".
+
+## SQL console
+
+The site doubles as a small database. A bar docked along the bottom of Home
+and Projects ("SQL console · This site is a database. Query it.") opens into
+an editor; nothing loads until a visitor opens it, so the default view is the
+same fast static page, and every card and link works with the console closed
+or without JavaScript. A page opts in with one tag at the end of `<body>`,
+`<script type="module" src="/assets/console.min.js">`; Home and Projects
+carry it. The script loads `console.min.css` itself (no inline `<style>`)
+and only mounts the bar once the stylesheet is in, so a page without it is
+left exactly as it was.
+
+- **Nav as queries.** While the console is open, the Home and Projects
+  links in the top nav (and the mobile nav) type that page's query
+  (`SELECT * FROM resume;`,
+  `SELECT * FROM projects ORDER BY featured DESC, sort_order;`) and run it
+  instead of swapping the page; a click during a run is queued and runs
+  next. The SQL Playground link still goes to `/playground`, and the Résumé
+  link always opens the PDF. The query is typed in over a moment (instantly
+  under `prefers-reduced-motion`); typing in the editor stops it.
+- **Editor.** Ctrl or ⌘ + Enter runs the query, Cancel stops it, and Escape
+  (with focus inside the console, and not during a run) closes the panel.
+  Opening the console runs the current page's query at once.
+- **Results as cards.** A result is drawn with the site's own components
+  when its columns fit one (`title` + `summary`/`eyebrow`/`tags` → project
+  cards, `role` + `org` → the experience timeline, `name` + `headline` → a
+  profile card, `skill` → toolkit chips, `credential` → credential chips),
+  with a Table view, CSV download, and a link to the full page (hidden when
+  that page is the one you're on). Anything else is a table. Values are
+  written with `textContent`, and card links are only ever `https://` addresses, `mailto:` or this site's own paths (a single
+  leading slash, no backslashes or control characters). A project card's
+  "How the data flows" link opens the diagram's modal through the page's
+  own `[data-flow-open]` trigger (`pipeline.js`), and on a page without one
+  it loads `/projects#<figure id>`, which opens the modal from the hash.
+- **Tables.** `projects`, `experience`, `skills`, `credentials`, `resume`
+  (built from the pages, below) plus the playground's synthetic `park_days`,
+  `orders`, `order_items`, `products`.
+- **Open state** is remembered in `localStorage` (`sqlc-open`), so a visitor
+  who opened it keeps it open from page to page (best effort: it starts
+  collapsed when storage is unavailable). The console is hidden in print.
+- **Limits** are the playground's: a result is read up to 200,000 rows
+  (the Table view shows the first 500, cards the first 60, and the CSV
+  holds what was read); Cancel or a 30-second watchdog stops a query, and a
+  worker that won't stop is thrown away and restarted on the next run;
+  DuckDB's working memory is capped at 256 MB. On a Save-Data connection
+  opening the console doesn't download DuckDB (about 7 MB); the first Run
+  does.
+
+Files: `assets/console.js` (UI; imports `assets/sql-engine.js`, the DuckDB
+loader, and is bundled with it into `console.min.js`) and
+`assets/console.css` (loaded by the script itself). Rebuild after editing:
+
+    esbuild assets/console.js --bundle --format=esm --minify --outfile=assets/console.min.js --allow-overwrite
+    esbuild assets/console.css --minify --outfile=assets/console.min.css --allow-overwrite
+
+The site tables live in `data/console/site.sql`, generated from
+`index.html` and `projects.html` so the console never says something the
+pages don't (the `resume` row's headline is the hero's first clause and its
+location comes from the footer brand). After changing a project card, the
+experience timeline, the toolkit, credentials, the hero, the "now" strip,
+the contact buttons or the footer brand, rerun:
+
+    python3 scripts/build_console_data.py          # rewrite site.sql
+    python3 scripts/build_console_data.py --check  # fails if it's stale
+
+The `Console data` workflow (`.github/workflows/console-data.yml`) runs that
+`--check` on every pull request and push to `main`, so a stale `site.sql`
+fails the build instead of showing old cards.
+
+If `data/console/extra.sql` exists, the script appends it verbatim after the
+generated tables. It is the one place for hand-written console SQL (tables
+that don't come from the pages; the Easter egg hunt will use it), and
+`--check` fails when `site.sql` doesn't include it.
+
+`sql-engine.js` loads the same pinned DuckDB-Wasm as the playground (from
+jsDelivr, only once the console is opened), attaches the playground file
+READ_ONLY as `owl_park`, runs `site.sql` into the tab's memory, puts both on
+the search path, then switches off extensions and external access, caps
+memory and locks the configuration (the same lock as the playground).
+Visitors can change the site tables in their own tab; a reload restores
+them. `vercel.json` serves `.sql` files with the same `must-revalidate`
+cache header as the other text assets, so a regenerated `site.sql` is
+picked up on the next load.
+
 ## SQL playground data
 
 `data/playground/owl_park.duckdb.gz` (about 300 KB) is one DuckDB database
@@ -206,8 +304,9 @@ and the data has no personal fields at all, real or simulated. To change the
 data, edit the script and rerun it (`python3 -m pip install duckdb numpy`,
 then `python3 data/playground/generate.py`); if you add or rename a column,
 update the table reference in `playground.html`. The file is written in
-DuckDB's v1.1.0 storage format to match the pinned DuckDB-Wasm 1.29.0; move
-both together.
+DuckDB's v1.1.0 storage format to match the pinned DuckDB-Wasm 1.29.0
+(pinned in both `assets/playground.js` and `assets/sql-engine.js`, which the
+SQL console uses to attach the same file); move all of them together.
 
 How the page keeps visitor queries safe (all of it runs on the visitor's own
 device, and there is no key, backend, or database connection on the page):

@@ -1,0 +1,260 @@
+/* ─────────────────────────────────────────────────────────────
+ * console.css — the docked SQL console (console.js loads this file
+ * itself, so a page opts in with one module script tag).
+ *
+ *   .sqlc            fixed to the bottom of the viewport
+ *   .sqlc__dock      the slim bar: one toggle button
+ *   .sqlc__panel     editor + results, shown when open
+ *   .sqlc-profile    the "resume" row drawn as a card
+ *
+ * Results reuse the site's own components from pages.css (.project,
+ * .xp, .chip-list, .now, .btn), so cards look the same in the console.
+ * ───────────────────────────────────────────────────────────── */
+
+body.has-sqlc { padding-bottom: calc(var(--sqlc-dock-h) + env(safe-area-inset-bottom, 0px)); }
+:root { --sqlc-dock-h: 48px; }
+
+.sqlc {
+    position: fixed;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 60;            /* above page content and the top bar (50), under the mobile nav (90) */
+    display: flex;
+    flex-direction: column-reverse;
+    pointer-events: none;   /* only the bar and panel take clicks */
+    font-family: var(--font-text);
+    color: var(--ink-1);
+}
+
+/* ── The bar ── */
+.sqlc__dock {
+    pointer-events: auto;
+    background: color-mix(in srgb, var(--surface-1) 92%, transparent);
+    backdrop-filter: blur(12px) saturate(1.1);
+    -webkit-backdrop-filter: blur(12px) saturate(1.1);
+    border-top: 1px solid var(--hairline);
+    padding-bottom: env(safe-area-inset-bottom, 0px);
+}
+.sqlc__toggle {
+    display: flex;
+    align-items: center;
+    gap: 0.65rem;
+    width: 100%;
+    max-width: calc(var(--max-w) + 2 * var(--gutter));
+    min-height: var(--sqlc-dock-h);
+    margin: 0 auto;
+    padding: 0 var(--gutter);
+    border: 0;
+    background: none;
+    color: inherit;
+    font: inherit;
+    text-align: left;
+    cursor: pointer;
+}
+.sqlc__toggle:focus-visible { outline: 2px solid var(--focus-ring); outline-offset: -3px; border-radius: var(--r-sm); }
+.sqlc__prompt {
+    font-family: var(--font-mono);
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: var(--on-accent);
+    background: var(--accent);
+    border-radius: 6px;
+    padding: 0.12rem 0.4rem;
+}
+.sqlc__label { font-weight: 600; font-size: 0.92rem; }
+.sqlc__hint {
+    font-size: 0.86rem;
+    color: var(--ink-3);
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+.sqlc__chev {
+    margin-left: auto;
+    width: 0.6rem;
+    height: 0.6rem;
+    border-right: 2px solid var(--ink-2);
+    border-top: 2px solid var(--ink-2);
+    transform: translateY(2px) rotate(-45deg);
+    transition: transform var(--dur-fast) var(--ease-out);
+    flex: none;
+}
+.sqlc.is-open .sqlc__chev { transform: translateY(-2px) rotate(135deg); }
+@media (max-width: 420px) {
+    .sqlc__hint { display: none; }
+}
+
+/* ── The panel ── */
+.sqlc__panel {
+    pointer-events: auto;
+    max-height: min(72vh, 46rem);
+    overflow: auto;
+    overscroll-behavior: contain;
+    background: var(--bg);
+    border-top: 1px solid var(--hairline-strong);
+    box-shadow: var(--shadow-lg);
+    -webkit-overflow-scrolling: touch;
+}
+.sqlc__panel[hidden] { display: none; }
+.sqlc__inner {
+    max-width: calc(var(--max-w) + 2 * var(--gutter));
+    margin: 0 auto;
+    padding: 1rem var(--gutter) 1.25rem;
+}
+
+.sqlc__editor {
+    background: var(--surface-1);
+    border: 1px solid var(--hairline);
+    border-radius: var(--r-md);
+    overflow: hidden;
+}
+.sqlc__sql {
+    display: block;
+    width: 100%;
+    min-height: 4.5rem;
+    resize: vertical;
+    padding: 0.8rem 1rem;
+    border: 0;
+    border-bottom: 1px solid var(--hairline);
+    background: var(--bg);
+    color: var(--ink-1);
+    font-family: var(--font-mono);
+    font-size: 16px;              /* 16px keeps iOS from zooming on focus */
+    line-height: 1.5;
+    tab-size: 4;
+    white-space: pre;
+    overflow: auto;
+}
+@media (min-width: 720px) {
+    .sqlc__sql { font-size: 0.9rem; }
+}
+.sqlc__sql:focus-visible { outline: 2px solid var(--focus-ring); outline-offset: -2px; }
+.sqlc__bar {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.5rem 0.9rem;
+    padding: 0.6rem 0.8rem;
+}
+.sqlc__bar .btn { padding: 0.5rem 1rem; font-size: 0.88rem; }
+.sqlc__bar .btn[disabled] { opacity: 0.55; cursor: progress; transform: none; }
+.sqlc .btn[hidden] { display: none; }
+.sqlc__status { font-size: 0.86rem; color: var(--ink-3); min-width: 0; }
+.sqlc__keys { margin-left: auto; font-size: 0.8rem; color: var(--ink-3); }
+@media (hover: none) and (pointer: coarse) {
+    .sqlc__keys { display: none; }
+}
+
+/* ── Results ── */
+.sqlc__result { margin-top: 0.9rem; }
+.sqlc__result[hidden], .sqlc__error[hidden] { display: none; }
+.sqlc__result-head {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.4rem 1rem;
+    margin-bottom: 0.6rem;
+}
+.sqlc__meta { font-size: 0.86rem; color: var(--ink-2); }
+.sqlc__result-tools { display: flex; flex-wrap: wrap; align-items: center; gap: 0.5rem 0.8rem; }
+.sqlc__views {
+    display: inline-flex;
+    border: 1px solid var(--hairline-strong);
+    border-radius: var(--r-pill);
+    overflow: hidden;
+}
+.sqlc__views[hidden] { display: none; }
+.sqlc__view, .sqlc__csv {
+    font: inherit;
+    font-size: 0.82rem;
+    font-weight: 500;
+    color: var(--ink-1);
+    background: var(--surface-1);
+    border: 0;
+    padding: 0.4rem 0.8rem;
+    min-height: 34px;
+    cursor: pointer;
+}
+.sqlc__view + .sqlc__view { border-left: 1px solid var(--hairline-strong); }
+.sqlc__view[aria-pressed="true"] { background: var(--accent-soft); font-weight: 600; }
+.sqlc__csv { border: 1px solid var(--hairline-strong); border-radius: var(--r-pill); }
+.sqlc__csv[hidden] { display: none; }
+.sqlc__view:hover, .sqlc__csv:hover { background: var(--surface-2); }
+.sqlc__view[aria-pressed="true"]:hover { background: var(--accent-soft); }
+.sqlc__view:focus-visible, .sqlc__csv:focus-visible { outline: 2px solid var(--focus-ring); outline-offset: -2px; }
+.sqlc__pagelink { font-size: 0.86rem; font-weight: 600; color: var(--accent-ink); }
+.sqlc__pagelink[hidden] { display: none; }
+
+.sqlc__out:focus-visible { outline: 2px solid var(--focus-ring); outline-offset: 4px; border-radius: var(--r-sm); }
+.sqlc__empty { font-size: 0.86rem; color: var(--ink-3); padding: 0.6rem 0.2rem; }
+.sqlc__grid { margin: 0; }
+.sqlc__xp { margin: 0; }
+
+.sqlc__table-wrap {
+    max-height: 22rem;
+    overflow: auto;
+    border: 1px solid var(--hairline);
+    border-radius: var(--r-md);
+    background: var(--surface-1);
+}
+.sqlc__table { border-collapse: collapse; width: max-content; min-width: 100%; font-size: 0.84rem; }
+.sqlc__table th, .sqlc__table td {
+    padding: 0.45rem 0.75rem;
+    text-align: left;
+    border-bottom: 1px solid var(--hairline);
+    white-space: nowrap;
+    max-width: 28rem;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+.sqlc__table th {
+    position: sticky;
+    top: 0;
+    background: var(--surface-2);
+    font-weight: 600;
+    font-family: var(--font-mono);
+    font-size: 0.8rem;
+}
+.sqlc__table td { font-family: var(--font-mono); font-size: 0.8rem; }
+.sqlc__table .is-num { text-align: right; font-variant-numeric: tabular-nums; }
+.sqlc__table .is-null { color: var(--ink-3); font-style: italic; }
+
+.sqlc__error {
+    margin-top: 0.9rem;
+    padding: 0.8rem 1rem;
+    border: 1px solid color-mix(in srgb, var(--danger) 45%, transparent);
+    border-radius: var(--r-md);
+    background: color-mix(in srgb, var(--danger) 8%, var(--bg));
+}
+.sqlc__error strong { display: block; color: var(--danger); margin-bottom: 0.3rem; }
+.sqlc__error pre {
+    font-family: var(--font-mono);
+    font-size: 0.8rem;
+    white-space: pre-wrap;
+    word-break: break-word;
+    color: var(--ink-1);
+    margin: 0;
+}
+
+/* ── The profile card (the resume row) ── */
+.sqlc-profile {
+    background: var(--surface-1);
+    border: 1px solid var(--hairline);
+    border-radius: var(--r-lg);
+    padding: 1.1rem 1.2rem;
+    box-shadow: var(--shadow-sm);
+}
+.sqlc-profile__name { font-family: var(--font-display); font-size: 1.45rem; margin: 0; }
+.sqlc-profile__headline { color: var(--ink-2); margin: 0.2rem 0 0.8rem; }
+.sqlc-profile .now { margin: 0 0 0.9rem; }
+
+@media (prefers-reduced-motion: reduce) {
+    .sqlc__chev { transition: none; }
+}
+@media print {
+    .sqlc { display: none; }
+    body.has-sqlc { padding-bottom: 0; }
+}
