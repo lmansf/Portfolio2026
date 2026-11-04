@@ -1,0 +1,526 @@
+{
+  "fetched_at": "2026-11-04T18:12:21Z",
+  "user": "lmansf",
+  "window_days": 30,
+  "activity": [
+    {
+      "day": "2026-10-31",
+      "repo": "lmansf/Welcome-to-Owl-Park",
+      "events": 4,
+      "pushes": 3
+    },
+    {
+      "day": "2026-11-01",
+      "repo": "lmansf/Welcome-to-Owl-Park",
+      "events": 69,
+      "pushes": 45
+    },
+    {
+      "day": "2026-11-02",
+      "repo": "lmansf/Portfolio2026",
+      "events": 21,
+      "pushes": 11
+    },
+    {
+      "day": "2026-11-02",
+      "repo": "lmansf/Welcome-to-Owl-Park",
+      "events": 106,
+      "pushes": 55
+    },
+    {
+      "day": "2026-11-03",
+      "repo": "lmansf/Portfolio2026",
+      "events": 31,
+      "pushes": 3
+    },
+    {
+      "day": "2026-11-03",
+      "repo": "lmansf/Welcome-to-Owl-Park",
+      "events": 48,
+      "pushes": 8
+    },
+    {
+      "day": "2026-11-04",
+      "repo": "lmansf/Portfolio2026",
+      "events": 10,
+      "pushes": 0
+    },
+    {
+      "day": "2026-11-04",
+      "repo": "lmansf/Welcome-to-Owl-Park",
+      "events": 11,
+      "pushes": 0
+    }
+  ],
+  "repos": [
+    {
+      "repo": "lmansf/Animal-Detector",
+      "language": "Jupyter Notebook",
+      "stars": 0,
+      "pushed_on": "2026-02-19",
+      "archived": false
+    },
+    {
+      "repo": "lmansf/Attendance-Nowcast",
+      "language": null,
+      "stars": 0,
+      "pushed_on": "2026-09-23",
+      "archived": false
+    },
+    {
+      "repo": "lmansf/Attendance-Projections",
+      "language": "HTML",
+      "stars": 0,
+      "pushed_on": "2026-08-26",
+      "archived": false
+    },
+    {
+      "repo": "lmansf/Churn-Modeling",
+      "language": "Jupyter Notebook",
+      "stars": 0,
+      "pushed_on": "2026-01-03",
+      "archived": false
+    },
+    {
+      "repo": "lmansf/Claude-Encounters",
+      "language": "HTML",
+      "stars": 0,
+      "pushed_on": "2026-05-11",
+      "archived": false
+    },
+    {
+      "repo": "lmansf/ComparingJson",
+      "language": "Python",
+      "stars": 1,
+      "pushed_on": "2026-02-18",
+      "archived": false
+    },
+    {
+      "repo": "lmansf/DataFramework",
+      "language": "Jupyter Notebook",
+      "stars": 0,
+      "pushed_on": "2026-01-15",
+      "archived": false
+    },
+    {
+      "repo": "lmansf/Dogedin",
+      "language": "TypeScript",
+      "stars": 0,
+      "pushed_on": "2026-07-28",
+      "archived": false
+    },
+    {
+      "repo": "lmansf/EDA-with-AirBnb",
+      "language": "Jupyter Notebook",
+      "stars": 0,
+      "pushed_on": "2026-01-06",
+      "archived": false
+    },
+    {
+      "repo": "lmansf/ETL-in-Duckdb",
+      "language": "Jupyter Notebook",
+      "stars": 1,
+      "pushed_on": "2026-09-13",
+      "archived": false
+    },
+    {
+      "repo": "lmansf/Ecommerce-Data-Pipeline",
+      "language": "HTML",
+      "stars": 0,
+      "pushed_on": "2026-04-03",
+      "archived": false
+    },
+    {
+      "repo": "lmansf/EcommercePBI",
+      "language": null,
+      "stars": 0,
+      "pushed_on": "2026-04-05",
+      "archived": false
+    },
+    {
+      "repo": "lmansf/Fraud-Detection",
+      "language": "Jupyter Notebook",
+      "stars": 0,
+      "pushed_on": "2026-01-08",
+      "archived": false
+    },
+    {
+      "repo": "lmansf/Fraud-V3",
+      "language": "Jupyter Notebook",
+      "stars": 0,
+      "pushed_on": "2026-06-16",
+      "archived": false
+    },
+    {
+      "repo": "lmansf/HashSolution",
+      "language": "HTML",
+      "stars": 0,
+      "pushed_on": "2025-11-04",
+      "archived": false
+    },
+    {
+      "repo": "lmansf/Learn-Excel",
+      "language": null,
+      "stars": 0,
+      "pushed_on": "2026-10-02",
+      "archived": false
+    },
+    {
+      "repo": "lmansf/Learning-Chat",
+      "language": "HTML",
+      "stars": 0,
+      "pushed_on": "2025-11-10",
+      "archived": false
+    },
+    {
+      "repo": "lmansf/Learning-Pytorch",
+      "language": "Jupyter Notebook",
+      "stars": 0,
+      "pushed_on": "2026-01-19",
+      "archived": false
+    },
+    {
+      "repo": "lmansf/Learning-dbt",
+      "language": null,
+      "stars": 0,
+      "pushed_on": "2026-10-02",
+      "archived": false
+    },
+    {
+      "repo": "lmansf/LoLMetaDrift",
+      "language": "Python",
+      "stars": 0,
+      "pushed_on": "2026-06-26",
+      "archived": false
+    },
+    {
+      "repo": "lmansf/Manatee-Role-Call",
+      "language": "Python",
+      "stars": 0,
+      "pushed_on": "2026-09-24",
+      "archived": false
+    },
+    {
+      "repo": "lmansf/Member-Segmentation-Analysis",
+      "language": "JavaScript",
+      "stars": 0,
+      "pushed_on": "2026-08-13",
+      "archived": false
+    },
+    {
+      "repo": "lmansf/PetServices",
+      "language": "HTML",
+      "stars": 0,
+      "pushed_on": "2026-01-01",
+      "archived": false
+    },
+    {
+      "repo": "lmansf/PlayerPotential",
+      "language": "Python",
+      "stars": 0,
+      "pushed_on": "2026-03-13",
+      "archived": false
+    },
+    {
+      "repo": "lmansf/Portfolio2026",
+      "language": "JavaScript",
+      "stars": 1,
+      "pushed_on": "2026-11-04",
+      "archived": false
+    },
+    {
+      "repo": "lmansf/Predicting-Student-Test-Scores",
+      "language": "Jupyter Notebook",
+      "stars": 0,
+      "pushed_on": "2026-01-11",
+      "archived": false
+    },
+    {
+      "repo": "lmansf/Project_322",
+      "language": "Python",
+      "stars": 0,
+      "pushed_on": "2026-03-23",
+      "archived": false
+    },
+    {
+      "repo": "lmansf/Quack-Query",
+      "language": "TypeScript",
+      "stars": 0,
+      "pushed_on": "2026-10-04",
+      "archived": false
+    },
+    {
+      "repo": "lmansf/SQL-refresher",
+      "language": "JavaScript",
+      "stars": 0,
+      "pushed_on": "2026-08-16",
+      "archived": false
+    },
+    {
+      "repo": "lmansf/StPetePups",
+      "language": "TypeScript",
+      "stars": 0,
+      "pushed_on": "2026-07-04",
+      "archived": false
+    },
+    {
+      "repo": "lmansf/The-Story-So-Far",
+      "language": "HTML",
+      "stars": 0,
+      "pushed_on": "2025-11-24",
+      "archived": false
+    },
+    {
+      "repo": "lmansf/Titanic-ANN",
+      "language": "Jupyter Notebook",
+      "stars": 0,
+      "pushed_on": "2026-01-16",
+      "archived": false
+    },
+    {
+      "repo": "lmansf/USL-ticketing-and-stadium-revenue-forecasting",
+      "language": "Python",
+      "stars": 1,
+      "pushed_on": "2026-09-18",
+      "archived": false
+    },
+    {
+      "repo": "lmansf/Video-Annotator",
+      "language": "TypeScript",
+      "stars": 0,
+      "pushed_on": "2026-03-11",
+      "archived": false
+    },
+    {
+      "repo": "lmansf/Voice-Supression",
+      "language": "Python",
+      "stars": 0,
+      "pushed_on": "2026-04-10",
+      "archived": false
+    },
+    {
+      "repo": "lmansf/Welcome-to-Owl-Park",
+      "language": "TypeScript",
+      "stars": 1,
+      "pushed_on": "2026-11-04",
+      "archived": false
+    },
+    {
+      "repo": "lmansf/Youtube-Guru",
+      "language": "Python",
+      "stars": 0,
+      "pushed_on": "2026-04-06",
+      "archived": false
+    },
+    {
+      "repo": "lmansf/animalfinder_prod",
+      "language": null,
+      "stars": 1,
+      "pushed_on": "2025-10-04",
+      "archived": false
+    },
+    {
+      "repo": "lmansf/conditional-box-reveal-js",
+      "language": "JavaScript",
+      "stars": 0,
+      "pushed_on": "2025-10-22",
+      "archived": false
+    },
+    {
+      "repo": "lmansf/crow-game",
+      "language": "JavaScript",
+      "stars": 0,
+      "pushed_on": "2026-07-11",
+      "archived": false
+    },
+    {
+      "repo": "lmansf/dogedin-media-kit",
+      "language": "TypeScript",
+      "stars": 0,
+      "pushed_on": "2026-07-06",
+      "archived": false
+    },
+    {
+      "repo": "lmansf/dogedin-public-analytics",
+      "language": "TypeScript",
+      "stars": 0,
+      "pushed_on": "2026-07-06",
+      "archived": false
+    },
+    {
+      "repo": "lmansf/eFrog-Trainer",
+      "language": "Jupyter Notebook",
+      "stars": 0,
+      "pushed_on": "2026-06-09",
+      "archived": false
+    },
+    {
+      "repo": "lmansf/efrog",
+      "language": "JavaScript",
+      "stars": 0,
+      "pushed_on": "2026-08-03",
+      "archived": false
+    },
+    {
+      "repo": "lmansf/efrog-training",
+      "language": "Jupyter Notebook",
+      "stars": 0,
+      "pushed_on": "2026-06-19",
+      "archived": false
+    },
+    {
+      "repo": "lmansf/fraud-detection-pipeline",
+      "language": null,
+      "stars": 0,
+      "pushed_on": "2026-10-11",
+      "archived": false
+    },
+    {
+      "repo": "lmansf/fraud_detection_version_3",
+      "language": null,
+      "stars": 0,
+      "pushed_on": "2026-05-24",
+      "archived": false
+    },
+    {
+      "repo": "lmansf/learning-assembly",
+      "language": "C",
+      "stars": 0,
+      "pushed_on": "2026-08-27",
+      "archived": false
+    },
+    {
+      "repo": "lmansf/learning-dagster",
+      "language": "Python",
+      "stars": 0,
+      "pushed_on": "2026-08-23",
+      "archived": false
+    },
+    {
+      "repo": "lmansf/learning-docker",
+      "language": "Python",
+      "stars": 0,
+      "pushed_on": "2026-08-23",
+      "archived": false
+    },
+    {
+      "repo": "lmansf/learning-git",
+      "language": "HTML",
+      "stars": 0,
+      "pushed_on": "2026-08-23",
+      "archived": false
+    },
+    {
+      "repo": "lmansf/learningPasswordEncryption",
+      "language": "JavaScript",
+      "stars": 0,
+      "pushed_on": "2025-11-11",
+      "archived": false
+    },
+    {
+      "repo": "lmansf/lighthouse",
+      "language": "Rust",
+      "stars": 0,
+      "pushed_on": "2026-10-19",
+      "archived": false
+    },
+    {
+      "repo": "lmansf/lighthouse-web",
+      "language": "HTML",
+      "stars": 0,
+      "pushed_on": "2026-07-07",
+      "archived": false
+    },
+    {
+      "repo": "lmansf/loopsite",
+      "language": "TypeScript",
+      "stars": 0,
+      "pushed_on": "2026-09-22",
+      "archived": false
+    },
+    {
+      "repo": "lmansf/my-name-jev",
+      "language": null,
+      "stars": 0,
+      "pushed_on": "2026-10-03",
+      "archived": false
+    },
+    {
+      "repo": "lmansf/observations-master",
+      "language": null,
+      "stars": 0,
+      "pushed_on": "2026-06-05",
+      "archived": false
+    },
+    {
+      "repo": "lmansf/owl-park",
+      "language": "HTML",
+      "stars": 0,
+      "pushed_on": "2026-07-13",
+      "archived": false
+    },
+    {
+      "repo": "lmansf/owl-park-pos",
+      "language": "JavaScript",
+      "stars": 0,
+      "pushed_on": "2026-08-13",
+      "archived": false
+    },
+    {
+      "repo": "lmansf/pandas-refresher",
+      "language": "JavaScript",
+      "stars": 0,
+      "pushed_on": "2026-08-16",
+      "archived": false
+    },
+    {
+      "repo": "lmansf/pokeapi-capabilities",
+      "language": "HTML",
+      "stars": 0,
+      "pushed_on": "2026-06-18",
+      "archived": false
+    },
+    {
+      "repo": "lmansf/portfolioSite",
+      "language": "HTML",
+      "stars": 1,
+      "pushed_on": "2025-11-27",
+      "archived": false
+    },
+    {
+      "repo": "lmansf/quickstart-guide-dagster",
+      "language": "Python",
+      "stars": 0,
+      "pushed_on": "2026-08-31",
+      "archived": false
+    },
+    {
+      "repo": "lmansf/realtimeFraud_supabase",
+      "language": "TSQL",
+      "stars": 0,
+      "pushed_on": "2026-05-09",
+      "archived": false
+    },
+    {
+      "repo": "lmansf/simpleHeartbeat",
+      "language": "Python",
+      "stars": 0,
+      "pushed_on": "2025-11-15",
+      "archived": false
+    },
+    {
+      "repo": "lmansf/slopup",
+      "language": "HTML",
+      "stars": 0,
+      "pushed_on": "2025-10-08",
+      "archived": false
+    },
+    {
+      "repo": "lmansf/temp",
+      "language": "Python",
+      "stars": 0,
+      "pushed_on": "2026-02-01",
+      "archived": false
+    }
+  ]
+}

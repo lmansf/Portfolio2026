@@ -1,0 +1,784 @@
+{
+  "_about": "Written by scripts/data_run.py on every data run. latest is the newest run in full; history is the last 30 runs, newest first. /status and the SQL source trust badges read it.",
+  "latest": {
+    "id": "2026-11-04T18:12:21Z",
+    "started_at": "2026-11-04T18:12:21Z",
+    "finished_at": "2026-11-04T18:12:24Z",
+    "seconds": 3.0,
+    "trigger": "after a merge",
+    "commit": "d0589d7",
+    "status": "failed",
+    "passed": 68,
+    "total": 72,
+    "sources": [
+      {
+        "name": "site_pages",
+        "status": "ok",
+        "as_of": "2026-11-04T18:12:21Z",
+        "detail": "Rebuilt the site tables from index.html and projects.html."
+      },
+      {
+        "name": "fraud_snapshot",
+        "status": "ok",
+        "as_of": "2026-11-02T17:19:37Z",
+        "detail": "Read data/fraud-snapshot.json, published from Supabase by the Fraud snapshot job."
+      },
+      {
+        "name": "github",
+        "status": "ok",
+        "as_of": "2026-11-04T18:12:21Z",
+        "detail": "Pulled 300 public events and 67 public repositories."
+      }
+    ],
+    "tables": {
+      "projects": {
+        "as_of": "2026-11-04T18:12:21Z",
+        "rows": 11
+      },
+      "experience": {
+        "as_of": "2026-11-04T18:12:21Z",
+        "rows": 3
+      },
+      "skills": {
+        "as_of": "2026-11-04T18:12:21Z",
+        "rows": 14
+      },
+      "credentials": {
+        "as_of": "2026-11-04T18:12:21Z",
+        "rows": 3
+      },
+      "resume": {
+        "as_of": "2026-11-04T18:12:21Z",
+        "rows": 1
+      },
+      "fraud_totals": {
+        "as_of": "2026-11-02T17:19:37Z",
+        "rows": 1
+      },
+      "fraud_daily": {
+        "as_of": "2026-11-02T17:19:37Z",
+        "rows": 15
+      },
+      "fraud_score_bins": {
+        "as_of": "2026-11-02T17:19:37Z",
+        "rows": 16
+      },
+      "fraud_patterns": {
+        "as_of": "2026-11-02T17:19:37Z",
+        "rows": 5
+      },
+      "github_activity": {
+        "as_of": "2026-11-04T18:12:21Z",
+        "rows": 8
+      },
+      "github_repos": {
+        "as_of": "2026-11-04T18:12:21Z",
+        "rows": 67
+      }
+    },
+    "checks": [
+      {
+        "id": "projects.documented",
+        "node": "projects",
+        "name": "every column is described",
+        "status": "pass",
+        "detail": "11 columns described"
+      },
+      {
+        "id": "projects.row_count",
+        "node": "projects",
+        "name": "at least 3 rows",
+        "status": "pass",
+        "detail": "11 rows"
+      },
+      {
+        "id": "projects.not_null",
+        "node": "projects",
+        "name": "no blanks in slug, title, eyebrow, year, summary",
+        "status": "pass",
+        "detail": "none blank"
+      },
+      {
+        "id": "projects.unique_slug",
+        "node": "projects",
+        "name": "slug is unique",
+        "status": "pass",
+        "detail": "no repeats"
+      },
+      {
+        "id": "projects.unique_title",
+        "node": "projects",
+        "name": "title is unique",
+        "status": "pass",
+        "detail": "no repeats"
+      },
+      {
+        "id": "projects.accepted_values",
+        "node": "projects",
+        "name": "status is one of active, archived",
+        "status": "pass",
+        "detail": "all expected"
+      },
+      {
+        "id": "projects.exactly_three_featured_projects",
+        "node": "projects",
+        "name": "exactly three featured projects",
+        "status": "pass",
+        "detail": "holds"
+      },
+      {
+        "id": "experience.documented",
+        "node": "experience",
+        "name": "every column is described",
+        "status": "pass",
+        "detail": "9 columns described"
+      },
+      {
+        "id": "experience.row_count",
+        "node": "experience",
+        "name": "at least 1 row",
+        "status": "pass",
+        "detail": "3 rows"
+      },
+      {
+        "id": "experience.not_null",
+        "node": "experience",
+        "name": "no blanks in role, org, started, summary",
+        "status": "pass",
+        "detail": "none blank"
+      },
+      {
+        "id": "experience.a_role_ends_after_it_starts",
+        "node": "experience",
+        "name": "a role ends after it starts",
+        "status": "pass",
+        "detail": "holds on every row"
+      },
+      {
+        "id": "experience.exactly_one_current_role",
+        "node": "experience",
+        "name": "exactly one current role",
+        "status": "pass",
+        "detail": "holds"
+      },
+      {
+        "id": "skills.documented",
+        "node": "skills",
+        "name": "every column is described",
+        "status": "pass",
+        "detail": "3 columns described"
+      },
+      {
+        "id": "skills.row_count",
+        "node": "skills",
+        "name": "at least 3 rows",
+        "status": "pass",
+        "detail": "14 rows"
+      },
+      {
+        "id": "skills.not_null",
+        "node": "skills",
+        "name": "no blanks in skill, category",
+        "status": "pass",
+        "detail": "none blank"
+      },
+      {
+        "id": "skills.unique_skill",
+        "node": "skills",
+        "name": "skill is unique",
+        "status": "pass",
+        "detail": "no repeats"
+      },
+      {
+        "id": "skills.accepted_values",
+        "node": "skills",
+        "name": "category is one of Data stack, Forecasting & ML, Platforms I run at ZooTampa",
+        "status": "pass",
+        "detail": "all expected"
+      },
+      {
+        "id": "credentials.documented",
+        "node": "credentials",
+        "name": "every column is described",
+        "status": "pass",
+        "detail": "3 columns described"
+      },
+      {
+        "id": "credentials.row_count",
+        "node": "credentials",
+        "name": "at least 1 row",
+        "status": "pass",
+        "detail": "3 rows"
+      },
+      {
+        "id": "credentials.not_null",
+        "node": "credentials",
+        "name": "no blanks in credential",
+        "status": "pass",
+        "detail": "none blank"
+      },
+      {
+        "id": "credentials.unique_credential",
+        "node": "credentials",
+        "name": "credential is unique",
+        "status": "pass",
+        "detail": "no repeats"
+      },
+      {
+        "id": "resume.documented",
+        "node": "resume",
+        "name": "every column is described",
+        "status": "pass",
+        "detail": "11 columns described"
+      },
+      {
+        "id": "resume.row_count",
+        "node": "resume",
+        "name": "exactly 1 row",
+        "status": "pass",
+        "detail": "1 row"
+      },
+      {
+        "id": "resume.not_null",
+        "node": "resume",
+        "name": "no blanks in name, headline, now, building, latest, email",
+        "status": "pass",
+        "detail": "none blank"
+      },
+      {
+        "id": "fraud_totals.documented",
+        "node": "fraud_totals",
+        "name": "every column is described",
+        "status": "pass",
+        "detail": "15 columns described"
+      },
+      {
+        "id": "fraud_totals.row_count",
+        "node": "fraud_totals",
+        "name": "exactly 1 row",
+        "status": "pass",
+        "detail": "1 row"
+      },
+      {
+        "id": "fraud_totals.not_null",
+        "node": "fraud_totals",
+        "name": "no blanks in checkouts, fraud, fraud_caught, legit",
+        "status": "pass",
+        "detail": "none blank"
+      },
+      {
+        "id": "fraud_totals.fraud_plus_legit_equals_checkouts",
+        "node": "fraud_totals",
+        "name": "fraud plus legit equals checkouts",
+        "status": "pass",
+        "detail": "holds on every row"
+      },
+      {
+        "id": "fraud_totals.flagged_equals_reviewed_plus_declined",
+        "node": "fraud_totals",
+        "name": "flagged equals reviewed plus declined",
+        "status": "pass",
+        "detail": "holds on every row"
+      },
+      {
+        "id": "fraud_totals.caught_fraud_is_no_more_than_all_fraud",
+        "node": "fraud_totals",
+        "name": "caught fraud is no more than all fraud",
+        "status": "pass",
+        "detail": "holds on every row"
+      },
+      {
+        "id": "fraud_totals.freshness",
+        "node": "fraud_totals",
+        "name": "updated within 36 hours",
+        "status": "fail",
+        "detail": "2 days old"
+      },
+      {
+        "id": "fraud_daily.documented",
+        "node": "fraud_daily",
+        "name": "every column is described",
+        "status": "pass",
+        "detail": "11 columns described"
+      },
+      {
+        "id": "fraud_daily.row_count",
+        "node": "fraud_daily",
+        "name": "at least 1 row",
+        "status": "pass",
+        "detail": "15 rows"
+      },
+      {
+        "id": "fraud_daily.not_null",
+        "node": "fraud_daily",
+        "name": "no blanks in day, checkouts, fraud, fraud_caught",
+        "status": "pass",
+        "detail": "none blank"
+      },
+      {
+        "id": "fraud_daily.unique_day",
+        "node": "fraud_daily",
+        "name": "day is unique",
+        "status": "pass",
+        "detail": "no repeats"
+      },
+      {
+        "id": "fraud_daily.approved_reviewed_and_declined_add_up_to_checkouts",
+        "node": "fraud_daily",
+        "name": "approved, reviewed and declined add up to checkouts",
+        "status": "pass",
+        "detail": "holds on every row"
+      },
+      {
+        "id": "fraud_daily.the_days_add_up_to_the_30_day_totals",
+        "node": "fraud_daily",
+        "name": "the days add up to the 30-day totals",
+        "status": "pass",
+        "detail": "holds"
+      },
+      {
+        "id": "fraud_daily.freshness",
+        "node": "fraud_daily",
+        "name": "updated within 36 hours",
+        "status": "fail",
+        "detail": "2 days old"
+      },
+      {
+        "id": "fraud_score_bins.documented",
+        "node": "fraud_score_bins",
+        "name": "every column is described",
+        "status": "pass",
+        "detail": "4 columns described"
+      },
+      {
+        "id": "fraud_score_bins.row_count",
+        "node": "fraud_score_bins",
+        "name": "1 to 20 rows",
+        "status": "pass",
+        "detail": "16 rows"
+      },
+      {
+        "id": "fraud_score_bins.unique_score_from",
+        "node": "fraud_score_bins",
+        "name": "score_from is unique",
+        "status": "pass",
+        "detail": "no repeats"
+      },
+      {
+        "id": "fraud_score_bins.bins_sit_between_0_and_1",
+        "node": "fraud_score_bins",
+        "name": "bins sit between 0 and 1",
+        "status": "pass",
+        "detail": "holds on every row"
+      },
+      {
+        "id": "fraud_score_bins.the_bins_add_up_to_the_30_day_totals",
+        "node": "fraud_score_bins",
+        "name": "the bins add up to the 30-day totals",
+        "status": "pass",
+        "detail": "holds"
+      },
+      {
+        "id": "fraud_score_bins.freshness",
+        "node": "fraud_score_bins",
+        "name": "updated within 36 hours",
+        "status": "fail",
+        "detail": "2 days old"
+      },
+      {
+        "id": "fraud_patterns.documented",
+        "node": "fraud_patterns",
+        "name": "every column is described",
+        "status": "pass",
+        "detail": "3 columns described"
+      },
+      {
+        "id": "fraud_patterns.row_count",
+        "node": "fraud_patterns",
+        "name": "at least 1 row",
+        "status": "pass",
+        "detail": "5 rows"
+      },
+      {
+        "id": "fraud_patterns.unique_pattern",
+        "node": "fraud_patterns",
+        "name": "pattern is unique",
+        "status": "pass",
+        "detail": "no repeats"
+      },
+      {
+        "id": "fraud_patterns.accepted_values",
+        "node": "fraud_patterns",
+        "name": "pattern is one of card_testing, stolen_card_resale, gift_card_cashout, account_takeover, fraud_ring",
+        "status": "pass",
+        "detail": "all expected"
+      },
+      {
+        "id": "fraud_patterns.the_patterns_add_up_to_all_fraud",
+        "node": "fraud_patterns",
+        "name": "the patterns add up to all fraud",
+        "status": "pass",
+        "detail": "holds"
+      },
+      {
+        "id": "fraud_patterns.freshness",
+        "node": "fraud_patterns",
+        "name": "updated within 36 hours",
+        "status": "fail",
+        "detail": "2 days old"
+      },
+      {
+        "id": "github_activity.documented",
+        "node": "github_activity",
+        "name": "every column is described",
+        "status": "pass",
+        "detail": "4 columns described"
+      },
+      {
+        "id": "github_activity.row_count",
+        "node": "github_activity",
+        "name": "any number of rows",
+        "status": "pass",
+        "detail": "8 rows"
+      },
+      {
+        "id": "github_activity.not_null",
+        "node": "github_activity",
+        "name": "no blanks in day, repo, events",
+        "status": "pass",
+        "detail": "none blank"
+      },
+      {
+        "id": "github_activity.unique_day_repo",
+        "node": "github_activity",
+        "name": "day and repo are unique together",
+        "status": "pass",
+        "detail": "no repeats"
+      },
+      {
+        "id": "github_activity.pushes_are_no_more_than_events",
+        "node": "github_activity",
+        "name": "pushes are no more than events",
+        "status": "pass",
+        "detail": "holds on every row"
+      },
+      {
+        "id": "github_activity.freshness",
+        "node": "github_activity",
+        "name": "updated within 30 hours",
+        "status": "pass",
+        "detail": "under an hour old"
+      },
+      {
+        "id": "github_repos.documented",
+        "node": "github_repos",
+        "name": "every column is described",
+        "status": "pass",
+        "detail": "5 columns described"
+      },
+      {
+        "id": "github_repos.row_count",
+        "node": "github_repos",
+        "name": "at least 1 row",
+        "status": "pass",
+        "detail": "67 rows"
+      },
+      {
+        "id": "github_repos.not_null",
+        "node": "github_repos",
+        "name": "no blanks in repo, pushed_on",
+        "status": "pass",
+        "detail": "none blank"
+      },
+      {
+        "id": "github_repos.unique_repo",
+        "node": "github_repos",
+        "name": "repo is unique",
+        "status": "pass",
+        "detail": "no repeats"
+      },
+      {
+        "id": "github_repos.freshness",
+        "node": "github_repos",
+        "name": "updated within 30 hours",
+        "status": "pass",
+        "detail": "under an hour old"
+      },
+      {
+        "id": "now.matches_page",
+        "node": "resume",
+        "name": "Home: the SQL source for the now strip returns exactly what the page shows",
+        "status": "pass",
+        "detail": "matches",
+        "piece": "now"
+      },
+      {
+        "id": "featured.matches_page",
+        "node": "projects",
+        "name": "Home: the SQL source for the featured projects returns exactly what the page shows",
+        "status": "pass",
+        "detail": "matches",
+        "piece": "featured"
+      },
+      {
+        "id": "experience.matches_page",
+        "node": "experience",
+        "name": "Home: the SQL source for the experience timeline returns exactly what the page shows",
+        "status": "pass",
+        "detail": "matches",
+        "piece": "experience"
+      },
+      {
+        "id": "credentials.matches_page",
+        "node": "credentials",
+        "name": "Home: the SQL source for the credentials returns exactly what the page shows",
+        "status": "pass",
+        "detail": "matches",
+        "piece": "credentials"
+      },
+      {
+        "id": "toolkit.matches_page",
+        "node": "skills",
+        "name": "Home: the SQL source for the toolkit returns exactly what the page shows",
+        "status": "pass",
+        "detail": "matches",
+        "piece": "toolkit"
+      },
+      {
+        "id": "projects-featured.matches_page",
+        "node": "projects",
+        "name": "Projects: the SQL source for the featured projects returns exactly what the page shows",
+        "status": "pass",
+        "detail": "matches",
+        "piece": "projects-featured"
+      },
+      {
+        "id": "projects-more.matches_page",
+        "node": "projects",
+        "name": "Projects: the SQL source for the more builds returns exactly what the page shows",
+        "status": "pass",
+        "detail": "matches",
+        "piece": "projects-more"
+      },
+      {
+        "id": "live-totals.matches_page",
+        "node": "fraud_totals",
+        "name": "Live data: the SQL source for the last 30 days totals returns the snapshot's numbers",
+        "status": "pass",
+        "detail": "matches",
+        "piece": "live-totals"
+      },
+      {
+        "id": "live-daily.matches_page",
+        "node": "fraud_daily",
+        "name": "Live data: the SQL source for the fraud per day chart returns the snapshot's numbers",
+        "status": "pass",
+        "detail": "matches",
+        "piece": "live-daily"
+      },
+      {
+        "id": "live-scores.matches_page",
+        "node": "fraud_score_bins",
+        "name": "Live data: the SQL source for the score distribution chart returns the snapshot's numbers",
+        "status": "pass",
+        "detail": "matches",
+        "piece": "live-scores"
+      },
+      {
+        "id": "live-patterns.matches_page",
+        "node": "fraud_patterns",
+        "name": "Live data: the SQL source for the catch rate by fraud pattern table returns the snapshot's numbers",
+        "status": "pass",
+        "detail": "matches",
+        "piece": "live-patterns"
+      }
+    ],
+    "pieces": {
+      "now": {
+        "as_of": "2026-11-04T18:12:21Z",
+        "max_hours": 36,
+        "checks": [
+          "resume.documented",
+          "resume.row_count",
+          "resume.not_null",
+          "now.matches_page"
+        ]
+      },
+      "featured": {
+        "as_of": "2026-11-04T18:12:21Z",
+        "max_hours": 36,
+        "checks": [
+          "projects.documented",
+          "projects.row_count",
+          "projects.not_null",
+          "projects.unique_slug",
+          "projects.unique_title",
+          "projects.accepted_values",
+          "projects.exactly_three_featured_projects",
+          "featured.matches_page"
+        ]
+      },
+      "experience": {
+        "as_of": "2026-11-04T18:12:21Z",
+        "max_hours": 36,
+        "checks": [
+          "experience.documented",
+          "experience.row_count",
+          "experience.not_null",
+          "experience.a_role_ends_after_it_starts",
+          "experience.exactly_one_current_role",
+          "experience.matches_page"
+        ]
+      },
+      "credentials": {
+        "as_of": "2026-11-04T18:12:21Z",
+        "max_hours": 36,
+        "checks": [
+          "credentials.documented",
+          "credentials.row_count",
+          "credentials.not_null",
+          "credentials.unique_credential",
+          "credentials.matches_page"
+        ]
+      },
+      "toolkit": {
+        "as_of": "2026-11-04T18:12:21Z",
+        "max_hours": 36,
+        "checks": [
+          "skills.documented",
+          "skills.row_count",
+          "skills.not_null",
+          "skills.unique_skill",
+          "skills.accepted_values",
+          "toolkit.matches_page"
+        ]
+      },
+      "projects-featured": {
+        "as_of": "2026-11-04T18:12:21Z",
+        "max_hours": 36,
+        "checks": [
+          "projects.documented",
+          "projects.row_count",
+          "projects.not_null",
+          "projects.unique_slug",
+          "projects.unique_title",
+          "projects.accepted_values",
+          "projects.exactly_three_featured_projects",
+          "projects-featured.matches_page"
+        ]
+      },
+      "projects-more": {
+        "as_of": "2026-11-04T18:12:21Z",
+        "max_hours": 36,
+        "checks": [
+          "projects.documented",
+          "projects.row_count",
+          "projects.not_null",
+          "projects.unique_slug",
+          "projects.unique_title",
+          "projects.accepted_values",
+          "projects.exactly_three_featured_projects",
+          "projects-more.matches_page"
+        ]
+      },
+      "live-totals": {
+        "as_of": "2026-11-02T17:19:37Z",
+        "max_hours": 36,
+        "checks": [
+          "fraud_totals.documented",
+          "fraud_totals.row_count",
+          "fraud_totals.not_null",
+          "fraud_totals.fraud_plus_legit_equals_checkouts",
+          "fraud_totals.flagged_equals_reviewed_plus_declined",
+          "fraud_totals.caught_fraud_is_no_more_than_all_fraud",
+          "fraud_totals.freshness",
+          "live-totals.matches_page"
+        ]
+      },
+      "live-daily": {
+        "as_of": "2026-11-02T17:19:37Z",
+        "max_hours": 36,
+        "checks": [
+          "fraud_daily.documented",
+          "fraud_daily.row_count",
+          "fraud_daily.not_null",
+          "fraud_daily.unique_day",
+          "fraud_daily.approved_reviewed_and_declined_add_up_to_checkouts",
+          "fraud_daily.the_days_add_up_to_the_30_day_totals",
+          "fraud_daily.freshness",
+          "live-daily.matches_page"
+        ]
+      },
+      "live-scores": {
+        "as_of": "2026-11-02T17:19:37Z",
+        "max_hours": 36,
+        "checks": [
+          "fraud_score_bins.documented",
+          "fraud_score_bins.row_count",
+          "fraud_score_bins.unique_score_from",
+          "fraud_score_bins.bins_sit_between_0_and_1",
+          "fraud_score_bins.the_bins_add_up_to_the_30_day_totals",
+          "fraud_score_bins.freshness",
+          "live-scores.matches_page"
+        ]
+      },
+      "live-patterns": {
+        "as_of": "2026-11-02T17:19:37Z",
+        "max_hours": 36,
+        "checks": [
+          "fraud_patterns.documented",
+          "fraud_patterns.row_count",
+          "fraud_patterns.unique_pattern",
+          "fraud_patterns.accepted_values",
+          "fraud_patterns.the_patterns_add_up_to_all_fraud",
+          "fraud_patterns.freshness",
+          "live-patterns.matches_page"
+        ]
+      }
+    }
+  },
+  "history": [
+    {
+      "id": "2026-11-04T18:12:21Z",
+      "finished_at": "2026-11-04T18:12:24Z",
+      "trigger": "after a merge",
+      "status": "failed",
+      "passed": 68,
+      "total": 72,
+      "failed": [
+        "fraud_totals.freshness",
+        "fraud_daily.freshness",
+        "fraud_score_bins.freshness",
+        "fraud_patterns.freshness"
+      ]
+    },
+    {
+      "id": "2026-11-04T18:11:16Z",
+      "finished_at": "2026-11-04T18:11:20Z",
+      "trigger": "after a merge",
+      "status": "failed",
+      "passed": 68,
+      "total": 72,
+      "failed": [
+        "fraud_totals.freshness",
+        "fraud_daily.freshness",
+        "fraud_score_bins.freshness",
+        "fraud_patterns.freshness"
+      ]
+    },
+    {
+      "id": "2026-11-04T18:08:29Z",
+      "finished_at": "2026-11-04T18:08:33Z",
+      "trigger": "after a merge",
+      "status": "failed",
+      "passed": 68,
+      "total": 72,
+      "failed": [
+        "fraud_totals.freshness",
+        "fraud_daily.freshness",
+        "fraud_score_bins.freshness",
+        "fraud_patterns.freshness"
+      ]
+    }
+  ]
+}
