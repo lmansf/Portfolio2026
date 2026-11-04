@@ -1,0 +1,102 @@
+{
+  "_about": "Written by scripts/data_run.py: one line per SQL source caption, for the trust badge beside it (assets/sql-source.js). Full detail is in run-log.json.",
+  "run_at": "2026-11-04T18:11:20Z",
+  "pieces": {
+    "now": {
+      "as_of": "2026-11-04T18:11:16Z",
+      "max_hours": 36,
+      "passed": 4,
+      "total": 4,
+      "table": "resume",
+      "failed": []
+    },
+    "featured": {
+      "as_of": "2026-11-04T18:11:16Z",
+      "max_hours": 36,
+      "passed": 8,
+      "total": 8,
+      "table": "projects",
+      "failed": []
+    },
+    "experience": {
+      "as_of": "2026-11-04T18:11:16Z",
+      "max_hours": 36,
+      "passed": 6,
+      "total": 6,
+      "table": "experience",
+      "failed": []
+    },
+    "credentials": {
+      "as_of": "2026-11-04T18:11:16Z",
+      "max_hours": 36,
+      "passed": 5,
+      "total": 5,
+      "table": "credentials",
+      "failed": []
+    },
+    "toolkit": {
+      "as_of": "2026-11-04T18:11:16Z",
+      "max_hours": 36,
+      "passed": 6,
+      "total": 6,
+      "table": "skills",
+      "failed": []
+    },
+    "projects-featured": {
+      "as_of": "2026-11-04T18:11:16Z",
+      "max_hours": 36,
+      "passed": 8,
+      "total": 8,
+      "table": "projects",
+      "failed": []
+    },
+    "projects-more": {
+      "as_of": "2026-11-04T18:11:16Z",
+      "max_hours": 36,
+      "passed": 8,
+      "total": 8,
+      "table": "projects",
+      "failed": []
+    },
+    "live-totals": {
+      "as_of": "2026-11-02T17:19:37Z",
+      "max_hours": 36,
+      "passed": 7,
+      "total": 8,
+      "table": "fraud_totals",
+      "failed": [
+        "updated within 36 hours"
+      ]
+    },
+    "live-daily": {
+      "as_of": "2026-11-02T17:19:37Z",
+      "max_hours": 36,
+      "passed": 7,
+      "total": 8,
+      "table": "fraud_daily",
+      "failed": [
+        "updated within 36 hours"
+      ]
+    },
+    "live-scores": {
+      "as_of": "2026-11-02T17:19:37Z",
+      "max_hours": 36,
+      "passed": 6,
+      "total": 7,
+      "table": "fraud_score_bins",
+      "failed": [
+        "updated within 36 hours"
+      ]
+    },
+    "live-patterns": {
+      "as_of": "2026-11-02T17:19:37Z",
+      "max_hours": 36,
+      "passed": 6,
+      "total": 7,
+      "table": "fraud_patterns",
+      "failed": [
+        "updated within 36 hours"
+      ]
+    }
+  }
+}
