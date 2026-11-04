@@ -153,7 +153,8 @@ soft and tappable things are pills.
   Pinned version and limits are the constants at the top of the file.
 - `assets/console.css`, `assets/console.js`, `assets/sql-engine.js` — the
   docked SQL console on Home and Projects (see "SQL console" below).
-  `console.js` is the bar, editor, nav-as-queries and card rendering;
+  `console.js` is the bar, editor, nav-as-queries, Tables panel, friendly
+  errors, Skip SQL toggle and card rendering;
   `sql-engine.js` is the playground's DuckDB-Wasm loader lifted into a
   module (pin, lockdown, row cap, watchdog, Arrow formatting) that
   `console.js` imports; `playground.js` keeps its own copy for now, so the
@@ -258,6 +259,25 @@ left exactly as it was.
   DuckDB's working memory is capped at 256 MB. On a Save-Data connection
   opening the console doesn't download DuckDB (about 7 MB); the first Run
   does.
+- **Tables panel.** The Tables button lists every table with a one-line note
+  and its columns (read from `information_schema`; opening the panel loads
+  DuckDB itself if needed, except on Save-Data, where the list waits for the
+  first Run); tapping a name previews ten rows. Notes live in `TABLE_NOTES`
+  in `console.js`, and any table in `HIDDEN_TABLES` stays out of the list.
+- **Friendly errors.** DuckDB's message is turned into a plain title, a hint
+  (a near-miss table, column, function or keyword, the clause order, a
+  missing GROUP BY, the read-only sample tables or a switched-off setting)
+  and, where it helps, a working example with a "Try this instead" button.
+  Keyword guesses skip the table and column names the Tables panel read, so
+  a real name is never called a typo. The raw message stays one tap away
+  under "DuckDB's own message". The logic is `friendlyError()` in
+  `console.js`.
+- **Skip SQL.** The bar's Skip SQL button hides the console entirely and
+  remembers it (`sqlc-off`, clearing `sqlc-open`); a "Show the SQL console"
+  link in the footer brings it back, collapsed. The link is appended to the
+  footer's `.footer-socials` block (or the `.shell-footer` itself) and is
+  put back after every `transition.js` page swap, so keep one of those in
+  the footer markup.
 
 Files: `assets/console.js` (UI; imports `assets/sql-engine.js`, the DuckDB
 loader, and is bundled with it into `console.min.js`) and
@@ -283,7 +303,10 @@ fails the build instead of showing old cards.
 If `data/console/extra.sql` exists, the script appends it verbatim after the
 generated tables. It is the one place for hand-written console SQL (tables
 that don't come from the pages; the Easter egg hunt will use it), and
-`--check` fails when `site.sql` doesn't include it.
+`--check` fails when `site.sql` doesn't include it. Give a new table a
+one-line note in `TABLE_NOTES` (`console.js`) so the Tables panel can
+describe it, or add it to `HIDDEN_TABLES` to keep it out of the panel (it
+stays queryable and in `information_schema`).
 
 `sql-engine.js` loads the same pinned DuckDB-Wasm as the playground (from
 jsDelivr, only once the console is opened), attaches the playground file

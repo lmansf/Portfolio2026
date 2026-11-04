@@ -13,19 +13,45 @@
  *     cards (project cards, the experience timeline, chips), with a Table
  *     view and a link to the full page.
  *   - Editable: change any query and run it again (Ctrl or ⌘ + Enter).
+ *   - Tables: a button in the editor bar lists every table with a one-line
+ *     note (TABLE_NOTES) and its columns, read from information_schema once
+ *     DuckDB is up; tapping a name previews ten rows. HIDDEN_TABLES keeps a
+ *     table out of the list (the Easter egg hunt will use it).
+ *   - Friendly errors: friendlyError() turns DuckDB's message into a plain
+ *     title, a hint and, where it helps, a working example with a "Try this
+ *     instead" button; the raw message stays under a <details>.
+ *   - Skip SQL: a button on the bar hides the console entirely (the pages
+ *     don't need it); a "Show the SQL console" button in the footer brings
+ *     it back, and is put back whenever transition.js swaps the footer.
  *   - Everything runs on the visitor's device; nothing they type is sent
  *     anywhere. Results are written with textContent, and card links only
  *     ever point at https:// addresses, mailto: or this site's own paths.
  *     A card's "How the data flows" link opens the diagram's modal through
  *     the page's own trigger (pipeline.js), as the page's card does.
  *
- * Whether the console is open is remembered in localStorage (per visitor,
- * best effort: it starts collapsed when storage is unavailable).
+ * Whether the console is open (sqlc-open) or skipped (sqlc-off) is
+ * remembered in localStorage (per visitor, best effort: it starts collapsed
+ * and shown when storage is unavailable).
  * ───────────────────────────────────────────────────────────── */
 
 import { createEngine, toObjects, eachRow, getCell, formatValue, isNumericType, cleanError, formatMs, csvCell, MAX_ROWS_KEPT, QUERY_TIMEOUT_MS } from './sql-engine.js';
 
 const OPEN_KEY = 'sqlc-open';
+const OFF_KEY = 'sqlc-off';
+// Tables the schema panel leaves out (still in information_schema).
+const HIDDEN_TABLES = new Set();
+// One line about each table, for the schema panel.
+const TABLE_NOTES = {
+    projects: 'every project card on /projects',
+    experience: 'the experience timeline',
+    skills: 'the toolkit, one row per skill',
+    credentials: 'certifications and workshops',
+    resume: 'one row: who I am, how to reach me',
+    park_days: 'synthetic: one row per park day, Mar to Aug 2026',
+    orders: 'synthetic: one row per checkout',
+    order_items: 'synthetic: one row per order line',
+    products: 'synthetic: tickets, passes, add-ons'
+};
 const MAX_ROWS_SHOWN = 500;
 const MAX_CARDS = 60;
 
@@ -150,6 +176,7 @@ function init() {
     el('span', { class: 'sqlc__label', text: 'SQL console' }),
     el('span', { class: 'sqlc__hint', text: 'This site is a database. Query it.' }),
     el('span', { class: 'sqlc__chev', 'aria-hidden': 'true' }));
+    const skipBtn = el('button', { class: 'sqlc__skip', type: 'button', 'aria-label': 'Skip SQL: hide the console' }, 'Skip SQL');
 
     const sql = el('textarea', {
         id: 'sqlc-sql',
@@ -158,12 +185,15 @@ function init() {
         autocapitalize: 'off',
         autocomplete: 'off',
         autocorrect: 'off',
-        rows: "4"
+        rows: '4'
     });
     const runBtn = el('button', { class: 'btn btn--primary sqlc__run', type: 'button' }, 'Run ', el('span', { class: 'arrow', 'aria-hidden': 'true', text: '→' }));
     const cancelBtn = el('button', { class: 'btn btn--ghost sqlc__cancel', type: 'button', hidden: true }, 'Cancel');
     const status = el('p', { class: 'sqlc__status', role: 'status', 'aria-live': 'polite', text: 'DuckDB loads when you open the console.' });
     const keys = el('span', { class: 'sqlc__keys', text: 'Ctrl or ⌘ + Enter runs it' });
+    const tablesBtn = el('button', { class: 'sqlc__tables-btn', type: 'button', 'aria-expanded': 'false', 'aria-controls': 'sqlc-schema' }, 'Tables');
+    const schema = el('div', { class: 'sqlc__schema', id: 'sqlc-schema', hidden: true },
+        el('p', { class: 'sqlc__empty', text: 'The table list appears once DuckDB has loaded.' }));
 
     const meta = el('p', { class: 'sqlc__meta' });
     const viewCards = el('button', { class: 'sqlc__view', type: 'button', 'aria-pressed': 'true', 'data-view': 'cards' }, 'Cards');
@@ -181,15 +211,50 @@ function init() {
             el('div', { class: 'sqlc__editor' },
                 el('label', { class: 'sr-only', for: 'sqlc-sql', text: 'SQL query' }),
                 sql,
-                el('div', { class: 'sqlc__bar' }, runBtn, cancelBtn, status, keys)),
+                el('div', { class: 'sqlc__bar' }, runBtn, cancelBtn, tablesBtn, status, keys)),
+            schema,
             error,
             result));
 
     const root = el('aside', { class: 'sqlc', 'aria-label': 'SQL console' },
-        el('div', { class: 'sqlc__dock' }, toggle),
+        el('div', { class: 'sqlc__dock' }, el('div', { class: 'sqlc__dock-inner' }, toggle, skipBtn)),
         panel);
     document.body.append(root);
-    document.body.classList.add('has-sqlc');
+    const restoreBtn = el('button', { class: 'sqlc-restore', type: 'button' }, 'Show the SQL console');
+
+    // ── Skip SQL: hide the whole console (remembered), with a way back in
+    //    the footer. The pages don't need it for anything. ──
+    function setOff(off, { remember = true } = {}) {
+        if (off) {
+            close();
+            store.set(OPEN_KEY, null);
+            root.hidden = true;
+            document.body.classList.remove('has-sqlc');
+            placeRestore();
+        } else {
+            root.hidden = false;
+            document.body.classList.add('has-sqlc');
+            restoreBtn.remove();
+        }
+        if (remember) store.set(OFF_KEY, off ? '1' : null);
+    }
+
+    // transition.js replaces the footer on page swaps, so put the button back.
+    function placeRestore() {
+        if (!root.hidden) return;
+        const spot = document.querySelector('.shell-footer .footer-socials') || document.querySelector('.shell-footer');
+        if (spot && !spot.contains(restoreBtn)) spot.append(restoreBtn);
+    }
+    new MutationObserver(placeRestore).observe(document.body, { childList: true });
+
+    skipBtn.addEventListener('click', () => {
+        setOff(true);
+        restoreBtn.focus({ preventScroll: true });
+    });
+    restoreBtn.addEventListener('click', () => {
+        setOff(false);
+        toggle.focus({ preventScroll: true });
+    });
 
     // ── Open / close ──
     function isOpen() { return root.classList.contains('is-open'); }
@@ -352,6 +417,82 @@ function init() {
         run();
     }
 
+    // ── Schema panel: tables and columns, read from DuckDB's own catalog ──
+    let schemaLoaded = false;
+    let schemaLoading = null;
+    tablesBtn.addEventListener('click', () => {
+        const show = schema.hidden;
+        schema.hidden = !show;
+        tablesBtn.setAttribute('aria-expanded', String(show));
+        if (show && !schemaLoaded) showSchema();
+    });
+
+    async function showSchema() {
+        const saveData = navigator.connection && navigator.connection.saveData;
+        if (saveData && !engine.loaded) {
+            schema.replaceChildren(el('p', { class: 'sqlc__empty', text: 'Data saver is on, so the table list loads with your first Run (DuckDB is about 7 MB).' }));
+            return;
+        }
+        try {
+            await engine.ready();
+            await loadSchema();
+            if (!busy) setStatus('Ready.');
+        } catch (err) {
+            console.error(err);
+        }
+    }
+
+    function loadSchema() {
+        if (schemaLoaded) return Promise.resolve();
+        if (!schemaLoading) {
+            schemaLoading = readSchema().finally(() => { schemaLoading = null; });
+        }
+        return schemaLoading;
+    }
+
+    async function readSchema() {
+        const { result: res } = await engine.run(`SELECT table_catalog, table_name, column_name, data_type
+FROM information_schema.columns
+WHERE table_schema = 'main'
+ORDER BY table_catalog = 'owl_park', table_name, ordinal_position`);
+        const tables = new Map();
+        for (const r of toObjects(res, 2000)) {
+            if (HIDDEN_TABLES.has(r.table_name)) continue;
+            if (r.table_catalog !== 'memory' && r.table_catalog !== 'owl_park') continue;
+            if (!tables.has(r.table_name)) tables.set(r.table_name, { site: r.table_catalog === 'memory', cols: [] });
+            tables.get(r.table_name).cols.push([r.column_name, String(r.data_type).toLowerCase()]);
+        }
+        knownTables = [...tables.keys()];
+        knownColumns = [...new Set([...tables.values()].flatMap((t) => t.cols.map(([c]) => c.toLowerCase())))];
+        const groups = [['Site', true], ['Owl Park sample data', false]];
+        const frag = document.createDocumentFragment();
+        for (const [label, site] of groups) {
+            const names = [...tables.entries()].filter(([, t]) => t.site === site);
+            if (!names.length) continue;
+            frag.append(el('p', { class: 'sqlc__schema-group', text: label }));
+            for (const [name, t] of names) {
+                const preview = el('button', { class: 'sqlc__schema-name', type: 'button', 'data-table': name, text: name });
+                preview.addEventListener('click', (e) => {
+                    e.preventDefault(); // don't toggle the <details>
+                    if (busy) return;
+                    sql.value = `SELECT *\nFROM ${name}\nLIMIT 10;`;
+                    lastRoute = null;
+                    fit();
+                    run();
+                });
+                frag.append(el('details', { class: 'sqlc__schema-table' },
+                    el('summary', {}, preview, TABLE_NOTES[name] ? el('span', { class: 'sqlc__schema-note', text: TABLE_NOTES[name] }) : null),
+                    el('ul', { class: 'sqlc__schema-cols' }, ...t.cols.map(([c, type]) =>
+                        el('li', {}, el('code', { text: c }), ' ', el('span', { text: type }))))));
+            }
+        }
+        frag.append(el('p', { class: 'sqlc__empty', text: 'Tap a name to preview it, or the arrow to see its columns. Everything runs in your browser.' }));
+        schema.replaceChildren(frag);
+        schemaLoaded = true;
+    }
+    let knownTables = [];
+    let knownColumns = [];
+
     // ── Run ──
     async function run() {
         if (busy) return;
@@ -370,6 +511,7 @@ function init() {
             try {
                 if (!engine.loaded) setStatus('Loading DuckDB…');
                 await engine.ready();
+                if (!schemaLoaded) await loadSchema().catch((e) => console.error(e));
                 cancelBtn.hidden = false;
                 cancelBtn.disabled = false;
                 setStatus('Running…');
@@ -404,9 +546,22 @@ function init() {
         lastResult = null;
         result.hidden = true;
         error.hidden = false;
-        const head = el('strong', { text: 'That query didn’t run.' });
-        const pre = el('pre', { text: cleanError(err) });
-        error.replaceChildren(head, pre);
+        const raw = cleanError(err);
+        const help = friendlyError(raw, knownTables, sql.value, knownColumns);
+        const parts = [el('strong', { text: help.title })];
+        if (help.hint) parts.push(el('p', { class: 'sqlc__error-hint', text: help.hint }));
+        if (help.example) {
+            const tryBtn = el('button', { class: 'sqlc__try', type: 'button' }, 'Try this instead');
+            tryBtn.addEventListener('click', () => {
+                sql.value = help.example;
+                lastRoute = null;
+                fit();
+                run();
+            });
+            parts.push(el('div', { class: 'sqlc__example' }, el('code', { text: help.example }), tryBtn));
+        }
+        parts.push(el('details', { class: 'sqlc__raw' }, el('summary', { text: 'DuckDB’s own message' }), el('pre', { text: raw })));
+        error.replaceChildren(...parts);
         setStatus('Fix the query and run it again.');
     }
 
@@ -517,8 +672,112 @@ function init() {
         setTimeout(() => URL.revokeObjectURL(url), 1000);
     }
 
-    // Remember the open state across pages, but don't grab focus on load.
-    if (store.get(OPEN_KEY) === '1') open({ focus: false, remember: false });
+    // Remember the choices across pages, but don't grab focus on load.
+    if (store.get(OFF_KEY) === '1') setOff(true, { remember: false });
+    else {
+        document.body.classList.add('has-sqlc');
+        if (store.get(OPEN_KEY) === '1') open({ focus: false, remember: false });
+    }
+}
+
+// ── Friendly errors: a plain hint and a working example ──
+const KEYWORDS = ['select', 'from', 'where', 'group', 'order', 'by', 'limit', 'join', 'having', 'with', 'as', 'and', 'or', 'not', 'distinct', 'union', 'case', 'when', 'then', 'else', 'end', 'on', 'like', 'between'];
+
+const RESERVED = new Set([...KEYWORDS, 'in', 'is', 'null', 'exists', 'all', 'any', 'asc', 'desc', 'offset', 'left', 'right', 'inner', 'outer', 'full', 'cross', 'using', 'over', 'partition', 'true', 'false', 'cast', 'values', 'except', 'intersect', 'ilike', 'nulls', 'first', 'last', 'into', 'set', 'table', 'create', 'drop', 'insert', 'update', 'delete']);
+
+function nearestKeyword(word) {
+    const w = word.toLowerCase();
+    if (RESERVED.has(w)) return null;
+    let best = null;
+    let bestD = w.length < 5 ? 2 : 3;
+    for (const k of KEYWORDS) {
+        const d = editDistance(w, k);
+        if (d > 0 && d < bestD && Math.abs(k.length - w.length) <= 2) { best = k; bestD = d; }
+    }
+    return best;
+}
+
+function editDistance(a, b) {
+    const dp = Array.from({ length: a.length + 1 }, (_, i) => [i, ...Array(b.length).fill(0)]);
+    for (let j = 1; j <= b.length; j++) dp[0][j] = j;
+    for (let i = 1; i <= a.length; i++) {
+        for (let j = 1; j <= b.length; j++) {
+            dp[i][j] = Math.min(dp[i - 1][j] + 1, dp[i][j - 1] + 1, dp[i - 1][j - 1] + (a[i - 1] === b[j - 1] ? 0 : 1));
+            // A swapped pair of letters (FORM for FROM) counts as one slip.
+            if (i > 1 && j > 1 && a[i - 1] === b[j - 2] && a[i - 2] === b[j - 1]) dp[i][j] = Math.min(dp[i][j], dp[i - 2][j - 2] + 1);
+        }
+    }
+    return dp[a.length][b.length];
+}
+
+/**
+ * Turn DuckDB's error text into { title, hint, example? } for the error box.
+ * `tables` and `columns` are the names read from information_schema (lower
+ * case columns), used to confirm DuckDB's own "Did you mean" and to keep a
+ * typo hint from flagging a real name; `sqlText` is the query, scanned for a
+ * misspelled keyword when the parser trips one word later (FORM projects).
+ */
+export function friendlyError(raw, tables = [], sqlText = '', columns = []) {
+    const listTables = tables.length ? `Tables you can use: ${tables.join(', ')}.` : 'Open Tables to see what you can query.';
+    let m;
+    if ((m = /Table with name (\S+) does not exist!(?:\s*Did you mean "([^"]+)")?/i.exec(raw))) {
+        let guess = m[2] ? m[2].replace(/^(memory|owl_park)\.(main\.)?/, '') : null;
+        if (guess && tables.length && !tables.includes(guess)) guess = null; // not a catalog table
+        return guess
+            ? { title: `There’s no table called ${m[1]}.`, hint: `Did you mean ${guess}?`, example: `SELECT *\nFROM ${guess}\nLIMIT 10;` }
+            : { title: `There’s no table called ${m[1]}.`, hint: `${listTables} If you changed or dropped one, reload the page to put it back.` };
+    }
+    if ((m = /Referenced column "([^"]+)" not found[^]*?Candidate bindings: ([^\n]+)/i.exec(raw))) {
+        const cands = m[2].split(',').map((c) => c.trim().replace(/^"|"$/g, '').replace(/^.*\./, '')).filter(Boolean);
+        return { title: `There’s no column called ${m[1]} there.`, hint: cands.length ? `Close matches: ${cands.join(', ')}.` : 'Open Tables to see each table’s columns.' };
+    }
+    if ((m = /Referenced column "([^"]+)" not found/i.exec(raw))) {
+        return { title: `There’s no column called ${m[1]} there.`, hint: 'Open Tables to see each table’s columns, or use single quotes for text: \'like this\'.' };
+    }
+    if ((m = /(Scalar|Aggregate|Table) Function with name (\S+) does not exist!(?:\s*Did you mean "([^"]+)")?/i.exec(raw))) {
+        return { title: `DuckDB has no function called ${m[2]}.`, hint: m[3] ? `Did you mean ${m[3]}?` : 'Check the spelling, or try count(*), sum(), avg(), min() or max().' };
+    }
+    if ((m = /syntax error at or near "([^"]+)"/i.exec(raw))) {
+        const near = m[1];
+        const guessable = /^[A-Za-z_]+$/.test(near) && near.length >= 3 && !tables.includes(near.toLowerCase()) && !columns.includes(near.toLowerCase());
+        let kw = guessable ? nearestKeyword(near) : null;
+        let typo = kw ? near : null;
+        if (!kw) {
+            // The parser often trips one word after the typo (FORM projects).
+            for (const w of sqlText.replace(/--[^\n]*|'[^']*'/g, ' ').match(/[A-Za-z_]+/g) || []) {
+                if (RESERVED.has(w.toLowerCase()) || tables.includes(w.toLowerCase()) || columns.includes(w.toLowerCase())) continue;
+                const k = nearestKeyword(w);
+                if (k && editDistance(w.toLowerCase(), k) === 1 && w.length >= 4) { kw = k; typo = w; break; }
+            }
+        }
+        return {
+            title: `Something’s off near “${m[1]}”.`,
+            hint: kw ? `Did you mean ${kw.toUpperCase()} instead of ${typo}?` : 'Check the spelling and the order: SELECT … FROM … WHERE … GROUP BY … ORDER BY … LIMIT.',
+            example: 'SELECT title, year\nFROM projects\nWHERE featured\nORDER BY sort_order;'
+        };
+    }
+    if (/syntax error at end of input/i.test(raw)) {
+        return { title: 'The query stops too early.', hint: 'Something is missing at the end, like the condition after WHERE or the ON after a JOIN.', example: 'SELECT title, year\nFROM projects\nWHERE year = 2026;' };
+    }
+    if (/must appear in the GROUP BY clause|GROUP BY clause or must be part of an aggregate/i.test(raw)) {
+        return { title: 'A column needs grouping.', hint: 'Every column you select must be in GROUP BY or inside an aggregate like count(*). GROUP BY ALL groups by everything that isn’t aggregated.', example: 'SELECT category, count(*) AS skills\nFROM skills\nGROUP BY ALL;' };
+    }
+    if ((m = /Ambiguous reference to column name "([^"]+)"/i.exec(raw))) {
+        return { title: `Two tables have a column called ${m[1]}.`, hint: `Say which one with an alias, like o.${m[1]}, or join USING (${m[1]}).` };
+    }
+    if (/read-only mode|Cannot execute statement of type/i.test(raw)) {
+        return { title: 'The Owl Park sample tables are read-only.', hint: 'You can still make your own tables in this tab.', example: 'CREATE TABLE weekend_days AS\nSELECT * FROM park_days WHERE is_weekend;' };
+    }
+    if (/out of memory/i.test(raw)) {
+        return { title: 'That result is too big for a browser tab.', hint: 'Add a LIMIT or a WHERE, or aggregate it.' };
+    }
+    if (/Conversion Error|Could not convert|Cannot compare values of type|No function matches|Could not choose a best candidate function/i.test(raw)) {
+        return { title: 'Two values don’t fit together.', hint: 'Text goes in single quotes, numbers don’t, and a CAST (x AS INTEGER) can turn one into the other.' };
+    }
+    if (/Permission Error|disabled (by|through) configuration|configuration has been locked/i.test(raw)) {
+        return { title: 'That’s switched off here.', hint: 'The console can’t read files or URLs, load extensions, or change its settings. Everything stays in this tab.' };
+    }
+    return { title: 'DuckDB couldn’t run that.', hint: listTables };
 }
 
 // ── Cards: the site's own components, filled from query rows ──

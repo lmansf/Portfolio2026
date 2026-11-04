@@ -36,15 +36,23 @@ body.has-sqlc { padding-bottom: calc(var(--sqlc-dock-h) + env(safe-area-inset-bo
     border-top: 1px solid var(--hairline);
     padding-bottom: env(safe-area-inset-bottom, 0px);
 }
+.sqlc[hidden] { display: none; }
+.sqlc__dock-inner {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    max-width: calc(var(--max-w) + 2 * var(--gutter));
+    margin: 0 auto;
+    padding: 0 var(--gutter);
+}
 .sqlc__toggle {
     display: flex;
     align-items: center;
     gap: 0.65rem;
-    width: 100%;
-    max-width: calc(var(--max-w) + 2 * var(--gutter));
+    flex: 1;
+    min-width: 0;
     min-height: var(--sqlc-dock-h);
-    margin: 0 auto;
-    padding: 0 var(--gutter);
+    padding: 0 0.2rem;
     border: 0;
     background: none;
     color: inherit;
@@ -81,6 +89,33 @@ body.has-sqlc { padding-bottom: calc(var(--sqlc-dock-h) + env(safe-area-inset-bo
     transition: transform var(--dur-fast) var(--ease-out);
     flex: none;
 }
+.sqlc__skip {
+    flex: none;
+    font: inherit;
+    font-size: 0.8rem;
+    font-weight: 500;
+    color: var(--ink-2);
+    background: none;
+    border: 1px solid var(--hairline-strong);
+    border-radius: var(--r-pill);
+    padding: 0.3rem 0.75rem;
+    min-height: 34px;
+    cursor: pointer;
+}
+.sqlc__skip:hover { background: var(--surface-2); color: var(--ink-1); }
+.sqlc__skip:focus-visible { outline: 2px solid var(--focus-ring); outline-offset: 2px; }
+.sqlc-restore {
+    font: inherit;
+    font-size: inherit;
+    color: inherit;
+    background: none;
+    border: 0;
+    padding: 0;
+    text-decoration: underline;
+    text-underline-offset: 3px;
+    cursor: pointer;
+}
+.sqlc-restore:focus-visible { outline: 2px solid var(--focus-ring); outline-offset: 2px; border-radius: 4px; }
 .sqlc.is-open .sqlc__chev { transform: translateY(-2px) rotate(135deg); }
 @media (max-width: 420px) {
     .sqlc__hint { display: none; }
@@ -146,6 +181,61 @@ body.has-sqlc { padding-bottom: calc(var(--sqlc-dock-h) + env(safe-area-inset-bo
 @media (hover: none) and (pointer: coarse) {
     .sqlc__keys { display: none; }
 }
+
+/* ── Schema panel ── */
+.sqlc__tables-btn {
+    font: inherit;
+    font-size: 0.84rem;
+    font-weight: 500;
+    color: var(--ink-1);
+    background: var(--surface-1);
+    border: 1px solid var(--hairline-strong);
+    border-radius: var(--r-pill);
+    padding: 0.4rem 0.85rem;
+    min-height: 36px;
+    cursor: pointer;
+}
+.sqlc__tables-btn[aria-expanded="true"] { background: var(--accent-soft); font-weight: 600; }
+.sqlc__tables-btn:focus-visible { outline: 2px solid var(--focus-ring); outline-offset: 2px; }
+.sqlc__schema {
+    margin-top: 0.8rem;
+    padding: 0.7rem 0.9rem;
+    border: 1px solid var(--hairline);
+    border-radius: var(--r-md);
+    background: var(--surface-1);
+    columns: 2 18rem;
+    column-gap: 1.5rem;
+}
+.sqlc__schema[hidden] { display: none; }
+.sqlc__schema-group {
+    break-after: avoid;
+    font-size: 0.74rem;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--chestnut);
+    margin: 0.3rem 0 0.2rem;
+}
+.sqlc__schema-table { break-inside: avoid; padding: 0.15rem 0; }
+.sqlc__schema-table summary { cursor: pointer; font-size: 0.86rem; color: var(--ink-2); }
+.sqlc__schema-name {
+    font: inherit;
+    font-family: var(--font-mono);
+    font-size: 0.84rem;
+    font-weight: 600;
+    color: var(--accent-ink);
+    background: none;
+    border: 0;
+    padding: 0.2rem 0.1rem;
+    margin-right: 0.4rem;
+    text-decoration: underline;
+    text-underline-offset: 3px;
+    cursor: pointer;
+}
+.sqlc__schema-name:focus-visible { outline: 2px solid var(--focus-ring); outline-offset: 1px; border-radius: 4px; }
+.sqlc__schema-note { font-size: 0.8rem; color: var(--ink-3); }
+.sqlc__schema-cols { list-style: none; margin: 0.2rem 0 0.4rem 1.1rem; padding: 0; font-size: 0.8rem; color: var(--ink-3); }
+.sqlc__schema-cols code { font-family: var(--font-mono); color: var(--ink-1); }
 
 /* ── Results ── */
 .sqlc__result { margin-top: 0.9rem; }
@@ -230,6 +320,38 @@ body.has-sqlc { padding-bottom: calc(var(--sqlc-dock-h) + env(safe-area-inset-bo
     background: color-mix(in srgb, var(--danger) 8%, var(--bg));
 }
 .sqlc__error strong { display: block; color: var(--danger); margin-bottom: 0.3rem; }
+.sqlc__error-hint { margin: 0 0 0.5rem; font-size: 0.9rem; color: var(--ink-1); }
+.sqlc__example {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.5rem 0.8rem;
+    margin: 0 0 0.5rem;
+}
+.sqlc__example code {
+    font-family: var(--font-mono);
+    font-size: 0.8rem;
+    white-space: pre-wrap;
+    background: var(--bg);
+    border: 1px solid var(--hairline);
+    border-radius: var(--r-sm);
+    padding: 0.4rem 0.6rem;
+}
+.sqlc__try {
+    font: inherit;
+    font-size: 0.82rem;
+    font-weight: 600;
+    color: var(--accent-ink);
+    background: none;
+    border: 1px solid var(--hairline-strong);
+    border-radius: var(--r-pill);
+    padding: 0.35rem 0.8rem;
+    min-height: 34px;
+    cursor: pointer;
+}
+.sqlc__try:focus-visible { outline: 2px solid var(--focus-ring); outline-offset: 2px; }
+.sqlc__raw summary { font-size: 0.8rem; color: var(--ink-3); cursor: pointer; }
+.sqlc__raw pre { margin-top: 0.3rem; }
 .sqlc__error pre {
     font-family: var(--font-mono);
     font-size: 0.8rem;
