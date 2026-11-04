@@ -259,16 +259,17 @@ left exactly as it was.
   opening the console doesn't download DuckDB (about 7 MB); the first Run
   does.
 - **Tables panel.** The Tables button lists every table with a one-line note
-  and its columns (read from `information_schema` once DuckDB is up); tapping
-  a name previews ten rows. Notes live in `TABLE_NOTES` in `console.js`, and
-  any table in `HIDDEN_TABLES` stays out of the list.
+  and its columns (read from `information_schema`; opening the panel loads
+  DuckDB itself if needed, except on Save-Data, where the list waits for the
+  first Run); tapping a name previews ten rows. Notes live in `TABLE_NOTES`
+  in `console.js`, and any table in `HIDDEN_TABLES` stays out of the list.
 - **Friendly errors.** DuckDB's message is turned into a plain title, a hint
   (a near-miss table, column, function or keyword, or the clause order) and,
   where it helps, a working example with a "Try this instead" button. The raw
   message stays one tap away under "DuckDB's own message".
 - **Skip SQL.** The bar's Skip SQL button hides the console entirely and
-  remembers it (`sqlc-off`); a "Show the SQL console" link in the footer
-  brings it back.
+  remembers it (`sqlc-off`, clearing `sqlc-open`); a "Show the SQL console"
+  link in the footer brings it back, collapsed.
 
 Files: `assets/console.js` (UI; imports `assets/sql-engine.js`, the DuckDB
 loader, and is bundled with it into `console.min.js`) and

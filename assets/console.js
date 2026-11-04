@@ -215,7 +215,8 @@ function init() {
     //    the footer. The pages don't need it for anything. ──
     function setOff(off, { remember = true } = {}) {
         if (off) {
-            close({ remember: false });
+            close();
+            store.set(OPEN_KEY, null);
             root.hidden = true;
             document.body.classList.remove('has-sqlc');
             placeRestore();
@@ -407,15 +408,38 @@ function init() {
 
     // ── Schema panel: tables and columns, read from DuckDB's own catalog ──
     let schemaLoaded = false;
+    let schemaLoading = null;
     tablesBtn.addEventListener('click', () => {
         const show = schema.hidden;
         schema.hidden = !show;
         tablesBtn.setAttribute('aria-expanded', String(show));
-        if (show && !engine.loaded) run();
+        if (show && !schemaLoaded) showSchema();
     });
 
-    async function loadSchema() {
-        if (schemaLoaded) return;
+    async function showSchema() {
+        const saveData = navigator.connection && navigator.connection.saveData;
+        if (saveData && !engine.loaded) {
+            schema.replaceChildren(el('p', { class: 'sqlc__empty', text: 'Data saver is on, so the table list loads with your first Run (DuckDB is about 7 MB).' }));
+            return;
+        }
+        try {
+            await engine.ready();
+            await loadSchema();
+            if (!busy) setStatus('Ready.');
+        } catch (err) {
+            console.error(err);
+        }
+    }
+
+    function loadSchema() {
+        if (schemaLoaded) return Promise.resolve();
+        if (!schemaLoading) {
+            schemaLoading = readSchema().finally(() => { schemaLoading = null; });
+        }
+        return schemaLoading;
+    }
+
+    async function readSchema() {
         const { result: res } = await engine.run(`SELECT table_catalog, table_name, column_name, data_type
 FROM information_schema.columns
 WHERE table_schema = 'main'
