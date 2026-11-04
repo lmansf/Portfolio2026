@@ -363,7 +363,7 @@ from bins;</code></pre>
                 <div class="sql-src__panel">
                     <pre class="sql-src__code" tabindex="0"><code>SELECT pattern, fraud, caught
 FROM fraud_patterns
-ORDER BY fraud DESC;</code></pre>
+ORDER BY fraud DESC, pattern;</code></pre>
                     <p class="sql-src__note">This query writes what&rsquo;s shown above, from the same aggregates-only snapshot the page draws; a check fails the build if it ever stops matching.</p>
                     <details class="sql-src__upstream">
                         <summary>Where the numbers come from</summary>
@@ -393,7 +393,7 @@ patterns as (
   where is_fraud and fraud_pattern is not null
   group by 1
 )
-select coalesce(json_agg(patterns order by fraud desc), '[]'::json) as patterns
+select coalesce(json_agg(patterns order by fraud desc, pattern), '[]'::json) as patterns
 from patterns;</code></pre>
                         <p class="sql-src__note">Part of <a href="https://github.com/lmansf/Portfolio2026/blob/main/scripts/fraud-snapshot.sql" target="_blank" rel="noopener">the read-only query</a> that runs once a day on Supabase and publishes the snapshot.</p>
                     </details>

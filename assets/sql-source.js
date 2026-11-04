@@ -267,7 +267,8 @@ async function loadSchema(eng) {
             all: new Set(rows.map((r) => r.t.toLowerCase())),
             columns: new Set(rows.map((r) => r.c))
         };
-    } catch {
+    } catch (err) {
+        if (err && err.message === 'busy') throw err;
         schema = { tables: [], all: new Set(), columns: new Set() };
     }
     return schema;
@@ -328,13 +329,15 @@ function syncReset(state) {
     state.reset.disabled = !state.edited && state.input.value === state.defaultSql && !state.out.firstChild;
 }
 
+const BUSY = 'Another query is still running. Try again in a moment.';
+
 function setStatus(state, msg) { state.status.textContent = msg; }
 
 async function runQuery(state) {
     const eng = getEngine();
     const sql = state.input.value;
     if (!sql.trim()) { setStatus(state, 'Type a query first.'); return; }
-    if (eng.running) { setStatus(state, 'Another query is still running. Try again in a moment.'); return; }
+    if (eng.running) { setStatus(state, BUSY); return; }
     state.running = true;
     state.run.textContent = 'Stop';
     statusTarget = (msg) => setStatus(state, msg);
@@ -343,12 +346,16 @@ async function runQuery(state) {
     let res;
     try {
         await eng.ready();
+        if (eng.running) throw new Error('busy');
         await loadSchema(eng);
+        if (eng.running) throw new Error('busy');
         setStatus(state, 'Running…');
         res = await eng.run(sql);
     } catch (err) {
         finish(state);
-        if (err && err.cancelled) {
+        if (err && err.message === 'busy') {
+            setStatus(state, BUSY);
+        } else if (err && err.cancelled) {
             setStatus(state, err.cancelled === 'timeout'
                 ? 'That query ran past 30 seconds, so it was stopped. The page is unchanged.'
                 : 'Stopped. The page is unchanged.');
