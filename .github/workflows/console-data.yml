@@ -1,6 +1,8 @@
-# Fails when data/console/site.sql (the tables behind the SQL console) is
-# out of step with index.html, projects.html or data/console/extra.sql.
-# Fix: python3 scripts/build_console_data.py, then commit site.sql.
+# Fails when data/console/site.sql (the site's own tables) is out of step with
+# index.html, projects.html or data/console/extra.sql, or when a "SQL source"
+# caption is stale or its query no longer returns what its page shows.
+# Fix: python3 scripts/build_console_data.py && python3 scripts/build_sql_sources.py,
+# then commit the results.
 name: Console data
 
 on:
@@ -17,5 +19,12 @@ jobs:
     timeout-minutes: 5
     steps:
       - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Install DuckDB
+        run: python3 -m pip install duckdb==1.5.6
       - name: Check site.sql is current
         run: python3 scripts/build_console_data.py --check
+      - name: Check the SQL source captions
+        run: python3 scripts/build_sql_sources.py --check

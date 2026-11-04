@@ -2,7 +2,7 @@
  * tactile buttons and links, the copy-email button, count-up numbers and the
  * live pulse dot). Loaded by motion.js as an external stylesheet, not an
  * inline <style>, so pages with a strict Content-Security-Policy
- * (style-src 'self', e.g. /playground) work. The script mounts the owl, tags
+ * (style-src 'self') work. The script mounts the owl, tags
  * reveals and adds the other touches only once this file has loaded, so
  * nothing flashes unstyled. Every animation here is off or static under
  * prefers-reduced-motion. */

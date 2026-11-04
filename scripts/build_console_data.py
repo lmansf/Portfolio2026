@@ -1,20 +1,22 @@
-"""Build data/console/site.sql, the tables behind the site's SQL console.
+"""Build data/console/site.sql, the site's own tables.
 
-The console (assets/console.js) runs DuckDB in the visitor's browser. Its
-site tables (projects, experience, skills, credentials, resume) are read from
-the pages themselves, so the console can never say something the pages don't:
+The tables (projects, experience, skills, credentials, resume) are read from
+the pages themselves, so they can never say something the pages don't. The
+"SQL source" captions query them (scripts/build_sql_sources.py checks that
+each caption's query returns exactly what its page shows):
 
     python3 scripts/build_console_data.py          # rewrite site.sql
     python3 scripts/build_console_data.py --check  # fail if site.sql is stale
 
 Sources: projects.html (every project card) and index.html (hero, "Now" rows,
 contact buttons, experience timeline, credentials, toolkit, footer brand).
-Rerun after editing either page. Standard library only.
+Rerun after editing either page. Standard library only. (The "console" in the
+name and path is left over from the retired SQL console.)
 
 If data/console/extra.sql exists, its statements are appended verbatim after
 the generated tables: that is the hook for tables that don't come from the
-pages (later: the Easter egg hunt). It's the only hand-written SQL that
-reaches the console, and --check covers it too.
+pages (today the parked nest-box hunt). It's the only hand-written SQL in
+site.sql, and --check covers it too.
 """
 
 import html
@@ -188,7 +190,7 @@ def skills(doc):
     for group in main_of(doc).find_all(cls="toolkit__group"):
         category = group.find(cls="toolkit__label").clean_text()
         for chip in group.find_all("li", "chip"):
-            rows.append({"skill": chip.clean_text(), "category": category})
+            rows.append({"skill": chip.clean_text(), "category": category, "sort_order": len(rows) + 1})
     return rows
 
 
@@ -196,7 +198,8 @@ def credentials(doc):
     rows = []
     for chip in main_of(doc).find_all("li", "chip--cred"):
         sub = chip.find(cls="chip__sub")
-        rows.append({"credential": own_text(chip, "chip__sub"), "detail": sub.clean_text() if sub else None})
+        rows.append({"credential": own_text(chip, "chip__sub"), "detail": sub.clean_text() if sub else None,
+                     "sort_order": len(rows) + 1})
     return rows
 
 
@@ -273,9 +276,9 @@ SCHEMAS = {
         ("role", "VARCHAR"), ("note", "VARCHAR"), ("org", "VARCHAR"), ("location", "VARCHAR"),
         ("started", "DATE"), ("ended", "DATE"), ("is_current", "BOOLEAN"), ("summary", "VARCHAR")]),
     "skills": ("The toolkit on the home page, one row per skill.", [
-        ("skill", "VARCHAR"), ("category", "VARCHAR")]),
+        ("skill", "VARCHAR"), ("category", "VARCHAR"), ("sort_order", "INTEGER")]),
     "credentials": ("Certifications and workshops.", [
-        ("credential", "VARCHAR"), ("detail", "VARCHAR")]),
+        ("credential", "VARCHAR"), ("detail", "VARCHAR"), ("sort_order", "INTEGER")]),
     "resume": ("One row: who I am and where to reach me.", [
         ("name", "VARCHAR"), ("headline", "VARCHAR"), ("now", "VARCHAR"), ("building", "VARCHAR"),
         ("latest", "VARCHAR"), ("location", "VARCHAR"), ("email", "VARCHAR"), ("linkedin", "VARCHAR"),

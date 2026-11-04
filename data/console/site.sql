@@ -47,33 +47,35 @@ INSERT INTO experience VALUES
 -- The toolkit on the home page, one row per skill.
 CREATE TABLE skills (
     skill VARCHAR,
-    category VARCHAR
+    category VARCHAR,
+    sort_order INTEGER
 );
 INSERT INTO skills VALUES
-    ('SQL', 'Data stack'),
-    ('Python · pandas', 'Data stack'),
-    ('DuckDB', 'Data stack'),
-    ('Databricks', 'Data stack'),
-    ('Spark SQL / PySpark', 'Data stack'),
-    ('Postgres / Supabase', 'Data stack'),
-    ('Microsoft Fabric', 'Data stack'),
-    ('Power BI', 'Data stack'),
-    ('Excel', 'Data stack'),
-    ('scikit-learn', 'Forecasting & ML'),
-    ('XGBoost', 'Forecasting & ML'),
-    ('Gateway Galaxy 8 · eGalaxy', 'Platforms I run at ZooTampa'),
-    ('PAR Pixel POS', 'Platforms I run at ZooTampa'),
-    ('HTML · CSS · JavaScript', 'Platforms I run at ZooTampa');
+    ('SQL', 'Data stack', 1),
+    ('Python · pandas', 'Data stack', 2),
+    ('DuckDB', 'Data stack', 3),
+    ('Databricks', 'Data stack', 4),
+    ('Spark SQL / PySpark', 'Data stack', 5),
+    ('Postgres / Supabase', 'Data stack', 6),
+    ('Microsoft Fabric', 'Data stack', 7),
+    ('Power BI', 'Data stack', 8),
+    ('Excel', 'Data stack', 9),
+    ('scikit-learn', 'Forecasting & ML', 10),
+    ('XGBoost', 'Forecasting & ML', 11),
+    ('Gateway Galaxy 8 · eGalaxy', 'Platforms I run at ZooTampa', 12),
+    ('PAR Pixel POS', 'Platforms I run at ZooTampa', 13),
+    ('HTML · CSS · JavaScript', 'Platforms I run at ZooTampa', 14);
 
 -- Certifications and workshops.
 CREATE TABLE credentials (
     credential VARCHAR,
-    detail VARCHAR
+    detail VARCHAR,
+    sort_order INTEGER
 );
 INSERT INTO credentials VALUES
-    ('Microsoft Certified: Power BI Data Analyst Associate', 'PL-300'),
-    ('SQL Certification of Competency', 'LearnSQL.com'),
-    ('Microsoft Fabric in a Day', 'workshop');
+    ('Microsoft Certified: Power BI Data Analyst Associate', 'PL-300', 1),
+    ('SQL Certification of Competency', 'LearnSQL.com', 2),
+    ('Microsoft Fabric in a Day', 'workshop', 3);
 
 -- One row: who I am and where to reach me.
 CREATE TABLE resume (

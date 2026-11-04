@@ -1,4 +1,9 @@
-# Egg codes (the SQL console's nest-box hunt)
+# Egg codes (the nest-box hunt)
+
+> **Parked (Nov 2026).** The docked SQL console that hosted the hunt is
+> retired, so no page leads to the trail right now. The endpoints below
+> still issue and verify codes, and the trail's data files are still in the
+> repo; see the README's "Parked: the nest-box hunt".
 
 A visitor who finds the hidden `nest_box` table in the site's SQL console and
 solves it gets a one-time **egg code**. Owl Park redeems that code once to
