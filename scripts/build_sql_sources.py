@@ -304,7 +304,8 @@ def status_link(name):
 
 def lineage(name):
     """The piece's path from raw to mart, from models.json: every node upstream of
-    its tables, grouped by layer, as a small ordered list."""
+    its tables, grouped by layer, as a small ordered list. Each step links to
+    its entry in the data catalog (/catalog, scripts/build_catalog.py)."""
     nodes = MODEL["nodes"]
     seen, stack = [], list(MODEL["pieces"][name]["tables"])
     while stack:
@@ -325,7 +326,7 @@ def lineage(name):
                     else html.escape(node["label"]))
             where = html.escape(node.get("where", ""))
             steps.append(f'<li class="sql-src__step"><span class="sql-src__layer">{layer}</span> '
-                         f'<span class="sql-src__node" title="{where}">{text}</span></li>')
+                         f'<a class="sql-src__node" href="/catalog#t-{html.escape(n)}" title="{where}">{text}</a></li>')
     return ('<ol class="sql-src__lineage" aria-label="Lineage, from raw source to the table this query reads">'
             + "".join(steps) + '</ol>')
 

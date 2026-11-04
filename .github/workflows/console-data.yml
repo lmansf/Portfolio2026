@@ -2,10 +2,11 @@
 # index.html, projects.html or data/console/extra.sql, or when a "SQL source"
 # caption is stale or its query no longer returns what its page shows, or
 # when data/pipeline/metrics.sql is out of step with data/pipeline/metrics.json,
+# when catalog.html is out of step with models.json or metrics.json,
 # or when assets/sql-source.min.js or assets/live.min.js wasn't rebuilt after
 # its sources changed.
 # Fix: python3 scripts/build_console_data.py && python3 scripts/build_sql_sources.py
-# && python3 scripts/build_metrics.py (and the esbuild lines in the README's
+# && python3 scripts/build_metrics.py && python3 scripts/build_catalog.py (and the esbuild lines in the README's
 # "SQL source captions" and "Metrics"), then commit the results.
 name: Console data
 
@@ -32,6 +33,8 @@ jobs:
         run: python3 scripts/build_console_data.py --check
       - name: Check metrics.sql is current
         run: python3 scripts/build_metrics.py --check
+      - name: Check the data catalog page is current
+        run: python3 scripts/build_catalog.py --check
       - name: Check the SQL source captions
         run: python3 scripts/build_sql_sources.py --check
       - name: Check the SQL source bundle is current
