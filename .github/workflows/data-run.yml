@@ -1,0 +1,95 @@
+# The site's nightly data run (scripts/data_run.py): pulls every source (the
+# site pages, the fraud snapshot, public GitHub activity), rebuilds the site
+# tables, runs every data test in data/pipeline/models.json, and writes the
+# run log that /status reads.
+#
+# Nightly and after a merge that touches the pipeline it commits what it
+# wrote to main (the push redeploys the site). A failed check is data, not a
+# broken build: it is logged, shown on /status, and raised as a warning here,
+# and the job still succeeds. A source that can't be reached keeps its last
+# good files. The job fails only when a definition is broken (a test whose
+# SQL errors, or models.json naming a table or caption that doesn't exist).
+#
+# On a pull request it runs the same steps as a dry run and writes nothing
+# (that job gets a read-only token; only the commit path can write).
+# No secrets: the GitHub API calls use the workflow's own token, read-only,
+# against public endpoints.
+name: Data run
+
+on:
+  schedule:
+    - cron: "15 6 * * *"   # 06:15 UTC, after the 05:35 fraud snapshot
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - "data/pipeline/models.json"
+      - "data/pipeline/sql/**"
+      - "data/pipeline/github-tables.json"
+      - "scripts/data_run.py"
+      - ".github/workflows/data-run.yml"
+  pull_request:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: data-run-${{ github.event_name == 'pull_request' && github.ref || 'main' }}
+  cancel-in-progress: false
+
+jobs:
+  dry-run:
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Install DuckDB
+        run: python3 -m pip install duckdb==1.5.6
+      - name: Dry run (pull request)
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+        run: python3 scripts/data_run.py --dry-run
+
+  run:
+    if: github.event_name != 'pull_request'
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Install DuckDB
+        run: python3 -m pip install duckdb==1.5.6
+
+      - name: Run, test and log
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+        run: python3 scripts/data_run.py
+
+      - name: Commit the run
+        run: |
+          set -euo pipefail
+          git add data/pipeline data/console/site.sql
+          if git diff --cached --quiet; then
+            echo "Nothing changed."
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git commit -m "Data run: rebuild, test and log the site data"
+          for attempt in 1 2 3; do
+            if git fetch origin main && git rebase origin/main && git push origin HEAD:main; then
+              exit 0
+            fi
+            git rebase --abort 2>/dev/null || true
+            sleep $((attempt * 5))
+          done
+          echo "::error::Couldn't push the run log after three tries (a conflict with main, or a push race that never settled)."
+          exit 1

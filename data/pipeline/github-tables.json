@@ -1,0 +1,11 @@
+{
+    "_about": "The GitHub tables the SQL source editors can query, built from data/pipeline/github.json (written by scripts/data_run.py). Same shape as data/console/snapshot-tables.json: each table lists its columns as [name, DuckDB type]. assets/sql-engine.js and scripts/data_run.py build them from this file.",
+    "github_activity": {
+        "snapshot": "activity",
+        "columns": [["day", "DATE"], ["repo", "VARCHAR"], ["events", "INTEGER"], ["pushes", "INTEGER"]]
+    },
+    "github_repos": {
+        "snapshot": "repos",
+        "columns": [["repo", "VARCHAR"], ["language", "VARCHAR"], ["stars", "INTEGER"], ["pushed_on", "DATE"], ["archived", "BOOLEAN"]]
+    }
+}

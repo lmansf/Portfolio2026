@@ -6,8 +6,8 @@ HTML/CSS/JS, no build step, deployed on Vercel.
 
 ## Site structure
 
-A deliberately lean two-page site, plus a live data page and one archived
-project page:
+A deliberately lean two-page site, plus a live data page, a data status
+page and one archived project page:
 
 - **Home** (`index.html`, `/`) — intro and contact buttons
   (résumé PDF, email, LinkedIn, GitHub), a three-line "now" strip, three
@@ -39,13 +39,16 @@ project page:
   infographic of the archived end-to-end data pipeline.
 - **Live data** (`live.html`, `/live`) — daily numbers from the fraud
   pipeline (see "Live fraud data" below).
+- **Data status** (`status.html`, `/status`) — the nightly data run's
+  latest results: each source, every check grouped by table (failures
+  first), and recent runs (see "The nightly data run" below).
 - **404** (`404.html`) — branded not-found page.
 - **SQL source captions** — under each data-backed piece on Home, Projects
   and `/live`, a quiet "SQL source" caret that opens the query producing it.
   Visitors can edit and run the query in the browser and the piece redraws
   from the result. See "SQL source captions" below.
 
-Clean URLs (`/projects`, `/owl-park`, `/live`), the `/resume`
+Clean URLs (`/projects`, `/owl-park`, `/live`, `/status`), the `/resume`
 shortcut to the résumé PDF, and legacy redirects (e.g. `/fraud` →
 `/projects#fraud`, `/pipeline` → `/owl-park`, and the retired `/playground` →
 `/`) are configured in `vercel.json`.
@@ -106,8 +109,8 @@ soft and tappable things are pills.
   (`.project__link--button`) is in `pages.css` so it never flashes
   unstyled.
 - `assets/motion.js` / `assets/motion.css` — the walking owl and scroll
-  reveals, loaded with one deferred script tag on Home, Projects, Live
-  and 404. The script adds `motion.min.css` as an external
+  reveals, loaded with one deferred script tag on Home, Projects, Live,
+  Status and 404. The script adds `motion.min.css` as an external
   stylesheet (no inline `<style>`, so a page with a strict
   `style-src 'self'` CSP can still load it) and only mounts the owl, tags reveals
   and adds the touches below once it has loaded. The owl walks in its own
@@ -151,6 +154,13 @@ soft and tappable things are pills.
 - `assets/live.css`, `assets/live.js` — styles and chart code for the live
   data page only (see "Live fraud data" below); `data/fraud-snapshot.json`
   is the aggregate snapshot it draws from, rewritten by a GitHub Action.
+- `assets/status.css`, `assets/status.js` — the `/status` page only (see
+  "The nightly data run" below). The script fetches
+  `data/pipeline/run-log.json` and draws the latest run's sources, every
+  check grouped by table (tables with a failure first and open), and the
+  last 14 runs; a `/status#t-<table>` link opens that table. Until a run
+  has written the log it says no run has finished yet, and without JS the
+  page points at the JSON file. Text goes in through `textContent` only.
 - `assets/profilepicture.webp` — circular hero avatar on the home page.
 - `assets/crow.png` — the crow mark in the top bar and footer (painted via
   CSS mask).
@@ -222,10 +232,14 @@ How it works:
   `assets/sql-engine.js` into `sql-source.min.js`) swaps the `<pre>` for a
   textarea the first time a caption opens. DuckDB-Wasm (pinned, from
   jsDelivr, several megabytes) loads only on the first Run, then every editor on the
-  page shares it. It runs over the site's own tables plus the Owl Park sample
-  tables (`owl_park`, read-only), with file, URL, extension and settings
-  access switched off. Nothing a visitor types leaves the tab. A page opts
-  in with one `<script type="module" src="/assets/sql-source.min.js">` tag.
+  page shares it. It runs over the site's own tables, the `fraud_*` tables
+  and the `github_activity` / `github_repos` tables (built in the browser
+  from `data/fraud-snapshot.json` and `data/pipeline/github.json`, the
+  nightly data run's pull of public GitHub activity; either is empty if its
+  file won't load) plus the Owl Park sample tables (`owl_park`, read-only),
+  with file, URL, extension and settings access switched off. Nothing a
+  visitor types leaves the tab. A page opts in with one
+  `<script type="module" src="/assets/sql-source.min.js">` tag.
   While a query runs the Run button becomes Stop; a query is also stopped
   after 30 seconds (and the worker replaced if it won't stop), and at most
   200,000 rows of a result are kept. The site tables live in the tab's
@@ -282,7 +296,9 @@ piece it redraws carries `data-sql-piece="<name>"`, and the default query is
 To caption a new piece: add the marker pair and `data-sql-piece` under it,
 add its query to `data/sql-sources/` with a matching entry in
 `TABLE_SOURCES` (the function that reads what the page shows), teach
-`PIECES` in `assets/sql-source.js` how to draw it, and rerun the script.
+`PIECES` in `assets/sql-source.js` how to draw it, give it a `pieces`
+entry in `data/pipeline/models.json` (the nightly run fails without one),
+and rerun the script.
 After editing `sql-source.js` or `sql-engine.js`, rebuild the bundle:
 
     npx esbuild assets/sql-source.js --bundle --format=esm --minify --outfile=assets/sql-source.min.js --allow-overwrite
@@ -302,7 +318,10 @@ buttons or the footer brand, rerun both scripts:
 The `Console data` workflow (`.github/workflows/console-data.yml`) runs both
 `--check`s on every pull request and push to `main`, and fails if
 `assets/sql-source.min.js` differs from a fresh esbuild of `sql-source.js`
-(the command above). If
+(the command above). The nightly data run also rebuilds `site.sql` and
+commits it if it changed, and tests each table against
+`data/pipeline/models.json`, so a table that gains or loses a column needs
+its `columns` there updated too (see "The nightly data run"). If
 `data/console/extra.sql` exists, the table script appends it verbatim after
 the generated tables (it holds the hunt's `nest_box`). The `console` in the
 path is left over from the retired SQL console.
@@ -348,10 +367,11 @@ part of it:
   (certifications; `alumniOf` and the degree are hidden for now), `knowsAbout`, and `sameAs` profile links —
   enough to disambiguate from other people with the same name. Projects,
   Owl Park and Live data are `WebPage`s that reference the
-  home `#person` / `#website` ids and carry `BreadcrumbList`s. The home
+  home `#person` / `#website` ids and carry `BreadcrumbList`s, as does
+  Data status. The home
   `ProfilePage` points `primaryImageOfPage` at the share card and carries
   a `dateModified` to bump alongside `sitemap.xml`.
-- **`sitemap.xml`** / **`robots.txt`** — the four public URLs; bump each
+- **`sitemap.xml`** / **`robots.txt`** — the five public URLs; bump each
   `<lastmod>` when its page changes.
 - **`llms.txt`** — a short, factual plain-text summary (role, employer,
   certification, pages, profiles) for AI answer engines. Keep it
@@ -420,12 +440,69 @@ webstore checkouts). Nothing on the page talks to the database.
 To add a field, change the SQL, add the field to the workflow's
 allow-list, then read it in `live.js` (and list it in
 `data/console/snapshot-tables.json` if the page's SQL source editors should
-see it). `assets/motion.js` also reads
+see it, with a description under its table's `columns` in
+`data/pipeline/models.json`: the nightly run fails a check for an
+undescribed column). `assets/motion.js` also reads
 `generated_at` and `latest_event_at` (for the freshness dot beside the
 `Live numbers` links on Home and Projects), so keep those two when
 reshaping the file. Don't hand-edit
 `data/fraud-snapshot.json` beyond regenerating it with the query: the next
 scheduled run overwrites it.
+
+## The nightly data run (`/status`)
+
+The site treats its own data like a small data product: sourced, tested,
+automated, and honest about when it last ran. Everything is described once,
+in **`data/pipeline/models.json`**: every node from raw to staging to mart
+(where it lives, what it's for, its owner), each mart's columns with a
+description, the tests it's held to, and which tables each "SQL source"
+caption reads (`pieces`). The hidden hunt table is left out on purpose.
+
+**`scripts/data_run.py`** is the one orchestrated run:
+
+1. **Extract** three sources. The site pages rebuild `data/console/site.sql`
+   (via `build_console_data.py`); the fraud snapshot is read as the
+   `Fraud snapshot` job published it; and the GitHub public API gives public
+   events and repositories for `lmansf`, staged as
+   `data/pipeline/stg_github_events.json` (id, type, repo, time only) and
+   modelled by `data/pipeline/sql/github_activity.sql` into
+   `data/pipeline/github.json`. A source that can't be reached keeps its
+   last good files and fails its freshness check; the site never breaks.
+2. **Load** every mart into DuckDB, the same tables the SQL source editors
+   query (the editors also get `github_activity` and `github_repos`, built
+   from `github.json` with the columns in `data/pipeline/github-tables.json`).
+3. **Test**: each mart's tests in `models.json` (`row_count`, `not_null`,
+   `unique`, `accepted_values`, `expression` that must hold per row or as a
+   `scalar`, and `freshness` against the table's `freshness.max_hours`), plus
+   two the run adds: every column is described, and every caption's default
+   query still returns what its page shows.
+4. **Log** to `data/pipeline/run-log.json`: the latest run in full and a
+   30-run history. `/status` (`assets/status.js`) draws it.
+
+    python3 scripts/data_run.py              # run and write
+    python3 scripts/data_run.py --dry-run    # run, print, write nothing
+    python3 scripts/data_run.py --offline    # skip the GitHub API
+
+The **`Data run`** workflow (`.github/workflows/data-run.yml`) runs it at
+06:15 UTC every night, on demand, and after a merge that changes the
+pipeline, then commits what changed to `main` (which redeploys the site). A
+failed check is data, not a broken build: it's logged, shown on `/status`
+and raised as a workflow warning. The job fails only when a definition is
+broken (a test's SQL errors, or `models.json` names a table or caption that
+doesn't exist). Pull requests get a dry run. It needs no secrets: the
+GitHub calls use the workflow's own token against public endpoints.
+
+To test a new table, add it to `models.json` with its columns and tests; to
+add a caption, give it a `pieces` entry too (the run fails if a caption has
+none). When a table gains or loses a column, update its `columns` entry:
+the "every column is described" check fails on an undescribed column, or
+one described but gone. `data/pipeline/run-log.json`, `github.json` and
+`stg_github_events.json` are written by the run; don't hand-edit them. No
+run log is committed until the first run after the workflow lands, and
+`/status` says so until then. The fraud snapshot's freshness checks fail
+whenever the `Fraud snapshot` job hasn't published in 36 hours (it skips
+without its database secret or over an empty window), and that shows on
+`/status` as data, not as a broken run.
 
 ## Local development
 
@@ -434,7 +511,8 @@ No build step — serve the folder and open it:
     python3 -m http.server 8000
 
 Note that `vercel.json` clean URLs, redirects and headers aren't applied by
-a plain static server, so open `/projects.html` and `/live.html` directly;
+a plain static server, so open `/projects.html`, `/live.html` and
+`/status.html` directly;
 `vercel dev` reproduces production routing and headers if needed.
 
 ## Validation gate
