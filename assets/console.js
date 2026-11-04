@@ -15,7 +15,9 @@
  *   - Editable: change any query and run it again (Ctrl or ⌘ + Enter).
  *   - Everything runs on the visitor's device; nothing they type is sent
  *     anywhere. Results are written with textContent, and card links only
- *     ever point at https:// addresses or this site's own paths.
+ *     ever point at https:// addresses or this site's own paths. A card's
+ *     "How the data flows" link opens the diagram's modal through the
+ *     page's own trigger (pipeline.js), as the page's card does.
  *
  * Whether the console is open is remembered in localStorage (per visitor,
  * best effort: it starts collapsed when storage is unavailable).
@@ -82,21 +84,43 @@ function safeHref(url) {
     if (typeof url !== 'string') return null;
     const u = url.trim();
     if (/^https:\/\/[^\s/]+/i.test(u)) return u;
-    if (/^\/(?!\/)[^\s]*$/.test(u)) return u;
+    if (/^\/(?![\/\\])[^\s\\\x00-\x1f\x7f]*$/.test(u)) return u;
     if (/^mailto:[^\s@]+@[^\s@]+$/i.test(u)) return u;
     return null;
+}
+
+// "How the data flows" links (/projects#<figure id>) open the diagram's modal
+// through the page's own [data-flow-open] trigger (see pipeline.js).
+const FLOW_LINK = /^\/projects#([a-z0-9-]+)$/i;
+
+function flowTrigger(href) {
+    const m = FLOW_LINK.exec(href);
+    return m ? document.querySelector('[data-flow-open="' + m[1].toLowerCase() + '"]') : null;
 }
 
 function linkEl(label, url, cls) {
     const href = safeHref(url);
     if (!href) return el('span', { class: cls, text: label });
     const external = href.startsWith('https://');
-    return el('a', {
+    const a = el('a', {
         class: cls,
         href,
         target: external ? '_blank' : null,
         rel: external ? 'noopener' : null
     }, label + (external ? ' ↗' : ''));
+    if (!external && FLOW_LINK.test(href)) {
+        const trigger = flowTrigger(href);
+        if (trigger && trigger.tagName === 'BUTTON') a.setAttribute('aria-haspopup', 'dialog');
+        a.addEventListener('click', (e) => {
+            if (e.button !== 0 || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;
+            e.preventDefault();
+            e.stopPropagation();
+            const t = flowTrigger(href);
+            if (t) t.click();
+            else window.location.assign(href);
+        });
+    }
+    return a;
 }
 
 function init() {

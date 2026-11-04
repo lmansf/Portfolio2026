@@ -218,7 +218,11 @@ or without JavaScript.
   profile card, `skill` → toolkit chips, `credential` → credential chips),
   with a Table view, CSV download, and a link to the full page. Anything else
   is a table. Values are written with `textContent`, and card links are only
-  ever `https://` addresses, `mailto:` or this site's own paths.
+  ever `https://` addresses, `mailto:` or this site's own paths (a single
+  leading slash, no backslashes or control characters). A project card's
+  "How the data flows" link opens the diagram's modal through the page's
+  own `[data-flow-open]` trigger (`pipeline.js`), and on a page without one
+  it loads `/projects#<figure id>`, which opens the modal from the hash.
 - **Tables.** `projects`, `experience`, `skills`, `credentials`, `resume`
   (built from the pages, below) plus the playground's synthetic `park_days`,
   `orders`, `order_items`, `products`.
