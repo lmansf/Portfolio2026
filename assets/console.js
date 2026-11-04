@@ -672,8 +672,11 @@ ORDER BY table_catalog = 'owl_park', table_name, ordinal_position`);
 // ── Friendly errors: a plain hint and a working example ──
 const KEYWORDS = ['select', 'from', 'where', 'group', 'order', 'by', 'limit', 'join', 'having', 'with', 'as', 'and', 'or', 'not', 'distinct', 'union', 'case', 'when', 'then', 'else', 'end', 'on', 'like', 'between'];
 
+const RESERVED = new Set([...KEYWORDS, 'in', 'is', 'null', 'exists', 'all', 'any', 'asc', 'desc', 'offset', 'left', 'right', 'inner', 'outer', 'full', 'cross', 'using', 'over', 'partition', 'true', 'false', 'cast', 'values', 'except', 'intersect', 'ilike', 'nulls', 'first', 'last', 'into', 'set', 'table', 'create', 'drop', 'insert', 'update', 'delete']);
+
 function nearestKeyword(word) {
     const w = word.toLowerCase();
+    if (RESERVED.has(w)) return null;
     let best = null;
     let bestD = 3;
     for (const k of KEYWORDS) {
@@ -722,7 +725,7 @@ export function friendlyError(raw, tables = [], sqlText = '', columns = []) {
         if (!kw) {
             // The parser often trips one word after the typo (FORM projects).
             for (const w of sqlText.replace(/--[^\n]*|'[^']*'/g, ' ').match(/[A-Za-z_]+/g) || []) {
-                if (KEYWORDS.includes(w.toLowerCase()) || tables.includes(w) || columns.includes(w.toLowerCase())) continue;
+                if (RESERVED.has(w.toLowerCase()) || tables.includes(w) || columns.includes(w.toLowerCase())) continue;
                 const k = nearestKeyword(w);
                 if (k && editDistance(w.toLowerCase(), k) === 1 && w.length >= 4) { kw = k; typo = w; break; }
             }
