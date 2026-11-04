@@ -264,7 +264,7 @@
             "upstream": ["stg_github_events"],
             "where": "data/pipeline/github.json → activity",
             "freshness": {"from": "github", "max_hours": 30},
-            "description": "Public GitHub activity per day and repository, last 30 days.",
+            "description": "Public GitHub activity per day and repository over the last 30 days, as far back as the 300 most recent public events the API serves.",
             "columns": {
                 "day": "Calendar day, America/New_York.",
                 "repo": "Public repository (owner/name).",
