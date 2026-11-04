@@ -21,10 +21,12 @@ Two kinds of source:
   can never drift from what it sits under.
 * /live. Each chart's caption is an excerpt of scripts/fraud-snapshot.sql,
   the read-only query that feeds data/fraud-snapshot.json: the shared `base`
-  CTE, the chart's own CTE, and the slice of the final select that publishes
-  it. The CTEs are cut from that file, so editing it and rerunning this
-  script keeps the captions honest; the run fails if a slice it quotes is no
-  longer in the file.
+  CTE, the chart's own CTE, and the entry of the final json_build_object
+  that publishes it, rewritten as a select of its own. All three are cut
+  from that file, so editing it and rerunning this script keeps the captions
+  honest; the run fails if a CTE or entry it quotes is no longer there.
+
+Nothing is written unless every query and excerpt checks out.
 
 Needs the duckdb Python package (pip install duckdb).
 """
@@ -107,56 +109,111 @@ TABLE_SOURCES = {
     "projects-more": ("projects.html", lambda d: project_cards(d, False)),
 }
 
-# name -> (CTEs to quote, the final select that publishes them)
+# name -> (CTEs to quote, the key of the final json_build_object entry that
+# publishes the last of them)
 LIVE_SOURCES = {
-    "live-totals": (["base", "totals"],
-                    "select row_to_json(totals) as totals from totals;"),
-    "live-daily": (["base", "daily"],
-                   "select coalesce(json_agg(daily order by day), '[]'::json) as daily from daily;"),
-    "live-scores": (["base", "bins"],
-                    "select coalesce(json_agg(json_build_object(\n"
-                    "         'from', round(bin / 20.0, 2)::float8, 'to', round((bin + 1) / 20.0, 2)::float8,\n"
-                    "         'legit', legit, 'fraud', fraud) order by bin), '[]'::json) as score_bins\n"
-                    "from bins;"),
-    "live-patterns": (["base", "patterns"],
-                      "select coalesce(json_agg(patterns order by fraud desc), '[]'::json) as patterns\n"
-                      "from patterns;"),
+    "live-totals": (["base", "totals"], "totals"),
+    "live-daily": (["base", "daily"], "daily"),
+    "live-scores": (["base", "bins"], "score_bins"),
+    "live-patterns": (["base", "patterns"], "patterns"),
 }
-# The expression each final select above publishes; it must still be in
-# fraud-snapshot.sql, or the excerpt would quote something the job no longer runs.
-LIVE_MUST_CONTAIN = {
-    "live-totals": "(select row_to_json(totals) from totals)",
-    "live-daily": "json_agg(daily order by day)",
-    "live-scores": "'legit', legit, 'fraud', fraud) order by bin)",
-    "live-patterns": "json_agg(patterns order by fraud desc)",
+
+# What each caption's accessible name says it belongs to (the visible text
+# stays "SQL source").
+LABELS = {
+    "now": "the now strip",
+    "featured": "the featured projects",
+    "experience": "the experience timeline",
+    "credentials": "the credentials",
+    "toolkit": "the toolkit",
+    "projects-featured": "the featured projects",
+    "projects-more": "the more builds",
+    "live-totals": "the last 30 days totals",
+    "live-daily": "the fraud per day chart",
+    "live-scores": "the score distribution chart",
+    "live-patterns": "the catch rate by fraud pattern table",
 }
 
 
-# ── /live: cut CTEs out of fraud-snapshot.sql ──
+# ── /live: cut CTEs and final-select entries out of fraud-snapshot.sql ──
+def close_paren(text, start, what):
+    """Index just past the ')' matching the '(' before `start`, skipping
+    parentheses inside quoted strings and `--` comments."""
+    depth, i, n = 1, start, len(text)
+    while i < n:
+        ch = text[i]
+        if ch == "'":
+            end = text.find("'", i + 1)
+            while end != -1 and text[end + 1:end + 2] == "'":
+                end = text.find("'", end + 2)
+            if end == -1:
+                sys.exit(f"{what}: unterminated string literal in scripts/fraud-snapshot.sql")
+            i = end + 1
+            continue
+        if ch == '"':
+            end = text.find('"', i + 1)
+            if end == -1:
+                sys.exit(f"{what}: unterminated quoted identifier in scripts/fraud-snapshot.sql")
+            i = end + 1
+            continue
+        if text.startswith("--", i):
+            end = text.find("\n", i)
+            i = n if end == -1 else end + 1
+            continue
+        if ch == "(":
+            depth += 1
+        elif ch == ")":
+            depth -= 1
+            if depth == 0:
+                return i + 1
+        i += 1
+    sys.exit(f"{what}: unbalanced parentheses in scripts/fraud-snapshot.sql")
+
+
 def snapshot_ctes(text):
     """Map CTE name -> its full `name as (...)` text, as written in the file."""
     ctes = {}
     for m in re.finditer(r"^(?:with )?([a-z_]+) as \(\n", text, re.M):
-        depth, i = 1, m.end()
-        while depth:
-            ch = text[i]
-            depth += ch == "("
-            depth -= ch == ")"
-            i += 1
+        end = close_paren(text, m.end(), f"CTE {m.group(1)}")
         start = m.start() + (5 if text[m.start():].startswith("with ") else 0)
-        ctes[m.group(1)] = text[start:i]
+        ctes[m.group(1)] = text[start:end]
     return ctes
 
 
-def live_sql(name, text, ctes):
-    names, final = LIVE_SOURCES[name]
-    must = LIVE_MUST_CONTAIN[name]
-    if must not in text:
-        sys.exit(f"{name}: scripts/fraud-snapshot.sql no longer contains {must!r}; "
+def snapshot_entry(text, key, name):
+    """The `(select ... from cte)` published under `key` in the final
+    json_build_object, as `select ... as key from cte;`."""
+    m = re.search(rf"^\s*'{re.escape(key)}', \(select ", text, re.M)
+    if not m:
+        sys.exit(f"{name}: no '{key}', (select ...) entry in scripts/fraud-snapshot.sql; "
                  "update LIVE_SOURCES in scripts/build_sql_sources.py")
+    end = close_paren(text, m.end(), f"{name}: the '{key}' entry")
+    inner = text[m.end() - len("select "):end - 1]
+    tail = re.search(r"\s+from\s+([a-z_]+)\s*$", inner)
+    if not tail:
+        sys.exit(f"{name}: the '{key}' entry in scripts/fraud-snapshot.sql doesn't end in "
+                 "`from <cte>`; update LIVE_SOURCES in scripts/build_sql_sources.py")
+    expr, cte = inner[:tail.start()], tail.group(1)
+    lines = expr.split("\n")
+    if len(lines) > 1:
+        cut = min(len(ln) - len(ln.lstrip(" ")) for ln in lines[1:] if ln.strip())
+        lines[1:] = [(" " * 9 + ln[cut:]) if ln.strip() else ln for ln in lines[1:]]
+        expr = "\n".join(lines)
+    one_line = f"{expr} as {key} from {cte};"
+    if len(lines) == 1 and len(one_line) <= 80:
+        return one_line, cte
+    return f"{expr} as {key}\nfrom {cte};", cte
+
+
+def live_sql(name, text, ctes):
+    names, key = LIVE_SOURCES[name]
     missing = [n for n in names if n not in ctes]
     if missing:
         sys.exit(f"{name}: no CTE named {', '.join(missing)} in scripts/fraud-snapshot.sql")
+    final, cte = snapshot_entry(text, key, name)
+    if cte != names[-1]:
+        sys.exit(f"{name}: the '{key}' entry in scripts/fraud-snapshot.sql selects from "
+                 f"{cte}, not {names[-1]}; update LIVE_SOURCES in scripts/build_sql_sources.py")
     body = ",\n".join(ctes[n] for n in names)
     return "with " + body + "\n" + final
 
@@ -181,11 +238,12 @@ def check_table_sources(con, pages):
 
 
 # ── HTML ──
-def caption(sql, note, indent):
+def caption(name, sql, note, indent):
     code = html.escape(sql.strip("\n"), quote=False)
+    label = html.escape(f"SQL source for {LABELS[name]}")
     lines = [
         '<details class="sql-src">',
-        '    <summary class="sql-src__toggle">SQL source</summary>',
+        f'    <summary class="sql-src__toggle" aria-label="{label}">SQL source</summary>',
         '    <div class="sql-src__panel">',
         f'        <pre class="sql-src__code" tabindex="0"><code>{code}</code></pre>',
         f'        <p class="sql-src__note">{note}</p>',
@@ -212,13 +270,14 @@ def render(page_text, sources):
             sys.exit(f"unknown sql-source {name!r}")
         seen.append(name)
         sql, note = sources[name]
-        return (f"{indent}<!-- sql-source: {name} -->\n{caption(sql, note, indent)}\n"
+        return (f"{indent}<!-- sql-source: {name} -->\n{caption(name, sql, note, indent)}\n"
                 f"{indent}<!-- /sql-source -->")
 
     return MARKER.sub(sub, page_text), seen
 
 
 def main():
+    check = "--check" in sys.argv
     pages = {p: site.parse(ROOT / p) for p in ("index.html", "projects.html")}
     con = duckdb.connect()
     con.execute(site.build())
@@ -229,17 +288,18 @@ def main():
     sources = {n: ((SOURCES / f"{n}.sql").read_text(encoding="utf-8"), TABLES_NOTE)
                for n in TABLE_SOURCES}
     sources.update({n: (live_sql(n, snap, ctes), LIVE_NOTE) for n in LIVE_SOURCES})
+    unlabeled = sorted(set(sources) - set(LABELS))
+    if unlabeled:
+        sys.exit("no LABELS entry in scripts/build_sql_sources.py for: " + ", ".join(unlabeled))
 
-    used, stale = [], []
+    used, rendered = [], {}
     for page in ("index.html", "projects.html", "live.html"):
         path = ROOT / page
         before = path.read_text(encoding="utf-8")
         after, seen = render(before, sources)
         used += seen
         if after != before:
-            stale.append(page)
-            if "--check" not in sys.argv:
-                path.write_text(after, encoding="utf-8")
+            rendered[path] = after
     unused = sorted(set(sources) - set(used))
     if unused:
         errors.append("no caption on any page for: " + ", ".join(unused))
@@ -248,13 +308,16 @@ def main():
         errors.append("more than one caption for: " + ", ".join(dupes))
 
     if errors:
-        sys.exit("\n".join(errors))
-    if "--check" in sys.argv:
+        sys.exit("\n".join(errors) + "\n(nothing was written)")
+    stale = [p.name for p in rendered]
+    if check:
         if stale:
             sys.exit("SQL source captions are out of date in " + ", ".join(stale)
                      + ": run python3 scripts/build_sql_sources.py")
         print(f"{len(used)} SQL source captions are current, and every site-table query returns what its page shows")
     else:
+        for path, after in rendered.items():
+            path.write_text(after, encoding="utf-8")
         print("updated " + (", ".join(stale) if stale else "nothing") + f" ({len(used)} captions)")
 
 

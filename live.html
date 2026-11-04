@@ -146,7 +146,7 @@
             <p class="section-note">&ldquo;Caught&rdquo; means the model sent the order to review or declined it. Fraud is measured against the generator&rsquo;s answer key; in production those labels arrive weeks later, as chargebacks.</p>
             <!-- sql-source: live-totals -->
             <details class="sql-src">
-                <summary class="sql-src__toggle">SQL source</summary>
+                <summary class="sql-src__toggle" aria-label="SQL source for the last 30 days totals">SQL source</summary>
                 <div class="sql-src__panel">
                     <pre class="sql-src__code" tabindex="0"><code>with base as (
   select
@@ -227,7 +227,7 @@ select row_to_json(totals) as totals from totals;</code></pre>
             </details>
             <!-- sql-source: live-daily -->
             <details class="sql-src">
-                <summary class="sql-src__toggle">SQL source</summary>
+                <summary class="sql-src__toggle" aria-label="SQL source for the fraud per day chart">SQL source</summary>
                 <div class="sql-src__panel">
                     <pre class="sql-src__code" tabindex="0"><code>with base as (
   select
@@ -285,7 +285,7 @@ select coalesce(json_agg(daily order by day), '[]'::json) as daily from daily;</
             </div>
             <!-- sql-source: live-scores -->
             <details class="sql-src">
-                <summary class="sql-src__toggle">SQL source</summary>
+                <summary class="sql-src__toggle" aria-label="SQL source for the score distribution chart">SQL source</summary>
                 <div class="sql-src__panel">
                     <pre class="sql-src__code" tabindex="0"><code>with base as (
   select
@@ -334,7 +334,7 @@ from bins;</code></pre>
             </div>
             <!-- sql-source: live-patterns -->
             <details class="sql-src">
-                <summary class="sql-src__toggle">SQL source</summary>
+                <summary class="sql-src__toggle" aria-label="SQL source for the catch rate by fraud pattern table">SQL source</summary>
                 <div class="sql-src__panel">
                     <pre class="sql-src__code" tabindex="0"><code>with base as (
   select

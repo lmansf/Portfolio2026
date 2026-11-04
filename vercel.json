@@ -45,8 +45,8 @@
     { "source": "/architecture", "destination": "/owl-park", "permanent": true },
     { "source": "/resume", "destination": "/assets/loganmansfield.pdf", "permanent": false },
     { "source": "/feedback", "destination": "/", "permanent": true },
-    { "source": "/playground", "destination": "/", "permanent": true },
-    { "source": "/playground.html", "destination": "/", "permanent": true }
+    { "source": "/playground", "destination": "/", "permanent": false },
+    { "source": "/playground.html", "destination": "/", "permanent": false }
   ],
   "rewrites": [
     { "source": "/", "destination": "/index.html" },

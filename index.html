@@ -173,7 +173,7 @@
             </div>
             <!-- sql-source: now -->
             <details class="sql-src">
-                <summary class="sql-src__toggle">SQL source</summary>
+                <summary class="sql-src__toggle" aria-label="SQL source for the now strip">SQL source</summary>
                 <div class="sql-src__panel">
                     <pre class="sql-src__code" tabindex="0"><code>SELECT now, building, latest
 FROM resume;</code></pre>
@@ -248,7 +248,7 @@ FROM resume;</code></pre>
             </div>
             <!-- sql-source: featured -->
             <details class="sql-src">
-                <summary class="sql-src__toggle">SQL source</summary>
+                <summary class="sql-src__toggle" aria-label="SQL source for the featured projects">SQL source</summary>
                 <div class="sql-src__panel">
                     <pre class="sql-src__code" tabindex="0"><code>SELECT title, eyebrow, year, summary, tags
 FROM projects
@@ -307,12 +307,12 @@ ORDER BY sort_order;</code></pre>
             </ol>
             <!-- sql-source: experience -->
             <details class="sql-src">
-                <summary class="sql-src__toggle">SQL source</summary>
+                <summary class="sql-src__toggle" aria-label="SQL source for the experience timeline">SQL source</summary>
                 <div class="sql-src__panel">
                     <pre class="sql-src__code" tabindex="0"><code>SELECT
     role,
     note,
-    org || ' · ' || location AS org,
+    concat_ws(' · ', org, location) AS org,
     strftime(started, '%b %Y') || ' – '
         || coalesce(strftime(ended, '%b %Y'), 'present') AS dates,
     summary
@@ -337,7 +337,7 @@ ORDER BY started DESC;</code></pre>
                 </ul>
                 <!-- sql-source: credentials -->
                 <details class="sql-src">
-                    <summary class="sql-src__toggle">SQL source</summary>
+                    <summary class="sql-src__toggle" aria-label="SQL source for the credentials">SQL source</summary>
                     <div class="sql-src__panel">
                         <pre class="sql-src__code" tabindex="0"><code>SELECT credential, detail
 FROM credentials
@@ -388,7 +388,7 @@ ORDER BY sort_order;</code></pre>
                 </div>
                 <!-- sql-source: toolkit -->
                 <details class="sql-src">
-                    <summary class="sql-src__toggle">SQL source</summary>
+                    <summary class="sql-src__toggle" aria-label="SQL source for the toolkit">SQL source</summary>
                     <div class="sql-src__panel">
                         <pre class="sql-src__code" tabindex="0"><code>SELECT category, list(skill ORDER BY sort_order) AS skills
 FROM skills

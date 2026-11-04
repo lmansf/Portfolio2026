@@ -224,10 +224,12 @@ the page with `<!-- sql-source: <name> -->` … `<!-- /sql-source -->`, and
   `projects` table feeds both.
 - **`/live`** captions are excerpts of `scripts/fraud-snapshot.sql`, the
   read-only query that feeds the page: the shared `base` CTE, the chart's
-  own CTE (cut from the file as written), and the slice of the final select
-  that publishes it. Edit that file, rerun the script, and the captions
-  follow; the run fails if a slice it quotes is gone (`LIVE_SOURCES` in the
-  script).
+  own CTE, and the entry of the final `json_build_object` that publishes it,
+  rewritten as a select of its own. All three are cut from the file as
+  written, so edit it, rerun the script, and the captions follow; the run
+  fails if a CTE or entry it quotes is gone (`LIVE_SOURCES` in the script).
+  Each caption's `<summary>` also carries an `aria-label` naming its piece
+  (`LABELS` in the script), and nothing is written unless every check passes.
 
 To caption a new piece: add the marker pair under it, add its query to
 `data/sql-sources/` with a matching entry in `TABLE_SOURCES` (the function
@@ -264,6 +266,10 @@ come back in a new form or be retired cleanly:
   `data/playground/owl_park.duckdb.gz` (the synthetic Owl Park tables whose
   list prices order the shards, written by `data/playground/generate.py`)
   and `assets/sql-engine.js` stay in the repo, but no page loads them.
+- Nothing points to the trail, but it is still in plain sight: `nest_box` is
+  part of the public `data/console/site.sql` that the "SQL source" captions
+  link to, and `/api/egg/claim` still issues codes to anyone who posts the
+  answer. That is deliberate while the hunt waits for its next form.
 
 ## Search and sharing metadata
 
