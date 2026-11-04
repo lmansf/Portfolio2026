@@ -146,14 +146,14 @@
             <p class="section-note">&ldquo;Caught&rdquo; means the model sent the order to review or declined it. Fraud is measured against the generator&rsquo;s answer key; in production those labels arrive weeks later, as chargebacks.</p>
             <!-- sql-source: live-totals -->
             <details class="sql-src" data-sql-source="live-totals" data-sql-label="the last 30 days totals">
-                <summary class="sql-src__toggle" aria-label="SQL source for the last 30 days totals">SQL source</summary>
+                <summary class="sql-src__toggle" aria-label="SQL source for the last 30 days totals">SQL source<span class="sql-src__trust" data-sql-trust hidden></span></summary>
                 <div class="sql-src__panel">
                     <pre class="sql-src__code" tabindex="0"><code>SELECT
     checkouts, flagged, fraud, fraud_caught, legit, false_declines,
     fraud_dollars_stopped, fraud_dollars_approved,
     p95_scoring_ms, scoring_timeouts, active_days
 FROM fraud_totals;</code></pre>
-                    <p class="sql-src__note">This query writes what&rsquo;s shown above, from the same aggregates-only snapshot the page draws; a check fails the build if it ever stops matching.</p>
+                    <p class="sql-src__note">This query writes what&rsquo;s shown above, from the same aggregates-only snapshot the page draws; a check fails the build if it ever stops matching. <a href="/status#t-fraud_totals">See its checks</a>.</p>
                     <details class="sql-src__upstream">
                         <summary>Where the numbers come from</summary>
                         <pre class="sql-src__code" tabindex="0"><code>with base as (
@@ -236,14 +236,14 @@ select row_to_json(totals) as totals from totals;</code></pre>
             </details>
             <!-- sql-source: live-daily -->
             <details class="sql-src" data-sql-source="live-daily" data-sql-label="the fraud per day chart">
-                <summary class="sql-src__toggle" aria-label="SQL source for the fraud per day chart">SQL source</summary>
+                <summary class="sql-src__toggle" aria-label="SQL source for the fraud per day chart">SQL source<span class="sql-src__trust" data-sql-trust hidden></span></summary>
                 <div class="sql-src__panel">
                     <pre class="sql-src__code" tabindex="0"><code>SELECT
     day, checkouts, reviewed, declined,
     fraud, fraud_caught, false_declines, fraud_dollars_stopped
 FROM fraud_daily
 ORDER BY day;</code></pre>
-                    <p class="sql-src__note">This query writes what&rsquo;s shown above, from the same aggregates-only snapshot the page draws; a check fails the build if it ever stops matching.</p>
+                    <p class="sql-src__note">This query writes what&rsquo;s shown above, from the same aggregates-only snapshot the page draws; a check fails the build if it ever stops matching. <a href="/status#t-fraud_daily">See its checks</a>.</p>
                     <details class="sql-src__upstream">
                         <summary>Where the numbers come from</summary>
                         <pre class="sql-src__code" tabindex="0"><code>with base as (
@@ -303,12 +303,12 @@ select coalesce(json_agg(daily order by day), '[]'::json) as daily from daily;</
             </div>
             <!-- sql-source: live-scores -->
             <details class="sql-src" data-sql-source="live-scores" data-sql-label="the score distribution chart">
-                <summary class="sql-src__toggle" aria-label="SQL source for the score distribution chart">SQL source</summary>
+                <summary class="sql-src__toggle" aria-label="SQL source for the score distribution chart">SQL source<span class="sql-src__trust" data-sql-trust hidden></span></summary>
                 <div class="sql-src__panel">
                     <pre class="sql-src__code" tabindex="0"><code>SELECT score_from, score_to, legit, fraud
 FROM fraud_score_bins
 ORDER BY score_from;</code></pre>
-                    <p class="sql-src__note">This query writes what&rsquo;s shown above, from the same aggregates-only snapshot the page draws; a check fails the build if it ever stops matching.</p>
+                    <p class="sql-src__note">This query writes what&rsquo;s shown above, from the same aggregates-only snapshot the page draws; a check fails the build if it ever stops matching. <a href="/status#t-fraud_score_bins">See its checks</a>.</p>
                     <details class="sql-src__upstream">
                         <summary>Where the numbers come from</summary>
                         <pre class="sql-src__code" tabindex="0"><code>with base as (
@@ -359,12 +359,12 @@ from bins;</code></pre>
             </div>
             <!-- sql-source: live-patterns -->
             <details class="sql-src" data-sql-source="live-patterns" data-sql-label="the catch rate by fraud pattern table">
-                <summary class="sql-src__toggle" aria-label="SQL source for the catch rate by fraud pattern table">SQL source</summary>
+                <summary class="sql-src__toggle" aria-label="SQL source for the catch rate by fraud pattern table">SQL source<span class="sql-src__trust" data-sql-trust hidden></span></summary>
                 <div class="sql-src__panel">
                     <pre class="sql-src__code" tabindex="0"><code>SELECT pattern, fraud, caught
 FROM fraud_patterns
 ORDER BY fraud DESC, pattern;</code></pre>
-                    <p class="sql-src__note">This query writes what&rsquo;s shown above, from the same aggregates-only snapshot the page draws; a check fails the build if it ever stops matching.</p>
+                    <p class="sql-src__note">This query writes what&rsquo;s shown above, from the same aggregates-only snapshot the page draws; a check fails the build if it ever stops matching. <a href="/status#t-fraud_patterns">See its checks</a>.</p>
                     <details class="sql-src__upstream">
                         <summary>Where the numbers come from</summary>
                         <pre class="sql-src__code" tabindex="0"><code>with base as (

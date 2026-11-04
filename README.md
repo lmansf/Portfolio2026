@@ -458,7 +458,18 @@ caption reads (`pieces`). The hidden hunt table is left out on purpose.
    two the run adds: every column is described, and every caption's default
    query still returns what its page shows.
 4. **Log** to `data/pipeline/run-log.json`: the latest run in full and a
-   30-run history. `/status` (`assets/status.js`) draws it.
+   30-run history. `/status` (`assets/status.js`) draws it. It also writes
+   `data/pipeline/trust.json`, one line per caption, for the trust badges.
+
+**Trust badges.** Each "SQL source" summary carries a quiet badge, filled in
+the browser by `sql-source.js` from `trust.json`: "fresh 3h ago · 8 of 8
+checks passed", or "stale, 2d old · 7 of 8 checks passed" in chestnut when
+the data is older than its table's `freshness.max_hours` (36 hours for the
+site tables, which every run rebuilds) or a check failed; hovering lists the
+failing checks. A piece's checks are its tables' tests plus its own caption
+check. The badge is empty in the HTML, so the pages don't change night to
+night, and it stays hidden when there's no `trust.json` yet. Each caption's
+note links to that table's checks on `/status`.
 
     python3 scripts/data_run.py              # run and write
     python3 scripts/data_run.py --dry-run    # run, print, write nothing
