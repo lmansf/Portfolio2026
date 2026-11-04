@@ -106,6 +106,7 @@ function init() {
     let lastRoute = null;
     let view = 'cards';
     let typing = null;
+    let busy = false;
 
     // ── Markup ──
     const toggle = el('button', {
@@ -144,7 +145,7 @@ function init() {
     const result = el('div', { class: 'sqlc__result', hidden: true }, resultHead, out);
     const error = el('div', { class: 'sqlc__error', role: 'alert', hidden: true });
 
-    const panel = el('div', { class: 'sqlc__panel', id: 'sqlc-panel', role: 'region', 'aria-label': 'SQL console', hidden: true },
+    const panel = el('div', { class: 'sqlc__panel', id: 'sqlc-panel', role: 'region', 'aria-label': 'SQL editor and results', hidden: true },
         el('div', { class: 'sqlc__inner' },
             el('div', { class: 'sqlc__editor' },
                 el('label', { class: 'sr-only', for: 'sqlc-sql', text: 'SQL query' }),
@@ -197,7 +198,7 @@ function init() {
 
     root.addEventListener('keydown', (e) => {
         if (e.key === 'Escape' && isOpen()) {
-            if (engine.running) return; // Escape inside a run shouldn't drop the panel
+            if (busy) return; // Escape inside a run shouldn't drop the panel
             close();
             toggle.focus();
         }
@@ -240,13 +241,15 @@ function init() {
     }
 
     // Type the text into the editor a few characters at a time (instantly
-    // with reduced motion), then resolve.
+    // with reduced motion). Resolves true once the whole text is in, false
+    // when something interrupted it (the visitor typed, or another query
+    // started typing).
     function typeInto(text) {
         stopTyping();
         if (reduceMotion()) {
             sql.value = text;
             fit();
-            return Promise.resolve();
+            return Promise.resolve(true);
         }
         return new Promise((resolve) => {
             const total = text.length;
@@ -255,25 +258,28 @@ function init() {
             sql.value = '';
             sql.rows = Math.max(3, Math.min(14, text.split('\n').length + 1));
             typing = {
+                text,
                 resolve,
                 timer: setInterval(() => {
                     i++;
                     sql.value = text.slice(0, Math.ceil((total * i) / steps));
-                    if (i >= steps) {
-                        stopTyping();
-                        resolve();
-                    }
+                    if (i >= steps) stopTyping(true);
                 }, 16)
             };
         });
     }
 
-    function stopTyping() {
+    // Stop the typing animation; with complete, put the whole text in first.
+    function stopTyping(complete = false) {
         if (!typing) return;
         clearInterval(typing.timer);
-        const done = typing.resolve;
+        const { text, resolve } = typing;
         typing = null;
-        done();
+        if (complete) {
+            sql.value = text;
+            fit();
+        }
+        resolve(complete);
     }
 
     // ── Nav as queries ──
@@ -294,49 +300,55 @@ function init() {
     }, true);
 
     async function runRoute(key) {
-        if (engine.running) return;
+        if (busy) return;
         lastRoute = key;
         sql.focus({ preventScroll: true });
-        await typeInto(ROUTES[key].sql);
+        const typed = await typeInto(ROUTES[key].sql);
+        if (!typed || busy) return;
         lastRoute = key;
         run();
     }
 
     // ── Run ──
     async function run() {
-        if (engine.running) return;
-        stopTyping();
-        const text = sql.value.trim();
-        if (!text) {
-            setStatus('Type a query first.');
-            sql.focus();
-            return;
-        }
-        const route = lastRoute;
-        runBtn.disabled = true;
-        cancelBtn.hidden = false;
-        cancelBtn.disabled = false;
-        error.hidden = true;
+        if (busy) return;
+        busy = true;
         try {
-            if (!engine.loaded) setStatus('Loading DuckDB…');
-            await engine.ready();
-            setStatus('Running…');
-            const { result: res, ms } = await engine.run(text);
-            render(res, ms, route);
-            setStatus(`Done in ${formatMs(ms)}.`);
-        } catch (err) {
-            if (err && err.cancelled) {
-                const why = err.cancelled === 'timeout'
-                    ? `Stopped after ${QUERY_TIMEOUT_MS / 1000} seconds.`
-                    : 'Query cancelled.';
-                setStatus(err.killed ? `${why} DuckDB restarts on your next run.` : why);
-            } else if (engine.loaded) {
-                showError(err);
+            stopTyping(true);
+            const text = sql.value.trim();
+            if (!text) {
+                setStatus('Type a query first.');
+                sql.focus();
+                return;
+            }
+            const route = lastRoute;
+            runBtn.disabled = true;
+            error.hidden = true;
+            try {
+                if (!engine.loaded) setStatus('Loading DuckDB…');
+                await engine.ready();
+                cancelBtn.hidden = false;
+                cancelBtn.disabled = false;
+                setStatus('Running…');
+                const { result: res, ms } = await engine.run(text);
+                render(res, ms, route);
+                setStatus(`Done in ${formatMs(ms)}.`);
+            } catch (err) {
+                if (err && err.cancelled) {
+                    const why = err.cancelled === 'timeout'
+                        ? `Stopped after ${QUERY_TIMEOUT_MS / 1000} seconds.`
+                        : 'Query cancelled.';
+                    setStatus(err.killed ? `${why} DuckDB restarts on your next run.` : why);
+                } else if (engine.loaded) {
+                    showError(err);
+                }
+            } finally {
+                if (document.activeElement === cancelBtn) runBtn.focus();
+                cancelBtn.hidden = true;
+                runBtn.disabled = false;
             }
         } finally {
-            if (document.activeElement === cancelBtn) runBtn.focus();
-            cancelBtn.hidden = true;
-            runBtn.disabled = false;
+            busy = false;
         }
     }
 

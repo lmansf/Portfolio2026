@@ -8,8 +8,13 @@ the pages themselves, so the console can never say something the pages don't:
     python3 scripts/build_console_data.py --check  # fail if site.sql is stale
 
 Sources: projects.html (every project card) and index.html (hero, "Now" rows,
-experience timeline, credentials, toolkit). Rerun after editing either page.
-Standard library only.
+experience timeline, credentials, toolkit, footer brand). Rerun after editing
+either page. Standard library only.
+
+If data/console/extra.sql exists, its statements are appended verbatim after
+the generated tables: that is the hook for tables that don't come from the
+pages (later: the Easter egg hunt). It's the only hand-written SQL that
+reaches the console, and --check covers it too.
 """
 
 import html
@@ -198,6 +203,11 @@ def credentials(doc):
 def resume(doc):
     main = main_of(doc)
     name = main.find(cls="hero__name").clean_text().rstrip(".")
+    # The hero's first clause ("Data analyst moving into analytics
+    # engineering: I build…"), with inline tags such as <em> flattened.
+    headline = main.find(cls="hero__role").clean_text().split(":", 1)[0].strip()
+    # The footer brand reads "Logan Mansfield · Tampa, FL".
+    _, _, location = doc.find(cls="footer-brand").clean_text().partition(" · ")
     now = {}
     for row in main.find_all(cls="now__row"):
         now[row.find(cls="now__label").clean_text().lower()] = row.find(cls="now__value").clean_text()
@@ -214,11 +224,11 @@ def resume(doc):
             links["resume_pdf"] = href
     return [{
         "name": name,
-        "headline": "Data analyst moving into analytics engineering",
+        "headline": headline,
         "now": now.get("now"),
         "building": now.get("building"),
         "latest": now.get("latest"),
-        "location": "Tampa, FL",
+        "location": location.strip() or None,
         "email": links.get("email"),
         "linkedin": links.get("linkedin"),
         "github": links.get("github"),

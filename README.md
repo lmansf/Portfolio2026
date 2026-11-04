@@ -234,11 +234,17 @@ loader, and is bundled with it into `console.min.js`) and
 
 The site tables live in `data/console/site.sql`, generated from
 `index.html` and `projects.html` so the console never says something the
-pages don't. After changing a project card, the experience timeline, the
-toolkit, credentials or the hero, rerun:
+pages don't (the `resume` row's headline is the hero's first clause and its
+location comes from the footer brand). After changing a project card, the
+experience timeline, the toolkit, credentials, the hero or the footer, rerun:
 
     python3 scripts/build_console_data.py          # rewrite site.sql
     python3 scripts/build_console_data.py --check  # fails if it's stale
+
+If `data/console/extra.sql` exists, the script appends it verbatim after the
+generated tables. It is the one place for hand-written console SQL (tables
+that don't come from the pages; the Easter egg hunt will use it), and
+`--check` fails when `site.sql` doesn't include it.
 
 `sql-engine.js` attaches the playground file READ_ONLY, runs `site.sql` into
 the tab's memory, puts both on the search path, then switches off
