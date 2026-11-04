@@ -57,8 +57,8 @@ the toolkit's default query and its name kept out of error hints. After
 changing card, timeline, toolkit, credential, hero, "now" strip,
 contact-button or footer copy, or the snapshot query, rerun
 `build_console_data.py` then `build_sql_sources.py`; the `Console data`
-workflow runs both `--check`s in CI. See the README's "SQL source
-captions".
+workflow runs both `--check`s in CI and fails if `sql-source.min.js` is
+stale. See the README's "SQL source captions".
 
 Search/share metadata (head tags, JSON-LD, `sitemap.xml`, `robots.txt`,
 `llms.txt`, `assets/share-card.jpg`, the favicon set) is documented in the README's "Search and
@@ -79,7 +79,8 @@ Biology (Towson, 2019) is hidden for now at Logan's request (restore steps in
 the README's "Hidden for now" section); no sticky-navigation claim; no dbt, CRM ownership, UAT, or
 M365/D365 admin; titles and dates unchanged; LinkedIn is `in/lmansf96`.
 
-The nest-box hunt is parked (README, "Parked: the nest-box hunt"): keep
+The nest-box hunt (README, "The nest-box hunt"; contract in
+`docs/egg-codes.md`) runs from the SQL source editors: keep
 `api/egg/verify.js` and `api/egg/claim.js` working (Owl Park calls verify),
 keep the shard order in `data/console/extra.sql` in step with the Owl Park
 products' list prices in `data/playground/`, and never put `EGG_CODE_SECRET`

@@ -71,7 +71,10 @@ soft and tappable things are pills.
   view transitions (including the `@view-transition` opt-in that fades full
   page loads between pages).
 - `assets/pages.css` — page components: hero, now strip, project cards,
-  experience timeline, chips and toolkit groups, about, connect cards, buttons.
+  experience timeline, chips and toolkit groups, about, connect cards, buttons,
+  and the "SQL source" captions (`.sql-src`: the collapsed caption, the
+  editor, result tables, error and egg cards, and the dashed `is-sql-edited`
+  frame on a redrawn piece).
 - `assets/transition.js` — SPA-style page transitions and the mobile nav
   (Home and Projects only). In-site page swaps fade here; full page loads
   between pages that share `shell.css` (e.g. to and from 404) fade via the
@@ -221,7 +224,13 @@ How it works:
   jsDelivr, several megabytes) loads only on the first Run, then every editor on the
   page shares it. It runs over the site's own tables plus the Owl Park sample
   tables (`owl_park`, read-only), with file, URL, extension and settings
-  access switched off. Nothing a visitor types leaves the tab.
+  access switched off. Nothing a visitor types leaves the tab. A page opts
+  in with one `<script type="module" src="/assets/sql-source.min.js">` tag.
+  While a query runs the Run button becomes Stop; a query is also stopped
+  after 30 seconds (and the worker replaced if it won't stop), and at most
+  200,000 rows of a result are kept. The site tables live in the tab's
+  memory, so a visitor's `INSERT` or `UPDATE` lasts until a reload; the
+  Owl Park tables are read-only.
 - **Redrawing never breaks the page.** If the result has the columns the
   piece needs (a `title` for cards, a `category` and `skills` for the
   toolkit, one row for the now strip, `day`, `checkouts`, `fraud` and
@@ -291,7 +300,9 @@ buttons or the footer brand, rerun both scripts:
     python3 scripts/build_sql_sources.py
 
 The `Console data` workflow (`.github/workflows/console-data.yml`) runs both
-`--check`s on every pull request and push to `main`. If
+`--check`s on every pull request and push to `main`, and fails if
+`assets/sql-source.min.js` differs from a fresh esbuild of `sql-source.js`
+(the command above). If
 `data/console/extra.sql` exists, the table script appends it verbatim after
 the generated tables (it holds the hunt's `nest_box`). The `console` in the
 path is left over from the retired SQL console.

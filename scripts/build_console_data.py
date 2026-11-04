@@ -15,8 +15,8 @@ name and path is left over from the retired SQL console.)
 
 If data/console/extra.sql exists, its statements are appended verbatim after
 the generated tables: that is the hook for tables that don't come from the
-pages (today the parked nest-box hunt). It's the only hand-written SQL in
-site.sql, and --check covers it too.
+pages (today the nest-box hunt, docs/egg-codes.md). It's the only
+hand-written SQL in site.sql, and --check covers it too.
 """
 
 import html
