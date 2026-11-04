@@ -1,8 +1,8 @@
 # Logan Mansfield
 
-> Logan Mansfield is an IT Point of Sale Systems Analyst at ZooTampa at Lowry Park in Tampa, Florida, and a data analyst. At ZooTampa, Logan owns the Gateway Galaxy ticketing platform, the eGalaxy webstores, and the PAR Pixel point-of-sale systems. Outside the day job, Logan builds data pipelines, forecasts, and dashboards as portfolio work, and is open to data analyst, BI, and analytics engineering roles (Tampa or remote).
+> Logan Mansfield is an IT Point of Sale Systems Analyst at ZooTampa at Lowry Park in Tampa, Florida. At ZooTampa, Logan owns the Gateway Galaxy ticketing platform, the eGalaxy webstores, and the PAR Pixel point-of-sale systems. Outside the day job, Logan builds data pipelines, forecasts, and dashboards as portfolio work, and is open to data analyst, BI, and analytics engineering roles (Tampa or remote).
 
-This is Logan Mansfield's own site. There are other people named Logan Mansfield; this one is the Tampa, FL systems and data analyst who works at ZooTampa.
+This is Logan Mansfield's own site. There are other people named Logan Mansfield; this one is the Tampa, FL IT analyst who works at ZooTampa.
 
 ## Key facts
 

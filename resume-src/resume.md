@@ -1,6 +1,6 @@
 # LOGAN MANSFIELD
 
-IT Point of Sale Systems Analyst | Data Analyst moving into Analytics Engineering
+IT Point of Sale Systems Analyst | IT Analyst moving into Analytics Engineering
 Tampa, FL | 443-929-5292 | lmansf96@gmail.com | linkedin.com/in/lmansf96 | github.com/lmansf | loganmansfield.org
 
 ## Professional Summary

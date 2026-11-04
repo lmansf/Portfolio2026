@@ -1,6 +1,6 @@
 # loganmansfield.org — portfolio
 
-Personal portfolio for **Logan Mansfield**, a data analyst moving into
+Personal portfolio for **Logan Mansfield**, an IT analyst moving into
 analytics engineering (Tampa, FL — open to remote and relocation). Static
 HTML/CSS/JS, no build step, deployed on Vercel.
 
