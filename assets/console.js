@@ -511,6 +511,18 @@ function init() {
     }
 
     // ── Nav as queries ──
+    if (inline) {
+        document.addEventListener('click', (e) => {
+            const link = e.target instanceof Element ? e.target.closest('a[href]') : null;
+            if (!link || link.target === '_blank') return;
+            const href = link.getAttribute('href').trim();
+            if (!href || href.startsWith('#') || href.endsWith('.pdf')) return;
+            let url;
+            try { url = new URL(href, window.location.href); } catch { return; }
+            if (url.origin !== window.location.origin || url.pathname === window.location.pathname) return;
+            e.stopPropagation();
+        }, true);
+    }
     document.addEventListener('click', (e) => {
         if (!isOpen() || inline || e.defaultPrevented || e.button !== 0 || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;
         const link = e.target instanceof Element ? e.target.closest('.topnav a[href], .site-nav__panel a[href]') : null;
@@ -556,6 +568,10 @@ function init() {
         const saveData = navigator.connection && navigator.connection.saveData;
         if (saveData && !engine.loaded) {
             schema.replaceChildren(el('p', { class: 'sqlc__empty', text: 'Data saver is on, so the table list loads with your first Run (DuckDB is about 7 MB).' }));
+            return;
+        }
+        if (busy && !schemaLoading) {
+            schema.replaceChildren(el('p', { class: 'sqlc__empty', text: 'The table list loads after this query.' }));
             return;
         }
         try {
@@ -659,6 +675,7 @@ ORDER BY table_catalog = 'owl_park', table_name, ordinal_position`);
             }
         } finally {
             busy = false;
+            if (!schema.hidden && !schemaLoaded) showSchema();
             if (pendingRoute) {
                 const next = pendingRoute;
                 pendingRoute = null;

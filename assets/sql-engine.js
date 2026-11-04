@@ -128,7 +128,12 @@ export function createEngine({ onStatus = () => {} } = {}) {
             const conn = await db.connect();
             await conn.query(`ATTACH '${PARK_FILE}' AS owl_park (READ_ONLY)`);
             await conn.query(siteSql);
-            await conn.query(fraudDailySql(snapshot));
+            try {
+                await conn.query(fraudDailySql(snapshot));
+            } catch {
+                await conn.query('DROP TABLE IF EXISTS fraud_daily');
+                await conn.query(fraudDailySql(null));
+            }
             await conn.query("SET search_path = 'memory.main,owl_park.main'");
             // Lock it down: from here a query can read the tables (and make
             // tables in this tab) but can't load extensions, touch files or
