@@ -1,18 +1,25 @@
-# Egg codes (the SQL console's nest-box hunt)
+# Egg codes (the nest-box hunt)
 
-A visitor who finds the hidden `nest_box` table in the site's SQL console and
-solves it gets a one-time **egg code**. Owl Park redeems that code once to
-give them a painted egg pet. This file is the contract between the two.
+A visitor who finds the hidden `nest_box` table from any "SQL source" editor
+on the site and solves it gets a one-time **egg code**. Owl Park redeems that
+code once to give them a painted egg pet. This file is the contract between
+the two.
 
 ## The hunt (about two minutes for someone who knows SQL)
 
-1. The Home query carries a comment, and the console's Tables list a line,
-   saying not every table is listed.
-2. `SHOW TABLES` (or `information_schema.tables`) shows `nest_box`.
+Every "SQL source" caption on Home, Projects and `/live` opens to an editor
+that runs SQL in the browser (`assets/sql-source.js`), and every editor can
+query every table, so the hunt can start from any of them.
+
+1. The Home toolkit's default query opens with a comment: not every table
+   makes it onto a page, and `SHOW ALL TABLES` lists them.
+2. `SHOW ALL TABLES` (or `information_schema.tables`) shows `nest_box`, and
+   the Owl Park sample tables under `owl_park`. The editors' error hints
+   never name `nest_box`.
 3. `SELECT * FROM nest_box` shows nine shards and a four-line riddle: match
    each `shard_key` to `products.product_id`, order the shards by
    `list_price` cheapest first, and run what they spell.
-4. The shards spell `SELECT claim_egg('speckled-robin');`. The console sees
+4. The shards spell `SELECT claim_egg('speckled-robin');`. The editor sees
    the found line and asks `/api/egg/claim` for a code, which it shows with a
    Copy button and keeps in `localStorage` (`sqlc-egg`), so the same browser
    gets the same code back instead of a new one.

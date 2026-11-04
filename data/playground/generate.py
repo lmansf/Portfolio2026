@@ -1,4 +1,4 @@
-"""Generate the synthetic Owl Park sample data behind /playground.
+"""Generate the synthetic Owl Park sample data the "SQL source" editors query.
 
 Everything here is made up: Owl Park is a fictional park, and the data holds no
 names, emails, addresses, or card details, real or simulated. Seeded, so a rerun
@@ -9,10 +9,12 @@ gives the same files.
 
 Writes owl_park.duckdb.gz next to this script: one DuckDB database file with
 four tables (park_days, products, orders, order_items), gzipped so the repo
-and the download stay small. The page unzips it with the browser's
-DecompressionStream and attaches it READ_ONLY. It is written in DuckDB's
-v1.1.0 storage format so the pinned DuckDB-Wasm (1.29.0, DuckDB 1.1) can read
-it; bump STORAGE_VERSION if the page moves to a newer DuckDB-Wasm.
+and the download stay small. assets/sql-engine.js unzips it with the
+browser's DecompressionStream and attaches it READ_ONLY as `owl_park`. It is
+written in DuckDB's v1.1.0 storage format so the pinned DuckDB-Wasm (1.29.0,
+DuckDB 1.1) can read it; bump STORAGE_VERSION if the engine moves to a newer
+DuckDB-Wasm. The nest-box hunt's shard order follows these products' list
+prices (data/console/extra.sql), so reorder the shards if the prices change.
 """
 
 import gzip

@@ -1,8 +1,9 @@
 -- ── The nest box: a small hunt for people who poke around ──
 -- Hand-written (not built from the pages); build_console_data.py appends it
--- to site.sql. The console's Tables list leaves nest_box out on purpose
--- (HIDDEN_TABLES in assets/console.js), so it turns up only for someone who
--- looks: SHOW TABLES, information_schema, or the hint on the Home query.
+-- to site.sql. No page draws it, and the SQL source editors leave it out of
+-- the table names they suggest (HIDDEN_TABLES in assets/sql-source.js), so it
+-- turns up only for someone who looks: SHOW ALL TABLES, information_schema,
+-- or the comment on the Home toolkit's default query.
 --
 -- Solving it: join each shard_key to products.product_id, order the shards
 -- by list_price (cheapest first), and string them together. They spell a
@@ -25,8 +26,8 @@ INSERT INTO nest_box VALUES
     (8, 'laim', NULL),
     (9, 'SELE', NULL);
 
--- The query the shards spell calls this. The console sees the found line
--- and asks /api/egg/claim for this visitor's one-time egg code.
+-- The query the shards spell calls this. The editor that runs it sees the
+-- found line and asks /api/egg/claim for this visitor's one-time egg code.
 CREATE MACRO claim_egg(word) AS
     CASE WHEN lower(trim(word)) = 'speckled-robin'
          THEN 'You found the nest.'

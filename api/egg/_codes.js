@@ -1,4 +1,5 @@
-/* Egg codes: one per finder of the SQL console's nest-box hunt.
+/* Egg codes: one per finder of the nest-box hunt (the hidden table behind
+ * the site's "SQL source" editors, assets/sql-source.js).
  *
  * A code is EGG-XXXX-XXXX-XXXX-XXXX-XXXX (Crockford base32, 20 characters)
  * holding 12 bytes: a random 5-byte id, the issue day as 2 bytes (days since
