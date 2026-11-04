@@ -93,7 +93,7 @@ CREATE TABLE resume (
     site VARCHAR
 );
 INSERT INTO resume VALUES
-    ('Logan Mansfield', 'Data analyst moving into analytics engineering', 'IT Point of Sale Systems Analyst at ZooTampa at Lowry Park', 'A fraud-detection pipeline over simulated webstore checkouts, with live daily numbers', 'Quack Query — ask a data file questions in plain English; an LLM writes the SQL and DuckDB runs it in your browser', 'Tampa, FL', 'lmansf96@gmail.com', 'https://www.linkedin.com/in/lmansf96/', 'https://github.com/lmansf', '/assets/loganmansfield.pdf', 'https://loganmansfield.org');
+    ('Logan Mansfield', 'IT analyst moving into analytics engineering', 'IT Point of Sale Systems Analyst at ZooTampa at Lowry Park', 'A fraud-detection pipeline over simulated webstore checkouts, with live daily numbers', 'Quack Query — ask a data file questions in plain English; an LLM writes the SQL and DuckDB runs it in your browser', 'Tampa, FL', 'lmansf96@gmail.com', 'https://www.linkedin.com/in/lmansf96/', 'https://github.com/lmansf', '/assets/loganmansfield.pdf', 'https://loganmansfield.org');
 
 -- ── The nest box: a small hunt for people who poke around ──
 -- Hand-written (not built from the pages); build_console_data.py appends it
