@@ -678,7 +678,7 @@ function nearestKeyword(word) {
     const w = word.toLowerCase();
     if (RESERVED.has(w)) return null;
     let best = null;
-    let bestD = 3;
+    let bestD = w.length < 5 ? 2 : 3;
     for (const k of KEYWORDS) {
         const d = editDistance(w, k);
         if (d > 0 && d < bestD && Math.abs(k.length - w.length) <= 2) { best = k; bestD = d; }
@@ -721,13 +721,13 @@ export function friendlyError(raw, tables = [], sqlText = '', columns = []) {
     }
     if ((m = /syntax error at or near "([^"]+)"/i.exec(raw))) {
         const near = m[1];
-        const guessable = /^[A-Za-z_]+$/.test(near) && near.length >= 3 && !tables.includes(near) && !columns.includes(near.toLowerCase());
+        const guessable = /^[A-Za-z_]+$/.test(near) && near.length >= 3 && !tables.includes(near.toLowerCase()) && !columns.includes(near.toLowerCase());
         let kw = guessable ? nearestKeyword(near) : null;
         let typo = kw ? near : null;
         if (!kw) {
             // The parser often trips one word after the typo (FORM projects).
             for (const w of sqlText.replace(/--[^\n]*|'[^']*'/g, ' ').match(/[A-Za-z_]+/g) || []) {
-                if (RESERVED.has(w.toLowerCase()) || tables.includes(w) || columns.includes(w.toLowerCase())) continue;
+                if (RESERVED.has(w.toLowerCase()) || tables.includes(w.toLowerCase()) || columns.includes(w.toLowerCase())) continue;
                 const k = nearestKeyword(w);
                 if (k && editDistance(w.toLowerCase(), k) === 1 && w.length >= 4) { kw = k; typo = w; break; }
             }
