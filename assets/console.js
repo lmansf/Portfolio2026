@@ -720,8 +720,10 @@ export function friendlyError(raw, tables = [], sqlText = '', columns = []) {
         return { title: `DuckDB has no function called ${m[2]}.`, hint: m[3] ? `Did you mean ${m[3]}?` : 'Check the spelling, or try count(*), sum(), avg(), min() or max().' };
     }
     if ((m = /syntax error at or near "([^"]+)"/i.exec(raw))) {
-        let kw = nearestKeyword(m[1]);
-        let typo = kw ? m[1] : null;
+        const near = m[1];
+        const guessable = /^[A-Za-z_]+$/.test(near) && near.length >= 3 && !tables.includes(near) && !columns.includes(near.toLowerCase());
+        let kw = guessable ? nearestKeyword(near) : null;
+        let typo = kw ? near : null;
         if (!kw) {
             // The parser often trips one word after the typo (FORM projects).
             for (const w of sqlText.replace(/--[^\n]*|'[^']*'/g, ' ').match(/[A-Za-z_]+/g) || []) {
