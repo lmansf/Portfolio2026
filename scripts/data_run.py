@@ -170,16 +170,21 @@ def extract(started, offline):
     sources, writes = [], {}
 
     # Site pages → site.sql
+    pages = None
     try:
+        pages = {p: site.parse(ROOT / p) for p in ("index.html", "projects.html")}
         sql = site.build()
         if not SITE_SQL.exists() or SITE_SQL.read_text(encoding="utf-8") != sql:
             writes[SITE_SQL] = sql
         sources.append({"name": "site_pages", "status": "ok", "as_of": iso(started),
                         "detail": "Rebuilt the site tables from index.html and projects.html."})
     except Exception as err:  # noqa: BLE001  (logged, and the last site.sql stays)
-        sql = SITE_SQL.read_text(encoding="utf-8")
+        if SITE_SQL.exists():
+            sql, kept = SITE_SQL.read_text(encoding="utf-8"), "kept the last site.sql"
+        else:
+            sql, kept = "", "and there is no earlier site.sql to keep"
         sources.append({"name": "site_pages", "status": "failed", "as_of": None,
-                        "detail": f"Couldn't parse the pages ({err}); kept the last site.sql."})
+                        "detail": f"Couldn't parse the pages ({err}); {kept}."})
 
     # Fraud snapshot (published by the Fraud snapshot workflow)
     snapshot = read_json(SNAPSHOT_JSON)
@@ -209,7 +214,7 @@ def extract(started, offline):
             reason = getattr(err, "code", None) or getattr(err, "reason", None) or err
             sources.append({"name": "github", "status": "failed", "as_of": (github or {}).get("fetched_at"),
                             "detail": f"The GitHub API didn't answer ({reason}); kept the last pull."})
-    return sources, writes, {"site_sql": sql, "snapshot": snapshot, "github": github}
+    return sources, writes, {"site_sql": sql, "pages": pages, "snapshot": snapshot, "github": github}
 
 
 # ── 2. Load ──
@@ -243,7 +248,7 @@ def describe_test(t):
             return f"exactly {lo} row{'s' if lo != 1 else ''}"
         if hi is not None:
             return f"{lo or 0} to {hi} rows"
-        return f"at least {lo} row{'s' if lo != 1 else ''}"
+        return f"at least {lo} row{'s' if lo != 1 else ''}" if lo else "any number of rows"
     if kind == "not_null":
         return "no blanks in " + ", ".join(t["columns"])
     if kind == "unique":
@@ -320,12 +325,17 @@ def run_checks(con, models, sources, started, pages, snapshot):
     for name, node in nodes.items():
         if node.get("layer") != "mart":
             continue
-        if name not in actual:
-            broken.append(f"models.json describes {name}, but no such table was built")
-            continue
         fresh = node.get("freshness")
-        as_of = (by_source.get(fresh["from"], {}).get("as_of") if fresh
-                 else by_source.get("site_pages", {}).get("as_of"))
+        source = by_source.get(fresh["from"] if fresh else "site_pages", {})
+        as_of = source.get("as_of")
+        if name not in actual:
+            if source.get("status") == "failed":
+                tables[name] = {"as_of": None, "rows": 0}
+                add(f"{name}.built", name, "the table was built", False,
+                    f"not built this run: {source['detail']}")
+            else:
+                broken.append(f"models.json describes {name}, but no such table was built")
+            continue
         rows = con.execute(f"SELECT count(*) FROM {ident(name)}").fetchone()[0]
         tables[name] = {"as_of": as_of, "rows": rows}
 
@@ -378,7 +388,8 @@ def run_checks(con, models, sources, started, pages, snapshot):
         try:
             where = f"{spec['page']}: the SQL source for {spec['label']}"
             if piece in captions.TABLE_SOURCES:
-                err = captions.check_table_source(con, pages, piece)
+                err = (captions.check_table_source(con, pages, piece) if pages is not None
+                       else "the pages couldn't be parsed this run (see the site_pages source)")
                 label = f"{where} returns exactly what the page shows"
             elif piece in captions.LIVE_SOURCES:
                 err = captions.check_live_source(con, snapshot or {}, snapshot_tables, piece)
@@ -511,8 +522,7 @@ def main():
 
     sources, writes, data = extract(started, offline)
     con = load(data)
-    pages = {p: site.parse(ROOT / p) for p in ("index.html", "projects.html")}
-    checks, tables, pieces, more = run_checks(con, models, sources, started, pages, data["snapshot"])
+    checks, tables, pieces, more = run_checks(con, models, sources, started, data["pages"], data["snapshot"])
     broken += more
     finished = now_utc()
 
