@@ -154,6 +154,8 @@ soft and tappable things are pills.
 - `assets/live.css`, `assets/live.js` — styles and chart code for the live
   data page only (see "Live fraud data" below); `data/fraud-snapshot.json`
   is the aggregate snapshot it draws from, rewritten by a GitHub Action.
+  `live.js` takes every rate from `assets/metrics.js` and is bundled with
+  it into `assets/live.min.js` (see "Metrics" below).
 - `assets/status.css`, `assets/status.js` — the `/status` page only (see
   "The nightly data run" below). The script fetches
   `data/pipeline/run-log.json` and draws the latest run's sources, every
@@ -521,6 +523,37 @@ run log is committed until the first run after the workflow lands, and
 whenever the `Fraud snapshot` job hasn't published in 36 hours (it skips
 without its database secret or over an empty window), and that shows on
 `/status` as data, not as a broken run.
+
+### Metrics
+
+Every rate the site shows is defined once, in
+**`data/pipeline/metrics.json`**: catch rate, fraud approved, good customers
+declined and flagged, fraud dollars stopped, fraud rate and scoring
+timeouts, each as a numerator over a denominator in `fraud_*` columns
+(columns joined by `+` or `-`), on `fraud_totals` and on any other table it
+applies to (`fraud_daily`, `fraud_patterns`, where catch rate reads
+`caught / fraud`). Three things read it:
+
+- `assets/metrics.js` (`metric('catch_rate', row, 'fraud_daily')`) for every
+  rate on `/live`: tiles, tooltips, captions and the pattern bars.
+- `scripts/build_metrics.py` writes **`data/pipeline/metrics.sql`**: a DuckDB
+  macro per metric, so `SELECT day, catch_rate(fraud_caught, fraud) FROM
+  fraud_daily` uses the site's own definition, and the `fraud_metrics` view,
+  one row per metric over `fraud_totals`. The SQL source editors load it in
+  the browser and the data run loads it to test `fraud_metrics` like any
+  other mart.
+- `claims`: a sentence of site copy and the metric it states. The Home and
+  Projects synopsis says the rules "flagged about half the fraud and no
+  legitimate orders", so the data run checks that catch rate is between 40%
+  and 60% and good customers flagged is 0%, and that both pages still say
+  it. When the numbers move, `/status` says the copy needs updating.
+
+After changing `metrics.json` or `live.js`:
+
+    python3 scripts/build_metrics.py
+    npx esbuild assets/live.js --bundle --format=iife --minify --outfile=assets/live.min.js --allow-overwrite
+
+CI (`Console data`) fails when `metrics.sql` or `live.min.js` is stale.
 
 ## Local development
 

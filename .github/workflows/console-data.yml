@@ -1,10 +1,12 @@
 # Fails when data/console/site.sql (the site's own tables) is out of step with
 # index.html, projects.html or data/console/extra.sql, or when a "SQL source"
 # caption is stale or its query no longer returns what its page shows, or
-# when assets/sql-source.min.js wasn't rebuilt after its sources changed.
+# when data/pipeline/metrics.sql is out of step with data/pipeline/metrics.json,
+# or when assets/sql-source.min.js or assets/live.min.js wasn't rebuilt after
+# its sources changed.
 # Fix: python3 scripts/build_console_data.py && python3 scripts/build_sql_sources.py
-# (and the esbuild line in the README's "SQL source captions"), then commit
-# the results.
+# && python3 scripts/build_metrics.py (and the esbuild lines in the README's
+# "SQL source captions" and "Metrics"), then commit the results.
 name: Console data
 
 on:
@@ -28,9 +30,15 @@ jobs:
         run: python3 -m pip install duckdb==1.5.6
       - name: Check site.sql is current
         run: python3 scripts/build_console_data.py --check
+      - name: Check metrics.sql is current
+        run: python3 scripts/build_metrics.py --check
       - name: Check the SQL source captions
         run: python3 scripts/build_sql_sources.py --check
       - name: Check the SQL source bundle is current
         run: |
           npx --yes esbuild@0.24.2 assets/sql-source.js --bundle --format=esm --minify --outfile="$RUNNER_TEMP/sql-source.min.js" --log-level=warning
           cmp "$RUNNER_TEMP/sql-source.min.js" assets/sql-source.min.js || { echo "assets/sql-source.min.js is stale: rebuild it with esbuild (see the README)"; exit 1; }
+      - name: Check the /live bundle is current
+        run: |
+          npx --yes esbuild@0.24.2 assets/live.js --bundle --format=iife --minify --outfile="$RUNNER_TEMP/live.min.js" --log-level=warning
+          cmp "$RUNNER_TEMP/live.min.js" assets/live.min.js || { echo "assets/live.min.js is stale: rebuild it with esbuild (see the README)"; exit 1; }

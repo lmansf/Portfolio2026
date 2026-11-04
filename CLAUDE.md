@@ -106,6 +106,15 @@ caption needs a `pieces` entry. Keep the hunt table out of `models.json`,
 `/status` and anything else that lists tables. `run-log.json`, `github.json`
 and `stg_github_events.json` are written by the run: don't hand-edit them.
 
+Every rate the site shows is defined once in `data/pipeline/metrics.json`
+(README, "Metrics"). `live.js` computes rates only through `metric()` in
+`assets/metrics.js` (never its own division), and `live.min.js` is an esbuild
+`--bundle --format=iife` build, not a plain minify. After changing
+`metrics.json`, rerun `scripts/build_metrics.py` (it writes
+`data/pipeline/metrics.sql`). If you change site copy that states a number
+(like "flagged about half the fraud"), update its `claims` entry, or the data
+run will say the copy and the number disagree.
+
 ## Validate portfolio PRs through the `no-mistakes` gate
 
 Before opening a pull request for this portfolio, validate the change with the

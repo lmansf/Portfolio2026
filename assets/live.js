@@ -16,7 +16,15 @@
  * visitor's query: this file keeps the published snapshot in
  * window.__liveSnapshot and redraws from whatever a `live:render` event
  * carries, falling back to the published numbers if that doesn't draw.
+ *
+ * Every rate here (catch rate, good customers declined, dollars stopped,
+ * timeouts, catch rate by day and by pattern) comes from metric() in
+ * metrics.js, so it's the definition in data/pipeline/metrics.json that the
+ * SQL editors, the nightly data run and the site copy use too. Built with
+ * esbuild --bundle --format=iife (see the README).
  * ───────────────────────────────────────────────────────────── */
+import { metric } from './metrics.js';
+
 (function () {
     'use strict';
 
@@ -195,13 +203,13 @@
         const full = s.daily.slice(1, -1).map((d) => d.checkouts).filter((n) => n > 0).sort((a, b) => a - b);
         const perDay = full.length ? full[Math.floor(full.length / 2)] : NaN;
         set('checkouts', fmtInt(t.checkouts), Number.isFinite(perDay) ? `About ${fmtInt(Math.round(perDay / 100) * 100)} on a typical day` : `${fmtInt(t.active_days)} days with checkouts`);
-        set('caught', fmtPct(ratio(t.fraud_caught, t.fraud)), `${fmtInt(t.fraud_caught)} of ${fmtInt(t.fraud)} fraudulent orders`);
+        set('caught', fmtPct(metric('catch_rate', t)), `${fmtInt(t.fraud_caught)} of ${fmtInt(t.fraud)} fraudulent orders`);
         set('false-declines', fmtInt(t.false_declines), t.false_declines > 0
-            ? `${fmtPct(ratio(t.false_declines, t.legit), 2)} of ${fmtInt(t.legit)} legitimate orders`
+            ? `${fmtPct(metric('false_decline_rate', t), 2)} of ${fmtInt(t.legit)} legitimate orders`
             : `Out of ${fmtInt(t.legit)} legitimate orders`);
         const fraudDollars = (t.fraud_dollars_stopped || 0) + (t.fraud_dollars_approved || 0);
-        set('dollars', fmtMoney(t.fraud_dollars_stopped), `${fmtPct(ratio(t.fraud_dollars_stopped, fraudDollars))} of ${fmtMoney(fraudDollars)} attempted`);
-        set('latency', `${t.p95_scoring_ms} ms`, `${fmtInt(t.scoring_timeouts)} timeouts failed open (${fmtPct(ratio(t.scoring_timeouts, t.checkouts), 1)})`);
+        set('dollars', fmtMoney(t.fraud_dollars_stopped), `${fmtPct(metric('dollars_stopped_share', t))} of ${fmtMoney(fraudDollars)} attempted`);
+        set('latency', `${t.p95_scoring_ms} ms`, `${fmtInt(t.scoring_timeouts)} timeouts failed open (${fmtPct(metric('timeout_rate', t), 1)})`);
 
         // Ask motion.js to count these up once (it skips zeros, and does
         // nothing under reduced motion). The text set above is the final value.
@@ -297,7 +305,7 @@
                 ttRow('Checkouts', fmtInt(d.checkouts)) +
                 ttRow('Fraud caught', fmtInt(d.fraud_caught), 'caught') +
                 ttRow('Fraud missed', fmtInt(missed), 'missed') +
-                ttRow('Catch rate', fmtPct(ratio(d.fraud_caught, d.fraud))) +
+                ttRow('Catch rate', fmtPct(metric('catch_rate', d, 'fraud_daily'))) +
                 ttRow('Good customers declined', fmtInt(d.false_declines));
             bindTip(hit, html, col);
         });
@@ -308,7 +316,7 @@
             const median = vols[Math.floor(vols.length / 2)] || 0;
             // Full days only: skip today and any day the generator ran for part of.
             const full = s.daily.filter((d) => d.day !== todayEt && d.checkouts >= median * 0.8);
-            const rates = full.map((d) => ratio(d.fraud_caught, d.fraud)).filter(Number.isFinite);
+            const rates = full.map((d) => metric('catch_rate', d, 'fraud_daily')).filter(Number.isFinite);
             const missingDays = days.filter((d) => !byDay.has(d));
             let text = rates.length
                 ? `On full days the model caught between ${fmtPct(Math.min(...rates))} and ${fmtPct(Math.max(...rates))} of fraud.`
@@ -407,7 +415,9 @@
                     ? `Every good customer scored below ${topLegit.toFixed(2)}, under the review line, so none were declined.`
                     : `Every good customer scored below ${topLegit.toFixed(2)}, and none were sent to review or declined.`);
             } else if (totLegit > 0 && Number.isFinite(legitFlagged)) {
-                let line = `${fmtInt(legitFlagged)} good ${legitFlagged === 1 ? 'customer' : 'customers'} (${fmtPct(ratio(legitFlagged, totLegit), 1)}) scored at or above the review line`;
+                const defined = metric('legit_flag_rate', t);
+                const legitRate = Number.isFinite(defined) ? defined : ratio(legitFlagged, totLegit);
+                let line = `${fmtInt(legitFlagged)} good ${legitFlagged === 1 ? 'customer' : 'customers'} (${fmtPct(legitRate, 1)}) scored at or above the review line`;
                 if (hasReview) line += ` of ${th.review_from.toFixed(2)}`;
                 if (falseDeclines === 0) line += ', but none were declined.';
                 else if (Number.isFinite(falseDeclines)) line += `, and ${fmtInt(falseDeclines)} ${falseDeclines === 1 ? 'was' : 'were'} declined.`;
@@ -415,8 +425,7 @@
                 sentences.push(line);
             }
             if (Number.isFinite(t.fraud) && Number.isFinite(t.fraud_caught) && t.fraud > 0) {
-                const missed = Math.max(0, t.fraud - t.fraud_caught);
-                let line = `The cost is the fraud that scores low too: ${fmtPct(ratio(missed, t.fraud))} of fraudulent orders were approved`;
+                let line = `The cost is the fraud that scores low too: ${fmtPct(metric('miss_rate', t))} of fraudulent orders were approved`;
                 line += hasReview ? `, mostly because they scored below the review line of ${th.review_from.toFixed(2)}.` : '.';
                 sentences.push(line);
             }
@@ -431,7 +440,7 @@
         host.textContent = '';
         const rows = s.patterns
             .filter((p) => p.fraud > 0)
-            .map((p) => ({ ...p, rate: ratio(p.caught, p.fraud), name: PATTERN_NAMES[p.pattern] || String(p.pattern).replace(/_/g, ' ') }))
+            .map((p) => ({ ...p, rate: metric('catch_rate', p, 'fraud_patterns'), name: PATTERN_NAMES[p.pattern] || String(p.pattern).replace(/_/g, ' ') }))
             .sort((a, b) => b.rate - a.rate);
         rows.forEach((p) => {
             const row = document.createElement('div');

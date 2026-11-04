@@ -258,6 +258,38 @@
                 {"type": "freshness"}
             ]
         },
+        "fraud_metrics": {
+            "layer": "mart",
+            "label": "fraud_metrics",
+            "upstream": ["fraud_totals"],
+            "where": "data/pipeline/metrics.sql, from data/pipeline/metrics.json",
+            "freshness": { "from": "fraud_snapshot", "max_hours": 36 },
+            "description": "One row per site metric over fraud_totals: the definitions every page reads, with today's value. Each metric is also a macro, like catch_rate(fraud_caught, fraud).",
+            "columns": {
+                "metric": "The metric's name, as metrics.json and its macro call it.",
+                "label": "What the site calls it.",
+                "definition": "Numerator over denominator, in fraud_totals columns.",
+                "numerator": "The numerator's value.",
+                "denominator": "The denominator's value.",
+                "value": "Numerator divided by denominator (blank when there's nothing to divide by)."
+            },
+            "tests": [
+                { "type": "unique", "columns": ["metric"] },
+                { "type": "not_null", "columns": ["metric", "label", "definition", "value"] },
+                {
+                    "type": "expression",
+                    "name": "every metric is a share between 0 and 1",
+                    "sql": "value BETWEEN 0 AND 1"
+                },
+                {
+                    "type": "expression",
+                    "name": "catch rate and fraud approved add up to 1",
+                    "scalar": true,
+                    "sql": "(SELECT abs(sum(value) - 1) < 1e-9 FROM fraud_metrics WHERE metric IN ('catch_rate', 'miss_rate'))"
+                },
+                { "type": "freshness" }
+            ]
+        },
         "github_activity": {
             "layer": "mart",
             "label": "github_activity",
