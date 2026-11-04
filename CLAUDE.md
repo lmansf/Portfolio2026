@@ -32,9 +32,10 @@ and section for no-JS and browsers without `<dialog>`. Keep each link's
 reduced-motion-safe, and edit the diagrams only in `projects.html`. See the
 README's "Site structure" and "Assets" sections.
 
-`playground.html` (the DuckDB-Wasm SQL playground) is served with a
-Content-Security-Policy from `vercel.json`: no inline scripts, and any new
-origin the page loads from must be added to that header. Its data file and
+`playground.html` (the DuckDB-Wasm SQL playground, which is the SQL console
+mounted inline) is served with a Content-Security-Policy from `vercel.json`:
+no inline scripts, and any new origin the page or the console loads from must
+be added to that header. Its data file and
 safety limits are described in the README's "SQL playground data" section.
 
 The docked SQL console (`assets/console.js` + `assets/sql-engine.js`,
@@ -44,8 +45,8 @@ browser over `data/console/site.sql`, which `scripts/build_console_data.py`
 generates from `index.html` and `projects.html`: rerun it whenever card,
 timeline, toolkit, credential, hero, "now" strip, contact-button or footer
 copy changes (`--check` fails when it's stale, and the `Console data`
-workflow runs that check in CI). `sql-engine.js` pins the same DuckDB-Wasm
-version as `playground.js`; bump both together. The console must stay
+workflow runs that check in CI). `sql-engine.js` pins DuckDB-Wasm for the
+whole site (the playground is the console too). The console must stay
 collapsed by default and never block or replace the static pages:
 everything works with it closed, and with it hidden by the bar's Skip SQL
 button (`sqlc-off` in localStorage; the footer's "Show the SQL console"
@@ -77,8 +78,9 @@ M365/D365 admin; titles and dates unchanged; LinkedIn is `in/lmansf96`.
 The `/live` page (`live.html`, `assets/live.*`) is fed by
 `data/fraud-snapshot.json`, which the `fraud-snapshot` GitHub Action
 regenerates daily from `scripts/fraud-snapshot.sql` and commits to `main`.
-Keep the SQL output, the workflow's `jq` allow-list, and `live.js` in step
-when fields change (`motion.js` also reads `generated_at` and
+Keep the SQL output, the workflow's `jq` allow-list, `live.js`, and the
+console's `fraud_daily` columns (`FRAUD_COLUMNS` in `assets/sql-engine.js`)
+in step when fields change (`motion.js` also reads `generated_at` and
 `latest_event_at` for the freshness dot on Home and Projects); the snapshot
 holds aggregates only and the page must never carry a database key. See the
 README's "Live fraud data" section.

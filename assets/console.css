@@ -11,7 +11,9 @@
  * .xp, .chip-list, .now, .btn), so cards look the same in the console.
  * ───────────────────────────────────────────────────────────── */
 
-body.has-sqlc { padding-bottom: calc(var(--sqlc-dock-h) + env(safe-area-inset-bottom, 0px)); }
+/* --sqlc-h is the console's live height (bar, plus the panel when open), set
+   by console.js, so the end of the page can always scroll clear of it. */
+body.has-sqlc { padding-bottom: var(--sqlc-h, calc(var(--sqlc-dock-h) + env(safe-area-inset-bottom, 0px))); }
 :root { --sqlc-dock-h: 48px; }
 
 .sqlc {
@@ -372,6 +374,24 @@ body.has-sqlc { padding-bottom: calc(var(--sqlc-dock-h) + env(safe-area-inset-bo
 .sqlc-profile__name { font-family: var(--font-display); font-size: 1.45rem; margin: 0; }
 .sqlc-profile__headline { color: var(--ink-2); margin: 0.2rem 0 0.8rem; }
 .sqlc-profile .now { margin: 0 0 0.9rem; }
+
+/* ── Inline (the /playground page): the console sits in the page ── */
+.sqlc--inline {
+    position: static;
+    z-index: auto;
+    display: block;
+    pointer-events: auto;
+    scroll-margin-top: 5rem;
+}
+.sqlc--inline .sqlc__dock { display: none; }
+.sqlc--inline .sqlc__panel {
+    max-height: none;
+    overflow: visible;
+    background: none;
+    border: 0;
+    box-shadow: none;
+}
+.sqlc--inline .sqlc__inner { max-width: none; padding: 0; }
 
 @media (prefers-reduced-motion: reduce) {
     .sqlc__chev { transition: none; }

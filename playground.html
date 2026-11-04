@@ -97,32 +97,14 @@
             </div>
         </section>
 
-        <section class="pg" aria-labelledby="pg-editor-title" data-playground>
+        <section class="pg" aria-labelledby="pg-start-title">
             <header class="section-head">
-                <h2 class="section-head__title" id="pg-editor-title">Query</h2>
-                <span class="section-head__hint pg__hint-keys">Ctrl or ⌘ + Enter runs it</span>
+                <h2 class="section-head__title" id="pg-start-title">Start with a question</h2>
+                <span class="section-head__hint">Or write your own below</span>
             </header>
-
-            <div class="pg__starters" role="group" aria-label="Starter queries" data-starters></div>
-
-            <div class="pg__editor">
-                <label class="sr-only" for="pg-sql">SQL query</label>
-                <textarea id="pg-sql" class="pg__sql" spellcheck="false" autocapitalize="off" autocomplete="off" autocorrect="off" rows="10" data-sql></textarea>
-                <div class="pg__bar">
-                    <button class="btn btn--primary" type="button" data-run disabled>Run query <span class="arrow" aria-hidden="true">→</span></button>
-                    <button class="btn btn--ghost" type="button" data-cancel hidden>Cancel</button>
-                    <p class="pg__status" role="status" aria-live="polite" data-status>DuckDB loads when you open this page.</p>
-                </div>
-            </div>
-
-            <div class="pg__result" data-result hidden>
-                <div class="pg__result-head">
-                    <p class="pg__meta" data-meta></p>
-                    <button class="btn btn--ghost pg__csv" type="button" data-csv>Download CSV</button>
-                </div>
-                <div class="pg__table-wrap" tabindex="0" role="region" aria-label="Query results" data-table-wrap></div>
-            </div>
-            <div class="pg__error" role="alert" data-error hidden></div>
+            <div class="pg__starters" role="group" aria-label="Starter queries" data-sqlc-starters></div>
+            <div class="pg__console" data-sqlc-mount></div>
+            <noscript><p class="section-note">The console needs JavaScript. The table reference below still shows what's in the data.</p></noscript>
         </section>
 
         <section aria-labelledby="pg-tables-title">
@@ -194,6 +176,6 @@
 
     <script defer src="/assets/transition.min.js"></script>
     <script defer src="/assets/motion.min.js"></script>
-    <script type="module" src="/assets/playground.min.js"></script>
+    <script type="module" src="/assets/console.min.js"></script>
 </body>
 </html>

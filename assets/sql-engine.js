@@ -7,6 +7,9 @@
  *     (/data/playground/owl_park.duckdb.gz) READ_ONLY as `owl_park`,
  *   - runs /data/console/site.sql to build the site tables (projects,
  *     experience, skills, credentials, resume) in this tab's memory,
+ *   - builds `fraud_daily` from /data/fraud-snapshot.json, the same
+ *     aggregates-only file the /live page draws (one row per day: counts,
+ *     dollar totals, p95 scoring time; never an order, card or person),
  *   - puts both on the search path, so `FROM projects` and `FROM orders`
  *     both work,
  *   - switches off extension install/autoload and all external access
@@ -26,6 +29,36 @@ const DUCKDB_ESM = `https://cdn.jsdelivr.net/npm/@duckdb/duckdb-wasm@${DUCKDB_VE
 const PARK_FILE = 'owl_park.duckdb';
 const PARK_URL = `/data/playground/${PARK_FILE}.gz`;
 const SITE_SQL_URL = '/data/console/site.sql';
+const FRAUD_URL = '/data/fraud-snapshot.json';
+
+// fraud_daily's columns: exactly these fields of each `daily` entry, nothing
+// else from the file, typed and checked before they reach DuckDB.
+const FRAUD_COLUMNS = [
+    ['day', 'DATE'],
+    ['checkouts', 'INTEGER'], ['approved', 'INTEGER'], ['reviewed', 'INTEGER'], ['declined', 'INTEGER'],
+    ['fraud', 'INTEGER'], ['fraud_caught', 'INTEGER'], ['false_declines', 'INTEGER'],
+    ['fraud_dollars_stopped', 'DOUBLE'], ['fraud_dollars_approved', 'DOUBLE'], ['p95_scoring_ms', 'DOUBLE']
+];
+
+/** SQL that creates fraud_daily from a parsed snapshot (an empty table if it has no usable days). */
+export function fraudDailySql(snapshot) {
+    const days = snapshot && Array.isArray(snapshot.daily) ? snapshot.daily : [];
+    const rows = [];
+    for (const d of days) {
+        if (!d || typeof d.day !== 'string' || !/^\d{4}-\d{2}-\d{2}$/.test(d.day)) continue;
+        const vals = [`DATE '${d.day}'`];
+        let ok = true;
+        for (const [col, type] of FRAUD_COLUMNS.slice(1)) {
+            const v = d[col];
+            if (v === null || v === undefined) { vals.push('NULL'); continue; }
+            if (typeof v !== 'number' || !Number.isFinite(v) || (type === 'INTEGER' && !Number.isInteger(v))) { ok = false; break; }
+            vals.push(String(v));
+        }
+        if (ok) rows.push(`(${vals.join(', ')})`);
+    }
+    const create = `CREATE TABLE fraud_daily (${FRAUD_COLUMNS.map(([c, t]) => `${c} ${t}`).join(', ')});`;
+    return rows.length ? `${create}\nINSERT INTO fraud_daily VALUES\n${rows.join(',\n')};` : create;
+}
 export const MAX_ROWS_KEPT = 200000;
 export const QUERY_TIMEOUT_MS = 30000;
 const KILL_AFTER_MS = 1500;
@@ -77,7 +110,7 @@ export function createEngine({ onStatus = () => {} } = {}) {
             });
 
             onStatus('Loading the data…');
-            const [parkBytes, siteSql] = await Promise.all([
+            const [parkBytes, siteSql, snapshot] = await Promise.all([
                 fetch(PARK_URL).then((r) => {
                     if (!r.ok) throw new Error(`Couldn’t fetch the sample data (${r.status})`);
                     return r.arrayBuffer();
@@ -85,13 +118,17 @@ export function createEngine({ onStatus = () => {} } = {}) {
                 fetch(SITE_SQL_URL).then((r) => {
                     if (!r.ok) throw new Error(`Couldn’t fetch the site tables (${r.status})`);
                     return r.text();
-                })
+                }),
+                // The live numbers are a nice extra: if they don't load, the
+                // table is just empty and everything else still works.
+                fetch(FRAUD_URL).then((r) => (r.ok ? r.json() : null)).catch(() => null)
             ]);
             await db.registerFileBuffer(PARK_FILE, await gunzip(new Uint8Array(parkBytes)));
 
             const conn = await db.connect();
             await conn.query(`ATTACH '${PARK_FILE}' AS owl_park (READ_ONLY)`);
             await conn.query(siteSql);
+            await conn.query(fraudDailySql(snapshot));
             await conn.query("SET search_path = 'memory.main,owl_park.main'");
             // Lock it down: from here a query can read the tables (and make
             // tables in this tab) but can't load extensions, touch files or

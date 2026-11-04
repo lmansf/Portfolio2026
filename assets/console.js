@@ -23,6 +23,11 @@
  *   - Skip SQL: a button on the bar hides the console entirely (the pages
  *     don't need it); a "Show the SQL console" button in the footer brings
  *     it back, and is put back whenever transition.js swaps the footer.
+ *   - /live is `SELECT * FROM fraud_daily`, and /playground is the console
+ *     itself: a page with a [data-sqlc-mount] element gets the console
+ *     inline there (always open, no dock, nav links navigate as usual),
+ *     [data-sqlc-starters] gets the starter query chips, and any
+ *     [data-preview="table"] button previews that table here.
  *   - Everything runs on the visitor's device; nothing they type is sent
  *     anywhere. Results are written with textContent, and card links only
  *     ever point at https:// addresses, mailto: or this site's own paths.
@@ -50,13 +55,117 @@ const TABLE_NOTES = {
     park_days: 'synthetic: one row per park day, Mar to Aug 2026',
     orders: 'synthetic: one row per checkout',
     order_items: 'synthetic: one row per order line',
-    products: 'synthetic: tickets, passes, add-ons'
+    products: 'synthetic: tickets, passes, add-ons',
+    fraud_daily: 'live: the fraud pipeline, one row per day (aggregates only)'
 };
 const MAX_ROWS_SHOWN = 500;
 const MAX_CARDS = 60;
 
+// Starter queries for /playground (the Owl Park sample data).
+export const STARTERS = [
+    {
+        label: 'Revenue by month',
+        sql: `-- Monthly revenue from completed orders, by sales channel
+SELECT strftime(o.visit_date, '%Y-%m') AS month,
+       o.channel,
+       count(DISTINCT o.order_id)          AS orders,
+       round(sum(i.quantity * i.unit_price), 2) AS revenue
+FROM orders o
+JOIN order_items i USING (order_id)
+WHERE o.status = 'completed'
+GROUP BY ALL
+ORDER BY month, revenue DESC;`
+    },
+    {
+        label: 'Rain vs. attendance',
+        sql: `-- Does rain keep guests home? Compare dry and rainy weekdays
+-- within each month, so summer crowds don't hide the effect.
+SELECT strftime(visit_date, '%B') AS month,
+       round(avg(attendance) FILTER (WHERE rain_inches = 0))    AS dry_day_avg,
+       round(avg(attendance) FILTER (WHERE rain_inches >= 0.5)) AS rainy_day_avg,
+       count(*) FILTER (WHERE rain_inches >= 0.5)              AS rainy_days
+FROM park_days
+WHERE NOT is_weekend AND NOT is_holiday
+GROUP BY month, month(visit_date)
+ORDER BY month(visit_date);`
+    },
+    {
+        label: 'Best sellers',
+        sql: `-- What sells, and each product's share of revenue (a window function)
+SELECT p.product_name,
+       p.category,
+       sum(i.quantity) AS units,
+       round(sum(i.quantity * i.unit_price), 2) AS revenue,
+       round(100 * revenue / sum(revenue) OVER (), 1) AS pct_of_revenue
+FROM order_items i
+JOIN orders o   USING (order_id)
+JOIN products p USING (product_id)
+WHERE o.status = 'completed'
+GROUP BY ALL
+ORDER BY revenue DESC;`
+    },
+    {
+        label: 'How far ahead people book',
+        sql: `-- Online orders: how many days before the visit were they placed?
+SELECT CASE WHEN lead_days = 0 THEN 'same day'
+            WHEN lead_days <= 3 THEN '1-3 days'
+            WHEN lead_days <= 7 THEN '4-7 days'
+            ELSE '8+ days' END AS booked_ahead,
+       count(*) AS orders,
+       round(100.0 * orders / sum(orders) OVER (), 1) AS pct_of_orders
+FROM (
+    SELECT date_diff('day', ordered_at::DATE, visit_date) AS lead_days
+    FROM orders
+    WHERE channel <> 'gate' AND status = 'completed'
+)
+GROUP BY booked_ahead
+ORDER BY min(lead_days);`
+    },
+    {
+        label: '7-day revenue trend',
+        sql: `-- Daily revenue with a rolling 7-day average, last 30 days
+WITH daily AS (
+    SELECT o.visit_date, sum(i.quantity * i.unit_price) AS revenue
+    FROM orders o
+    JOIN order_items i USING (order_id)
+    WHERE o.status = 'completed'
+    GROUP BY o.visit_date
+)
+SELECT d.visit_date,
+       d.day_of_week,
+       d.attendance,
+       round(daily.revenue, 2) AS revenue,
+       round(avg(daily.revenue) OVER (
+           ORDER BY d.visit_date ROWS BETWEEN 6 PRECEDING AND CURRENT ROW
+       ), 2) AS revenue_7day_avg
+FROM park_days d
+JOIN daily USING (visit_date)
+ORDER BY d.visit_date DESC
+LIMIT 30;`
+    },
+    {
+        label: 'Pick a fraud cutoff',
+        sql: `-- For each risk-score cutoff: how much fraud it would catch,
+-- and how many good orders it would wrongly flag.
+SELECT cutoff,
+       count(*) FILTER (WHERE is_fraud AND risk_score >= cutoff)     AS fraud_caught,
+       round(100.0 * fraud_caught / count(*) FILTER (WHERE is_fraud), 1) AS catch_rate_pct,
+       count(*) FILTER (WHERE NOT is_fraud AND risk_score >= cutoff) AS good_orders_flagged
+FROM orders, range(40, 100, 10) AS r(cutoff)
+GROUP BY cutoff
+ORDER BY cutoff;`
+    }
+];
+
 // Each page the nav can reach, as the query that "is" that page.
 const ROUTES = {
+    '/live': {
+        name: 'Live numbers',
+        sql: `-- Live: the fraud pipeline's daily numbers, refreshed once a day
+-- (aggregates only: counts, dollars, scoring time; never an order)
+SELECT * FROM fraud_daily
+ORDER BY day DESC;`
+    },
     '/': {
         name: 'Home',
         sql: `-- Home: who I am and where to reach me
@@ -67,10 +176,11 @@ SELECT * FROM resume;`
         sql: `-- Projects: featured first, in the order the page shows them
 SELECT * FROM projects
 ORDER BY featured DESC, sort_order;`
-    }
+    },
+    '/playground': { name: 'SQL Playground', sql: STARTERS[0].sql }
 };
 
-const ROUTE_ALIASES = { '/index.html': '/', '/projects.html': '/projects' };
+const ROUTE_ALIASES = { '/index.html': '/', '/projects.html': '/projects', '/live.html': '/live', '/playground.html': '/playground' };
 
 function routeFor(pathname) {
     const clean = (pathname || '/').replace(/\/+$/, '') || '/';
@@ -219,7 +329,22 @@ function init() {
     const root = el('aside', { class: 'sqlc', 'aria-label': 'SQL console' },
         el('div', { class: 'sqlc__dock' }, el('div', { class: 'sqlc__dock-inner' }, toggle, skipBtn)),
         panel);
-    document.body.append(root);
+    const mount = document.querySelector('[data-sqlc-mount]');
+    const inline = Boolean(mount);
+    if (inline) {
+        root.classList.add('sqlc--inline');
+        root.setAttribute('aria-label', 'SQL editor');
+        mount.append(root);
+    } else {
+        document.body.append(root);
+    }
+    // Keep the page's bottom padding equal to the docked console's height,
+    // so the page can scroll out from under an open panel.
+    if (!inline && 'ResizeObserver' in window) {
+        new ResizeObserver(() => {
+            document.documentElement.style.setProperty('--sqlc-h', `${Math.ceil(root.getBoundingClientRect().height)}px`);
+        }).observe(root);
+    }
     const restoreBtn = el('button', { class: 'sqlc-restore', type: 'button' }, 'Show the SQL console');
 
     // ── Skip SQL: hide the whole console (remembered), with a way back in
@@ -259,7 +384,7 @@ function init() {
     // ── Open / close ──
     function isOpen() { return root.classList.contains('is-open'); }
 
-    function open({ focus = true, remember = true } = {}) {
+    function open({ focus = true, remember = true, autoRun = true } = {}) {
         if (isOpen()) return;
         root.classList.add('is-open');
         panel.hidden = false;
@@ -271,13 +396,13 @@ function init() {
         const saveData = navigator.connection && navigator.connection.saveData;
         if (saveData && !engine.loaded) {
             setStatus('Data saver is on, so DuckDB (about 7 MB) loads when you press Run.');
-        } else if (!lastResult) {
+        } else if (autoRun && !lastResult) {
             run();
         }
     }
 
     function close({ remember = true } = {}) {
-        if (!isOpen()) return;
+        if (!isOpen() || inline) return;
         if (typing) {
             const { text } = typing;
             stopTyping();
@@ -387,7 +512,7 @@ function init() {
 
     // ── Nav as queries ──
     document.addEventListener('click', (e) => {
-        if (!isOpen() || e.defaultPrevented || e.button !== 0 || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;
+        if (!isOpen() || inline || e.defaultPrevented || e.button !== 0 || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;
         const link = e.target instanceof Element ? e.target.closest('.topnav a[href], .site-nav__panel a[href]') : null;
         if (!link || link.target === '_blank') return;
         let url;
@@ -672,8 +797,45 @@ ORDER BY table_catalog = 'owl_park', table_name, ordinal_position`);
         setTimeout(() => URL.revokeObjectURL(url), 1000);
     }
 
-    // Remember the choices across pages, but don't grab focus on load.
-    if (store.get(OFF_KEY) === '1') setOff(true, { remember: false });
+    // ── Page hooks (the /playground page): starter chips and table previews
+    //    that type into the console and run. ──
+    const starterBtns = [];
+    async function runSql(text, { starter = -1 } = {}) {
+        if (busy) { setStatus('One moment: a query is still running.'); return; }
+        if (root.hidden) setOff(false, { remember: false });
+        open({ focus: false, remember: false, autoRun: false });
+        if (inline) root.scrollIntoView({ behavior: reduceMotion() ? 'auto' : 'smooth', block: 'start' });
+        starterBtns.forEach((b, j) => b.setAttribute('aria-pressed', String(j === starter)));
+        lastRoute = null;
+        sql.focus({ preventScroll: true });
+        if ((await typeInto(text)) === false) return;
+        run();
+    }
+    const startersSpot = document.querySelector('[data-sqlc-starters]');
+    if (startersSpot) {
+        STARTERS.forEach((starter, i) => {
+            const b = el('button', { class: 'pg__starter', type: 'button', 'aria-pressed': 'false' }, starter.label);
+            b.addEventListener('click', () => runSql(starter.sql, { starter: i }));
+            startersSpot.append(b);
+            starterBtns.push(b);
+        });
+        sql.addEventListener('input', () => starterBtns.forEach((b) => b.setAttribute('aria-pressed', 'false')));
+    }
+    document.querySelectorAll('[data-preview]').forEach((btn) => {
+        btn.addEventListener('click', (e) => {
+            e.preventDefault(); // don't toggle the <details>
+            const table = btn.getAttribute('data-preview');
+            if (!/^[a-z_]+$/.test(table)) return;
+            runSql(`SELECT *\nFROM ${table}\nLIMIT 20;`);
+        });
+    });
+
+    // Remember the choices across pages, but don't grab focus on load. A
+    // page that is the console (inline) always shows it open.
+    if (inline) {
+        open({ focus: false, remember: false });
+        if (starterBtns[0] && lastRoute === '/playground') starterBtns[0].setAttribute('aria-pressed', 'true');
+    } else if (store.get(OFF_KEY) === '1') setOff(true, { remember: false });
     else {
         document.body.classList.add('has-sqlc');
         if (store.get(OPEN_KEY) === '1') open({ focus: false, remember: false });
