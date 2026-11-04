@@ -19,7 +19,6 @@ pages (today the nest-box hunt, docs/egg-codes.md). It's the only
 hand-written SQL in site.sql, and --check covers it too.
 """
 
-import html
 import re
 import sys
 from datetime import date
