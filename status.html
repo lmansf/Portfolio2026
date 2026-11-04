@@ -130,7 +130,7 @@
             </header>
             <ol class="status-steps">
                 <li><strong>Extract.</strong> Rebuild the site&rsquo;s tables from its own pages, read the fraud pipeline&rsquo;s published snapshot, and pull public activity from the GitHub API. A source that can&rsquo;t be reached keeps its last good data and fails its freshness check here.</li>
-                <li><strong>Test.</strong> Hold every table to the tests <a href="https://github.com/lmansf/Portfolio2026/blob/main/data/pipeline/models.json" target="_blank" rel="noopener">written down once</a>, check every column is described, and rerun each &ldquo;SQL source&rdquo; query to prove it still returns what its page shows.</li>
+                <li><strong>Test.</strong> Hold every table to the tests <a href="https://github.com/lmansf/Portfolio2026/blob/main/data/pipeline/models.json" target="_blank" rel="noopener">written down once</a>, check every column is described, and rerun each &ldquo;SQL source&rdquo; query to prove it still returns what its page shows. <a href="/catalog">The data catalog</a> lists every table, column and metric those tests cover.</li>
                 <li><strong>Log.</strong> <a href="https://github.com/lmansf/Portfolio2026/blob/main/.github/workflows/data-run.yml" target="_blank" rel="noopener">A scheduled GitHub Action</a> commits the results, the site redeploys, and this page reads them.</li>
             </ol>
         </section>
