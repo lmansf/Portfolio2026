@@ -43,8 +43,13 @@ import { createEngine, toObjects, eachRow, getCell, formatValue, isNumericType, 
 
 const OPEN_KEY = 'sqlc-open';
 const OFF_KEY = 'sqlc-off';
-// Tables the schema panel leaves out (still in information_schema).
-const HIDDEN_TABLES = new Set();
+const EGG_KEY = 'sqlc-egg';
+// What claim_egg() returns for the right word (data/console/extra.sql).
+const EGG_FOUND = 'You found the nest.';
+const EGG_CLAIM_URL = '/api/egg/claim';
+// Tables the schema panel leaves out (still in information_schema). The
+// nest box is the hunt: finding it is the point.
+const HIDDEN_TABLES = new Set(['nest_box']);
 // One line about each table, for the schema panel.
 const TABLE_NOTES = {
     projects: 'every project card on /projects',
@@ -169,6 +174,7 @@ ORDER BY day DESC;`
     '/': {
         name: 'Home',
         sql: `-- Home: who I am and where to reach me
+-- (Psst: not every table shows up under Tables.)
 SELECT * FROM resume;`
     },
     '/projects': {
@@ -627,7 +633,7 @@ ORDER BY table_catalog = 'owl_park', table_name, ordinal_position`);
                         el('li', {}, el('code', { text: c }), ' ', el('span', { text: type }))))));
             }
         }
-        frag.append(el('p', { class: 'sqlc__empty', text: 'Tap a name to preview it, or the arrow to see its columns. Everything runs in your browser.' }));
+        frag.append(el('p', { class: 'sqlc__empty', text: 'Tap a name to preview it, or the arrow to see its columns. Everything runs in your browser. Not every table is listed here.' }));
         schema.replaceChildren(frag);
         schemaLoaded = true;
     }
@@ -659,6 +665,7 @@ ORDER BY table_catalog = 'owl_park', table_name, ordinal_position`);
                 const { result: res, ms } = await engine.run(text);
                 render(res, ms, route);
                 setStatus(`Done in ${formatMs(ms)}.`);
+                maybeEgg(res, text);
             } catch (err) {
                 if (err && err.cancelled) {
                     const why = err.cancelled === 'timeout'
@@ -747,6 +754,78 @@ ORDER BY table_catalog = 'owl_park', table_name, ordinal_position`);
         updatePageLink();
         drawBody(res);
         out.scrollTop = 0;
+    }
+
+    // ── The nest-box hunt: the right claim_egg() call earns a one-time code ──
+    function maybeEgg(res, text) {
+        if (res.numRows !== 1 || res.fields.length !== 1) return;
+        if (Object.values(toObjects(res, 1)[0] || {})[0] !== EGG_FOUND) return;
+        const m = /claim_egg\s*\(\s*'([^']{1,40})'\s*\)/i.exec(text);
+        if (!m) return;
+        const card = el('div', { class: 'sqlc-egg', role: 'status' });
+        out.prepend(card);
+        let saved = null;
+        try { saved = JSON.parse(store.get(EGG_KEY) || 'null'); } catch { saved = null; }
+        if (saved && typeof saved.code === 'string' && /^EGG-[0-9A-Z-]{20,30}$/.test(saved.code)) {
+            showEggCode(card, saved, true);
+            return;
+        }
+        claimEgg(card, m[1]);
+    }
+
+    async function claimEgg(card, answer) {
+        card.replaceChildren(el('p', { class: 'sqlc-egg__title', text: 'You found the egg.' }),
+            el('p', { class: 'sqlc-egg__text', text: 'Painting your code…' }));
+        let res;
+        try {
+            res = await fetch(EGG_CLAIM_URL, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ answer }),
+                credentials: 'omit'
+            });
+        } catch {
+            res = null;
+        }
+        let body = null;
+        if (res) { try { body = await res.json(); } catch { body = null; } }
+        if (res && res.ok && body && typeof body.code === 'string' && /^EGG-[0-9A-Z-]{20,30}$/.test(body.code)) {
+            const saved = { code: body.code, issued: typeof body.issued === 'string' ? body.issued.slice(0, 10) : null };
+            store.set(EGG_KEY, JSON.stringify(saved));
+            showEggCode(card, saved, false);
+            return;
+        }
+        const notReady = res && res.status === 503;
+        const retry = el('button', { class: 'sqlc__try', type: 'button' }, 'Try again');
+        retry.addEventListener('click', () => claimEgg(card, answer));
+        card.replaceChildren(
+            el('p', { class: 'sqlc-egg__title', text: 'You found the egg.' }),
+            el('p', { class: 'sqlc-egg__text', text: notReady
+                ? 'Egg codes aren’t switched on yet, so there’s nothing to claim today. Check back soon.'
+                : 'The nest box didn’t answer just now.' }),
+            ...(notReady ? [] : [retry]));
+    }
+
+    function showEggCode(card, saved, again) {
+        const code = el('code', { class: 'sqlc-egg__code', text: saved.code });
+        const copy = el('button', { class: 'sqlc__try', type: 'button' }, 'Copy code');
+        copy.addEventListener('click', async () => {
+            try {
+                await navigator.clipboard.writeText(saved.code);
+                copy.textContent = 'Copied';
+            } catch {
+                const range = document.createRange();
+                range.selectNodeContents(code);
+                const sel = window.getSelection();
+                sel.removeAllRanges();
+                sel.addRange(range);
+            }
+        });
+        card.replaceChildren(
+            el('p', { class: 'sqlc-egg__title', text: again ? 'You already found the egg. Here’s your code again.' : 'You found the egg.' }),
+            el('p', { class: 'sqlc-egg__text', text: 'Take this code to Owl Park to adopt a painted egg. It works once, so keep it to yourself.' }),
+            el('div', { class: 'sqlc-egg__row' }, code, copy),
+            ...(saved.issued ? [el('p', { class: 'sqlc-egg__meta', text: `Issued ${saved.issued}` })] : []));
     }
 
     function drawBody(res) {

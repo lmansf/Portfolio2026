@@ -75,6 +75,12 @@ Biology (Towson, 2019) is hidden for now at Logan's request (restore steps in
 the README's "Hidden for now" section); no sticky-navigation claim; no dbt, CRM ownership, UAT, or
 M365/D365 admin; titles and dates unchanged; LinkedIn is `in/lmansf96`.
 
+The console's nest-box hunt (`data/console/extra.sql`, `api/egg/`, the egg
+card in `console.js`) is described in `docs/egg-codes.md`. Keep the shard
+order in step with the Owl Park products' list prices, keep `nest_box` in
+`HIDDEN_TABLES`, and never put `EGG_CODE_SECRET` in the repo; it lives only in
+Vercel's environment variables.
+
 The `/live` page (`live.html`, `assets/live.*`) is fed by
 `data/fraud-snapshot.json`, which the `fraud-snapshot` GitHub Action
 regenerates daily from `scripts/fraud-snapshot.sql` and commits to `main`.

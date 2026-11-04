@@ -323,6 +323,17 @@ them. `vercel.json` serves `.sql` files with the same `must-revalidate`
 cache header as the other text assets, so a regenerated `site.sql` is
 picked up on the next load.
 
+### The nest-box hunt
+
+A small Easter egg for visitors who poke around: a table the Tables list
+leaves out (`nest_box`, from `data/console/extra.sql`), a riddle, and a
+`claim_egg()` call that earns a one-time egg code from `/api/egg/claim`
+(Vercel functions in `api/egg/`). Owl Park redeems codes through
+`/api/egg/verify`. Codes need the `EGG_CODE_SECRET` environment variable in
+Vercel; until it's set, finders see that egg codes aren't switched on yet.
+The trail, the code format, the endpoints and the setup are in
+[`docs/egg-codes.md`](docs/egg-codes.md).
+
 ## SQL playground data
 
 `data/playground/owl_park.duckdb.gz` (about 300 KB) is one DuckDB database

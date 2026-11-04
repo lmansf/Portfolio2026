@@ -375,6 +375,31 @@ body.has-sqlc { padding-bottom: var(--sqlc-h, calc(var(--sqlc-dock-h) + env(safe
 .sqlc-profile__headline { color: var(--ink-2); margin: 0.2rem 0 0.8rem; }
 .sqlc-profile .now { margin: 0 0 0.9rem; }
 
+/* ── The nest-box egg code ── */
+.sqlc-egg {
+    margin-bottom: 0.9rem;
+    padding: 1rem 1.1rem;
+    border: 1px dashed var(--accent);
+    border-radius: var(--r-lg);
+    background: var(--accent-soft);
+}
+.sqlc-egg__title { font-family: var(--font-display); font-size: 1.2rem; margin: 0 0 0.3rem; }
+.sqlc-egg__text { margin: 0 0 0.6rem; color: var(--ink-2); font-size: 0.92rem; }
+.sqlc-egg__row { display: flex; flex-wrap: wrap; align-items: center; gap: 0.5rem 0.8rem; }
+.sqlc-egg__code {
+    font-family: var(--font-mono);
+    font-size: 1rem;
+    font-weight: 600;
+    letter-spacing: 0.04em;
+    padding: 0.35rem 0.6rem;
+    border-radius: var(--r-sm);
+    background: var(--bg);
+    border: 1px solid var(--hairline-strong);
+    user-select: all;
+    word-break: break-all;
+}
+.sqlc-egg__meta { margin: 0.5rem 0 0; font-size: 0.8rem; color: var(--ink-3); }
+
 /* ── Inline (the /playground page): the console sits in the page ── */
 .sqlc--inline {
     position: static;
