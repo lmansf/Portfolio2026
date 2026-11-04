@@ -206,7 +206,7 @@ def credentials(doc):
 def resume(doc):
     main = main_of(doc)
     name = main.find(cls="hero__name").clean_text().rstrip(".")
-    # The hero's first clause ("Data analyst moving into analytics
+    # The hero's first clause ("IT analyst moving into analytics
     # engineering: I build…"), with inline tags such as <em> flattened.
     headline = main.find(cls="hero__role").clean_text().split(":", 1)[0].strip()
     # The footer brand reads "Logan Mansfield · Tampa, FL".

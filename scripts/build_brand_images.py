@@ -177,7 +177,7 @@ def share_card_svg(f, photo_png: bytes) -> str:
     name, name_size = "Logan Mansfield", 84
     while f["display"].width(name, name_size, -0.01) > maxw:
         name_size -= 1
-    role, role_size = "Data Analyst · Tampa, FL", 36
+    role, role_size = "IT Analyst · Tampa, FL", 36
     body = ["Moving into analytics engineering. I build the",
             "pipelines, models, and dashboards that turn raw",
             "operational data into decisions."]
