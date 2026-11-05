@@ -5,7 +5,8 @@
  * breast of Tyto alba as the page, deep eye-brown as ink, the plumage
  * browns (tan → caramel → chestnut → umber) as warm accents, and a
  * creamy, milk-washed blue as the one action color (links, buttons,
- * focus). Day is the default; Night follows prefers-color-scheme: dark.
+ * focus). Day is the default; Night (a moonlit slate with the same warm
+ * accents) follows prefers-color-scheme: dark.
  *
  * Every page imports this BEFORE any other stylesheet.
  * ────────────────────────────────────────────────────────────── */
@@ -83,47 +84,51 @@
     --max-w:       920px;
 }
 
-/* ── Night: the owl's hunting hour ── */
+/* ── Night: moonlit slate ──
+ * A cool blue-grey night sky instead of a second brown, so cards read as
+ * clearly lighter panels on the page (1.2:1 surface step plus a visible
+ * hairline). The barn-owl warmth stays in the cream ink, the tan/caramel
+ * accents and the fawn glow; brown is an accent here, never the ground. */
 @media (prefers-color-scheme: dark) {
     :root {
         color-scheme: dark;
 
-        --bg:               #1b140f;
-        --surface-1:        #261c15;
-        --surface-2:        #31251c;
-        --surface-3:        #3d2f24;
+        --bg:               #181c22;     /* page: night sky */
+        --surface-1:        #252c36;     /* raised cards, clearly lifted off --bg */
+        --surface-2:        #2e3743;     /* sunken / hover / chips */
+        --surface-3:        #384351;     /* deeper hover, pressed */
 
-        --ink-1:            #f4e9db;
-        --ink-2:            #c4ad96;
-        --ink-3:            #b09a84;
+        --ink-1:            #f3eee7;     /* warm cream text (12.2:1 on cards) */
+        --ink-2:            #bcc4ce;     /* 8.0:1 on cards */
+        --ink-3:            #a9b3bf;     /* ≥ 4.7:1 on every surface */
 
         --accent:           #9ec3da;
         --accent-ink:       #9ec3da;
-        --on-accent:        #1b140f;
-        --accent-soft:      #2b4254;
-        --accent-mist:      #22323e;
+        --on-accent:        #181c22;
+        --accent-soft:      #2b4459;
+        --accent-mist:      #1f2b37;
         --accent-glow:      rgba(158, 195, 218, 0.16);
 
         --tan:              #c9a682;
-        --on-tan:           #1b140f;
-        --caramel:          #c98a51;
-        --chestnut:         #e0976a;
-        --umber:            #5a3f2d;
-        --on-umber:         #f4e9db;
-        --fawn:             #4a3628;
-        --plume:            #8b7d70;
+        --on-tan:           #181c22;
+        --caramel:          #d6995f;
+        --chestnut:         #eaa57a;
+        --umber:            #0f1216;     /* footer band: a shade below the page */
+        --on-umber:         #f3eee7;
+        --fawn:             #3a3129;     /* the one warm wash (bottom-left glow, pills) */
+        --plume:            #7d8794;
 
         --success:          #93b57a;
         --danger:           #e88473;
 
-        --hairline:         #3d2f24;
-        --hairline-strong:  #86705b;
+        --hairline:         #3d4856;     /* card outlines, visible on --bg and cards */
+        --hairline-strong:  #6f7d8e;     /* control borders (3.4:1 on cards) */
         --focus-ring:       #9ec3da;
 
-        --shadow-sm:  0 1px 2px rgba(0, 0, 0, 0.40), 0 2px 4px rgba(0, 0, 0, 0.30);
-        --shadow-md:  0 2px 4px rgba(0, 0, 0, 0.45), 0 6px 14px rgba(0, 0, 0, 0.40);
-        --shadow-lg:  0 4px 8px rgba(0, 0, 0, 0.50), 0 14px 32px rgba(0, 0, 0, 0.50);
-        --shadow-press: inset 0 -3px 0 rgba(0, 0, 0, 0.35), inset 0 1px 0 rgba(255, 255, 255, 0.12), 0 2px 4px rgba(0, 0, 0, 0.45);
+        --shadow-sm:  0 1px 2px rgba(0, 0, 0, 0.35), 0 2px 4px rgba(0, 0, 0, 0.25);
+        --shadow-md:  0 2px 4px rgba(0, 0, 0, 0.40), 0 6px 14px rgba(0, 0, 0, 0.35);
+        --shadow-lg:  0 4px 8px rgba(0, 0, 0, 0.45), 0 14px 32px rgba(0, 0, 0, 0.45);
+        --shadow-press: inset 0 -3px 0 rgba(0, 0, 0, 0.35), inset 0 1px 0 rgba(255, 255, 255, 0.12), 0 2px 4px rgba(0, 0, 0, 0.40);
         --shadow-pressed: inset 0 2px 3px rgba(0, 0, 0, 0.45);
     }
 }

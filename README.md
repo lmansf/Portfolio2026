@@ -63,7 +63,9 @@ facial disc and cream breast as the page surfaces, deep eye-brown as ink, the
 plumage browns (tan → caramel → chestnut → umber) as warm accents, and one
 creamy, milk-washed blue as the action color (links, buttons, focus ring,
 soft fills). Day is the default theme; Night follows
-`prefers-color-scheme: dark`. Every text/background pair meets WCAG AA.
+`prefers-color-scheme: dark` and swaps the brown ground for a moonlit
+slate (cards a clear step lighter than the page, with a visible outline),
+keeping the cream ink and warm accents. Every text/background pair meets WCAG AA.
 
 Type is Fraunces (display, 600) for headlines and Figtree for everything else,
 loaded from Google Fonts; code uses the system monospace stack. Corners are
