@@ -79,14 +79,29 @@ meets WCAG AA. The legacy role names in `tokens.css` (`--tan`, `--chestnut`,
 onto this palette.
 
 Type is Schibsted Grotesk (variable, 400 to 900) for headlines and body, and
-JetBrains Mono for numbers, labels, dates, tags and SQL, both loaded from
-Google Fonts in one request.
+JetBrains Mono for numbers, labels, dates, tags and SQL. Both are
+self-hosted in `assets/fonts/` (the same variable WOFF2 files and unicode
+ranges Google Fonts serves, latin and latin-ext only, with their SIL OFL
+licenses alongside): the `@font-face` rules are at the top of `tokens.css`,
+and every page preloads `schibsted-grotesk-latin.woff2`. No third-party
+request sits in front of the first paint, which matters most on a phone.
 
 The Home hero is a canvas animation (`assets/hero-pipeline.js`): dots flow
 through the three lanes, gather into an owl, then settle into the name, and
 they push away from the pointer once settled. It is hidden until the script
 draws, the `<h1>` stays the real heading, and reduced motion gets the final
-name with no movement.
+name with no movement. So the intro doesn't jump when the stage appears,
+`theme.js` puts `hero-wait` on `<html>` before the first paint and
+`pages.css` shows the empty stage (with the smaller photo and the visually
+hidden name) at its final size from the start; `hero-pipeline.js` removes
+the class when it draws or finds no canvas, and `theme.js` drops it after
+six seconds if the script never ran, which brings the plain hero back.
+
+Phones: every control on a touch screen (`pointer: coarse`) gets at least a
+44px-tall hit area (project links, section links, SQL source carets and
+buttons, Replay, footer links, Hide owl, summaries on `/live`, `/status`
+and `/catalog`) without changing the desktop look, and the SQL editors use
+16px text there so iOS doesn't zoom on focus.
 
 The CSS `.min.css` files can be rebuilt with esbuild (`npx esbuild <src>
 --minify --outfile=<min>`) or any CSS minifier; only the three JS bundles
@@ -170,7 +185,10 @@ The CSS `.min.css` files can be rebuilt with esbuild (`npx esbuild <src>
   already on screen at load are left alone so they never blink to zero
   (the `/live` tiles, filled after a fetch, count as soon as they land).
 - `assets/theme.js` — optional per-company accent theming via `?ink=<company>`
-  (see [`docs/referrers.md`](docs/referrers.md)).
+  (see [`docs/referrers.md`](docs/referrers.md)), plus the `hero-wait` class
+  that holds the Home hero's place until it draws.
+- `assets/fonts/` — self-hosted Schibsted Grotesk and JetBrains Mono (variable
+  WOFF2, latin and latin-ext) and their OFL license files.
 - `assets/sql-source.js` + `assets/sql-engine.js` — the runnable "SQL
   source" captions and the DuckDB-Wasm engine they share (pin, lockdown, row
   cap, watchdog), bundled into `assets/sql-source.min.js`. See "SQL source

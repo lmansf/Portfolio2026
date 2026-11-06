@@ -8,6 +8,7 @@
 body {
     position: relative;
     min-height: 100vh;
+    min-height: 100svh; /* phones: the visible height, so short pages' footers aren't under the browser bar */
     overflow-x: hidden;
     display: flex;
     flex-direction: column;
@@ -258,6 +259,9 @@ footer.shell-footer .footer-socials a {
     border-radius: var(--r-sm);
     margin: 0 0.4rem 0.4rem 0;
     transition: background var(--dur-fast) linear, color var(--dur-fast) linear;
+}
+@media (pointer: coarse) {
+    footer.shell-footer .footer-socials a { display: inline-flex; align-items: center; min-height: 44px; }
 }
 footer.shell-footer .footer-socials a:hover {
     color: var(--accent-on-dark);

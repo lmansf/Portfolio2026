@@ -70,6 +70,7 @@
     cursor: pointer;
     transition: background var(--dur-fast) linear, color var(--dur-fast) linear;
 }
+@media (pointer: coarse) { .flow__play { min-height: 44px; } }
 .flow__play:hover { background: var(--ink-1); color: var(--bg); }
 .flow__play:active { transform: translateY(1px); box-shadow: none; }
 .flow__play:focus-visible { border-radius: var(--r-pill); }

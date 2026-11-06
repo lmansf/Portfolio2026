@@ -25,6 +25,7 @@
     list-style: none;
     color: var(--ink-1);
 }
+@media (pointer: coarse) { .cat-table__head { min-height: 44px; align-content: center; } }
 .cat-table__head::-webkit-details-marker { display: none; }
 .cat-table__head:focus-visible { outline: 2px solid var(--accent-ink); outline-offset: 2px; border-radius: var(--r-md, 12px); }
 .cat-table__name { font-size: 0.9rem; font-weight: 600; }
