@@ -29,7 +29,7 @@
     display: inline-block;
     width: 0.55rem;
     height: 0.55rem;
-    border-radius: 50%;
+    border-radius: 0;
     background: var(--success);
 }
 .status-dot--bad {
@@ -46,7 +46,7 @@
 }
 .status-source {
     background: var(--surface-1);
-    border: 1px solid var(--hairline);
+    border: var(--bw) solid var(--hairline);
     border-radius: var(--r-md, 12px);
     padding: 0.8rem 1rem;
 }
@@ -64,7 +64,7 @@
 .status-tables { display: grid; gap: 0.5rem; }
 .status-table {
     background: var(--surface-1);
-    border: 1px solid var(--hairline);
+    border: var(--bw) solid var(--hairline);
     border-radius: var(--r-md, 12px);
 }
 .status-table__head {
