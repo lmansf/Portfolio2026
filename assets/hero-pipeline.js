@@ -1,16 +1,22 @@
-/* hero-pipeline.js: the Home hero's one moving moment.
+/* hero-pipeline.js: the Home hero, a replay of the fraud pipeline.
  *
- * Points of "raw data" enter on the left (ingest), get sorted into lanes
- * (transform), swirl together into an owl that tilts its head, then break
- * apart and settle into the name (serve). Once settled, the pointer pushes
- * points aside and they spring back.
+ * The dots are checkouts from the fraud pipeline's own snapshot
+ * (/data/fraud-snapshot.json, the same aggregates /live draws). They
+ * arrive from Owl Park's webstore and gather into an owl (ingest), stream
+ * through the scoring gate where the fraud share turns amber and the share
+ * the rules caught drops into a "flagged" tray (transform), and the rest,
+ * missed fraud included, settle into the name (serve). Each stage label
+ * links to the project that does that step and counts up its real number.
+ * Once settled, the pointer pushes points aside and they spring back.
  *
  * Progressive enhancement: the stage ships `hidden` and the real <h1>
  * stays visible, so no-JS visitors and browsers without canvas see the
  * plain hero. When this script starts, it shows the stage and adds
  * `hero--pipe` to the hero, which keeps the <h1> for screen readers and
- * search but hides it visually (the canvas is aria-hidden).
- * Under prefers-reduced-motion the finished name is drawn once, with no
+ * search but hides it visually (the canvas is aria-hidden; the stage links
+ * carry the numbers as text). If the snapshot can't be read, the dots run
+ * the same path with no fraud split and the labels show no numbers.
+ * Under prefers-reduced-motion the finished state is drawn once, with no
  * animation and no Replay button. The loop only runs while the stage is
  * on screen and the tab is visible.
  */
@@ -21,6 +27,11 @@
     var cv = stage.querySelector("canvas");
     var hero = stage.closest(".hero");
     var replay = stage.querySelector("[data-hero-replay]");
+    var note = stage.querySelector("[data-hero-note]");
+    var nums = {};
+    Array.prototype.forEach.call(stage.querySelectorAll("[data-hero-num]"), function (el) {
+        nums[el.getAttribute("data-hero-num")] = el;
+    });
     var ctx = cv && cv.getContext && cv.getContext("2d");
     if (!ctx || !hero) return;
 
@@ -29,21 +40,28 @@
     var NAME = (hero.querySelector(".hero__name") || {}).textContent || "Logan Mansfield";
     NAME = NAME.replace(/\.\s*$/, "").trim();
     var MAX_POINTS = 2600;
+    var SNAPSHOT_URL = "/data/fraud-snapshot.json";
 
-    var W = 0, H = 0, P = [], OC = [0, 0], t0 = 0, mx = -1e4, my = -1e4;
+    /* Snapshot totals; null until read (or if it can't be read). */
+    var snap = null;
+
+    var W = 0, H = 0, P = [], OC = [0, 0], TRAY = [0, 0], t0 = 0, mx = -1e4, my = -1e4;
     var colors = {};
-    var running = false, onScreen = true, rafId = 0, lastW = -1;
+    var running = false, onScreen = true, rafId = 0, lastW = -1, shown = {}, begun = false;
 
     function readColors() {
         var cs = getComputedStyle(document.documentElement);
         colors = {
-            c1: cs.getPropertyValue("--pipe-1").trim() || "#8a97a3",
-            c2: cs.getPropertyValue("--pipe-2").trim() || "#c97a00",
-            c3: cs.getPropertyValue("--pipe-3").trim() || "#0f7b6c",
+            raw: cs.getPropertyValue("--ink-3").trim() || "#4a5660",
+            fraud: cs.getPropertyValue("--pipe-2").trim() || "#c97a00",
+            ok: cs.getPropertyValue("--pipe-3").trim() || "#0f7b6c",
             line: cs.getPropertyValue("--hairline").trim() || "#d3d8d6",
-            font: cs.getPropertyValue("--font-display").trim() || "sans-serif"
+            font: cs.getPropertyValue("--font-display").trim() || "sans-serif",
+            mono: cs.getPropertyValue("--font-mono").trim() || "monospace"
         };
     }
+
+    function fmt(n) { return Math.round(n).toLocaleString("en-US"); }
 
     /* Points inside whatever `draw` paints on an offscreen canvas. */
     function samplePoints(w, h, draw, step) {
@@ -81,47 +99,89 @@
         o.restore();
     }
 
+    function shuffle(a) {
+        for (var c = a.length - 1; c > 0; c--) {
+            var r = Math.floor(Math.random() * (c + 1)), tmp = a[c];
+            a[c] = a[r]; a[r] = tmp;
+        }
+        return a;
+    }
+
+    /* Shares from the snapshot: what fraction of checkouts were fraud, and
+     * what fraction of the fraud the rules caught (reviewed or declined). */
+    function shares() {
+        if (!snap) return { fraud: 0, caught: 0 };
+        return {
+            fraud: snap.checkouts > 0 ? Math.min(1, snap.fraud / snap.checkouts) : 0,
+            caught: snap.fraud > 0 ? Math.min(1, snap.fraud_caught / snap.fraud) : 0
+        };
+    }
+
     function build(w, h) {
         W = w; H = h;
+        var phone = w < 640;
         var words = NAME.split(/\s+/);
-        var two = w < 640 && words.length > 1;
-        var fs = two ? Math.min(w * 0.19, h * 0.3) : Math.min(w * 0.11, h * 0.42);
-        var step = w < 640 ? 4 : 5;
-        var pts = samplePoints(w, h, function (o, ow, oh) {
+        var two = phone && words.length > 1;
+        var fs = two ? Math.min(w * 0.19, h * 0.24) : Math.min(w * 0.11, h * 0.36);
+        var step = phone ? 4 : 5;
+        var namePts = samplePoints(w, h, function (o, ow, oh) {
             o.fillStyle = "#000";
             o.textAlign = "center";
             o.textBaseline = "middle";
             o.font = "800 " + fs + "px " + colors.font;
             if (two) {
-                o.fillText(words[0], ow / 2, oh * 0.38);
-                o.fillText(words.slice(1).join(" "), ow / 2, oh * 0.38 + fs * 1.0);
+                o.fillText(words[0], ow / 2, oh * 0.43);
+                o.fillText(words.slice(1).join(" "), ow / 2, oh * 0.43 + fs * 1.0);
             } else {
-                o.fillText(NAME, ow / 2, oh * 0.54);
+                o.fillText(NAME, ow / 2, oh * 0.56);
             }
         }, step);
-        if (pts.length > MAX_POINTS) {
-            var keep = [], every = pts.length / MAX_POINTS;
-            for (var k = 0; k < MAX_POINTS; k++) keep.push(pts[Math.floor(k * every)]);
-            pts = keep;
+        if (namePts.length > MAX_POINTS) {
+            var keep = [], every = namePts.length / MAX_POINTS;
+            for (var k = 0; k < MAX_POINTS; k++) keep.push(namePts[Math.floor(k * every)]);
+            namePts = keep;
         }
-        var lanes = 7, gate = w * 0.3;
-        var os = Math.min(h * 0.86, w * 0.9);
-        var oxx = w * 0.52 - os * 0.4, oyy = (h - os) / 2 + 4;
+
+        /* Caught fraud goes to the tray instead of the name, so add that many
+         * extra points; missed fraud is a random share of the name's points. */
+        var sh = shares();
+        var caughtShare = sh.fraud * sh.caught;
+        var nTray = Math.round(namePts.length * caughtShare / Math.max(0.01, 1 - caughtShare));
+        var nMissed = Math.min(namePts.length, Math.round((namePts.length + nTray) * sh.fraud * (1 - sh.caught)));
+        var trayStep = phone ? 4 : 5, trayCols = Math.max(1, Math.ceil(Math.sqrt(nTray * 3)));
+        TRAY = [w / 2, h - (phone ? 52 : 58)];
+        var trayRows = Math.ceil(nTray / trayCols);
+        var trayPts = [];
+        for (var t = 0; t < nTray; t++) {
+            var col = t % trayCols, row = Math.floor(t / trayCols);
+            trayPts.push([TRAY[0] + (col - (trayCols - 1) / 2) * trayStep, TRAY[1] + (row - (trayRows - 1) / 2) * trayStep]);
+        }
+
+        /* The owl sits in the ingest column, below the stage labels. */
+        var top = phone ? 70 : 64;
+        var os = Math.min((h - top - 44) * 0.92, (w / 3) / 0.62);
+        var oxx = w / 6 - os * 0.4, oyy = top + (h - top - os) / 2;
         OC = [oxx + os * 0.4, oyy + os * 0.55];
-        var cand = samplePoints(w, h, function (o) { drawOwl(o, oxx, oyy, os); }, 2);
-        /* Shuffle the owl's pixels so the points cover it evenly (no stripes). */
-        for (var c = cand.length - 1; c > 0; c--) {
-            var r = Math.floor(Math.random() * (c + 1)), tmp = cand[c];
-            cand[c] = cand[r]; cand[r] = tmp;
-        }
-        P = pts.map(function (p, i) {
-            var o = cand[i % Math.max(1, cand.length)] || [w / 2, h / 2];
+        var cand = shuffle(samplePoints(w, h, function (o) { drawOwl(o, oxx, oyy, os); }, 2));
+
+        var targets = namePts.map(function (p) { return { x: p[0], y: p[1], kind: "ok" }; });
+        shuffle(targets.map(function (_, i) { return i; })).slice(0, nMissed).forEach(function (i) {
+            targets[i].kind = "missed";
+        });
+        trayPts.forEach(function (p) { targets.push({ x: p[0], y: p[1], kind: "caught" }); });
+        shuffle(targets);
+
+        var lanes = 7, gate = w * 0.5;
+        P = targets.map(function (tg, i) {
+            var o = cand[i % Math.max(1, cand.length)] || [w / 6, h / 2];
             return {
-                sx: -Math.random() * w * 0.35 - 10, sy: Math.random() * h,
-                gx: gate + (Math.random() - 0.5) * w * 0.12, gy: h * (0.18 + 0.7 * ((i % lanes) / (lanes - 1))),
-                ox: o[0], oy: o[1], tx: p[0], ty: p[1],
-                x: p[0], y: p[1], vx: 0, vy: 0,
-                d: Math.random() * 1.1, a: Math.random() * Math.PI * 2
+                sx: -Math.random() * w * 0.25 - 10, sy: top + Math.random() * (h - top),
+                ox: o[0], oy: o[1],
+                gx: gate + (Math.random() - 0.5) * w * 0.06,
+                gy: h * (0.28 + 0.5 * ((i % lanes) / (lanes - 1))) + (Math.random() - 0.5) * 8,
+                tx: tg.x, ty: tg.y, kind: tg.kind,
+                x: tg.x, y: tg.y, vx: 0, vy: 0,
+                d: Math.random() * 1.0, d2: Math.random() * 0.9, a: Math.random() * Math.PI * 2
             };
         });
     }
@@ -129,11 +189,34 @@
     function ease(u) { return u < 0.5 ? 2 * u * u : 1 - Math.pow(-2 * u + 2, 2) / 2; }
     function clamp01(v) { return v < 0 ? 0 : v > 1 ? 1 : v; }
 
-    /* Timeline in seconds: lanes by about 2.4, owl formed by about 4,
-     * owl holds and tilts its head until 5.6, name settled by about 7.6. */
-    var OWL_IN = 1.3, OWL_DUR = 1.6, HOLD_START = 4.2, HOLD_END = 5.6, NAME_DUR = 1.5;
+    /* Timeline in seconds: checkouts gather into the owl by about 2.6, the
+     * owl tilts its head until 3.9, points reach the scoring gate by about
+     * 5.8 and land in the name or the tray by about 7.2. */
+    var IN_DUR = 1.6, HOLD_START = 2.7, HOLD_END = 3.9, GATE_DUR = 1.0, OUT_DUR = 1.4;
+    var GATE_AT = HOLD_END + 0.45 + GATE_DUR;
+    var END = HOLD_END + 0.9 + GATE_DUR + OUT_DUR + 0.3;
+
+    function setNum(key, text, fraud) {
+        var el = nums[key];
+        if (!el || shown[key] === text) return;
+        shown[key] = text;
+        el.textContent = text;
+        if (el.classList) el.classList.toggle("is-fraud", !!fraud);
+    }
+
+    /* Stage labels count up as each step happens. */
+    function counters(T) {
+        if (!snap) return;
+        var k1 = clamp01(T / (IN_DUR + 1.0));
+        setNum("ingest", fmt(snap.checkouts * ease(k1)) + " checkouts");
+        var k2 = clamp01((T - HOLD_END - GATE_DUR) / (0.9 + OUT_DUR * 0.5));
+        setNum("transform", k2 > 0 ? fmt(snap.fraud_caught * ease(k2)) + " of " + fmt(snap.fraud * ease(k2)) + " fraud caught" : "", k2 > 0);
+        setNum("serve", T >= END - 0.4 ? fmt(snap.false_declines) + " good orders declined" : "");
+    }
 
     function draw(T, still) {
+        if (still) T = END + 1;
+        counters(T);
         ctx.clearRect(0, 0, W, H);
         ctx.strokeStyle = colors.line;
         ctx.lineWidth = 1;
@@ -142,39 +225,66 @@
             ctx.beginPath(); ctx.moveTo(Math.round(x) + 0.5, 0); ctx.lineTo(Math.round(x) + 0.5, H); ctx.stroke();
         });
         ctx.setLineDash([]);
+
+        if (snap) {
+            /* The scoring gate: a line in the transform column that lights
+             * up while checkouts pass through it. */
+            var gateOn = clamp01(1 - Math.abs(T - GATE_AT) / 1.1);
+            /* Fades away once checkouts have passed, so it never crosses the name. */
+            var gateFade = clamp01((GATE_AT + 1.6 - T) / 0.8);
+            ctx.globalAlpha = (0.35 + 0.65 * gateOn) * gateFade;
+            ctx.strokeStyle = gateOn > 0.05 ? colors.fraud : colors.line;
+            ctx.lineWidth = 2;
+            ctx.beginPath(); ctx.moveTo(W / 2, H * 0.24); ctx.lineTo(W / 2, H * 0.8); ctx.stroke();
+            ctx.globalAlpha = 1;
+
+            /* The flagged tray's caption, once caught checkouts start landing. */
+            var trayOn = clamp01((T - (HOLD_END + GATE_DUR + 0.6)) / 0.8);
+            if (snap.fraud_caught > 0 && trayOn > 0) {
+                ctx.globalAlpha = trayOn;
+                ctx.fillStyle = colors.raw;
+                ctx.font = "600 " + (W < 640 ? 9 : 10) + "px " + colors.mono;
+                ctx.textAlign = "center";
+                ctx.textBaseline = "bottom";
+                ctx.fillText("FLAGGED", TRAY[0], TRAY[1] - (W < 640 ? 12 : 16));
+                ctx.globalAlpha = 1;
+            }
+        }
+
         var sz = W < 640 ? 2.4 : 3;
         var hu = clamp01((T - HOLD_START) / (HOLD_END - HOLD_START));
         var tilt = 0.13 * Math.sin(Math.PI * 2 * hu), ct = Math.cos(tilt), st = Math.sin(tilt);
-        var swirlR = Math.min(W, H) * 0.3;
         var settled = true;
         for (var i = 0; i < P.length; i++) {
             var p = P[i], x, y, col;
+            var finalCol = p.kind === "ok" ? colors.ok : colors.fraud;
             if (still) {
-                x = p.tx; y = p.ty; col = colors.c3;
+                x = p.tx; y = p.ty; col = finalCol;
             } else {
-                var a1 = clamp01((T - p.d) / OWL_IN);
-                var a2 = clamp01((T - p.d - OWL_IN) / OWL_DUR);
-                var a3 = clamp01((T - HOLD_END - p.d * 0.5) / NAME_DUR);
+                var a1 = clamp01((T - p.d) / IN_DUR);
+                var g0 = HOLD_END + p.d2;
+                var a2 = clamp01((T - g0) / GATE_DUR);
+                var a3 = clamp01((T - g0 - GATE_DUR) / OUT_DUR);
                 var rx = p.ox - OC[0], ry = p.oy - OC[1];
                 var ox = OC[0] + rx * ct - ry * st, oy = OC[1] + rx * st + ry * ct;
-                if (a1 < 1) {
-                    var k1 = ease(a1);
-                    x = p.sx + (p.gx - p.sx) * k1; y = p.sy + (p.gy - p.sy) * k1;
-                    col = k1 < 0.7 ? colors.c1 : colors.c2;
-                } else if (a2 < 1 || a3 <= 0) {
-                    /* Murmuration: circle the owl, tightening onto its outline. */
-                    var k2 = ease(a2), r = Math.sin(Math.PI * a2) * swirlR, ang = p.a + T * 2.4;
-                    var m = Math.min(1, a2 * 1.6);
-                    var cx = p.gx + (OC[0] - p.gx) * m, cy = p.gy + (OC[1] - p.gy) * m;
-                    x = (cx + Math.cos(ang) * r) * (1 - k2) + ox * k2;
-                    y = (cy + Math.sin(ang) * r * 0.8) * (1 - k2) + oy * k2;
-                    col = colors.c2;
+                if (a2 <= 0) {
+                    /* Checkouts arrive and gather into the owl, swirling in. */
+                    var k1 = ease(a1), r = Math.sin(Math.PI * a1) * Math.min(W / 6, H * 0.3), ang = p.a + T * 2.4;
+                    x = p.sx + (ox - p.sx) * k1 + Math.cos(ang) * r;
+                    y = p.sy + (oy - p.sy) * k1 + Math.sin(ang) * r * 0.8;
+                    col = colors.raw;
+                } else if (a3 <= 0) {
+                    /* The owl streams out to the scoring gate. */
+                    var k2 = ease(a2);
+                    x = ox + (p.gx - ox) * k2;
+                    y = oy + (p.gy - oy) * k2;
+                    col = colors.raw;
                 } else {
-                    /* The owl breaks apart: points lift and spread, then land in the name. */
-                    var k3 = ease(a3), lift = Math.sin(k3 * Math.PI) * (H * 0.18);
-                    x = ox + (p.tx - ox) * k3 + Math.cos(p.a) * lift;
-                    y = oy + (p.ty - oy) * k3 + Math.sin(p.a) * lift * 0.6;
-                    col = k3 < 0.6 ? colors.c2 : colors.c3;
+                    /* Past the gate: scored, colored, and sent to the name or the tray. */
+                    var k3 = ease(a3), lift = Math.sin(k3 * Math.PI) * (H * 0.08);
+                    x = p.gx + (p.tx - p.gx) * k3 + Math.cos(p.a) * lift;
+                    y = p.gy + (p.ty - p.gy) * k3 + Math.sin(p.a) * lift * 0.6;
+                    col = finalCol;
                 }
                 if (a3 >= 1) {
                     var dx = p.x - mx, dy = p.y - my, d2 = dx * dx + dy * dy;
@@ -185,7 +295,7 @@
                     p.vx += (p.tx - p.x) * 0.06; p.vy += (p.ty - p.y) * 0.06;
                     p.vx *= 0.82; p.vy *= 0.82;
                     p.x += p.vx; p.y += p.vy;
-                    x = p.x; y = p.y; col = colors.c3;
+                    x = p.x; y = p.y; col = finalCol;
                     if (Math.abs(p.vx) + Math.abs(p.vy) > 0.05) settled = false;
                 } else {
                     p.x = x; p.y = y; p.vx = 0; p.vy = 0;
@@ -195,7 +305,7 @@
             ctx.fillStyle = col;
             ctx.fillRect(x - sz / 2, y - sz / 2, sz, sz);
         }
-        return settled;
+        return settled && T > END;
     }
 
     function frame(now) {
@@ -216,6 +326,15 @@
         }
     }
 
+    function showNote() {
+        if (!note || !snap || !P.length) return;
+        /* Phones get the short form so the note stays on one line under the tray. */
+        var per = "1 dot ≈ " + fmt(snap.checkouts / P.length) + " checkouts";
+        note.textContent = (W < 640 ? snap.window_days + "-day snapshot · " :
+            "Replaying the fraud pipeline's " + snap.window_days + "-day snapshot of simulated checkouts · ") + per;
+        note.hidden = false;
+    }
+
     function fit() {
         var r = cv.getBoundingClientRect();
         if (r.width < 1 || r.height < 1) return;
@@ -225,10 +344,12 @@
         ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
         lastW = r.width;
         build(r.width, r.height);
+        showNote();
         if (mqMotion.matches) draw(0, true); else start();
     }
 
     function begin() {
+        begun = true;
         readColors();
         stage.hidden = false;
         hero.classList.add("hero--pipe");
@@ -271,20 +392,32 @@
         if (mqMotion.addEventListener) mqMotion.addEventListener("change", onMotion);
     }
 
-    /* Wait for the display font so the name is sampled in the real face
-     * (or give up after 1.5 s and use whatever is loaded). */
-    var family = "Schibsted Grotesk";
-    var ready = document.fonts && document.fonts.load
-        ? Promise.race([
-            document.fonts.load('800 64px "' + family + '"'),
-            new Promise(function (res) { setTimeout(res, 1500); })
-        ]).catch(function () {})
+    /* Read the snapshot's totals: aggregate counts only, the same file /live draws. */
+    var dataReady = window.fetch
+        ? fetch(SNAPSHOT_URL, { credentials: "omit" }).then(function (r) {
+            return r.ok ? r.json() : null;
+        }).then(function (d) {
+            var t = d && d.totals;
+            if (t && t.checkouts > 0 && t.fraud >= 0 && t.fraud_caught >= 0) {
+                snap = {
+                    checkouts: +t.checkouts, fraud: +t.fraud, fraud_caught: +t.fraud_caught,
+                    false_declines: +t.false_declines || 0, window_days: +d.window_days || 30
+                };
+            }
+        }).catch(function () {})
         : Promise.resolve();
-    ready.then(begin);
-    /* If the font arrives after we gave up, resample once in the real face. */
-    if (document.fonts && document.fonts.load) {
-        document.fonts.load('800 64px "' + family + '"').then(function () {
-            if (!stage.hidden && lastW > 0) { readColors(); fit(); }
-        }).catch(function () {});
-    }
+
+    /* Wait for the display font (so the name is sampled in the real face)
+     * and the snapshot, or start after 1.5 s with whatever has arrived. */
+    var family = "Schibsted Grotesk";
+    var fontReady = document.fonts && document.fonts.load
+        ? document.fonts.load('800 64px "' + family + '"').catch(function () {})
+        : Promise.resolve();
+    var allReady = Promise.all([fontReady, dataReady]);
+    var late = false;
+    Promise.race([allReady, new Promise(function (res) { setTimeout(function () { late = true; res(); }, 1500); })]).then(begin);
+    /* If the font or the data arrived after we started, rebuild once. */
+    allReady.then(function () {
+        if (late && begun && !stage.hidden && lastW > 0) { readColors(); t0 = performance.now(); fit(); }
+    });
 })();

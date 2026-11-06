@@ -141,10 +141,15 @@
 
         <!-- Intro -->
         <section class="hero" aria-labelledby="home-name">
-            <!-- Pipeline hero: hidden until assets/hero-pipeline.js draws it (the h1 below stays the real heading) -->
+            <!-- Pipeline hero: a replay of the fraud pipeline's snapshot, hidden until assets/hero-pipeline.js draws it (the h1 below stays the real heading) -->
             <div class="hero-pipe" data-hero-pipe hidden>
                 <canvas class="hero-pipe__canvas" aria-hidden="true"></canvas>
-                <div class="hero-pipe__labels" aria-hidden="true"><span>Ingest</span><span>Transform</span><span>Serve</span></div>
+                <div class="hero-pipe__labels">
+                    <a class="hero-pipe__stage" href="/projects#owl-park"><span class="hero-pipe__kind">Ingest</span><span class="hero-pipe__what">Owl Park webstore</span><span class="hero-pipe__num" data-hero-num="ingest"></span></a>
+                    <a class="hero-pipe__stage" href="/projects#fraud"><span class="hero-pipe__kind">Transform</span><span class="hero-pipe__what">Fraud rules</span><span class="hero-pipe__num" data-hero-num="transform"></span></a>
+                    <a class="hero-pipe__stage" href="/live"><span class="hero-pipe__kind">Serve</span><span class="hero-pipe__what">Live numbers</span><span class="hero-pipe__num" data-hero-num="serve"></span></a>
+                </div>
+                <p class="hero-pipe__note" data-hero-note hidden></p>
                 <button type="button" class="hero-pipe__replay" data-hero-replay hidden>Replay</button>
             </div>
             <div class="hero__card">
