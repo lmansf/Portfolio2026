@@ -5,7 +5,7 @@ Tampa, FL | 443-929-5292 | lmansf96@gmail.com | linkedin.com/in/lmansf96 | githu
 
 ## Professional Summary
 
-IT systems analyst who owns the ticketing and webstore platforms behind ZooTampa's admissions revenue; three prior years as a data analyst; Microsoft PL-300 (Power BI) certified. Builds self-directed data projects end to end: a fraud-detection pipeline on Databricks and Supabase, natural-language-to-SQL on DuckDB, and attendance forecasting. Targeting analytics engineering and data analyst roles that turn source-system knowledge into trusted data models.
+IT systems analyst responsible for the ticketing and webstore platforms behind ZooTampa's admissions revenue; three prior years as a data analyst; Microsoft PL-300 (Power BI) certified. Builds self-directed data projects end to end: a fraud-detection pipeline on Databricks and Supabase, natural-language-to-SQL on DuckDB, and attendance forecasting. Targeting analytics engineering and data analyst roles that turn source-system knowledge into trusted data models.
 
 ## Skills
 
@@ -18,7 +18,7 @@ IT systems analyst who owns the ticketing and webstore platforms behind ZooTampa
 
 ### IT Point of Sale Systems Analyst
 ZooTampa at Lowry Park | Tampa, FL | Nov 2024 - Present
-- Own the Gateway Galaxy 8 ticketing platform and eGalaxy webstores (product and pricing configuration, monitoring, vendor escalation), the systems behind the Zoo's admissions and membership revenue.
+- Responsible for the Gateway Galaxy 8 ticketing platform and eGalaxy webstores (product and pricing configuration, monitoring, vendor escalation), the systems behind the Zoo's admissions and membership revenue.
 - Built 9 new premium animal-experience products and an admission-inclusive bundle in the ticketing and webstore systems; all still on sale.
 - Designed, implemented, and monitored webstore upsells: add-on offers, a membership upsell tile, and announcement ribbons built in custom HTML, CSS, and JavaScript.
 - Administer two POS platforms (PAR Pixel, Galaxy) and a fleet of about 90 terminals: inventory, maintenance, replacements.
