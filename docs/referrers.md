@@ -54,21 +54,21 @@ Each theme has four values:
 ## Current palette (official brand colors)
 | Key      | Accent (brand) | Link ink (Day) | Link ink (Night) | Text-on-accent | Notes                           |
 |----------|----------------|----------------|------------------|----------------|---------------------------------|
-| netflix  | `#e50914`      | `#d70813`      | `#ef6970`        | `#ffffff`      | Netflix Red                     |
-| meta     | `#0866ff`      | `#0860f1`      | `#5092ff`        | `#ffffff`      | Meta Blue                       |
-| google   | `#4285f4`      | `#3469c1`      | `#5994f5`        | `#06141a`      | Google Blue                     |
-| stripe   | `#635bff`      | `#5c54ec`      | `#8c86ff`        | `#ffffff`      | Stripe "blurple"                |
+| netflix  | `#e50914`      | `#d70813`      | `#f38b91`        | `#ffffff`      | Netflix Red                     |
+| meta     | `#0866ff`      | `#0860f1`      | `#75a9ff`        | `#ffffff`      | Meta Blue                       |
+| google   | `#4285f4`      | `#3469c1`      | `#7baaf7`        | `#06141a`      | Google Blue                     |
+| stripe   | `#635bff`      | `#5c54ec`      | `#a39eff`        | `#ffffff`      | Stripe "blurple"                |
 | amazon   | `#ff9900`      | `#9a5d00`      | `#ff9900`        | `#06141a`      | Amazon Orange                   |
-| microsoft| `#00a4ef`      | `#0072a6`      | `#00a4ef`        | `#06141a`      | Microsoft logo blue             |
+| microsoft| `#00a4ef`      | `#0072a6`      | `#29b3f2`        | `#06141a`      | Microsoft logo blue             |
 | spotify  | `#1ed760`      | `#117c37`      | `#1ed760`        | `#06141a`      | Spotify Green                   |
-| linkedin | `#0a66c2`      | `#0a66c2`      | `#5b98d6`        | `#ffffff`      | LinkedIn Blue (already AA on Day)|
-| anthropic| `#d97757`      | `#9f5740`      | `#d97757`        | `#06141a`      | Claude coral                    |
-| claude   | `#d97757`      | `#9f5740`      | `#d97757`        | `#06141a`      | alias of `anthropic`            |
+| linkedin | `#0a66c2`      | `#0a66c2`      | `#7daedf`        | `#ffffff`      | LinkedIn Blue (already AA on Day)|
+| anthropic| `#d97757`      | `#9f5740`      | `#e2967e`        | `#06141a`      | Claude coral                    |
+| claude   | `#d97757`      | `#9f5740`      | `#e2967e`        | `#06141a`      | alias of `anthropic`            |
 
 The Day ink column is the brand color darkened until it clears WCAG AA
 (4.5:1) as small text on the cream card surface (`--surface-1`, `#f6eee2`,
 where most links sit); the Night ink column is the lift that clears AA on
-the Night card surface (`#252c36`). Where the brand color already passes,
+the Night card surface (`#343d4c`). Where the brand color already passes,
 ink equals accent.
 
 ## Add a company
@@ -79,6 +79,6 @@ Edit the `THEMES` object in `assets/theme.js`, then regenerate the minified file
 Set `accent` to the brand-exact hex. Then check its contrast as link text on
 the Day card surface (`#f6eee2`): if it clears 4.5:1, set `ink` equal to
 `accent`; if it falls short, darken it until it clears ~4.6:1 and use that
-for `ink`. Do the same against the Night card surface (`#252c36`) for
+for `ink`. Do the same against the Night card surface (`#343d4c`) for
 `inkDark`, lifting toward white instead. Set `on` (text shown on accent-filled buttons)
 to dark `#06141a` for bright accents or `#ffffff` for dark/saturated ones.
