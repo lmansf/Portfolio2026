@@ -24,11 +24,10 @@
  * opens that diagram's modal on load; closing that one moves focus to the
  * diagram's card (or the page heading) instead.
  *
- * transition.js swaps the contents of <main> on in-site navigation (it
- * does not bring the new page's <head>), so this script is loaded on
- * Home as well as Projects (the two pages it swaps between), adds
- * pipeline.min.css itself the first time a diagram appears, and sets
- * diagrams up on load and whenever <main> changes.
+ * This script is loaded on Home as well as Projects (both show the
+ * featured diagrams), adds pipeline.min.css itself the first time a
+ * diagram appears, and sets diagrams up on load and whenever <main>
+ * changes.
  * ───────────────────────────────────────────────────────────── */
 (function () {
     'use strict';

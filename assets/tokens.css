@@ -189,30 +189,8 @@ a { color: var(--accent-ink); }
     color: var(--on-accent);
 }
 
-/* Page transitions (classes toggled by transition.js) */
-main {
-    transition: opacity 0.5s ease-in-out;
-}
-
-.page-exit {
-    opacity: 0;
-}
-
-/* First load paints immediately (no fade), so the hero is the first thing on
- * screen; only in-site page swaps fade. */
-.page-enter {
-    animation: page-fade-in 0.5s ease-out forwards;
-}
-
-@keyframes page-fade-in {
-    from { opacity: 0; }
-    to   { opacity: 1; }
-}
-
 @media (prefers-reduced-motion: reduce) {
     html { scroll-behavior: auto; }
-    main { transition: none; }
-    .page-enter { animation-duration: 1ms; }
 }
 
 /* Scrollbar on-palette */

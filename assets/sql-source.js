@@ -933,8 +933,7 @@ function fillTrust() {
     });
 }
 
-// Home and Projects swap <main> on in-site navigation (transition.js), so
-// fill badges that arrive later too.
+// Fill badges on captions that are added after load too.
 fillTrust();
 let trustQueued = false;
 new MutationObserver(() => {
@@ -945,7 +944,7 @@ new MutationObserver(() => {
 
 /* ── Start: hydrate a caption the first time it opens ── */
 // `toggle` doesn't bubble, so listen in the capture phase; this also covers
-// captions that transition.js swaps in when Home and Projects change page.
+// captions added after load.
 document.addEventListener('toggle', (e) => {
     const d = e.target;
     if (d instanceof HTMLDetailsElement && d.open && d.matches('details.sql-src[data-sql-source]')) hydrate(d);
