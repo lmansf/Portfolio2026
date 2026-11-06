@@ -26,10 +26,10 @@
     <link rel="icon" href="/assets/favicon.svg" type="image/svg+xml">
     <link rel="apple-touch-icon" href="/assets/apple-touch-icon.png">
     <link rel="manifest" href="/manifest.json">
-    <meta name="theme-color" content="#ebebe7">
+    <meta name="theme-color" content="#f5f6f4">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@100..125,400..900&amp;display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Schibsted+Grotesk:wght@400..900&amp;display=swap" rel="stylesheet">
     <script type="application/ld+json">
     {
         "@context": "https://schema.org",
@@ -52,18 +52,18 @@
   *{margin:0;padding:0;box-sizing:border-box;}
 
   /* Self-contained page (does not load assets/tokens.css). Variable names are
-     legacy: --red/--orange hold the site's signal-orange text tone, --cyan
+     legacy: --red/--orange hold the site's teal text tone, --cyan
      and --pink are neutral inks; the rest mirror the Day bg / surface / ink /
-     line tokens of the "control room" style (square, solid, hard shadows). */
+     line tokens of the "Pipeline" style. */
   :root{
-    --bg:#ebebe7;
+    --bg:#f5f6f4;
     --bg-soft:#ffffff;
-    --text:#0b0b0b;
-    --muted:#3d3d3d;
+    --text:#111b22;
+    --muted:#36424b;
     --line:#0b0b0b;
     --line-strong:#0b0b0b;
-    --red:#a63100;
-    --orange:#a63100;
+    --red:#0f6f62;
+    --orange:#0f6f62;
     --cyan:#0b0b0b;
     --pink:#4a4a4a;
     --glass:#ffffff;
@@ -74,10 +74,10 @@
      ═══════════════════════════════════ */
   html,body{
     width:100vw;height:100vh;overflow:hidden;
-    font-family:"Archivo","Helvetica Neue",Arial,system-ui,sans-serif;
+    font-family:"Schibsted Grotesk","Helvetica Neue",Arial,system-ui,sans-serif;
     color:var(--text);
     background:
-      #ebebe7;
+      #f5f6f4;
     background-color:var(--bg);
   }
 
@@ -87,11 +87,11 @@
   .header{
     display:flex;align-items:center;justify-content:center;gap:14px;
     height:56px;
-    background:linear-gradient(90deg,rgba(255,79,0,.1),rgba(255,79,0,.08),rgba(11,11,11,.08));
+    background:linear-gradient(90deg,rgba(15,111,98,.1),rgba(15,111,98,.06),rgba(11,11,11,.08));
     border-bottom:1px solid rgba(11,11,11,.46);
   }
   .header .owl-logo{ width:30px;height:30px; }
-  .header h1{font-size:22px;font-weight:800;letter-spacing:.5px;font-family:"Archivo","Helvetica Neue",Arial,sans-serif;font-stretch:112%;text-transform:uppercase;}
+  .header h1{font-size:22px;font-weight:800;letter-spacing:.5px;font-family:"Schibsted Grotesk","Helvetica Neue",Arial,sans-serif;}
   .header h1 span{color:var(--orange);}
   .header .sep{color:rgba(11,11,11,.35);font-size:18px;}
   .header .subtitle{font-size:10px;color:#3d3d3d;letter-spacing:1.2px;text-transform:uppercase;font-weight:600;}

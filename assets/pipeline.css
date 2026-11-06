@@ -41,7 +41,6 @@
 .flow__title {
     font-family: var(--font-display);
     font-weight: 800;
-    font-stretch: 106%;
     font-size: 1.3rem;
     line-height: 1.2;
     letter-spacing: -0.01em;
@@ -67,13 +66,12 @@
     font-family: var(--font-mono);
     font-size: 0.8rem;
     font-weight: 600;
-    text-transform: uppercase;
     box-shadow: var(--shadow-sm);
     cursor: pointer;
     transition: background var(--dur-fast) linear, color var(--dur-fast) linear;
 }
 .flow__play:hover { background: var(--ink-1); color: var(--bg); }
-.flow__play:active { transform: translate(3px, 3px); box-shadow: none; }
+.flow__play:active { transform: translateY(1px); box-shadow: none; }
 .flow__play:focus-visible { border-radius: var(--r-pill); }
 .flow__play-icon {
     width: 0;
@@ -145,7 +143,7 @@
     place-items: center;
     width: 1.6rem;
     height: 1.6rem;
-    border-radius: 0;
+    border-radius: var(--r-pill);
     background: var(--surface-2);
     color: var(--ink-1);
     font-family: var(--font-mono);
@@ -295,7 +293,7 @@
     color: var(--ink-1);
     background: var(--surface-2);
     padding: 0.05rem 0.3rem;
-    border-radius: 0;
+    border-radius: var(--r-sm);
 }
 
 .flow__planned {
@@ -419,7 +417,7 @@ html:has(dialog.flow-dialog[open]) { overflow: hidden; scrollbar-gutter: stable;
     place-items: center;
     width: 44px;
     height: 44px;
-    border-radius: 0;
+    border-radius: var(--r-sm);
     border: var(--bw) solid var(--hairline-strong);
     background: var(--surface-1);
     color: var(--ink-1);
@@ -430,7 +428,7 @@ html:has(dialog.flow-dialog[open]) { overflow: hidden; scrollbar-gutter: stable;
     transition: background var(--dur-fast) var(--ease-out);
 }
 .flow-dialog__close:hover { background: var(--ink-1); color: var(--bg); }
-.flow-dialog__close:focus-visible { border-radius: 0; }
+.flow-dialog__close:focus-visible { border-radius: var(--r-sm); }
 
 @keyframes flow-dialog-in {
     from { opacity: 0; transform: translateY(10px) scale(0.985); }
@@ -448,7 +446,7 @@ html:has(dialog.flow-dialog[open]) { overflow: hidden; scrollbar-gutter: stable;
         height: 100dvh;
         max-height: 100dvh;
         border: 0;
-        border-radius: 0;
+        border-radius: var(--r-lg);
     }
     @keyframes flow-dialog-in {
         from { transform: translateY(24px); opacity: 0; }

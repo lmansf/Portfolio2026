@@ -4,14 +4,14 @@
  *   main.page          page wrapper
  *   .hero              top-of-page intro (card variant on Home)
  *   .now               three-line "now" strip (Home)
- *   .section-head      heavy rule + numbered uppercase title + optional hint
+ *   .section-head      thin rule + numbered stage title + optional hint
  *   .project           project card (+ --featured numbered ledger rows)
  *   .xp                experience ledger (dates in their own column)
  *   .chip-list / .chip skills, stack, credentials
  *   .toolkit           chip lists grouped under small uppercase labels (Home)
  *   .about, .socials   about copy + connect cards
  *   .wf-divider        retired divider (markup kept, not drawn)
- *   .btn               square block buttons (+ .btn__meta small suffix, e.g. "PDF")
+ *   .btn               small rounded buttons (+ .btn__meta small suffix, e.g. "PDF")
  *   .sql-src           collapsed, runnable "SQL source" caption under a data-backed piece
  * ───────────────────────────────────────────────────────────── */
 
@@ -30,32 +30,32 @@ main.page {
 main.page > * { min-width: 0; }
 
 /* ──────────────────── Type helpers ──────────────────── */
-/* Eyebrow: an inverted mono tag, not small caps. */
+/* Eyebrow: a small mono stage label in teal. */
 .eyebrow {
     justify-self: start;
     display: inline-block;
     font-family: var(--font-mono);
     font-size: 0.74rem;
     font-weight: 600;
-    letter-spacing: 0;
+    letter-spacing: 0.06em;
     text-transform: uppercase;
-    color: var(--bg);
-    background: var(--ink-1);
+    color: var(--accent-ink);
+    background: var(--accent-mist);
+    border-radius: var(--r-sm);
     padding: 0.28rem 0.55rem;
 }
 
-/* ──────────────────── Buttons: square blocks with a hard shadow ──────────────────── */
+/* ──────────────────── Buttons: small rounded blocks with a soft shadow ──────────────────── */
 .btn {
     display: inline-flex;
     align-items: center;
     gap: 0.55rem;
     min-height: 44px;
     padding: 0.7rem 1.1rem;
-    border-radius: 0;
-    font-family: var(--font-mono);
+    border-radius: var(--r-sm);
+    font-family: var(--font-text);
     font-weight: 600;
-    font-size: 0.86rem;
-    text-transform: uppercase;
+    font-size: 0.95rem;
     letter-spacing: 0;
     line-height: 1;
     text-decoration: none;
@@ -76,15 +76,17 @@ main.page > * { min-width: 0; }
     background: var(--surface-1);
     color: var(--ink-1);
 }
-.btn--ghost:hover { background: var(--ink-1); color: var(--bg); }
-.btn--primary:hover { background: var(--ink-1); color: var(--bg); }
-.btn:active { transform: translate(4px, 4px); box-shadow: var(--shadow-pressed); }
+.btn--ghost:hover { background: var(--surface-2); color: var(--ink-1); border-color: var(--hairline-strong); }
+.btn--primary { border-color: var(--accent); }
+.btn--primary:hover { background: var(--ink-1); border-color: var(--ink-1); color: var(--bg); }
+.btn:active { transform: translateY(1px); box-shadow: var(--shadow-pressed); }
 .btn .arrow { font-family: var(--font-mono); font-weight: 600; }
 .btn__meta {
     font-size: 0.7rem;
     font-weight: 600;
     padding: 0.12rem 0.3rem;
-    border: 1.5px solid currentColor;
+    border: 1px solid currentColor;
+    border-radius: 4px;
 }
 
 /* ──────────────────── Hero ──────────────────── */
@@ -97,7 +99,72 @@ main.page > * { min-width: 0; }
     gap: 1.1rem;
     justify-items: start;
 }
-/* Home masthead: no card, just a giant name with the photo blocked in beside it. */
+/* Pipeline stage (Home): points flow through ingest, transform and serve,
+ * swirl into an owl, then settle into the name. Drawn by hero-pipeline.js;
+ * shipped `hidden`, so without JS the plain <h1> shows instead. */
+.hero-pipe {
+    position: relative;
+    height: clamp(230px, 38vw, 400px);
+    background: var(--surface-1);
+    border: var(--bw) solid var(--hairline);
+    border-radius: var(--r-lg);
+    box-shadow: var(--shadow-md);
+    overflow: hidden;
+}
+.hero-pipe[hidden] { display: none; }
+.hero-pipe__canvas { display: block; width: 100%; height: 100%; touch-action: pan-y; }
+.hero-pipe__labels {
+    position: absolute;
+    inset: 0 0 auto;
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    pointer-events: none;
+}
+.hero-pipe__labels span {
+    font-family: var(--font-mono);
+    font-size: 0.74rem;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    padding: 0.75rem 0.9rem;
+    color: var(--ink-3);
+}
+.hero-pipe__labels span:nth-child(2) { text-align: center; }
+.hero-pipe__labels span:nth-child(3) { text-align: right; color: var(--accent-ink); }
+.hero-pipe__replay {
+    position: absolute;
+    right: 0.6rem;
+    bottom: 0.6rem;
+    min-height: 36px;
+    padding: 0.4rem 0.75rem;
+    font: 600 0.78rem/1 var(--font-mono);
+    letter-spacing: 0.04em;
+    color: var(--ink-2);
+    background: var(--surface-1);
+    border: var(--bw) solid var(--hairline-strong);
+    border-radius: var(--r-sm);
+    cursor: pointer;
+}
+.hero-pipe__replay:hover { color: var(--accent-ink); border-color: var(--accent); }
+.hero-pipe__replay[hidden] { display: none; }
+.hero--pipe .hero__avatar {
+    width: clamp(84px, 15vw, 140px);
+    height: clamp(84px, 15vw, 140px);
+}
+/* Once the stage draws the name, the <h1> stays for screen readers and search only. */
+.hero--pipe .hero__name {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    margin: -1px;
+    padding: 0;
+    overflow: hidden;
+    clip: rect(0 0 0 0);
+    clip-path: inset(50%);
+    white-space: nowrap;
+}
+
+/* Home masthead: the intro with the photo beside it (the big name is the pipeline stage when JS runs). */
 .hero__card {
     display: grid;
     grid-template-columns: 1fr;
@@ -115,20 +182,19 @@ main.page > * { min-width: 0; }
     display: block;
     width: clamp(120px, 22vw, 208px);
     height: clamp(120px, 22vw, 208px);
-    border-radius: 0;
+    border-radius: var(--r-lg);
     object-fit: cover;
-    border: var(--bw-heavy) solid var(--hairline);
-    box-shadow: var(--shadow-lg);
+    border: var(--bw) solid var(--hairline);
+    box-shadow: var(--shadow-md);
     background: var(--surface-2);
 }
 .hero__name {
     font-family: var(--font-display);
     font-size: clamp(2.2rem, 7.6vw, 5.75rem);
-    line-height: 0.92;
-    letter-spacing: -0.02em;
-    font-weight: 900;
+    line-height: 0.98;
+    letter-spacing: -0.025em;
+    font-weight: 800;
     font-stretch: var(--display-stretch);
-    text-transform: uppercase;
     color: var(--ink-1);
     max-width: 100%;
 }
@@ -140,10 +206,11 @@ main.page > * { min-width: 0; }
     max-width: 60ch;
 }
 .hero__role em {
-    color: var(--on-accent);
+    color: var(--ink-1);
     font-style: normal;
     font-weight: 700;
-    background: var(--accent);
+    background: var(--accent-soft);
+    border-radius: 4px;
     padding: 0 0.2em;
     box-decoration-break: clone;
     -webkit-box-decoration-break: clone;
@@ -190,13 +257,15 @@ main.page > * { min-width: 0; }
     .hero__card > .hero__intro { grid-column: 1; grid-row: 1; }
 }
 
-/* ──────────────────── Now strip: an inverted readout ──────────────────── */
+/* ──────────────────── Now strip: a dark readout panel ──────────────────── */
 .now {
     display: grid;
     gap: 0;
     background: var(--umber);
     color: var(--on-umber);
-    border: var(--bw) solid var(--hairline);
+    border: var(--bw) solid var(--umber);
+    border-radius: var(--r-lg);
+    overflow: hidden;
     box-shadow: var(--shadow-md);
 }
 .now__row {
@@ -205,42 +274,40 @@ main.page > * { min-width: 0; }
     gap: 0.9rem;
     align-items: baseline;
     padding: 0.9rem 1.1rem;
-    border-bottom: var(--bw) solid color-mix(in srgb, var(--on-umber) 30%, transparent);
+    border-bottom: var(--bw) solid color-mix(in srgb, var(--on-umber) 16%, transparent);
 }
 .now__row:last-child { border-bottom: 0; }
 .now__label {
     font-family: var(--font-mono);
     font-size: 0.74rem;
     font-weight: 600;
-    letter-spacing: 0;
+    letter-spacing: 0.06em;
     text-transform: uppercase;
-    color: var(--accent);
+    color: var(--accent-on-dark);
 }
-.now__label::before { content: "> "; }
-.now__label::before { content: "> " / ""; }
 .now__value { color: var(--on-umber); font-size: 0.95rem; }
 .now__value a {
     color: var(--on-umber);
     font-weight: 600;
     text-decoration: underline;
-    text-decoration-color: var(--accent);
-    text-decoration-thickness: 2px;
+    text-decoration-color: var(--accent-on-dark);
+    text-decoration-thickness: 1.5px;
     text-underline-offset: 3px;
 }
-.now__value a:hover { color: var(--on-accent); background: var(--accent); text-decoration-color: var(--on-accent); }
+.now__value a:hover { color: var(--accent-on-dark); }
 @media (min-width: 720px) {
     .now { grid-template-columns: repeat(3, 1fr); }
     .now__row {
         grid-template-columns: 1fr;
         gap: 0.4rem;
         border-bottom: 0;
-        border-right: var(--bw) solid color-mix(in srgb, var(--on-umber) 30%, transparent);
+        border-right: var(--bw) solid color-mix(in srgb, var(--on-umber) 16%, transparent);
         padding: 1rem 1.25rem;
     }
     .now__row:last-child { border-right: 0; }
 }
 
-/* ──────────────────── Section heading: a heavy rule and a numbered title ──────────────────── */
+/* ──────────────────── Section heading: a thin rule and a numbered stage title ──────────────────── */
 .section-head {
     display: flex;
     align-items: baseline;
@@ -248,8 +315,8 @@ main.page > * { min-width: 0; }
     gap: 0.75rem 1rem;
     flex-wrap: wrap;
     margin-bottom: 1.4rem;
-    padding-top: 0.85rem;
-    border-top: var(--bw-heavy) solid var(--hairline);
+    padding-top: 1rem;
+    border-top: var(--bw) solid var(--hairline);
 }
 .section-head__title {
     counter-increment: sec;
@@ -259,17 +326,16 @@ main.page > * { min-width: 0; }
     font-family: var(--font-display);
     font-weight: 800;
     font-stretch: var(--display-stretch);
-    font-size: clamp(1.55rem, 3.4vw, 2.35rem);
-    letter-spacing: -0.015em;
+    font-size: clamp(1.5rem, 3.2vw, 2.15rem);
+    letter-spacing: -0.02em;
     line-height: 1.05;
-    text-transform: uppercase;
     color: var(--ink-1);
 }
 .section-head__title::before {
-    content: counter(sec, decimal-leading-zero);
-    content: counter(sec, decimal-leading-zero) / "";
+    content: counter(sec, decimal-leading-zero) " ·";
+    content: counter(sec, decimal-leading-zero) " ·" / "";
     font-family: var(--font-mono);
-    font-size: 0.5em;
+    font-size: 0.45em;
     font-weight: 600;
     font-stretch: normal;
     letter-spacing: 0;
@@ -285,19 +351,19 @@ main.page > * { min-width: 0; }
     font-family: var(--font-mono);
     font-size: 0.8rem;
     font-weight: 600;
-    text-transform: uppercase;
     color: var(--ink-1);
     text-decoration: none;
     padding: 0.45rem 0.75rem;
     border: var(--bw) solid var(--hairline);
+    border-radius: var(--r-sm);
     background: var(--surface-1);
     box-shadow: var(--shadow-sm);
     transition: background var(--dur-fast) linear, color var(--dur-fast) linear;
 }
-.section-head__link:hover { background: var(--ink-1); color: var(--bg); }
+.section-head__link:hover { background: var(--surface-2); color: var(--accent-ink); }
 
 /* ──────────────────── Divider: retired ────────────────────
- * Each section now opens with its own heavy rule, so the old crow divider
+ * Each section now opens with its own rule, so the old crow divider
  * would only double it. The markup stays (aria-hidden) and is not drawn. */
 .wf-divider { display: none; }
 
@@ -316,14 +382,14 @@ main.page > * { min-width: 0; }
     scroll-margin-top: calc(var(--top-bar-h) + 1rem);
     background: var(--surface-1);
     border: var(--bw) solid var(--hairline);
-    border-radius: 0;
+    border-radius: var(--r-lg);
     box-shadow: var(--shadow-md);
     transition: transform var(--dur-fast) linear,
                 box-shadow var(--dur-fast) linear;
 }
 @media (hover: hover) and (prefers-reduced-motion: no-preference) {
     .project:not(.project--featured):hover {
-        transform: translate(-2px, -2px);
+        transform: translateY(-2px);
         box-shadow: var(--shadow-lg);
     }
 }
@@ -360,7 +426,6 @@ main.page > * { min-width: 0; }
 .project__title {
     font-family: var(--font-display);
     font-weight: 800;
-    font-stretch: 106%;
     font-size: 1.4rem;
     line-height: 1.1;
     letter-spacing: -0.01em;
@@ -391,7 +456,7 @@ main.page > * { min-width: 0; }
     background: var(--surface-2);
     border: var(--bw) solid var(--hairline);
     padding: 0.18rem 0.45rem;
-    border-radius: 0;
+    border-radius: var(--r-sm);
 }
 .project__links {
     display: flex;
@@ -419,7 +484,7 @@ main.page > * { min-width: 0; }
     appearance: none;
     background: none;
     border: 0;
-    border-radius: 0;
+    border-radius: var(--r-sm);
     padding: 0;
     font: inherit;
     font-family: var(--font-mono);
@@ -440,7 +505,7 @@ main.page > * { min-width: 0; }
     background: var(--accent);
     border: var(--bw) solid var(--hairline);
     padding: 0.16rem 0.45rem;
-    border-radius: 0;
+    border-radius: var(--r-sm);
     vertical-align: middle;
 }
 .project__badge--muted { background: var(--surface-2); color: var(--ink-1); }
@@ -450,18 +515,21 @@ main.page > * { min-width: 0; }
 }
 
 /* Featured: a numbered ledger, one full-width row per project, inside one
- * heavy frame (not a grid of three soft cards). */
+ * rounded frame (not a grid of three cards). */
 .project-grid--featured {
     display: grid;
     grid-template-columns: 1fr;
     gap: 0;
     background: var(--surface-1);
     border: var(--bw) solid var(--hairline);
-    box-shadow: var(--shadow-lg);
+    border-radius: var(--r-lg);
+    overflow: hidden;
+    box-shadow: var(--shadow-md);
     counter-reset: feat;
 }
 .project--featured {
     counter-increment: feat;
+    border-radius: 0;
     border: 0;
     border-top: var(--bw) solid var(--hairline);
     box-shadow: none;
@@ -548,7 +616,9 @@ main.page > * { min-width: 0; }
     position: relative;
     background: var(--surface-1);
     border: var(--bw) solid var(--hairline);
-    box-shadow: var(--shadow-lg);
+    border-radius: var(--r-lg);
+    overflow: hidden;
+    box-shadow: var(--shadow-md);
 }
 .xp__item {
     display: block;
@@ -562,7 +632,7 @@ main.page > * { min-width: 0; }
     display: grid;
     gap: 0.4rem;
 }
-.xp__item--now .xp__card { box-shadow: inset 8px 0 0 var(--accent); }
+.xp__item--now .xp__card { box-shadow: inset 3px 0 0 var(--accent); }
 .xp__head {
     display: flex;
     flex-wrap: wrap;
@@ -642,7 +712,7 @@ main.page > * { min-width: 0; }
     background: var(--surface-1);
     border: var(--bw) solid var(--hairline);
     padding: 0.4rem 0.65rem;
-    border-radius: 0;
+    border-radius: var(--r-pill);
 }
 .chip--cred {
     font-family: var(--font-text);
@@ -652,7 +722,8 @@ main.page > * { min-width: 0; }
     background: var(--ink-1);
     border-color: var(--ink-1);
     padding: 0.6rem 0.8rem;
-    box-shadow: 4px 4px 0 var(--accent);
+    border-radius: var(--r-md);
+    box-shadow: none;
 }
 .chip--cred .chip__sub {
     font-family: var(--font-mono);
@@ -713,7 +784,7 @@ main.page > * { min-width: 0; }
     padding: 0.95rem 1.1rem;
     background: var(--surface-1);
     border: var(--bw) solid var(--hairline);
-    border-radius: 0;
+    border-radius: var(--r-lg);
     text-decoration: none;
     color: inherit;
     box-shadow: var(--shadow-md);
@@ -721,7 +792,7 @@ main.page > * { min-width: 0; }
                 box-shadow var(--dur-fast) linear;
 }
 .social:hover {
-    transform: translate(-2px, -2px);
+    transform: translateY(-2px);
     box-shadow: var(--shadow-lg);
 }
 .social__icon {
@@ -730,7 +801,7 @@ main.page > * { min-width: 0; }
     flex-shrink: 0;
     display: grid;
     place-items: center;
-    border-radius: 0;
+    border-radius: var(--r-md);
     background: var(--accent);
     border: var(--bw) solid var(--hairline);
     color: var(--on-accent);
@@ -771,7 +842,7 @@ main.page > * { min-width: 0; }
     color: var(--ink-3);
     cursor: pointer;
     list-style: none;
-    border-radius: 0;
+    border-radius: var(--r-sm);
     user-select: none;
 }
 .sql-src__toggle::-webkit-details-marker { display: none; }
@@ -781,7 +852,7 @@ main.page > * { min-width: 0; }
     height: 0;
     border-top: 5px solid transparent;
     border-bottom: 5px solid transparent;
-    border-left: 7px solid var(--accent);
+    border-left: 3px solid var(--accent);
     transition: transform var(--dur-fast) var(--ease-out);
 }
 .sql-src[open] > .sql-src__toggle::before { transform: rotate(90deg); }
@@ -802,7 +873,7 @@ main.page > * { min-width: 0; }
 .sql-src__panel {
     margin-top: 0.4rem;
     border: var(--bw) solid var(--hairline);
-    border-radius: 0;
+    border-radius: var(--r-md);
     background: var(--surface-1);
     box-shadow: var(--shadow-sm);
     overflow: hidden;
@@ -855,7 +926,7 @@ a.sql-src__node {
     text-underline-offset: 2px;
 }
 a.sql-src__node:hover { text-decoration-color: currentColor; }
-a.sql-src__node:focus-visible { outline: 3px solid var(--focus-ring); outline-offset: 2px; border-radius: 0; }
+a.sql-src__node:focus-visible { outline: 3px solid var(--focus-ring); outline-offset: 2px; border-radius: var(--r-sm); }
 .sql-src__note {
     margin: 0;
     padding: 0.55rem 0.95rem 0.65rem;
@@ -891,7 +962,7 @@ a.sql-src__node:focus-visible { outline: 3px solid var(--focus-ring); outline-of
     color: var(--ink-1);
     background: var(--bg);
     border: var(--bw) solid var(--hairline-strong);
-    border-radius: 0;
+    border-radius: var(--r-sm);
     resize: vertical;
     white-space: pre;
     overflow-x: auto;
@@ -920,16 +991,15 @@ a.sql-src__node:focus-visible { outline: 3px solid var(--focus-ring); outline-of
     font-family: var(--font-mono);
     font-size: 0.76rem;
     font-weight: 600;
-    text-transform: uppercase;
     color: var(--ink-1);
     background: var(--surface-1);
     border: var(--bw) solid var(--hairline-strong);
-    border-radius: 0;
+    border-radius: var(--r-sm);
     box-shadow: var(--shadow-sm);
     cursor: pointer;
 }
 .sql-src__btn:hover:not(:disabled):not([aria-disabled="true"]) { background: var(--ink-1); color: var(--bg); }
-.sql-src__btn:active:not(:disabled):not([aria-disabled="true"]) { transform: translate(3px, 3px); box-shadow: none; }
+.sql-src__btn:active:not(:disabled):not([aria-disabled="true"]) { transform: translateY(1px); box-shadow: none; }
 .sql-src__btn:disabled,
 .sql-src__btn[aria-disabled="true"] { opacity: 0.55; cursor: default; }
 .sql-src__btn--run {
@@ -966,7 +1036,7 @@ a.sql-src__node:focus-visible { outline: 3px solid var(--focus-ring); outline-of
     border: var(--bw) solid var(--danger);
     border-left-width: 8px;
     background: var(--bg);
-    border-radius: 0;
+    border-radius: var(--r-sm);
 }
 .sql-src__error p { margin: 0 0 0.3rem; }
 .sql-src__raw summary { cursor: pointer; color: var(--ink-3); font-size: 0.74rem; }
@@ -982,7 +1052,7 @@ a.sql-src__node:focus-visible { outline: 3px solid var(--focus-ring); outline-of
     max-height: 18rem;
     overflow: auto;
     border: var(--bw) solid var(--hairline);
-    border-radius: 0;
+    border-radius: var(--r-sm);
     background: var(--bg);
 }
 .sql-src__result:focus-visible { outline: 3px solid var(--focus-ring); outline-offset: 1px; }
@@ -1023,7 +1093,7 @@ a.sql-src__node:focus-visible { outline: 3px solid var(--focus-ring); outline-of
 [data-sql-piece].is-sql-edited {
     outline: var(--bw) dashed var(--accent);
     outline-offset: 6px;
-    border-radius: 0;
+    border-radius: var(--r-sm);
 }
 [data-sql-piece] [hidden] { display: none !important; }
 
@@ -1031,9 +1101,9 @@ a.sql-src__node:focus-visible { outline: 3px solid var(--focus-ring); outline-of
 .sql-egg {
     padding: 0.75rem 0.85rem;
     border: var(--bw) solid var(--hairline);
-    border-radius: 0;
+    border-radius: var(--r-md);
     background: var(--accent-mist);
-    box-shadow: 4px 4px 0 var(--accent);
+    box-shadow: 0 0 0 3px var(--accent-glow);
 }
 .sql-egg__title { margin: 0 0 0.25rem; font-weight: 800; color: var(--ink-1); }
 .sql-egg__text, .sql-egg__meta { margin: 0 0 0.45rem; font-size: 0.8rem; color: var(--ink-2); }
@@ -1044,7 +1114,7 @@ a.sql-src__node:focus-visible { outline: 3px solid var(--focus-ring); outline-of
     padding: 0.25rem 0.5rem;
     background: var(--bg);
     border: var(--bw) solid var(--hairline);
-    border-radius: 0;
+    border-radius: var(--r-sm);
     overflow-wrap: anywhere;
 }
 

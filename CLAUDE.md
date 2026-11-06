@@ -1,16 +1,24 @@
 # Portfolio2026 — working notes
 
 Static HTML/CSS/JS portfolio (no build step), deployed on Vercel. Routing is in
-`vercel.json`; design tokens in `assets/tokens.css` (the "Control room" style: square
-corners, thick ink rules, hard offset shadows, Archivo + JetBrains Mono, one
-signal-orange accent, Day + Night themes, no brown);
+`vercel.json`; design tokens in `assets/tokens.css` (the "Pipeline" style: rounded
+panels, 1px hairlines, soft shadows, Schibsted Grotesk + JetBrains Mono, one
+teal accent with amber/slate pipeline lane colors, Day + Night themes, no brown);
 minified `.min` assets are what the pages load, so regenerate them after
 editing source (esbuild is fine:
 `npx esbuild <src> --minify --outfile=<min> --allow-overwrite`).
 
 Text colors must stay WCAG AA on every surface token: the ink tokens and
-`--accent-ink` pass; `--accent` (signal orange) is a fill with ink text on it,
-not a text color on light surfaces.
+`--accent-ink` pass; in Night `--accent` is a bright teal fill with dark
+`--on-accent` text on it.
+
+The Home hero animation (`assets/hero-pipeline.js`, loaded as
+`hero-pipeline.min.js`) is progressive enhancement: the `[data-hero-pipe]` stage
+is `hidden` in the HTML and the real `<h1>` stays the heading; the script
+unhides the stage and adds `hero--pipe` (which visually hides the h1 text)
+only once it can draw. Dots flow through three lanes, gather into an owl,
+then settle into the name. Under `prefers-reduced-motion` it draws the final
+name with no motion. After editing it, regenerate the `.min.js`.
 
 Motion extras (the walking Owl Park owl, scroll reveals, button hover/press,
 the copy-email button, `data-countup` numbers and the `/live` freshness dot)
