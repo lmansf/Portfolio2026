@@ -106,15 +106,12 @@ The CSS `.min.css` files can be rebuilt with esbuild (`npx esbuild <src>
   frame on a redrawn piece).
 - `assets/hero-pipeline.js` — the Home hero canvas (lanes, owl, then the
   name); loaded as `hero-pipeline.min.js`, rebuild that after edits.
-- `assets/transition.js` — SPA-style page transitions and the mobile nav
-  (Home and Projects only). In-site page swaps fade here; full page loads
-  between pages that share `shell.css` (e.g. to and from 404) fade via the
-  cross-document `@view-transition` opt-in in `shell.css`, which has to sit in
-  a render-blocking stylesheet. The very first load from elsewhere paints
-  immediately so the hero is on screen at once. In-page `#hash` links are
-  left to the browser rather than re-swapping `<main>`. Dismissing the
-  mobile nav (Escape, backdrop, burger) returns focus
-  to the burger, whose label toggles Open/Close navigation.
+- `assets/transition.js` — the mobile nav. In-site links are ordinary full
+  page loads (Home is always the real `index.html`, so its hero replays on
+  every visit); they fade via the cross-document `@view-transition` opt-in in
+  `shell.css`, which has to sit in a render-blocking stylesheet. Dismissing
+  the mobile nav (Escape, backdrop, burger) returns focus to the burger,
+  whose label toggles Open/Close navigation.
 - `assets/pipeline.css` / `assets/pipeline.js` — the clickable pipeline
   diagrams (`[data-flow]` figures on Projects). The script turns each one into
   a tabs widget: click, tap or hover a stage to read its note, arrow keys and
@@ -123,8 +120,8 @@ The CSS `.min.css` files can be rebuilt with esbuild (`npx esbuild <src>
   before the selected one stay lit. Stages stack down a rail on phones and
   tablets and sit in one row from 880px. Without JS every note shows as a
   list, styled by a `<noscript>` copy of the stylesheet link. The page
-  preloads the stylesheet; the script applies it, and adds it after an
-  in-site swap from Home (which is why Home loads the script too).
+  preloads the stylesheet; the script applies it, and adds it itself on Home,
+  which shows the same diagrams in modals.
   The same script runs the "How the data flows" modals: a native modal
   `<dialog>` (page behind inert, Esc closes, a backdrop click closes, focus
   returns to the button), a full-screen sheet under 640px, no animation under
@@ -153,8 +150,7 @@ The CSS `.min.css` files can be rebuilt with esbuild (`npx esbuild <src>
   (`apps/park/public/art/owl-barn-*@2x.png` in Welcome-to-Owl-Park, tinted
   with the species' natural colours). Scroll reveals only touch cards and
   section heads that start below the fold, drop their `reveal` classes once
-  shown so the cards' own hover styles take over, re-run after in-site page
-  swaps, and are off under reduced motion, for print, and without
+  shown so the cards' own hover styles take over, and are off under reduced motion, for print, and without
   `IntersectionObserver`. The Owl Park infographic page is standalone (no
   `shell.css` or site footer), so it gets neither the owl nor the fades.
   The same files carry the site's other small responsive touches, all off

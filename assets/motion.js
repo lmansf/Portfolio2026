@@ -14,8 +14,7 @@
  *     tab is visible. With prefers-reduced-motion it stands still.
  *  2. Scroll reveals. Cards and section heads that start below the fold
  *     fade up as they scroll into view. Off with reduced motion, without
- *     IntersectionObserver, and for print. Re-runs after transition.js
- *     swaps <main> on in-site navigation.
+ *     IntersectionObserver, and for print.
  *  3. Copy email: a small copy button beside mailto buttons, with a
  *     "Copied" note.
  *  4. Count-up numbers ([data-countup]) the first time they scroll into view.
@@ -23,11 +22,9 @@
  *     /live snapshot is.
  * Hover lift and press feedback on buttons and links are plain CSS in
  * motion.css. Everything is off or static with prefers-reduced-motion.
- * Full page loads between pages (e.g. to and from 404) fade via the
- * cross-document `@view-transition` opt-in in shell.css, not here: the
- * inbound page is checked for it at first render, before deferred scripts
- * run. In-site Home <-> Projects navigation keeps transition.js's own
- * View Transition.
+ * Page changes are full page loads that fade via the cross-document
+ * `@view-transition` opt-in in shell.css, not here: the inbound page is
+ * checked for it at first render, before deferred scripts run.
  * ───────────────────────────────────────────────────────────── */
 (function () {
     'use strict';
