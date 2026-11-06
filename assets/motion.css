@@ -50,6 +50,8 @@
 
 .owl-lane__toggle { position: absolute; right: var(--gutter, 1rem); bottom: 10px; pointer-events: auto; font: 600 0.72rem/1 var(--font-mono, ui-monospace, monospace); text-transform: uppercase; color: var(--ink-3, #4a4a4a); background: transparent; border: var(--bw, 2px) solid transparent; border-radius: var(--r-sm, 6px); padding: 0.4rem 0.65rem; cursor: pointer; }
 
+@media (pointer: coarse) { .owl-lane__toggle { min-height: 44px; padding-inline: 0.85rem; } }
+
 .owl-lane__toggle:hover { color: var(--ink-1, #0b0b0b); border-color: var(--hairline, #0b0b0b); background: var(--surface-1, #fff); }
 
 .owl-lane__toggle:focus-visible { outline: 3px solid var(--focus-ring, #0f6f62); outline-offset: 2px; }

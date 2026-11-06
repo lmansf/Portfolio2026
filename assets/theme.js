@@ -44,3 +44,20 @@
         s.setProperty('--accent-glow', 'color-mix(in srgb, ' + t.accent + ' 16%, transparent)');
     } catch (e) { /* no-op */ }
 })();
+
+/* Home hero: hold the pipeline stage's place from the first paint.
+ * hero-pipeline.js unhides the stage a moment after load; on a phone that
+ * pushed the whole intro down by the stage's height (a big layout shift).
+ * With `hero-wait` on <html>, pages.css shows the empty stage and the
+ * smaller photo straight away, so nothing moves when the dots start.
+ * hero-pipeline.js removes the class when it starts or gives up; if it
+ * never runs (blocked or failed to load), the class comes off after a few
+ * seconds and the plain hero shows. Other pages have no stage, so the
+ * class does nothing there. */
+(function () {
+    var root = document.documentElement;
+    root.classList.add('hero-wait');
+    setTimeout(function () {
+        if (!document.querySelector('.hero--pipe')) root.classList.remove('hero-wait');
+    }, 6000);
+})();

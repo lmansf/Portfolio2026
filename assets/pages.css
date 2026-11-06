@@ -112,6 +112,11 @@ main.page > * { min-width: 0; }
     overflow: hidden;
 }
 .hero-pipe[hidden] { display: none; }
+/* theme.js adds `hero-wait` to <html> before the first paint and
+ * hero-pipeline.js takes it off when it draws: until then the empty stage
+ * (and the smaller photo and hidden name below) already hold their final
+ * size, so the intro doesn't jump down on a phone when the dots start. */
+.hero-wait .page-home .hero-pipe[hidden] { display: block; }
 .hero-pipe__canvas { display: block; width: 100%; height: 100%; touch-action: pan-y; }
 .hero-pipe__labels {
     position: absolute;
@@ -191,12 +196,14 @@ main.page > * { min-width: 0; }
 }
 .hero-pipe__replay:hover { color: var(--accent-ink); border-color: var(--accent); }
 .hero-pipe__replay[hidden] { display: none; }
-.hero--pipe .hero__avatar {
+.hero--pipe .hero__avatar,
+.hero-wait .page-home .hero__avatar {
     width: clamp(84px, 15vw, 140px);
     height: clamp(84px, 15vw, 140px);
 }
 /* Once the stage draws the name, the <h1> stays for screen readers and search only. */
-.hero--pipe .hero__name {
+.hero--pipe .hero__name,
+.hero-wait .page-home .hero__name {
     position: absolute;
     width: 1px;
     height: 1px;
@@ -1168,6 +1175,28 @@ a.sql-src__node:focus-visible { outline: 3px solid var(--focus-ring); outline-of
 @media print {
     .sql-src { display: none; }
     [data-sql-piece].is-sql-edited { outline: none; }
+}
+
+/* ──────────────────── Touch screens: full-size tap targets ────────────────────
+ * On a phone every control gets at least a 44px-tall hit area (Apple's and
+ * WCAG's target size) without changing how it looks on a desktop. */
+@media (pointer: coarse) {
+    .project__link,
+    .project__link--button,
+    .section-head__link {
+        display: inline-flex;
+        align-items: center;
+        min-height: 44px;
+    }
+    .project__links { gap: 0.25rem 1.1rem; padding-top: 0.25rem; }
+    .sql-src__toggle { min-height: 44px; }
+    .sql-src__btn,
+    .hero-pipe__replay { min-height: 44px; }
+    .sql-src__upstream > summary { padding-block: 0.8rem; }
+}
+/* Narrow phones: the "now" strip's label column only needs the width of "BUILDING". */
+@media (max-width: 479px) {
+    .now__row { grid-template-columns: 5.25rem minmax(0, 1fr); gap: 0.7rem; padding: 0.85rem 1rem; }
 }
 
 /* ──────────────────── 404: the incident report ────────────────────

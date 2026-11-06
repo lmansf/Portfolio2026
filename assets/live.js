@@ -138,6 +138,10 @@ import { metric } from './metrics.js';
         else hideTip();
     }, { passive: true });
     document.addEventListener('keydown', (e) => { if (e.key === 'Escape' || e.key === 'Esc') hideTip(); });
+    // Touch: a tap on a bar shows its numbers (bindTip's click), a tap anywhere else puts them away.
+    document.addEventListener('pointerdown', (e) => {
+        if (tipAnchor && !(e.target instanceof Element && e.target.closest('.hit'))) hideTip();
+    }, { passive: true });
 
     function bindTip(target, html, group) {
         const on = () => {
@@ -151,6 +155,7 @@ import { metric } from './metrics.js';
         target.addEventListener('mouseleave', off);
         target.addEventListener('focus', on);
         target.addEventListener('blur', off);
+        target.addEventListener('click', on);
     }
     const ttRow = (key, value, swatch) =>
         `<div class="tt-row"><span class="tt-key">${swatch ? `<span class="live-swatch live-swatch--${swatch}"></span>` : ''}${esc(key)}</span><span>${esc(value)}</span></div>`;
@@ -233,7 +238,7 @@ import { metric } from './metrics.js';
         const days = [];
         for (let d = first; d <= last; d = addDays(d, 1)) days.push(d);
 
-        const width = Math.max(320, host.clientWidth || 640);
+        const width = Math.max(280, host.clientWidth || 640);
         const height = width < 480 ? 220 : 260;
         const m = { top: 12, right: 8, bottom: 28, left: 36 };
         const iw = width - m.left - m.right;
@@ -343,7 +348,7 @@ import { metric } from './metrics.js';
         const totFraud = bins.reduce((a, b) => a + b.fraud, 0);
         bins.forEach((b) => { b.legitShare = ratio(b.legit, totLegit) || 0; b.fraudShare = ratio(b.fraud, totFraud) || 0; });
 
-        const width = Math.max(320, host.clientWidth || 640);
+        const width = Math.max(280, host.clientWidth || 640);
         const height = width < 480 ? 220 : 260;
         const m = { top: 22, right: 8, bottom: 30, left: 40 };
         const iw = width - m.left - m.right;

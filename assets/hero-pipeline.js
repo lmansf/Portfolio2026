@@ -11,7 +11,8 @@
  *
  * Progressive enhancement: the stage ships `hidden` and the real <h1>
  * stays visible, so no-JS visitors and browsers without canvas see the
- * plain hero. When this script starts, it shows the stage and adds
+ * plain hero (theme.js holds the stage's empty box in place from the
+ * first paint, so the intro doesn't jump on a phone). When this script starts, it shows the stage and adds
  * `hero--pipe` to the hero, which keeps the <h1> for screen readers and
  * search but hides it visually (the canvas is aria-hidden; the stage links
  * carry the numbers as text). If the snapshot can't be read, the dots run
@@ -33,7 +34,10 @@
         nums[el.getAttribute("data-hero-num")] = el;
     });
     var ctx = cv && cv.getContext && cv.getContext("2d");
-    if (!ctx || !hero) return;
+    /* theme.js holds the stage's place (`hero-wait`) until this script
+     * starts; with no canvas, give the plain hero back. */
+    var waiting = document.documentElement.classList;
+    if (!ctx || !hero) { waiting.remove("hero-wait"); return; }
 
     var mqMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
     var mqDark = window.matchMedia("(prefers-color-scheme: dark)");
@@ -353,6 +357,7 @@
         readColors();
         stage.hidden = false;
         hero.classList.add("hero--pipe");
+        waiting.remove("hero-wait");
         if (replay && !mqMotion.matches) replay.hidden = false;
         t0 = performance.now();
         fit();

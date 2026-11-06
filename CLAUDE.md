@@ -4,7 +4,9 @@ Static HTML/CSS/JS portfolio (no build step), deployed on Vercel. Routing is in
 `vercel.json`; design tokens in `assets/tokens.css` (the "Pipeline" style: rounded
 panels, 1px hairlines, soft shadows, Schibsted Grotesk + JetBrains Mono, one
 teal accent with amber/slate pipeline lane colors, Day + Night themes, no brown);
-minified `.min` assets are what the pages load, so regenerate them after
+fonts are self-hosted in `assets/fonts/` (`@font-face` at the top of
+`tokens.css`; pages preload the latin Schibsted Grotesk file; no Google
+Fonts link); minified `.min` assets are what the pages load, so regenerate them after
 editing source (esbuild is fine:
 `npx esbuild <src> --minify --outfile=<min> --allow-overwrite`).
 
@@ -16,7 +18,10 @@ The Home hero animation (`assets/hero-pipeline.js`, loaded as
 `hero-pipeline.min.js`) is progressive enhancement: the `[data-hero-pipe]` stage
 is `hidden` in the HTML and the real `<h1>` stays the heading; the script
 unhides the stage and adds `hero--pipe` (which visually hides the h1 text)
-only once it can draw. Dots flow through three lanes, gather into an owl,
+only once it can draw (until then `theme.js`'s `hero-wait` class on
+`<html>` makes `pages.css` hold the empty stage at its final size, so the
+intro never jumps on a phone; keep that class and the `.hero--pipe` rules in
+step). Dots flow through three lanes, gather into an owl,
 then settle into the name. Under `prefers-reduced-motion` it draws the final
 name with no motion. After editing it, regenerate the `.min.js`.
 

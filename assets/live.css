@@ -227,6 +227,9 @@
     color: var(--accent-ink);
     width: fit-content;
 }
+@media (pointer: coarse) {
+    .live-table summary { display: flex; align-items: center; min-height: 44px; }
+}
 .live-table__scroll {
     margin-top: 0.75rem;
     overflow-x: auto;
