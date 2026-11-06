@@ -11,7 +11,7 @@
 .cat-tables { display: grid; gap: 0.5rem; }
 .cat-table {
     background: var(--surface-1);
-    border: 1px solid var(--hairline);
+    border: var(--bw) solid var(--hairline);
     border-radius: var(--r-md, 12px);
     scroll-margin-top: 5rem;
 }
@@ -31,7 +31,7 @@
 .cat-table__fresh { font-size: 0.78rem; color: var(--ink-3); }
 .cat-table__fresh--warn { color: var(--warn, var(--chestnut)); }
 .cat-table__desc { flex-basis: 100%; font-size: 0.86rem; color: var(--ink-2); line-height: 1.45; }
-.cat-table__body { padding: 0 1rem 0.9rem; border-top: 1px solid var(--hairline); }
+.cat-table__body { padding: 0 1rem 0.9rem; border-top: var(--bw) solid var(--hairline); }
 
 .cat-facts {
     display: grid;
@@ -39,7 +39,7 @@
     gap: 0.5rem 1.25rem;
     margin: 0.75rem 0;
 }
-.cat-fact dt { font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.06em; color: var(--ink-3); }
+.cat-fact dt { font-family: var(--font-mono); font-weight: 600; font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.02em; color: var(--ink-3); }
 .cat-fact dd { margin: 0.1rem 0 0; font-size: 0.86rem; color: var(--ink-1); overflow-wrap: anywhere; line-height: 1.4; }
 .cat-fact code, .cat-metric code, .cat-col__name { font-family: var(--font-mono); font-size: 0.8rem; }
 
@@ -76,7 +76,7 @@
 }
 .cat-metric, .cat-source {
     background: var(--surface-1);
-    border: 1px solid var(--hairline);
+    border: var(--bw) solid var(--hairline);
     border-radius: var(--r-md, 12px);
     padding: 0.75rem 1rem;
     scroll-margin-top: 5rem;
@@ -93,4 +93,4 @@
 .cat-metric__sig { color: var(--ink-2); overflow-wrap: anywhere; }
 .cat-metric__desc, .cat-source__desc { margin: 0.3rem 0 0; font-size: 0.86rem; color: var(--ink-2); line-height: 1.45; }
 .cat-metric__claim, .cat-source__where { margin: 0.3rem 0 0; font-size: 0.8rem; color: var(--ink-3); line-height: 1.45; overflow-wrap: anywhere; }
-.cat-layer { font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.06em; color: var(--ink-3); }
+.cat-layer { font-family: var(--font-mono); font-weight: 600; font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.02em; color: var(--ink-3); }

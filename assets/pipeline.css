@@ -23,7 +23,7 @@
     display: grid;
     gap: 1.1rem;
     background: var(--surface-1);
-    border: 1px solid var(--hairline);
+    border: var(--bw) solid var(--hairline);
     border-radius: var(--r-lg);
     padding: clamp(1.15rem, 3vw, 1.6rem);
     box-shadow: var(--shadow-sm);
@@ -40,8 +40,8 @@
 
 .flow__title {
     font-family: var(--font-display);
-    font-weight: 600;
-    font-variation-settings: "opsz" 48;
+    font-weight: 800;
+    font-stretch: 106%;
     font-size: 1.3rem;
     line-height: 1.2;
     letter-spacing: -0.01em;
@@ -60,16 +60,20 @@
     gap: 0.45rem;
     padding: 0.5rem 0.95rem;
     border-radius: var(--r-pill);
-    border: 1px solid var(--hairline-strong);
-    background: transparent;
+    border: var(--bw) solid var(--hairline-strong);
+    background: var(--surface-1);
     color: var(--ink-1);
     font: inherit;
-    font-size: 0.85rem;
+    font-family: var(--font-mono);
+    font-size: 0.8rem;
     font-weight: 600;
+    text-transform: uppercase;
+    box-shadow: var(--shadow-sm);
     cursor: pointer;
-    transition: background var(--dur-fast) var(--ease-out);
+    transition: background var(--dur-fast) linear, color var(--dur-fast) linear;
 }
-.flow__play:hover { background: var(--surface-2); }
+.flow__play:hover { background: var(--ink-1); color: var(--bg); }
+.flow__play:active { transform: translate(3px, 3px); box-shadow: none; }
 .flow__play:focus-visible { border-radius: var(--r-pill); }
 .flow__play-icon {
     width: 0;
@@ -104,7 +108,7 @@
     position: absolute;
     left: 1.35rem;
     top: 100%;
-    width: 2px;
+    width: var(--bw-heavy);
     height: 0.55rem;
     background: var(--hairline-strong);
     transition: background var(--dur-base) var(--ease-out);
@@ -123,7 +127,7 @@
     font: inherit;
     color: var(--ink-1);
     background: var(--bg);
-    border: 1px solid var(--hairline-strong);
+    border: var(--bw) solid var(--hairline-strong);
     border-radius: var(--r-md);
     cursor: pointer;
     transition: background var(--dur-base) var(--ease-out),
@@ -141,7 +145,7 @@
     place-items: center;
     width: 1.6rem;
     height: 1.6rem;
-    border-radius: 50%;
+    border-radius: 0;
     background: var(--surface-2);
     color: var(--ink-1);
     font-family: var(--font-mono);
@@ -154,7 +158,7 @@
     font-family: var(--font-mono);
     font-size: 0.66rem;
     font-weight: 600;
-    letter-spacing: 0.1em;
+    letter-spacing: 0.02em;
     text-transform: uppercase;
     color: var(--chestnut);
 }
@@ -245,7 +249,7 @@
     gap: 0.5rem;
     padding: 1rem 1.1rem;
     background: var(--bg);
-    border: 1px solid var(--hairline);
+    border: var(--bw) solid var(--hairline);
     border-left: 4px solid var(--accent);
     border-radius: var(--r-md);
 }
@@ -274,7 +278,7 @@
     font-family: var(--font-mono);
     font-size: 0.7rem;
     font-weight: 600;
-    letter-spacing: 0.1em;
+    letter-spacing: 0.02em;
     text-transform: uppercase;
     color: var(--chestnut);
 }
@@ -291,7 +295,7 @@
     color: var(--ink-1);
     background: var(--surface-2);
     padding: 0.05rem 0.3rem;
-    border-radius: 4px;
+    border-radius: 0;
 }
 
 .flow__planned {
@@ -301,12 +305,14 @@
 }
 .flow__badge {
     display: inline-block;
+    font-family: var(--font-mono);
     font-size: 0.66rem;
     font-weight: 600;
-    letter-spacing: 0.06em;
+    letter-spacing: 0;
     text-transform: uppercase;
     color: var(--ink-1);
     background: var(--surface-2);
+    border: var(--bw) solid var(--hairline);
     padding: 0.18rem 0.5rem;
     border-radius: var(--r-pill);
     margin-right: 0.35rem;
@@ -320,10 +326,12 @@
     margin-top: 0.15rem;
 }
 .flow__tools li {
-    font-size: 0.74rem;
-    font-weight: 500;
+    font-family: var(--font-mono);
+    font-size: 0.72rem;
+    font-weight: 600;
     color: var(--ink-1);
-    background: var(--accent-soft);
+    background: var(--surface-1);
+    border: var(--bw) solid var(--hairline);
     padding: 0.26rem 0.6rem;
     border-radius: var(--r-pill);
 }
@@ -333,12 +341,15 @@
     color: var(--ink-3);
 }
 .flow__source a {
-    color: var(--accent-ink);
+    color: var(--ink-1);
     font-weight: 600;
-    text-decoration: none;
-    border-bottom: 1px solid color-mix(in srgb, var(--accent) 30%, transparent);
+    text-decoration: underline;
+    text-decoration-color: var(--accent);
+    text-decoration-thickness: 2px;
+    text-underline-offset: 3px;
+    border-bottom: 0;
 }
-.flow__source a:hover { border-bottom-color: var(--accent); }
+.flow__source a:hover { background: var(--accent); color: var(--on-accent); }
 
 @media (prefers-reduced-motion: reduce) {
     .flow__node,
@@ -366,7 +377,7 @@ html:has(dialog.flow-dialog[open]) { overflow: hidden; scrollbar-gutter: stable;
     max-width: none;
     max-height: calc(100dvh - 2rem);
     padding: 0;
-    border: 1px solid var(--hairline);
+    border: var(--bw) solid var(--hairline);
     border-radius: var(--r-lg);
     background: var(--surface-1);
     color: var(--ink-1);
@@ -408,8 +419,8 @@ html:has(dialog.flow-dialog[open]) { overflow: hidden; scrollbar-gutter: stable;
     place-items: center;
     width: 44px;
     height: 44px;
-    border-radius: 50%;
-    border: 1px solid var(--hairline-strong);
+    border-radius: 0;
+    border: var(--bw) solid var(--hairline-strong);
     background: var(--surface-1);
     color: var(--ink-1);
     font: inherit;
@@ -418,8 +429,8 @@ html:has(dialog.flow-dialog[open]) { overflow: hidden; scrollbar-gutter: stable;
     cursor: pointer;
     transition: background var(--dur-fast) var(--ease-out);
 }
-.flow-dialog__close:hover { background: var(--surface-2); }
-.flow-dialog__close:focus-visible { border-radius: 50%; }
+.flow-dialog__close:hover { background: var(--ink-1); color: var(--bg); }
+.flow-dialog__close:focus-visible { border-radius: 0; }
 
 @keyframes flow-dialog-in {
     from { opacity: 0; transform: translateY(10px) scale(0.985); }

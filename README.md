@@ -56,19 +56,33 @@ shortcut to the résumé PDF, and legacy redirects (e.g. `/fraud` →
 `/projects#fraud`, `/pipeline` → `/owl-park`, and the retired `/playground` →
 `/`) are configured in `vercel.json`.
 
-## Design: "Barn Owl"
+## Design: "Control room"
 
-The palette is taken from the barn owl (*Tyto alba*): the pale heart-shaped
-facial disc and cream breast as the page surfaces, deep eye-brown as ink, the
-plumage browns (tan → caramel → chestnut → umber) as warm accents, and one
-creamy, milk-washed blue as the action color (links, buttons, focus ring,
-soft fills). Day is the default theme; Night follows
-`prefers-color-scheme: dark`: a mid slate page with cards a clear step
-lighter and outlined, cream text, and cool accents (no brown in Night). Every text/background pair meets WCAG AA.
+A utilitarian data-tool look in the Swiss-grotesk / neo-brutalist family,
+chosen to read as a working analytics console rather than an editorial page.
+Corners are square everywhere (every radius token is 0); outlines are thick
+solid ink rules (`--bw` 2px, `--bw-heavy` 4px for section rules and the top
+bar) and depth comes from hard offset shadows with no blur. Each section opens
+with a heavy rule and a numbered uppercase title; featured projects are a
+numbered ledger (one full-width row each) and experience is a dated ledger
+with the dates in their own column.
 
-Type is Fraunces (display, 600) for headlines and Figtree for everything else,
-loaded from Google Fonts; code uses the system monospace stack. Corners are
-soft and tappable things are pills.
+Palette: concrete grey page, white panels and near-black ink in Day; graphite
+panels with off-white rules in Night (`prefers-color-scheme: dark`, no brown
+in either). One loud color, signal orange (`--accent` #ff4f00), is used as a
+fill (primary buttons, the active nav item, markers, link underlines) with ink
+text on it; where orange is text it uses the darker `--accent-ink`. Every
+text/background pair meets WCAG AA. The legacy role names in `tokens.css`
+(`--tan`, `--chestnut`, `--umber` and friends) are kept so every stylesheet
+keeps working, but now map onto this palette.
+
+Type is Archivo (variable, with its width axis set to 112% at display sizes)
+for headlines and body, and JetBrains Mono for numbers, labels, dates, tags,
+nav and SQL, both loaded from Google Fonts in one request.
+
+The CSS `.min.css` files can be rebuilt with esbuild (`npx esbuild <src>
+--minify --outfile=<min>`) or any CSS minifier; only the two JS bundles are
+byte-checked in CI.
 
 ## Assets
 
