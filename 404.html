@@ -3,11 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>404 · Page not found · Logan Mansfield</title>
-    <meta name="description" content="That page wandered off. Head back to Logan Mansfield's Data Analyst portfolio.">
+    <title>404 · Row not found · Logan Mansfield</title>
+    <meta name="description" content="Incident report: that page isn't in the table. Head back to Logan Mansfield's portfolio.">
     <meta name="robots" content="noindex">
-    <meta property="og:title" content="404 · Page not found · Logan Mansfield">
-    <meta property="og:description" content="That page wandered off. Head back to the portfolio.">
+    <meta property="og:title" content="404 · Row not found · Logan Mansfield">
+    <meta property="og:description" content="Incident report: that page isn't in the table. Head back to the portfolio.">
     <meta property="og:type" content="website">
     <meta property="og:url" content="https://loganmansfield.org/404">
     <meta property="og:image" content="https://loganmansfield.org/assets/share-card.jpg">
@@ -64,21 +64,57 @@
         </div>
     </nav>
 
-    <main id="main-content" class="page page-404">
-        <section class="hero" aria-labelledby="nf-title">
-            <div class="hero__main">
-                <p class="eyebrow">404 · Page not found</p>
-                <h1 class="hero__name" id="nf-title">This page<br>flew off.</h1>
-                <p class="hero__role">
-                    The link is broken or the page moved. No dead ends here &mdash; pick a
-                    <em>way back in</em> below.
-                </p>
-                <div class="pitch__actions">
-                    <a class="btn btn--primary" href="/">Back to home <span class="arrow">&rarr;</span></a>
-                    <a class="btn btn--ghost" href="/projects">See projects <span class="arrow">&rarr;</span></a>
-                </div>
+    <main id="main-content" class="page page-404" data-nf>
+        <section class="nf-head" aria-labelledby="nf-title">
+            <p class="nf-tags">
+                <span class="nf-tag nf-tag--id">INC-404</span>
+                <span class="nf-tag nf-tag--sev"><span class="nf-dot" aria-hidden="true"></span>Severity 4 (low)</span>
+                <span class="nf-tag nf-tag--ok"><span class="nf-dot" aria-hidden="true"></span>Resolved</span>
+            </p>
+            <h1 class="nf-title" id="nf-title">Row not found.</h1>
+            <p class="nf-lead">
+                The page you asked for isn&rsquo;t in the table. No harm done.
+                Here&rsquo;s the postmortem, written while it&rsquo;s fresh.
+            </p>
+            <div class="pitch__actions">
+                <a class="btn btn--primary" href="/">Back to home <span class="arrow">&rarr;</span></a>
+                <a class="btn btn--ghost" href="/projects">See projects <span class="arrow">&rarr;</span></a>
             </div>
         </section>
+
+        <div class="nf-report">
+            <section class="nf-panel nf-panel--query" aria-labelledby="nf-query-title">
+                <h2 class="nf-h" id="nf-query-title">The query that failed</h2>
+                <div class="nf-editor" data-nf-editor>
+                    <pre class="nf-sql" data-nf-sql>SELECT title, path
+FROM site_pages
+WHERE path = '/this-page';</pre>
+                </div>
+                <p class="nf-result" data-nf-status>Result: 0 rows.</p>
+                <p class="nf-hint" data-nf-hint hidden>
+                    It runs in your browser. Delete the WHERE line and press Run again to see every page that does exist.
+                </p>
+            </section>
+
+            <section class="nf-panel" aria-labelledby="nf-timeline-title">
+                <h2 class="nf-h" id="nf-timeline-title">Timeline</h2>
+                <ol class="nf-timeline" data-nf-timeline>
+                    <li><span class="nf-t" data-nf-t="request">T0</span><span>Your browser asked for <code class="nf-path" data-nf-path>this page</code>.</span></li>
+                    <li><span class="nf-t" data-nf-t="response">T1</span><span>The server looked it up and found 0 rows, so it answered 404.</span></li>
+                    <li><span class="nf-t" data-nf-t="ready">T2</span><span>This report loaded in place of a blank page.</span></li>
+                    <li><span class="nf-t">Now</span><span>You&rsquo;re reading the postmortem.</span></li>
+                </ol>
+            </section>
+
+            <section class="nf-panel" aria-labelledby="nf-findings-title">
+                <h2 class="nf-h" id="nf-findings-title">Findings</h2>
+                <dl class="nf-findings">
+                    <div><dt>Root cause</dt><dd data-nf-cause>A mistyped address, an old bookmark, or a page that moved.</dd></div>
+                    <div><dt>Impact</dt><dd>One visitor, briefly lost. No data was harmed.</dd></div>
+                    <div><dt>Fix</dt><dd>Serve a way back instead of a dead end: <a href="/">Home</a> or <a href="/projects">Projects</a>.</dd></div>
+                </dl>
+            </section>
+        </div>
     </main>
 
     <footer class="shell-footer">
@@ -95,5 +131,6 @@
 
     <script defer src="/assets/transition.min.js"></script>
     <script defer src="/assets/motion.min.js"></script>
+    <script type="module" src="/assets/notfound.min.js"></script>
 </body>
 </html>

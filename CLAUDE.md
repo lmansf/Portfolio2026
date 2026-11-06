@@ -70,6 +70,13 @@ contact-button or footer copy, or the snapshot query, rerun
 workflow runs both `--check`s in CI and fails if `sql-source.min.js` is
 stale. See the README's "SQL source captions".
 
+The 404 page (`404.html`) is a mock incident postmortem; `assets/notfound.js`
+(bundled into `notfound.min.js` like `sql-source.min.js`; CI byte-checks it)
+puts the requested path in only through `textContent`/`value` with quotes
+doubled in the SQL literal, and runs the query on the captions' DuckDB
+engine over an in-tab `site_pages` table. Keep its `SITE_PAGES` in step with
+`vercel.json`'s rewrites. See the README's "The 404 incident report".
+
 Search/share metadata (head tags, JSON-LD, `sitemap.xml`, `robots.txt`,
 `llms.txt`, `assets/share-card.jpg`, the favicon set) is documented in the README's "Search and
 sharing metadata" section. When a page's head or facts change, bump that

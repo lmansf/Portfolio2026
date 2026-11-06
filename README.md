@@ -45,7 +45,10 @@ page and one archived project page:
 - **Data catalog** (`catalog.html`, `/catalog`) — every table, its owner,
   freshness, columns and tests, and the site's metrics, generated from the
   same definitions (see "The data catalog" below).
-- **404** (`404.html`) — branded not-found page.
+- **404** (`404.html`) — the not-found page, written as a mock data
+  incident postmortem: the query that "failed" (runnable, see "The 404
+  incident report" below), a timeline and the findings, with links back to
+  Home and Projects.
 - **SQL source captions** — under each data-backed piece on Home, Projects
   and `/live`, a quiet "SQL source" caret that opens the query producing it.
   Visitors can edit and run the query in the browser and the piece redraws
@@ -86,8 +89,8 @@ draws, the `<h1>` stays the real heading, and reduced motion gets the final
 name with no movement.
 
 The CSS `.min.css` files can be rebuilt with esbuild (`npx esbuild <src>
---minify --outfile=<min>`) or any CSS minifier; only the two JS bundles are
-byte-checked in CI.
+--minify --outfile=<min>`) or any CSS minifier; only the three JS bundles
+(`sql-source.min.js`, `live.min.js`, `notfound.min.js`) are byte-checked in CI.
 
 ## Assets
 
@@ -233,6 +236,30 @@ The pages load the minified `.min` variants. After editing any source asset,
 regenerate its minified file:
 
     npx esbuild <src> --minify --outfile=<min> --allow-overwrite
+
+## The 404 incident report
+
+A missing page (`404.html`, which Vercel serves for any unknown path) reads
+as a postmortem. Without JavaScript it is plain HTML: tags (INC-404,
+severity, resolved), the failed query with a placeholder path, a timeline
+and the findings. `assets/notfound.js` (bundled with `sql-engine.js` and
+`sql-source.js` into `notfound.min.js` with `esbuild --bundle --format=esm
+--minify`) then:
+
+- puts the requested path into the query and the timeline, only through
+  `textContent` or the textarea's value, decoded, stripped of control
+  characters, capped at 80 characters, and with single quotes doubled
+  inside the SQL literal;
+- fills the timeline with real timings from this load (Navigation Timing),
+  and picks the root cause line from `document.referrer` (a link on this
+  site, a link from elsewhere, or none);
+- turns the query into an editor. Run starts the same DuckDB-Wasm engine as
+  the SQL source captions and adds an in-tab `site_pages` table (title,
+  path) listing the real pages, so the default query returns 0 rows and
+  dropping the WHERE line lists the pages that exist. Results draw as a small
+  table; only paths from that list become links. The site tables and the
+  nest-box hunt work here too. Keep `SITE_PAGES` in `notfound.js` in step
+  with `vercel.json`'s rewrites.
 
 ## SQL source captions
 

@@ -1170,8 +1170,143 @@ a.sql-src__node:focus-visible { outline: 3px solid var(--focus-ring); outline-of
     [data-sql-piece].is-sql-edited { outline: none; }
 }
 
-/* ──────────────────── 404 ──────────────────── */
-.page-404 .hero__main { padding: clamp(1rem, 5vw, 3rem) 0; }
+/* ──────────────────── 404: the incident report ────────────────────
+ * A missing page reads as a mock postmortem: tags, the query that "failed"
+ * (an editor once notfound.js runs), a timeline and the findings. Plain
+ * readable HTML without JS; the amber stripe marks the incident. */
+main.page.page-404 { gap: clamp(1.75rem, 4vw, 2.5rem); }
+.nf-head { display: grid; gap: 1rem; justify-items: start; padding-top: clamp(0.25rem, 3vw, 1.5rem); }
+.nf-tags { display: flex; flex-wrap: wrap; gap: 0.45rem; }
+.nf-tag {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    padding: 0.28rem 0.55rem;
+    font-family: var(--font-mono);
+    font-size: 0.72rem;
+    font-weight: 600;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--ink-1);
+    background: var(--surface-1);
+    border: var(--bw) solid var(--hairline);
+    border-radius: var(--r-sm);
+}
+.nf-tag--id { color: var(--bg); background: var(--ink-1); border-color: var(--ink-1); }
+.nf-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--tan); flex-shrink: 0; }
+.nf-tag--ok .nf-dot { background: var(--accent); }
+.nf-title {
+    font-family: var(--font-display);
+    font-size: clamp(2.4rem, 8vw, 5rem);
+    line-height: 0.98;
+    letter-spacing: -0.025em;
+    font-weight: 800;
+    font-stretch: var(--display-stretch);
+    color: var(--ink-1);
+}
+.nf-lead { font-size: clamp(1.05rem, 2.2vw, 1.25rem); line-height: 1.45; color: var(--ink-2); max-width: 54ch; }
+.nf-report { display: grid; gap: 1rem; grid-template-columns: minmax(0, 1fr); }
+@media (min-width: 820px) {
+    .nf-report { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 1.25rem; }
+    .nf-panel--query { grid-column: 1 / -1; }
+}
+.nf-panel {
+    min-width: 0;
+    padding: clamp(1rem, 3vw, 1.35rem);
+    background: var(--surface-1);
+    border: var(--bw) solid var(--hairline);
+    border-radius: var(--r-lg);
+    box-shadow: var(--shadow-md);
+}
+.nf-panel--query { box-shadow: inset 0 3px 0 var(--tan), var(--shadow-md); }
+.nf-h {
+    margin-bottom: 0.75rem;
+    font-family: var(--font-mono);
+    font-size: 0.76rem;
+    font-weight: 600;
+    letter-spacing: 0;
+    text-transform: uppercase;
+    color: var(--ink-1);
+}
+.nf-h::before { content: "// "; content: "// " / ""; color: var(--accent-ink); }
+.nf-sql {
+    margin: 0;
+    padding: 0.75rem 0.85rem;
+    overflow-x: auto;
+    font-family: var(--font-mono);
+    font-size: 0.82rem;
+    line-height: 1.55;
+    color: var(--ink-1);
+    background: var(--bg);
+    border: var(--bw) solid var(--hairline-strong);
+    border-radius: var(--r-sm);
+    white-space: pre;
+}
+.nf-input { font-size: 0.82rem; min-height: 5.5rem; }
+@media (pointer: coarse) { .nf-input { font-size: 16px; } }
+@media (max-width: 600px) { .nf-sql { white-space: pre-wrap; overflow-wrap: anywhere; } }
+.nf-out { margin: 0.6rem 0 0; }
+.nf-result {
+    margin-top: 0.6rem;
+    font-family: var(--font-mono);
+    font-size: 0.78rem;
+    line-height: 1.45;
+    color: var(--ink-2);
+}
+.nf-hint { margin-top: 0.35rem; font-size: 0.85rem; line-height: 1.45; color: var(--ink-3); }
+.nf-hint[hidden] { display: none; }
+.nf-empty { text-align: center; color: var(--ink-3); }
+.nf-timeline { list-style: none; display: grid; }
+.nf-timeline li {
+    display: grid;
+    grid-template-columns: 5.25rem minmax(0, 1fr);
+    gap: 0.75rem;
+    align-items: baseline;
+    padding: 0.55rem 0;
+    border-top: var(--bw) solid var(--rule-soft);
+    font-size: 0.95rem;
+    line-height: 1.45;
+    color: var(--ink-2);
+}
+.nf-timeline li:first-child { border-top: 0; padding-top: 0; }
+@media (max-width: 480px) { .nf-timeline li { grid-template-columns: 4.25rem minmax(0, 1fr); gap: 0.6rem; } }
+.nf-t {
+    font-family: var(--font-mono);
+    font-size: 0.76rem;
+    font-weight: 600;
+    color: var(--accent-ink);
+    font-variant-numeric: tabular-nums;
+    white-space: nowrap;
+}
+.nf-path {
+    font-family: var(--font-mono);
+    font-size: 0.82em;
+    color: var(--ink-1);
+    background: var(--surface-2);
+    border-radius: 4px;
+    padding: 0.05em 0.3em;
+    overflow-wrap: anywhere;
+}
+.nf-findings { display: grid; gap: 0.85rem; }
+.nf-findings dt {
+    font-family: var(--font-mono);
+    font-size: 0.72rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    color: var(--ink-3);
+}
+.nf-findings dd { margin-top: 0.15rem; font-size: 0.95rem; line-height: 1.45; color: var(--ink-1); }
+.nf-findings a,
+.nf-out a {
+    color: var(--ink-1);
+    font-weight: 700;
+    text-decoration: underline;
+    text-decoration-color: var(--accent);
+    text-decoration-thickness: 2px;
+    text-underline-offset: 3px;
+}
+.nf-findings a:hover,
+.nf-out a:hover { background: var(--accent); color: var(--on-accent); }
 .pitch__actions {
     display: flex;
     flex-wrap: wrap;
