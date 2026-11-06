@@ -1,14 +1,15 @@
 /* ─────────────────────────────────────────────────────────────
  * tokens.css — design tokens for loganmansfield.org.
  *
- * Direction: "Control room". A utilitarian data-tool look in the
- * Swiss-grotesk / neo-brutalist family: square corners everywhere,
- * thick solid rules and hard offset shadows (no hairlines, no blur),
- * a heavy grotesk for headings (Archivo, expanded at display sizes),
- * a monospace for numbers, labels, dates and SQL (JetBrains Mono),
- * high-contrast neutrals and one loud signal orange.
- * Day (concrete grey + black ink) is the default; Night (graphite +
- * off-white rules) follows prefers-color-scheme: dark. No browns.
+ * Direction: "Pipeline". A calm, readable data-engineering look: the
+ * page reads like a well-run pipeline, with one moving moment (the Home
+ * hero, where points of data are ingested, swirl into an owl, and settle
+ * into the name). Everything else stays quiet: sentence-case headings in
+ * Schibsted Grotesk, JetBrains Mono for numbers, labels, dates and SQL,
+ * thin cool-grey lines, small radii, soft shadows, a teal accent for
+ * what's "served" and an amber mid-pipeline accent used only as a fill.
+ * Day (off-white) is the default; Night (deep blue-black) follows
+ * prefers-color-scheme: dark.
  *
  * Every page imports this BEFORE any other stylesheet.
  * ────────────────────────────────────────────────────────────── */
@@ -17,74 +18,80 @@
     color-scheme: light;
 
     /* ── Ground ── */
-    --bg:               #ebebe7;     /* page: concrete */
+    --bg:               #f5f6f4;     /* page: cool off-white */
     --surface-1:        #ffffff;     /* raised panels */
-    --surface-2:        #dcdcd8;     /* sunken / hover / chips */
-    --surface-3:        #cfcfca;     /* deeper hover, pressed */
+    --surface-2:        #eceeeb;     /* sunken / hover / chips */
+    --surface-3:        #e1e4e1;     /* deeper hover, pressed */
 
     /* ── Ink ── */
-    --ink-1:            #0b0b0b;     /* primary text (16:1 on --bg) */
-    --ink-2:            #3d3d3d;     /* secondary text (9:1) */
-    --ink-3:            #4a4a4a;     /* labels, meta (≥ 6.4:1 on every surface) */
+    --ink-1:            #111b22;     /* primary text (16:1 on --bg) */
+    --ink-2:            #36424b;     /* secondary text (10:1) */
+    --ink-3:            #4a5660;     /* labels, meta (>= 6.4:1 on every surface) */
 
-    /* ── Signal orange: the one loud color ── */
-    --accent:           #ff4f00;     /* fills: primary button, active nav, markers (ink text on it 6:1) */
-    --accent-ink:       #a63100;     /* orange as text (≥ 5:1 on the page, panels and chips) */
-    --on-accent:        #0b0b0b;     /* text on an accent fill */
-    --accent-soft:      #ffc4a6;     /* light orange fill behind ink text (12.8:1) */
-    --accent-mist:      #ffe7da;     /* faint orange wash for hover rows */
-    --accent-glow:      rgba(255, 79, 0, 0.14);
+    /* ── Teal: the "served" color ── */
+    --accent:           #0f6f62;     /* fills: primary button, active nav, markers (white text on it 6:1) */
+    --accent-ink:       #0f6f62;     /* teal as text (>= 5.6:1 on the page, panels and chips) */
+    --on-accent:        #ffffff;     /* text on an accent fill */
+    --accent-on-dark:   #4fd1b8;     /* teal on the dark readout band */
+    --accent-soft:      #cfe9e3;     /* light teal fill behind ink text (14:1) */
+    --accent-mist:      #e6f3f0;     /* faint teal wash for hover rows */
+    --accent-glow:      rgba(15, 111, 98, 0.14);
+
+    /* ── Pipeline points (hero canvas): ingest grey, transform amber, serve teal ── */
+    --pipe-1:           #8a97a3;
+    --pipe-2:           #c97a00;
+    --pipe-3:           #0f7b6c;
 
     /* ── Legacy role names (kept so every stylesheet keeps working) ── */
-    --tan:              #ff4f00;     /* identity fill: marks, featured stripe (fill only) */
-    --on-tan:           #0b0b0b;
-    --caramel:          #a63100;     /* display accents as text */
-    --chestnut:         #3d3d3d;     /* labels and eyebrows */
-    --warn:             #a63100;     /* warning text (stale data) */
-    --umber:            #0b0b0b;     /* inverted band: footer, readouts */
-    --on-umber:         #f2f2ee;
-    --fawn:             #dcdcd8;
-    --plume:            #9a9a95;     /* texture / disabled only, never text */
+    --tan:              #c97a00;     /* identity fill: marks, featured stripe (fill only, ink text on it) */
+    --on-tan:           #111b22;
+    --caramel:          #0f6f62;     /* display accents as text */
+    --chestnut:         #36424b;     /* labels and eyebrows */
+    --warn:             #9a4d00;     /* warning text (stale data) */
+    --umber:            #111b22;     /* inverted band: footer, readouts */
+    --on-umber:         #e8eef0;
+    --fawn:             #eceeeb;
+    --plume:            #a3adb5;     /* texture / disabled only, never text */
 
     /* ── Signal ── */
     --success:          #1a7f37;
     --danger:           #c62828;
 
-    /* ── Lines: solid and heavy ── */
-    --bw:               2px;         /* default border width */
-    --bw-heavy:         4px;         /* section rules, top bar */
-    --hairline:         #0b0b0b;     /* outlines are ink now, not tint */
-    --hairline-strong:  #0b0b0b;     /* control borders */
-    --rule-soft:        #b9b9b4;     /* inner table/grid lines only */
-    --focus-ring:       #ff4f00;
-    --scrim:            rgba(11, 11, 11, 0.7);   /* modal backdrop */
+    /* ── Lines: thin and cool ── */
+    --bw:               1px;         /* default border width */
+    --bw-heavy:         2px;         /* section rules, top bar */
+    --hairline:         #d3d8d6;     /* card and panel outlines */
+    --hairline-strong:  #7d8a86;     /* control borders (3:1 on white) */
+    --rule-soft:        #e1e4e1;     /* inner table/grid lines only */
+    --focus-ring:       #0f6f62;
+    --scrim:            rgba(17, 27, 34, 0.6);   /* modal backdrop */
 
-    /* ── Shadows: hard offsets, no blur ── */
-    --shadow-color: #0b0b0b;
-    --shadow-sm:  3px 3px 0 var(--shadow-color);
-    --shadow-md:  5px 5px 0 var(--shadow-color);
-    --shadow-lg:  8px 8px 0 var(--shadow-color);
-    --shadow-press: 4px 4px 0 var(--shadow-color);
-    --shadow-pressed: 0 0 0 var(--shadow-color);
+    /* ── Shadows: soft and low ── */
+    --shadow-color: rgba(17, 27, 34, 0.08);
+    --shadow-sm:  0 1px 2px rgba(17, 27, 34, 0.06);
+    --shadow-md:  0 1px 2px rgba(17, 27, 34, 0.05), 0 4px 12px rgba(17, 27, 34, 0.05);
+    --shadow-lg:  0 2px 4px rgba(17, 27, 34, 0.05), 0 10px 28px rgba(17, 27, 34, 0.08);
+    --shadow-press: 0 1px 2px rgba(17, 27, 34, 0.08);
+    --shadow-pressed: 0 0 0 rgba(17, 27, 34, 0);
 
     /* ── Type ── */
-    --font-display: "Archivo", "Helvetica Neue", Arial, system-ui, sans-serif;
-    --font-text:    "Archivo", "Helvetica Neue", Arial, system-ui, sans-serif;
+    --font-display: "Schibsted Grotesk", "Helvetica Neue", Arial, system-ui, sans-serif;
+    --font-text:    "Schibsted Grotesk", "Helvetica Neue", Arial, system-ui, sans-serif;
     --font-mono:    "JetBrains Mono", ui-monospace, "SF Mono", Menlo, Consolas, "Liberation Mono", monospace;
-    --display-stretch: 112%;         /* Archivo's width axis at display sizes */
+    --display-stretch: 100%;
 
-    /* ── Radii: none ── */
-    --r-sm:   0;
-    --r-md:   0;
-    --r-lg:   0;
-    --r-xl:   0;
-    --r-pill: 0;
+    /* ── Radii: small and consistent ── */
+    --r-sm:   6px;
+    --r-md:   10px;
+    --r-lg:   14px;
+    --r-xl:   18px;
+    --r-pill: 999px;
 
     /* ── Motion ── */
     --ease-out:    cubic-bezier(0.2, 0.8, 0.2, 1);
     --ease-in-out: cubic-bezier(0.65, 0, 0.35, 1);
-    --dur-fast:    90ms;
-    --dur-base:    160ms;
+    --dur-fast:    120ms;
+    --dur-base:    180ms;
     --dur-slow:    320ms;
 
     /* ── Layout ── */
@@ -93,49 +100,58 @@
     --max-w:       1080px;
 }
 
-/* ── Night: graphite ──
- * Near-black graphite with off-white rules and the same signal orange.
- * Hard shadows switch to a mid grey so they still read on the dark page. */
+/* ── Night: deep blue-black ──
+ * The same pipeline with brighter teal and amber so both read on the dark page. */
 @media (prefers-color-scheme: dark) {
     :root {
         color-scheme: dark;
 
-        --bg:               #141517;
-        --surface-1:        #1e2023;
-        --surface-2:        #2a2c30;
-        --surface-3:        #34373c;
+        --bg:               #0c1215;
+        --surface-1:        #131b20;
+        --surface-2:        #1b252b;
+        --surface-3:        #243038;
 
-        --ink-1:            #f2f2ee;     /* 16:1 on --bg */
-        --ink-2:            #c9c9c4;
-        --ink-3:            #b8b8b2;     /* ≥ 6:1 on every surface */
+        --ink-1:            #e8eef0;     /* 15:1 on --bg */
+        --ink-2:            #c3ccd0;
+        --ink-3:            #a1adb3;     /* >= 6:1 on every surface */
 
-        --accent:           #ff4f00;
-        --accent-ink:       #ff6a2b;     /* 5.7:1 on cards */
-        --on-accent:        #0b0b0b;
-        --accent-soft:      #44474d;     /* neutral steel fill behind light text (no brown) */
-        --accent-mist:      #26282c;
-        --accent-glow:      rgba(255, 79, 0, 0.18);
+        --accent:           #4fd1b8;
+        --accent-ink:       #4fd1b8;     /* 9:1 on cards */
+        --on-accent:        #0c1215;
+        --accent-on-dark:   #4fd1b8;
+        --accent-soft:      #1f3a36;     /* dark teal fill behind light text */
+        --accent-mist:      #16252a;
+        --accent-glow:      rgba(79, 209, 184, 0.16);
 
-        --tan:              #ff4f00;
-        --on-tan:           #0b0b0b;
-        --caramel:          #ff6a2b;
-        --chestnut:         #c9c9c4;
-        --warn:             #ffb38a;
-        --umber:            #050506;
-        --on-umber:         #f2f2ee;
-        --fawn:             #2a2c30;
-        --plume:            #75777c;
+        --pipe-1:           #5c6a73;
+        --pipe-2:           #f0a73a;
+        --pipe-3:           #4fd1b8;
+
+        --tan:              #f0a73a;
+        --on-tan:           #0c1215;
+        --caramel:          #4fd1b8;
+        --chestnut:         #c3ccd0;
+        --warn:             #f0a73a;
+        --umber:            #070b0d;
+        --on-umber:         #e8eef0;
+        --fawn:             #1b252b;
+        --plume:            #5c6a73;
 
         --success:          #6fd08c;
         --danger:           #ff8a80;
 
-        --hairline:         #d9d9d4;
-        --hairline-strong:  #d9d9d4;
-        --rule-soft:        #4a4d53;
-        --focus-ring:       #ff6a2b;
-        --scrim:            rgba(0, 0, 0, 0.72);
+        --hairline:         #2a353b;
+        --hairline-strong:  #6b7a82;
+        --rule-soft:        #243038;
+        --focus-ring:       #4fd1b8;
+        --scrim:            rgba(0, 0, 0, 0.7);
 
-        --shadow-color: #5c5f66;
+        --shadow-color: rgba(0, 0, 0, 0.4);
+        --shadow-sm:  0 1px 2px rgba(0, 0, 0, 0.35);
+        --shadow-md:  0 1px 2px rgba(0, 0, 0, 0.3), 0 4px 12px rgba(0, 0, 0, 0.25);
+        --shadow-lg:  0 2px 4px rgba(0, 0, 0, 0.3), 0 10px 28px rgba(0, 0, 0, 0.35);
+        --shadow-press: 0 1px 2px rgba(0, 0, 0, 0.4);
+        --shadow-pressed: 0 0 0 rgba(0, 0, 0, 0);
     }
 }
 
@@ -202,5 +218,5 @@ main {
 /* Scrollbar on-palette */
 ::-webkit-scrollbar { width: 10px; }
 ::-webkit-scrollbar-track { background: var(--surface-1); }
-::-webkit-scrollbar-thumb { background: var(--ink-3); border-radius: 0; border: 2px solid var(--surface-1); }
+::-webkit-scrollbar-thumb { background: var(--plume); border-radius: var(--r-pill); border: 2px solid var(--surface-1); }
 ::-webkit-scrollbar-thumb:hover { background: var(--ink-3); }

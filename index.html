@@ -33,13 +33,13 @@
     <link rel="icon" href="/assets/favicon.svg" type="image/svg+xml">
     <link rel="apple-touch-icon" href="/assets/apple-touch-icon.png">
     <link rel="manifest" href="/manifest.json">
-    <meta name="theme-color" media="(prefers-color-scheme: light)" content="#ebebe7">
-    <meta name="theme-color" media="(prefers-color-scheme: dark)" content="#141517">
+    <meta name="theme-color" media="(prefers-color-scheme: light)" content="#f5f6f4">
+    <meta name="theme-color" media="(prefers-color-scheme: dark)" content="#0c1215">
     <script src="/assets/theme.min.js"></script>
     <link rel="stylesheet" href="/assets/tokens.min.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@100..125,400..900&amp;family=JetBrains+Mono:wght@400..700&amp;display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Schibsted+Grotesk:wght@400..900&amp;family=JetBrains+Mono:wght@400..700&amp;display=swap" rel="stylesheet">
     <link rel="stylesheet" href="/assets/shell.min.css">
     <link rel="stylesheet" href="/assets/pages.min.css">
     <script>
@@ -141,6 +141,12 @@
 
         <!-- Intro -->
         <section class="hero" aria-labelledby="home-name">
+            <!-- Pipeline hero: hidden until assets/hero-pipeline.js draws it (the h1 below stays the real heading) -->
+            <div class="hero-pipe" data-hero-pipe hidden>
+                <canvas class="hero-pipe__canvas" aria-hidden="true"></canvas>
+                <div class="hero-pipe__labels" aria-hidden="true"><span>Ingest</span><span>Transform</span><span>Serve</span></div>
+                <button type="button" class="hero-pipe__replay" data-hero-replay hidden>Replay</button>
+            </div>
             <div class="hero__card">
                 <img class="hero__avatar" src="/assets/profilepicture.webp" alt="Logan Mansfield" width="172" height="172" decoding="async" fetchpriority="high">
                 <div class="hero__intro">
@@ -463,6 +469,7 @@ ORDER BY min(sort_order);</code></pre>
         </div>
     </footer>
 
+    <script defer src="/assets/hero-pipeline.min.js"></script>
     <script defer src="/assets/transition.min.js"></script>
     <script defer src="/assets/pipeline.min.js"></script>
     <script defer src="/assets/motion.min.js"></script>

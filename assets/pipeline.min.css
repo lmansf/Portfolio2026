@@ -35,7 +35,6 @@
 .flow__title {
     font-family: var(--font-display);
     font-weight: 800;
-    font-stretch: 106%;
     font-size: 1.3rem;
     line-height: 1.2;
     letter-spacing: -0.01em;
@@ -61,13 +60,12 @@
     font-family: var(--font-mono);
     font-size: 0.8rem;
     font-weight: 600;
-    text-transform: uppercase;
     box-shadow: var(--shadow-sm);
     cursor: pointer;
     transition: background var(--dur-fast) linear, color var(--dur-fast) linear;
 }
 .flow__play:hover { background: var(--ink-1); color: var(--bg); }
-.flow__play:active { transform: translate(3px, 3px); box-shadow: none; }
+.flow__play:active { transform: translateY(1px); box-shadow: none; }
 .flow__play:focus-visible { border-radius: var(--r-pill); }
 .flow__play-icon {
     width: 0;
@@ -139,7 +137,7 @@
     place-items: center;
     width: 1.6rem;
     height: 1.6rem;
-    border-radius: 0;
+    border-radius: var(--r-pill);
     background: var(--surface-2);
     color: var(--ink-1);
     font-family: var(--font-mono);
@@ -289,7 +287,7 @@
     color: var(--ink-1);
     background: var(--surface-2);
     padding: 0.05rem 0.3rem;
-    border-radius: 0;
+    border-radius: var(--r-sm);
 }
 
 .flow__planned {
@@ -354,4 +352,4 @@
 }
 
 /* ─────────────────────────────────────────────────────────────
- * The diagrams open in a modal <dialog> from each featured card's * "How the data flows" button (pipeline.js). Phones get a full-screen * sheet;wider screens a centered panel. The page behind can't scroll. * ───────────────────────────────────────────────────────────── */ [data-flow-fallback][hidden]{display: none}html:has(dialog.flow-dialog[open]){overflow: hidden;scrollbar-gutter: stable}.flow-dialog{position: fixed;inset: 0;margin: auto;width: min(1040px,calc(100vw - 2rem));max-width: none;max-height: calc(100dvh - 2rem);padding: 0;border: var(--bw) solid var(--hairline);border-radius: var(--r-lg);background: var(--surface-1);color: var(--ink-1);box-shadow: var(--shadow-lg);overflow: hidden}.flow-dialog[open]{display: flex;flex-direction: column;animation: flow-dialog-in var(--dur-base) var(--ease-out)}.flow-dialog::backdrop{background: var(--scrim,rgba(27,20,15,0.55))}.flow-dialog[open]::backdrop{animation: flow-backdrop-in var(--dur-base) var(--ease-out)}.flow-dialog__body{flex: 1 1 auto;overflow-y: auto;overscroll-behavior: contain;padding: clamp(1.15rem,3vw,1.6rem)}.flow-dialog .flow{background: transparent;border: 0;box-shadow: none;padding: 0}.flow-dialog .flow__head{padding-right: 3rem}.flow-dialog__close{position: absolute;top: 0.6rem;right: 0.6rem;z-index: 2;display: grid;place-items: center;width: 44px;height: 44px;border-radius: 0;border: var(--bw) solid var(--hairline-strong);background: var(--surface-1);color: var(--ink-1);font: inherit;font-size: 1.5rem;line-height: 1;cursor: pointer;transition: background var(--dur-fast) var(--ease-out)}.flow-dialog__close:hover{background: var(--ink-1);color: var(--bg)}.flow-dialog__close:focus-visible{border-radius: 0}@keyframes flow-dialog-in{from{opacity: 0;transform: translateY(10px) scale(0.985)}to{opacity: 1;transform: none}}@keyframes flow-backdrop-in{from{opacity: 0}to{opacity: 1}}@media (max-width: 639px){.flow-dialog{width: 100vw;height: 100dvh;max-height: 100dvh;border: 0;border-radius: 0}@keyframes flow-dialog-in{from{transform: translateY(24px);opacity: 0}to{transform: none;opacity: 1}}}@media (prefers-reduced-motion: reduce){.flow-dialog[open],.flow-dialog[open]::backdrop{animation: none}.flow-dialog__close{transition: none}}
+ * The diagrams open in a modal <dialog> from each featured card's * "How the data flows" button (pipeline.js). Phones get a full-screen * sheet;wider screens a centered panel. The page behind can't scroll. * ───────────────────────────────────────────────────────────── */ [data-flow-fallback][hidden]{display: none}html:has(dialog.flow-dialog[open]){overflow: hidden;scrollbar-gutter: stable}.flow-dialog{position: fixed;inset: 0;margin: auto;width: min(1040px,calc(100vw - 2rem));max-width: none;max-height: calc(100dvh - 2rem);padding: 0;border: var(--bw) solid var(--hairline);border-radius: var(--r-lg);background: var(--surface-1);color: var(--ink-1);box-shadow: var(--shadow-lg);overflow: hidden}.flow-dialog[open]{display: flex;flex-direction: column;animation: flow-dialog-in var(--dur-base) var(--ease-out)}.flow-dialog::backdrop{background: var(--scrim,rgba(27,20,15,0.55))}.flow-dialog[open]::backdrop{animation: flow-backdrop-in var(--dur-base) var(--ease-out)}.flow-dialog__body{flex: 1 1 auto;overflow-y: auto;overscroll-behavior: contain;padding: clamp(1.15rem,3vw,1.6rem)}.flow-dialog .flow{background: transparent;border: 0;box-shadow: none;padding: 0}.flow-dialog .flow__head{padding-right: 3rem}.flow-dialog__close{position: absolute;top: 0.6rem;right: 0.6rem;z-index: 2;display: grid;place-items: center;width: 44px;height: 44px;border-radius: var(--r-sm);border: var(--bw) solid var(--hairline-strong);background: var(--surface-1);color: var(--ink-1);font: inherit;font-size: 1.5rem;line-height: 1;cursor: pointer;transition: background var(--dur-fast) var(--ease-out)}.flow-dialog__close:hover{background: var(--ink-1);color: var(--bg)}.flow-dialog__close:focus-visible{border-radius: var(--r-sm)}@keyframes flow-dialog-in{from{opacity: 0;transform: translateY(10px) scale(0.985)}to{opacity: 1;transform: none}}@keyframes flow-backdrop-in{from{opacity: 0}to{opacity: 1}}@media (max-width: 639px){.flow-dialog{width: 100vw;height: 100dvh;max-height: 100dvh;border: 0;border-radius: var(--r-lg)}@keyframes flow-dialog-in{from{transform: translateY(24px);opacity: 0}to{transform: none;opacity: 1}}}@media (prefers-reduced-motion: reduce){.flow-dialog[open],.flow-dialog[open]::backdrop{animation: none}.flow-dialog__close{transition: none}}

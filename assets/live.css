@@ -15,14 +15,14 @@
  * ───────────────────────────────────────────────────────────── */
 
 :root {
-    --live-legit:  #4a4a4a;   /* good customers / caught: neutral graphite */
-    --live-fraud:  #ff4f00;   /* fraud / missed: the signal orange */
+    --live-legit:  #4a5660;   /* good customers / caught: cool graphite */
+    --live-fraud:  #ff4f00;   /* fraud / missed: a warning orange, apart from the teal */
     --live-grid:   var(--rule-soft);
     --live-axis:   var(--ink-3);
 }
 @media (prefers-color-scheme: dark) {
     :root {
-        --live-legit: #a9aaa6;
+        --live-legit: #a1adb3;
         --live-fraud: #ff6a2b;
     }
 }
@@ -56,7 +56,7 @@
     width: 0.5rem;
     height: 0.5rem;
     margin-right: 0.45rem;
-    border-radius: 0;
+    border-radius: 50%;
     background: var(--success);
 }
 .live-meta__text {
@@ -178,7 +178,7 @@
 .live-swatch {
     width: 0.8rem;
     height: 0.8rem;
-    border-radius: 0;
+    border-radius: 3px;
     display: inline-block;
 }
 .live-swatch--caught,
@@ -211,7 +211,7 @@
 }
 .live-bar__fill {
     height: 100%;
-    border-radius: 0 4px 4px 0;
+    border-radius: 0 3px 3px 0;
     background: var(--live-legit);
     min-width: 2px;
 }

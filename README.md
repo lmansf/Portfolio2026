@@ -56,29 +56,34 @@ shortcut to the résumé PDF, and legacy redirects (e.g. `/fraud` →
 `/projects#fraud`, `/pipeline` → `/owl-park`, and the retired `/playground` →
 `/`) are configured in `vercel.json`.
 
-## Design: "Control room"
+## Design: "Pipeline"
 
-A utilitarian data-tool look in the Swiss-grotesk / neo-brutalist family,
-chosen to read as a working analytics console rather than an editorial page.
-Corners are square everywhere (every radius token is 0); outlines are thick
-solid ink rules (`--bw` 2px, `--bw-heavy` 4px for section rules and the top
-bar) and depth comes from hard offset shadows with no blur. Each section opens
-with a heavy rule and a numbered uppercase title; featured projects are a
-numbered ledger (one full-width row each) and experience is a dated ledger
-with the dates in their own column.
+A clean data-engineering look: data moves through stages (ingest, transform,
+serve) and the page reads like a well-made product, not an academic paper or
+a brutalist console. Panels have rounded corners (radius tokens 6 to 18px),
+1px hairline borders and soft, blurred shadows. Each section opens with a thin
+rule and a numbered title; featured projects are a numbered ledger in one
+rounded frame and experience is a dated ledger.
 
-Palette: concrete grey page, white panels and near-black ink in Day; graphite
-panels with off-white rules in Night (`prefers-color-scheme: dark`, no brown
-in either). One loud color, signal orange (`--accent` #ff4f00), is used as a
-fill (primary buttons, the active nav item, markers, link underlines) with ink
-text on it; where orange is text it uses the darker `--accent-ink`. Every
-text/background pair meets WCAG AA. The legacy role names in `tokens.css`
-(`--tan`, `--chestnut`, `--umber` and friends) are kept so every stylesheet
-keeps working, but now map onto this palette.
+Palette: off-white page, white panels and deep blue-black ink in Day; near-black
+blue panels in Night (`prefers-color-scheme: dark`, no brown in either). One
+accent, teal (`--accent` #0f6f62 in Day, #4fd1b8 in Night), marks primary
+buttons, the current nav item, eyebrows and link underlines. The three
+pipeline lane colors (`--pipe-1` slate, `--pipe-2` amber, `--pipe-3` teal)
+color the Home hero animation and stage markers. Every text/background pair
+meets WCAG AA. The legacy role names in `tokens.css` (`--tan`, `--chestnut`,
+`--umber` and friends) are kept so every stylesheet keeps working, but now map
+onto this palette.
 
-Type is Archivo (variable, with its width axis set to 112% at display sizes)
-for headlines and body, and JetBrains Mono for numbers, labels, dates, tags,
-nav and SQL, both loaded from Google Fonts in one request.
+Type is Schibsted Grotesk (variable, 400 to 900) for headlines and body, and
+JetBrains Mono for numbers, labels, dates, tags and SQL, both loaded from
+Google Fonts in one request.
+
+The Home hero is a canvas animation (`assets/hero-pipeline.js`): dots flow
+through the three lanes, gather into an owl, then settle into the name, and
+they push away from the pointer once settled. It is hidden until the script
+draws, the `<h1>` stays the real heading, and reduced motion gets the final
+name with no movement.
 
 The CSS `.min.css` files can be rebuilt with esbuild (`npx esbuild <src>
 --minify --outfile=<min>`) or any CSS minifier; only the two JS bundles are
@@ -96,6 +101,8 @@ byte-checked in CI.
   and the "SQL source" captions (`.sql-src`: the collapsed caption, the
   editor, result tables, error and egg cards, and the dashed `is-sql-edited`
   frame on a redrawn piece).
+- `assets/hero-pipeline.js` — the Home hero canvas (lanes, owl, then the
+  name); loaded as `hero-pipeline.min.js`, rebuild that after edits.
 - `assets/transition.js` — SPA-style page transitions and the mobile nav
   (Home and Projects only). In-site page swaps fade here; full page loads
   between pages that share `shell.css` (e.g. to and from 404) fade via the

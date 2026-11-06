@@ -31,7 +31,7 @@ header.topbar {
     gap: 1rem;
     padding: 0 var(--gutter);
     background: var(--bg);
-    border-bottom: var(--bw-heavy) solid var(--hairline);
+    border-bottom: var(--bw) solid var(--hairline);
 }
 header.topbar .topbar__brand {
     display: flex;
@@ -42,7 +42,6 @@ header.topbar .topbar__brand {
     letter-spacing: 0;
     font-size: 0.95rem;
     color: var(--ink-1);
-    text-transform: uppercase;
 }
 header.topbar .topbar__brand a {
     color: inherit;
@@ -55,7 +54,7 @@ header.topbar .topbar__brand a {
 header.topbar .topbar__brand a:hover { color: var(--accent-ink); }
 
 /* Brand mark: the logo icon, painted via CSS mask so it takes any color,
- * in a square signal-orange block with a hard shadow. */
+ * in a small rounded teal block. */
 header.topbar .topbar__brand .brand-mark {
     display: inline-flex;
     align-items: center;
@@ -64,8 +63,8 @@ header.topbar .topbar__brand .brand-mark {
     height: 36px;
     background: var(--accent);
     color: var(--on-accent);
-    border: var(--bw) solid var(--hairline);
-    box-shadow: var(--shadow-sm);
+    border: 0;
+    border-radius: var(--r-sm);
 }
 .crow-mark {
     display: block;
@@ -92,20 +91,20 @@ header.topbar .topbar__brand .brand-mark .crow-mark { width: 21px; height: 17px;
         display: flex;
         align-items: center;
         padding: 0 1.15rem;
-        font-family: var(--font-mono);
-        font-size: 0.8rem;
+        font-family: var(--font-text);
+        font-size: 0.95rem;
         font-weight: 600;
-        text-transform: uppercase;
-        letter-spacing: 0.02em;
+        letter-spacing: 0;
         color: var(--ink-1);
         text-decoration: none;
         border-right: var(--bw) solid var(--hairline);
         transition: background var(--dur-fast) linear, color var(--dur-fast) linear;
     }
-    .topnav a:hover { background: var(--ink-1); color: var(--bg); }
+    .topnav a:hover { background: var(--surface-2); color: var(--accent-ink); }
     .topnav a[aria-current="page"] {
-        color: var(--on-accent);
-        background: var(--accent);
+        color: var(--accent-ink);
+        background: transparent;
+        box-shadow: inset 0 -2px 0 var(--accent);
     }
 }
 
@@ -122,7 +121,8 @@ header.topbar .topbar__brand .brand-mark .crow-mark { width: 21px; height: 17px;
     height: 44px;
     padding: 10px;
     background: var(--surface-1);
-    border: var(--bw) solid var(--hairline);
+    border: var(--bw) solid var(--hairline-strong);
+    border-radius: var(--r-sm);
     cursor: pointer;
     color: var(--ink-1);
     box-shadow: var(--shadow-sm);
@@ -130,11 +130,12 @@ header.topbar .topbar__brand .brand-mark .crow-mark { width: 21px; height: 17px;
     flex-shrink: 0;
 }
 .burger:hover { background: var(--surface-2); }
-.burger:active { transform: translate(3px, 3px); box-shadow: none; }
+.burger:active { transform: translateY(1px); box-shadow: none; }
 .burger__bar {
     display: block;
     width: 100%;
-    height: 3px;
+    height: 2px;
+    border-radius: 2px;
     background: currentColor;
     transform-origin: center;
     transition:
@@ -167,7 +168,8 @@ body.site-nav-open .burger .burger__bar:nth-child(3) { transform: translateY(-8p
     left: 0;
     right: 0;
     background: var(--surface-1);
-    border-bottom: var(--bw-heavy) solid var(--hairline);
+    border-bottom: var(--bw) solid var(--hairline);
+    box-shadow: var(--shadow-lg);
     padding: 0;
     display: flex;
     flex-direction: column;
@@ -199,26 +201,25 @@ body.site-nav-open .site-nav__panel {
 .site-nav__item {
     display: block;
     padding: 1rem var(--gutter);
-    font-family: var(--font-mono);
-    font-size: 0.95rem;
+    font-family: var(--font-text);
+    font-size: 1.05rem;
     font-weight: 600;
-    text-transform: uppercase;
     color: var(--ink-1);
     text-decoration: none;
     border-top: var(--bw) solid var(--hairline);
 }
 .site-nav__item:first-child { border-top: 0; }
-.site-nav__item:hover { color: var(--bg); background: var(--ink-1); }
-.site-nav__item[aria-current="page"] { color: var(--on-accent); background: var(--accent); }
+.site-nav__item:hover { color: var(--accent-ink); background: var(--surface-2); }
+.site-nav__item[aria-current="page"] { color: var(--accent-ink); background: var(--accent-mist); box-shadow: inset 3px 0 0 var(--accent); }
 
 /* ─────────────────────────────────────────────────────────────
- * Footer: an inverted slab under a signal-orange rule
+ * Footer: a dark band under a thin teal rule
  * ───────────────────────────────────────────────────────────── */
 footer.shell-footer {
     margin-top: auto;
     background: var(--umber);
     color: var(--on-umber);
-    border-top: 6px solid var(--accent);
+    border-top: 2px solid var(--accent);
     padding: 1.6rem var(--gutter) calc(1.6rem + env(safe-area-inset-bottom, 0px));
     position: relative;
     z-index: 1;
@@ -240,7 +241,7 @@ footer.shell-footer .footer-brand {
     font-size: 0.78rem;
     color: var(--on-umber);
 }
-footer.shell-footer .footer-brand .crow-mark { width: 22px; height: 18px; color: var(--accent); }
+footer.shell-footer .footer-brand .crow-mark { width: 22px; height: 18px; color: var(--accent-on-dark); }
 footer.shell-footer .footer-socials {
     display: flex;
     gap: 0;
@@ -252,15 +253,15 @@ footer.shell-footer .footer-socials a {
     font-family: var(--font-mono);
     font-size: 0.8rem;
     font-weight: 600;
-    text-transform: uppercase;
     padding: 0.55rem 0.85rem;
-    border: var(--bw) solid color-mix(in srgb, var(--on-umber) 55%, transparent);
-    margin-left: calc(-1 * var(--bw));
+    border: var(--bw) solid color-mix(in srgb, var(--on-umber) 30%, transparent);
+    border-radius: var(--r-sm);
+    margin: 0 0.4rem 0.4rem 0;
     transition: background var(--dur-fast) linear, color var(--dur-fast) linear;
 }
 footer.shell-footer .footer-socials a:hover {
-    background: var(--accent);
-    color: var(--on-accent);
+    color: var(--accent-on-dark);
+    border-color: var(--accent-on-dark);
 }
 
 /* ─────────────────────────────────────────────────────────────
@@ -271,7 +272,7 @@ button:focus-visible,
 summary:focus-visible {
     outline: 3px solid var(--focus-ring);
     outline-offset: 2px;
-    border-radius: 0;
+    border-radius: var(--r-sm);
 }
 .topnav a:focus-visible { outline-offset: -5px; }
 
