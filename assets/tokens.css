@@ -5,8 +5,8 @@
  * breast of Tyto alba as the page, deep eye-brown as ink, the plumage
  * browns (tan → caramel → chestnut → umber) as warm accents, and a
  * creamy, milk-washed blue as the one action color (links, buttons,
- * focus). Day is the default; Night (a moonlit slate with the same warm
- * accents) follows prefers-color-scheme: dark.
+ * focus). Day is the default; Night (a mid slate with cool accents and
+ * the same cream text) follows prefers-color-scheme: dark.
  *
  * Every page imports this BEFORE any other stylesheet.
  * ────────────────────────────────────────────────────────────── */
@@ -38,6 +38,7 @@
     --on-tan:           #3a281c;
     --caramel:          #a3622e;     /* eyebrows, icons, large display accents (4.6:1) */
     --chestnut:         #7a3f1f;     /* secondary action, emphasis text (7.8:1) */
+    --warn:             #7a3f1f;     /* warning text (stale data); same as chestnut in Day */
     --umber:            #4a3122;     /* deep band: footers, dark feature blocks */
     --on-umber:         #fdf9f3;
     --fawn:             #dcc8b2;     /* one soft callout per screen */
@@ -85,53 +86,54 @@
     --max-w:       920px;
 }
 
-/* ── Night: moonlit slate ──
- * A cool blue-grey night sky instead of a second brown, so cards read as
- * clearly lighter panels on the page (1.44:1 surface step plus a visible
- * hairline). The barn-owl warmth stays in the cream ink and the tan/caramel
- * accents; no brown is used as a background here. */
+/* ── Night: mid slate ──
+ * A mid blue-grey page (not near-black) with cards a clear step lighter
+ * (1.36:1 plus a visible outline), and no brown anywhere: the labels,
+ * featured stripe and owl marks take cool tones here too. The warmth of
+ * the barn owl is Day's job; Night only keeps the cream text. */
 @media (prefers-color-scheme: dark) {
     :root {
         color-scheme: dark;
 
-        --bg:               #1e232a;     /* page: night sky, a lifted slate */
-        --surface-1:        #343d4c;     /* raised cards: 1.44:1 off --bg, plus a visible outline */
-        --surface-2:        #3c4655;     /* sunken / hover / chips */
-        --surface-3:        #454f5f;     /* deeper hover, pressed */
+        --bg:               #283039;     /* page: mid slate */
+        --surface-1:        #3a4453;     /* raised cards: 1.36:1 off --bg, plus a visible outline */
+        --surface-2:        #434e5e;     /* sunken / hover / chips */
+        --surface-3:        #4b5767;     /* deeper hover, pressed */
 
-        --ink-1:            #f3eee7;     /* warm cream text (9.5:1 on cards) */
-        --ink-2:            #c8cfd8;     /* 7.0:1 on cards */
-        --ink-3:            #bac3cd;     /* ≥ 4.6:1 on every surface */
+        --ink-1:            #f5f1ea;     /* warm cream text (8.8:1 on cards) */
+        --ink-2:            #d0d6de;     /* 6.7:1 on cards */
+        --ink-3:            #c4ccd5;     /* ≥ 4.5:1 on every surface */
 
-        --accent:           #a6cae0;
-        --accent-ink:       #a6cae0;
-        --on-accent:        #1e232a;
-        --accent-soft:      #304a60;
-        --accent-mist:      #26313d;
-        --accent-glow:      rgba(158, 195, 218, 0.16);
+        --accent:           #b0d2e7;
+        --accent-ink:       #b0d2e7;
+        --on-accent:        #283039;
+        --accent-soft:      #36536b;
+        --accent-mist:      #2e3a47;
+        --accent-glow:      rgba(176, 210, 231, 0.14);
 
-        --tan:              #c9a682;
-        --on-tan:           #1e232a;
-        --caramel:          #e0a46c;
-        --chestnut:         #efae86;
-        --umber:            #13161b;     /* footer band: a shade below the page */
-        --on-umber:         #f3eee7;
-        --fawn:             #33404e;     /* soft callout + bottom-left glow: cool, so no brown patch shows */
-        --plume:            #87919e;
+        --tan:              #93b3c8;     /* featured stripe, owl marks: steel blue here (fill only) */
+        --on-tan:           #283039;
+        --caramel:          #a3d8cb;
+        --chestnut:         #a3d8cb;     /* labels and eyebrows: soft sea-glass (6.2:1 on cards) */
+        --warn:             #f3b98a;     /* warning text keeps a warm signal (5.7:1 on cards) */
+        --umber:            #1b2027;     /* footer band: a shade below the page */
+        --on-umber:         #f5f1ea;
+        --fawn:             #3a4858;     /* soft callout + bottom-left glow */
+        --plume:            #96a0ac;
 
-        --success:          #9cbf83;
-        --danger:           #f0958a;
+        --success:          #a6c98d;
+        --danger:           #f39d92;
 
-        --hairline:         #586474;     /* card outlines, visible on --bg and cards */
-        --hairline-strong:  #8592a3;     /* control borders (3.5:1 on cards) */
-        --focus-ring:       #a6cae0;
-        --scrim:            rgba(8, 10, 14, 0.62);
+        --hairline:         #66738a;     /* card outlines (2.8:1 on the page) */
+        --hairline-strong:  #94a1b2;     /* control borders (3.8:1 on cards) */
+        --focus-ring:       #b0d2e7;
+        --scrim:            rgba(10, 12, 16, 0.6);
 
-        --shadow-sm:  0 1px 2px rgba(0, 0, 0, 0.35), 0 2px 4px rgba(0, 0, 0, 0.25);
-        --shadow-md:  0 2px 4px rgba(0, 0, 0, 0.40), 0 6px 14px rgba(0, 0, 0, 0.35);
-        --shadow-lg:  0 4px 8px rgba(0, 0, 0, 0.45), 0 14px 32px rgba(0, 0, 0, 0.45);
-        --shadow-press: inset 0 -3px 0 rgba(0, 0, 0, 0.35), inset 0 1px 0 rgba(255, 255, 255, 0.12), 0 2px 4px rgba(0, 0, 0, 0.40);
-        --shadow-pressed: inset 0 2px 3px rgba(0, 0, 0, 0.45);
+        --shadow-sm:  0 1px 2px rgba(0, 0, 0, 0.30), 0 2px 4px rgba(0, 0, 0, 0.20);
+        --shadow-md:  0 2px 4px rgba(0, 0, 0, 0.32), 0 6px 14px rgba(0, 0, 0, 0.28);
+        --shadow-lg:  0 4px 8px rgba(0, 0, 0, 0.36), 0 14px 32px rgba(0, 0, 0, 0.36);
+        --shadow-press: inset 0 -3px 0 rgba(0, 0, 0, 0.30), inset 0 1px 0 rgba(255, 255, 255, 0.12), 0 2px 4px rgba(0, 0, 0, 0.32);
+        --shadow-pressed: inset 0 2px 3px rgba(0, 0, 0, 0.40);
     }
 }
 

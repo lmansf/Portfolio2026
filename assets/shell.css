@@ -56,6 +56,11 @@ header.topbar {
     -webkit-backdrop-filter: blur(14px) saturate(1.1);
     border-bottom: 1px solid var(--hairline);
 }
+/* Night: an opaque bar, so iOS Safari (which tints its status-bar strip
+ * from the top sticky bar) extends the page's slate, not a guess. */
+@media (prefers-color-scheme: dark) {
+    header.topbar { background: var(--bg); }
+}
 header.topbar .topbar__brand {
     display: flex;
     align-items: center;

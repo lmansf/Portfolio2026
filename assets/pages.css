@@ -706,7 +706,7 @@ main.page > * { min-width: 0; }
     color: var(--ink-3);
 }
 .sql-src__trust::before { content: "·"; margin-right: 0.4rem; }
-.sql-src__trust--warn { color: var(--chestnut); }
+.sql-src__trust--warn { color: var(--warn, var(--chestnut)); }
 .sql-src__toggle:hover { color: var(--accent-ink); }
 .sql-src__toggle:focus-visible {
     outline: 2px solid var(--focus-ring);
