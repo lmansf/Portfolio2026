@@ -51,6 +51,7 @@
     --hairline:         #e4d5c0;     /* decorative dividers, card outlines */
     --hairline-strong:  #957e69;     /* control borders (3.7:1) */
     --focus-ring:       #35607b;
+    --scrim:            rgba(27, 20, 15, 0.55);   /* modal backdrop */
 
     /* ── Shadows (warm, stacked: contact + ambient) ── */
     --shadow-sm:  0 1px 2px rgba(58, 40, 28, 0.08), 0 2px 4px rgba(58, 40, 28, 0.06);
@@ -86,44 +87,45 @@
 
 /* ── Night: moonlit slate ──
  * A cool blue-grey night sky instead of a second brown, so cards read as
- * clearly lighter panels on the page (1.2:1 surface step plus a visible
- * hairline). The barn-owl warmth stays in the cream ink, the tan/caramel
- * accents and the fawn glow; brown is an accent here, never the ground. */
+ * clearly lighter panels on the page (1.44:1 surface step plus a visible
+ * hairline). The barn-owl warmth stays in the cream ink and the tan/caramel
+ * accents; no brown is used as a background here. */
 @media (prefers-color-scheme: dark) {
     :root {
         color-scheme: dark;
 
-        --bg:               #181c22;     /* page: night sky */
-        --surface-1:        #252c36;     /* raised cards, clearly lifted off --bg */
-        --surface-2:        #2e3743;     /* sunken / hover / chips */
-        --surface-3:        #384351;     /* deeper hover, pressed */
+        --bg:               #1e232a;     /* page: night sky, a lifted slate */
+        --surface-1:        #343d4c;     /* raised cards: 1.44:1 off --bg, plus a visible outline */
+        --surface-2:        #3c4655;     /* sunken / hover / chips */
+        --surface-3:        #454f5f;     /* deeper hover, pressed */
 
-        --ink-1:            #f3eee7;     /* warm cream text (12.2:1 on cards) */
-        --ink-2:            #bcc4ce;     /* 8.0:1 on cards */
-        --ink-3:            #a9b3bf;     /* ≥ 4.7:1 on every surface */
+        --ink-1:            #f3eee7;     /* warm cream text (9.5:1 on cards) */
+        --ink-2:            #c8cfd8;     /* 7.0:1 on cards */
+        --ink-3:            #bac3cd;     /* ≥ 4.6:1 on every surface */
 
-        --accent:           #9ec3da;
-        --accent-ink:       #9ec3da;
-        --on-accent:        #181c22;
-        --accent-soft:      #2b4459;
-        --accent-mist:      #1f2b37;
+        --accent:           #a6cae0;
+        --accent-ink:       #a6cae0;
+        --on-accent:        #1e232a;
+        --accent-soft:      #304a60;
+        --accent-mist:      #26313d;
         --accent-glow:      rgba(158, 195, 218, 0.16);
 
         --tan:              #c9a682;
-        --on-tan:           #181c22;
-        --caramel:          #d6995f;
-        --chestnut:         #eaa57a;
-        --umber:            #0f1216;     /* footer band: a shade below the page */
+        --on-tan:           #1e232a;
+        --caramel:          #e0a46c;
+        --chestnut:         #efae86;
+        --umber:            #13161b;     /* footer band: a shade below the page */
         --on-umber:         #f3eee7;
-        --fawn:             #3a3129;     /* the one warm wash (bottom-left glow, pills) */
-        --plume:            #7d8794;
+        --fawn:             #33404e;     /* soft callout + bottom-left glow: cool, so no brown patch shows */
+        --plume:            #87919e;
 
-        --success:          #93b57a;
-        --danger:           #e88473;
+        --success:          #9cbf83;
+        --danger:           #f0958a;
 
-        --hairline:         #3d4856;     /* card outlines, visible on --bg and cards */
-        --hairline-strong:  #6f7d8e;     /* control borders (3.4:1 on cards) */
-        --focus-ring:       #9ec3da;
+        --hairline:         #586474;     /* card outlines, visible on --bg and cards */
+        --hairline-strong:  #8592a3;     /* control borders (3.5:1 on cards) */
+        --focus-ring:       #a6cae0;
+        --scrim:            rgba(8, 10, 14, 0.62);
 
         --shadow-sm:  0 1px 2px rgba(0, 0, 0, 0.35), 0 2px 4px rgba(0, 0, 0, 0.25);
         --shadow-md:  0 2px 4px rgba(0, 0, 0, 0.40), 0 6px 14px rgba(0, 0, 0, 0.35);
@@ -143,6 +145,7 @@
 }
 
 html {
+    background-color: var(--bg);
     -webkit-text-size-adjust: 100%;
     scroll-behavior: smooth;
 }

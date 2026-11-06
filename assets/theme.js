@@ -9,23 +9,23 @@
  * are darkened until they pass; where the brand color already clears AA it
  * equals `accent`.
  * `inkDark` is the link-text color in Night, lifted toward white until it
- * clears AA on the Night card surface (--surface-1, #252c36).
+ * clears AA on the Night card surface (--surface-1, #343d4c).
  * `on` is the text/icon color that sits on top of an accent fill (the CTA);
  * it is used in both schemes because the fill stays brand-exact.
  *
  * Add companies here and document them in docs/referrers.md. */
 (function () {
     var THEMES = {
-        netflix:   { accent: '#e50914', ink: '#d70813', inkDark: '#ef6970', on: '#ffffff' },
-        meta:      { accent: '#0866ff', ink: '#0860f1', inkDark: '#5092ff', on: '#ffffff' },
-        google:    { accent: '#4285f4', ink: '#3469c1', inkDark: '#5994f5', on: '#06141a' },
-        stripe:    { accent: '#635bff', ink: '#5c54ec', inkDark: '#8c86ff', on: '#ffffff' },
+        netflix:   { accent: '#e50914', ink: '#d70813', inkDark: '#f38b91', on: '#ffffff' },
+        meta:      { accent: '#0866ff', ink: '#0860f1', inkDark: '#75a9ff', on: '#ffffff' },
+        google:    { accent: '#4285f4', ink: '#3469c1', inkDark: '#7baaf7', on: '#06141a' },
+        stripe:    { accent: '#635bff', ink: '#5c54ec', inkDark: '#a39eff', on: '#ffffff' },
         amazon:    { accent: '#ff9900', ink: '#9a5d00', inkDark: '#ff9900', on: '#06141a' },
-        microsoft: { accent: '#00a4ef', ink: '#0072a6', inkDark: '#00a4ef', on: '#06141a' },
+        microsoft: { accent: '#00a4ef', ink: '#0072a6', inkDark: '#29b3f2', on: '#06141a' },
         spotify:   { accent: '#1ed760', ink: '#117c37', inkDark: '#1ed760', on: '#06141a' },
-        linkedin:  { accent: '#0a66c2', ink: '#0a66c2', inkDark: '#5b98d6', on: '#ffffff' },
-        anthropic: { accent: '#d97757', ink: '#9f5740', inkDark: '#d97757', on: '#06141a' },
-        claude:    { accent: '#d97757', ink: '#9f5740', inkDark: '#d97757', on: '#06141a' }
+        linkedin:  { accent: '#0a66c2', ink: '#0a66c2', inkDark: '#7daedf', on: '#ffffff' },
+        anthropic: { accent: '#d97757', ink: '#9f5740', inkDark: '#e2967e', on: '#06141a' },
+        claude:    { accent: '#d97757', ink: '#9f5740', inkDark: '#e2967e', on: '#06141a' }
     };
     try {
         var key = new URLSearchParams(window.location.search).get('ink');
@@ -39,8 +39,8 @@
         s.setProperty('--accent-ink', ink);
         s.setProperty('--on-accent', t.on);
         s.setProperty('--focus-ring', ink);
-        s.setProperty('--accent-soft', 'color-mix(in srgb, ' + t.accent + ' ' + (dark ? '34%' : '22%') + ', ' + (dark ? '#181c22' : '#fdf9f3') + ')');
-        s.setProperty('--accent-mist', 'color-mix(in srgb, ' + t.accent + ' ' + (dark ? '20%' : '10%') + ', ' + (dark ? '#181c22' : '#fdf9f3') + ')');
+        s.setProperty('--accent-soft', 'color-mix(in srgb, ' + t.accent + ' ' + (dark ? '34%' : '22%') + ', ' + (dark ? '#1e232a' : '#fdf9f3') + ')');
+        s.setProperty('--accent-mist', 'color-mix(in srgb, ' + t.accent + ' ' + (dark ? '20%' : '10%') + ', ' + (dark ? '#1e232a' : '#fdf9f3') + ')');
         s.setProperty('--accent-glow', 'color-mix(in srgb, ' + t.accent + ' 16%, transparent)');
     } catch (e) { /* no-op */ }
 })();

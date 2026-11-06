@@ -379,7 +379,7 @@ html:has(dialog.flow-dialog[open]) { overflow: hidden; scrollbar-gutter: stable;
     animation: flow-dialog-in var(--dur-base) var(--ease-out);
 }
 .flow-dialog::backdrop {
-    background: rgba(27, 20, 15, 0.55);
+    background: var(--scrim, rgba(27, 20, 15, 0.55));
 }
 .flow-dialog[open]::backdrop { animation: flow-backdrop-in var(--dur-base) var(--ease-out); }
 
