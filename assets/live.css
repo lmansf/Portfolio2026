@@ -22,8 +22,8 @@
 }
 @media (prefers-color-scheme: dark) {
     :root {
-        --live-legit: #5a9ed3;
-        --live-fraud: #d0884a;
+        --live-legit: #6aaadb;
+        --live-fraud: #db9660;
     }
 }
 

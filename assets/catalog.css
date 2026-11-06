@@ -29,7 +29,7 @@
 .cat-table__head:focus-visible { outline: 2px solid var(--accent-ink); outline-offset: 2px; border-radius: var(--r-md, 12px); }
 .cat-table__name { font-size: 0.9rem; font-weight: 600; }
 .cat-table__fresh { font-size: 0.78rem; color: var(--ink-3); }
-.cat-table__fresh--warn { color: var(--chestnut); }
+.cat-table__fresh--warn { color: var(--warn, var(--chestnut)); }
 .cat-table__desc { flex-basis: 100%; font-size: 0.86rem; color: var(--ink-2); line-height: 1.45; }
 .cat-table__body { padding: 0 1rem 0.9rem; border-top: 1px solid var(--hairline); }
 
