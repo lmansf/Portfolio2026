@@ -805,7 +805,7 @@ const store = {
     set(k, v) { try { localStorage.setItem(k, v); } catch { /* private mode */ } }
 };
 
-function maybeEgg(state, result, sql) {
+export function maybeEgg(state, result, sql) {
     if (result.numRows !== 1 || result.fields.length !== 1) return false;
     if (Object.values(toObjects(result, 1)[0] || {})[0] !== EGG_FOUND) return false;
     const m = /claim_egg\s*\(\s*'([^']{1,40})'\s*\)/i.exec(sql);
