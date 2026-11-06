@@ -104,7 +104,7 @@ main.page > * { min-width: 0; }
  * shipped `hidden`, so without JS the plain <h1> shows instead. */
 .hero-pipe {
     position: relative;
-    height: clamp(230px, 38vw, 400px);
+    height: clamp(300px, 40vw, 420px);
     background: var(--surface-1);
     border: var(--bw) solid var(--hairline);
     border-radius: var(--r-lg);
@@ -120,17 +120,61 @@ main.page > * { min-width: 0; }
     grid-template-columns: repeat(3, 1fr);
     pointer-events: none;
 }
-.hero-pipe__labels span {
-    font-family: var(--font-mono);
-    font-size: 0.74rem;
-    font-weight: 600;
+/* Each stage label is a link to the project that does that step. */
+.hero-pipe__stage {
+    pointer-events: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 0.1rem;
+    padding: 0.7rem 0.9rem;
+    color: var(--ink-2);
+    text-decoration: none;
+    border-radius: var(--r-md);
+    transition: background-color var(--dur-fast, 0.15s) ease;
+}
+.hero-pipe__stage:nth-child(2) { align-items: center; text-align: center; }
+.hero-pipe__stage:nth-child(3) { align-items: flex-end; text-align: right; }
+.hero-pipe__stage:hover,
+.hero-pipe__stage:focus-visible { background: var(--accent-mist); }
+.hero-pipe__kind {
+    font: 600 0.7rem/1.3 var(--font-mono);
     letter-spacing: 0.08em;
     text-transform: uppercase;
-    padding: 0.75rem 0.9rem;
     color: var(--ink-3);
 }
-.hero-pipe__labels span:nth-child(2) { text-align: center; }
-.hero-pipe__labels span:nth-child(3) { text-align: right; color: var(--accent-ink); }
+.hero-pipe__stage:nth-child(3) .hero-pipe__kind { color: var(--accent-ink); }
+.hero-pipe__what {
+    font: 650 0.86rem/1.25 var(--font-text);
+    color: var(--ink-1);
+    text-decoration: underline;
+    text-decoration-color: var(--hairline-strong);
+    text-underline-offset: 3px;
+}
+.hero-pipe__stage:hover .hero-pipe__what { text-decoration-color: var(--accent); }
+.hero-pipe__num {
+    font: 500 0.72rem/1.3 var(--font-mono);
+    color: var(--ink-3);
+    min-height: 1.3em;
+    font-variant-numeric: tabular-nums;
+}
+.hero-pipe__num.is-fraud { color: var(--warn); }
+.hero-pipe__note {
+    position: absolute;
+    left: 0.9rem;
+    bottom: 0.8rem;
+    right: 6.5rem;
+    margin: 0;
+    font: 500 0.68rem/1.35 var(--font-mono);
+    color: var(--ink-3);
+    pointer-events: none;
+}
+.hero-pipe__note[hidden] { display: none; }
+@media (max-width: 639px) {
+    .hero-pipe__stage { padding: 0.55rem 0.5rem; }
+    .hero-pipe__what { font-size: 0.76rem; }
+    .hero-pipe__num { font-size: 0.66rem; }
+    .hero-pipe__note { left: 0.6rem; right: 5.5rem; bottom: 0.6rem; font-size: 0.62rem; }
+}
 .hero-pipe__replay {
     position: absolute;
     right: 0.6rem;
