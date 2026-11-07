@@ -1550,3 +1550,101 @@ main.page.page-404 { gap: clamp(1.75rem, 4vw, 2.5rem); }
     align-items: center;
     margin-top: 0.5rem;
 }
+
+/* ─── Scroll-linked pipeline rail (Home, built by assets/scroll-pipe.js) ───
+ * Shows only from 1280px, in the left margin, once the hero has scrolled
+ * away. --p (0 to 1) is how far down Home the visitor is. */
+.scroll-pipe { display: none; }
+@media (min-width: 1280px) {
+    .scroll-pipe {
+        display: block;
+        position: fixed;
+        z-index: 2;
+        top: 50%;
+        left: max(0.75rem, calc((100vw - var(--max-w)) / 2 - 5.5rem));
+        width: 4.75rem;
+        height: min(52vh, 26rem);
+        transform: translateY(-50%);
+        opacity: 0;
+        visibility: hidden;
+        pointer-events: none;
+        transition: opacity 0.35s ease, visibility 0s linear 0.35s;
+    }
+    .scroll-pipe.is-shown {
+        opacity: 1;
+        visibility: visible;
+        pointer-events: auto;
+        transition: opacity 0.35s ease, visibility 0s;
+    }
+}
+.scroll-pipe__track {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 0.45rem;
+    width: 2px;
+    background: var(--hairline);
+}
+.scroll-pipe__fill {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: calc(var(--p, 0) * 100%);
+    background: var(--pipe-1);
+    transition: background-color 0.3s ease;
+}
+.scroll-pipe.is-served .scroll-pipe__fill { background: var(--pipe-3); }
+.scroll-pipe__dot {
+    position: absolute;
+    left: 50%;
+    top: calc(var(--p, 0) * 100%);
+    width: 0.7rem;
+    height: 0.7rem;
+    margin: -0.35rem 0 0 -0.35rem;
+    border-radius: 50%;
+    background: var(--pipe-1);
+    box-shadow: 0 0 0 3px var(--bg);
+    transition: background-color 0.3s ease;
+}
+.scroll-pipe.is-served .scroll-pipe__dot { background: var(--pipe-3); }
+.scroll-pipe__stops { list-style: none; margin: 0; padding: 0; position: absolute; inset: 0; }
+.scroll-pipe__stop { position: absolute; left: 0; right: 0; transform: translateY(-50%); }
+.scroll-pipe__stop:nth-child(1) { top: 0; }
+.scroll-pipe__stop:nth-child(2) { top: 50%; }
+.scroll-pipe__stop:nth-child(3) { top: 100%; }
+.scroll-pipe__stop a {
+    display: flex;
+    align-items: center;
+    gap: 0.45rem;
+    min-height: 1.75rem;
+    text-decoration: none;
+    color: var(--ink-3);
+}
+.scroll-pipe__node {
+    flex: none;
+    width: 0.95rem;
+    height: 0.95rem;
+    border-radius: 50%;
+    border: 2px solid var(--hairline-strong);
+    background: var(--bg);
+    transition: border-color 0.3s ease, background-color 0.3s ease;
+}
+.scroll-pipe__kind {
+    font: 600 0.62rem/1.2 var(--font-mono);
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    transition: color 0.3s ease;
+}
+.scroll-pipe__stop[data-state="on"] .scroll-pipe__node { border-color: var(--pipe-1); background: var(--pipe-1); }
+.scroll-pipe__stop[data-state="on"]:nth-child(2) .scroll-pipe__node { border-color: var(--pipe-2); background: var(--pipe-2); }
+.scroll-pipe__stop[data-state="on"]:nth-child(3) .scroll-pipe__node { border-color: var(--pipe-3); background: var(--pipe-3); }
+.scroll-pipe__stop[data-state="on"] .scroll-pipe__kind { color: var(--ink-1); }
+.scroll-pipe__stop:nth-child(3)[data-state="on"] .scroll-pipe__kind { color: var(--accent-ink); }
+.scroll-pipe__stop a:hover .scroll-pipe__kind { color: var(--ink-1); text-decoration: underline; text-underline-offset: 3px; }
+@media (prefers-reduced-motion: reduce) {
+    .scroll-pipe__dot { display: none; }
+    .scroll-pipe, .scroll-pipe.is-shown, .scroll-pipe * { transition: none !important; }
+}
+html.text-mode .scroll-pipe { display: none !important; }
+@media print { .scroll-pipe { display: none !important; } }
