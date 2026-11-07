@@ -267,6 +267,29 @@ footer.shell-footer .footer-socials a:hover {
     color: var(--accent-on-dark);
     border-color: var(--accent-on-dark);
 }
+/* One quiet line under the links: each opens that AI with a question about
+   the site already typed (new tab). Plain text links, not buttons. */
+footer.shell-footer .footer-ask {
+    flex: 1 0 100%;
+    margin: 0;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: 0.1rem 0.9rem;
+    font-family: var(--font-mono);
+    font-size: 0.74rem;
+    color: color-mix(in srgb, var(--on-umber) 78%, transparent);
+}
+footer.shell-footer .footer-ask a {
+    color: var(--on-umber);
+    text-decoration: underline;
+    text-decoration-color: color-mix(in srgb, var(--on-umber) 40%, transparent);
+    text-underline-offset: 3px;
+}
+footer.shell-footer .footer-ask a:hover { color: var(--accent-on-dark); text-decoration-color: currentColor; }
+@media (pointer: coarse) {
+    footer.shell-footer .footer-ask a { display: inline-flex; align-items: center; min-height: 44px; }
+}
 
 /* ─────────────────────────────────────────────────────────────
  * Focus ring (global)
