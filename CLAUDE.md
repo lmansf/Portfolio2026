@@ -47,6 +47,13 @@ motion should check it too. The list view is CSS only (`pages.css`): it
 hides each card's synopsis and tags, so the card markup must not change
 for it.
 
+Home's scroll-linked pipeline rail (`assets/scroll-pipe.js`, loaded as
+`scroll-pipe.min.js`, styles at the end of `pages.css`) is built by script,
+shows only from 1280px wide once the hero has scrolled away, and is hidden
+in text mode and print; under reduced motion it keeps the stage lights but
+drops the moving dot. Its three stages and links must match the hero's
+`.hero-pipe__stage` links. Regenerate the `.min.js` after editing it.
+
 The three featured project synopses (Quack Query, Fraud Detection Pipeline,
 Owl Park) are the same text on Home and `/projects` and stay at about two
 short lines each; the detail lives in the "How the data flows" diagrams.
