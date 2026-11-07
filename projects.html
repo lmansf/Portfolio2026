@@ -122,6 +122,14 @@
                             <a class="project__link" href="https://github.com/lmansf/Quack-Query" target="_blank" rel="noopener">GitHub ↗</a>
                         </div>
                     </div>
+                    <details class="case">
+                        <summary class="case__toggle">Case file<span class="case__hint"> · problem, fix, result</span></summary>
+                        <dl class="case__rows">
+                            <div class="case__row"><dt class="case__label">Problem</dt><dd class="case__text">Asking a data file a question usually means writing SQL, or uploading the file to someone else&rsquo;s server.</dd></div>
+                            <div class="case__row"><dt class="case__label">Fix</dt><dd class="case__text">An LLM writes one read-only SELECT from the table profiles, and DuckDB runs it in the browser, so the file never leaves the device.</dd></div>
+                            <div class="case__row"><dt class="case__label">Result</dt><dd class="case__text">Live. Every answer shows its SQL, which you can edit; read-only checks run on both server and browser, and columns that look personal are kept from the model.</dd></div>
+                        </dl>
+                    </details>
                 </article>
 
                 <article class="project project--featured" id="fraud">
@@ -139,6 +147,18 @@
                             <a class="project__link" href="https://github.com/lmansf/fraud-detection-pipeline" target="_blank" rel="noopener">View on GitHub ↗</a>
                         </div>
                     </div>
+                    <details class="case">
+                        <summary class="case__toggle">Case file<span class="case__hint"> · problem, fix, result</span></summary>
+                        <dl class="case__rows">
+                            <div class="case__row"><dt class="case__label">Problem</dt><dd class="case__text">Five fraud patterns hide in about 3% of webstore orders, and the true label only arrives 5 to 60 days later, the way a chargeback does.</dd></div>
+                            <div class="case__row"><dt class="case__label">Fix</dt><dd class="case__text">Weighted rules score each checkout in time order and give reason codes. A score that takes over 150 ms fails open, so a real guest is never left waiting.</dd></div>
+                            <div class="case__row"><dt class="case__label">Result</dt><dd class="case__text">The baseline rules flagged about half the fraud and no legitimate orders, measured against the late labels.</dd></div>
+                        </dl>
+                        <ul class="case__metrics" aria-label="Measured result">
+                            <li class="case__metric"><span class="case__metric-label">Fraud flagged</span> <span class="case__metric-value">about half</span></li>
+                            <li class="case__metric"><span class="case__metric-label">Good orders declined</span> <span class="case__metric-value">0</span></li>
+                        </ul>
+                    </details>
                 </article>
 
                 <article class="project project--featured" id="owl-park">
@@ -155,6 +175,14 @@
                             <a class="project__link" href="#owl-park-flow" data-flow-open="owl-park-flow">How the data flows</a>
                         </div>
                     </div>
+                    <details class="case">
+                        <summary class="case__toggle">Case file<span class="case__hint"> · problem, fix, result</span></summary>
+                        <dl class="case__rows">
+                            <div class="case__row"><dt class="case__label">Problem</dt><dd class="case__text">Sales and visits are only worth analyzing if every event lands exactly once, even when a send fails.</dd></div>
+                            <div class="case__row"><dt class="case__label">Fix</dt><dd class="case__text">Signed Shopify webhooks issue the tickets. Each event goes to an outbox in the same step as the action it records, then ships in batches, and event ids make a resend land once.</dd></div>
+                            <div class="case__row"><dt class="case__label">Result</dt><dd class="case__text">Visits and sales arrive in a type 2 player dimension and fact tables, with views for minutes per room, free-to-paid conversion and lifetime value.</dd></div>
+                        </dl>
+                    </details>
                 </article>
 
             </div>
@@ -199,6 +227,14 @@ ORDER BY sort_order;</code></pre>
                             <a class="project__link" href="https://github.com/lmansf/lighthouse" target="_blank" rel="noopener">GitHub ↗</a>
                         </div>
                     </div>
+                    <details class="case">
+                        <summary class="case__toggle">Case file<span class="case__hint"> · problem, fix, result</span></summary>
+                        <dl class="case__rows">
+                            <div class="case__row"><dt class="case__label">Problem</dt><dd class="case__text">Getting answers from a small set of private files without sending them to a server.</dd></div>
+                            <div class="case__row"><dt class="case__label">Fix</dt><dd class="case__text">A Rust engine handles extraction, on-device OCR, embeddings and hybrid retrieval. A question about a spreadsheet becomes one read-only SQL query, run by DataFusion and shown verbatim.</dd></div>
+                            <div class="case__row"><dt class="case__label">Result</dt><dd class="case__text">Version 0.15 ships installers for Windows, macOS and Linux, and every answer cites the passage it came from.</dd></div>
+                        </dl>
+                    </details>
                 </article>
 
                 <article class="project" id="attendance">
@@ -214,6 +250,17 @@ ORDER BY sort_order;</code></pre>
                             <a class="project__link" href="https://github.com/lmansf/Attendance-Projections" target="_blank" rel="noopener">View on GitHub ↗</a>
                         </div>
                     </div>
+                    <details class="case">
+                        <summary class="case__toggle">Case file<span class="case__hint"> · problem, fix, result</span></summary>
+                        <dl class="case__rows">
+                            <div class="case__row"><dt class="case__label">Problem</dt><dd class="case__text">A tuned XGBoost model was the daily attendance forecast to beat.</dd></div>
+                            <div class="case__row"><dt class="case__label">Fix</dt><dd class="case__text">A blend of gradient-boosted trees, ridge and random forest, chosen by rolling-origin cross-validation.</dd></div>
+                            <div class="case__row"><dt class="case__label">Result</dt><dd class="case__text">About 6% lower MAE out of fold than the tuned XGBoost. The last 30 operating days are held out as an unseen live forecast with an 80% planning band.</dd></div>
+                        </dl>
+                        <ul class="case__metrics" aria-label="Measured result">
+                            <li class="case__metric"><span class="case__metric-label">Mean bias, guests a day</span> <span class="case__metric-value">+90 → −7</span></li>
+                        </ul>
+                    </details>
                 </article>
 
                 <article class="project" id="usl">
@@ -229,6 +276,14 @@ ORDER BY sort_order;</code></pre>
                             <a class="project__link" href="https://github.com/lmansf/USL-ticketing-and-stadium-revenue-forecasting" target="_blank" rel="noopener">View on GitHub ↗</a>
                         </div>
                     </div>
+                    <details class="case">
+                        <summary class="case__toggle">Case file<span class="case__hint"> · problem, fix, result</span></summary>
+                        <dl class="case__rows">
+                            <div class="case__row"><dt class="case__label">Problem</dt><dd class="case__text">USL promotion and relegation start in 2028, and there is no data yet on what they do to attendance.</dd></div>
+                            <div class="case__row"><dt class="case__label">Fix</dt><dd class="case__text">Two XGBoost models share every upstream table on a staged DuckDB warehouse and differ only by league-position features.</dd></div>
+                            <div class="case__row"><dt class="case__label">Result</dt><dd class="case__text">The error gap between the two models is the measuring stick, set as a baseline before promotion and relegation begin.</dd></div>
+                        </dl>
+                    </details>
                 </article>
 
                 <article class="project" id="roll-call">
@@ -244,6 +299,14 @@ ORDER BY sort_order;</code></pre>
                             <a class="project__link" href="https://github.com/lmansf/Manatee-Role-Call" target="_blank" rel="noopener">View on GitHub ↗</a>
                         </div>
                     </div>
+                    <details class="case">
+                        <summary class="case__toggle">Case file<span class="case__hint"> · problem, fix, result</span></summary>
+                        <dl class="case__rows">
+                            <div class="case__row"><dt class="case__label">Problem</dt><dd class="case__text">A daily manatee count is only useful if one bad observation can&rsquo;t quietly skew it.</dd></div>
+                            <div class="case__row"><dt class="case__label">Fix</dt><dd class="case__text">Freshness, volume, distribution and cross-source checks quarantine suspect observations and open an incident.</dd></div>
+                            <div class="case__row"><dt class="case__label">Result</dt><dd class="case__text">It runs daily on a systemd timer, emails what newly broke, and publishes the count to an Evidence dashboard.</dd></div>
+                        </dl>
+                    </details>
                 </article>
 
                 <article class="project" id="nowcast">
@@ -259,6 +322,14 @@ ORDER BY sort_order;</code></pre>
                             <a class="project__link" href="https://github.com/lmansf/Attendance-Nowcast" target="_blank" rel="noopener">View on GitHub ↗</a>
                         </div>
                     </div>
+                    <details class="case">
+                        <summary class="case__toggle">Case file<span class="case__hint"> · problem, fix, result</span></summary>
+                        <dl class="case__rows">
+                            <div class="case__row"><dt class="case__label">Problem</dt><dd class="case__text">A forecast made yesterday ignores what today&rsquo;s partial signals already say.</dd></div>
+                            <div class="case__row"><dt class="case__label">Fix</dt><dd class="case__text">A Kalman filter predicts from yesterday&rsquo;s state, then corrects with today&rsquo;s signals, weighting each one by its uncertainty.</dd></div>
+                            <div class="case__row"><dt class="case__label">Result</dt><dd class="case__text">A five-notebook write-up that builds the filter up from the scalar case.</dd></div>
+                        </dl>
+                    </details>
                 </article>
 
                 <article class="project" id="rfm">
@@ -274,6 +345,14 @@ ORDER BY sort_order;</code></pre>
                             <a class="project__link" href="https://github.com/lmansf/Member-Segmentation-Analysis" target="_blank" rel="noopener">View on GitHub ↗</a>
                         </div>
                     </div>
+                    <details class="case">
+                        <summary class="case__toggle">Case file<span class="case__hint"> · problem, fix, result</span></summary>
+                        <dl class="case__rows">
+                            <div class="case__row"><dt class="case__label">Problem</dt><dd class="case__text">One big member list treats every member the same.</dd></div>
+                            <div class="case__row"><dt class="case__label">Fix</dt><dd class="case__text">Recency, frequency and monetary scores modeled in SQL.</dd></div>
+                            <div class="case__row"><dt class="case__label">Result</dt><dd class="case__text">Member groups, reported in Power BI, that a marketing team can treat differently.</dd></div>
+                        </dl>
+                    </details>
                 </article>
 
                 <article class="project project--archived" id="efrog">

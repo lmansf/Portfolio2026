@@ -635,6 +635,114 @@ main.page > * { min-width: 0; }
     }
 }
 
+/* Case file (an incident-style note under each active project, after
+ * Interfere's issue cards): a closed <details> so the card stays short;
+ * open, it reads Problem / Fix / Result, with the measured before-and-after
+ * as small metric tiles where the project has one. Dots: amber problem,
+ * teal fix, green result, the pipeline's lane colours. */
+.case {
+    margin: 0 clamp(1.1rem, 3vw, 1.4rem);
+    border-top: var(--bw) dashed var(--hairline);
+}
+.project--featured .case { margin-left: calc(clamp(1.1rem, 3vw, 1.4rem) + 3.65rem); }
+@media (min-width: 880px) {
+    .project--featured .case { margin: 0 1.6rem 0 calc(1.6rem + 5.75rem); }
+}
+.case__toggle {
+    list-style: none;
+    display: flex;
+    align-items: center;
+    gap: 0.55rem;
+    min-height: 44px;
+    cursor: pointer;
+    font-family: var(--font-mono);
+    font-size: 0.76rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    color: var(--ink-1);
+}
+.case__toggle::-webkit-details-marker { display: none; }
+.case__toggle::before {
+    content: "+";
+    content: "+" / "";
+    display: inline-grid;
+    place-items: center;
+    width: 1.15rem;
+    height: 1.15rem;
+    border: var(--bw) solid var(--hairline-strong);
+    border-radius: var(--r-sm);
+    font-size: 0.85rem;
+    line-height: 1;
+    color: var(--accent-ink);
+}
+.case[open] > .case__toggle::before { content: "\2212"; content: "\2212" / ""; }
+.case__toggle:hover { color: var(--accent-ink); }
+.case__hint { color: var(--ink-3); text-transform: none; font-weight: 500; }
+.case__rows { display: grid; gap: 0.6rem; margin: 0 0 1rem; }
+.case__row { display: grid; grid-template-columns: 5.4rem minmax(0, 1fr); gap: 0.8rem; }
+.case__label {
+    display: flex;
+    align-items: baseline;
+    gap: 0.4rem;
+    font-family: var(--font-mono);
+    font-size: 0.7rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    color: var(--ink-3);
+    padding-top: 0.2rem;
+}
+.case__label::before {
+    content: "";
+    flex: 0 0 auto;
+    width: 0.5rem;
+    height: 0.5rem;
+    border-radius: 50%;
+    background: var(--pipe-3);
+}
+.case__row:first-child .case__label::before { background: var(--pipe-2); }
+.case__row:last-child .case__label::before { background: var(--success); }
+.case__text { margin: 0; color: var(--ink-2); font-size: 0.92rem; line-height: 1.5; }
+.case__metrics {
+    list-style: none;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    margin: -0.2rem 0 1.1rem;
+    padding: 0;
+}
+.case__metric {
+    display: inline-flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: 0.25rem 0.6rem;
+    padding: 0.4rem 0.65rem;
+    background: var(--surface-2);
+    border: var(--bw) solid var(--hairline);
+    border-radius: var(--r-sm);
+}
+.case__metric-label {
+    font-family: var(--font-mono);
+    font-size: 0.7rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    color: var(--ink-3);
+}
+.case__metric-value {
+    font-family: var(--font-mono);
+    font-size: 0.98rem;
+    font-weight: 700;
+    color: var(--ink-1);
+    white-space: nowrap;
+}
+@media (max-width: 419px) {
+    .case__row { grid-template-columns: 1fr; gap: 0.15rem; }
+    .case__hint { display: none; }
+}
+.projects-list .page-projects .case { display: none; }
+@media print {
+    .case { break-inside: avoid; }
+}
+
 /* Cards / List switch in the Projects intro (theme.js shows it). */
 .view-switch {
     display: inline-flex;
