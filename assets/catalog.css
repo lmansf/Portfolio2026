@@ -145,7 +145,7 @@
     display: inline-flex;
     align-items: baseline;
     gap: 0.4rem;
-    max-width: 15rem;
+    max-width: 18rem;
     padding: 0.3rem 0.55rem;
     border: var(--bw) solid var(--hairline-strong);
     border-radius: 6px;
