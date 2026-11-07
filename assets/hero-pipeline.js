@@ -322,7 +322,9 @@
         if (onScreen && !document.hidden) rafId = requestAnimationFrame(frame);
         else running = false;
     }
+    function textMode() { return document.documentElement.classList.contains("text-mode"); }
     function start() {
+        if (textMode()) { running = false; return; }
         if (mqMotion.matches) { draw(0, true); return; }
         if (!running) {
             running = true;
@@ -352,7 +354,29 @@
         if (mqMotion.matches) draw(0, true); else start();
     }
 
+    /* Text mode (theme.js): the plain hero, with the h1 as the heading. The
+     * stage only draws once text mode is off again. */
+    var listening = false;
+    function onTextMode() {
+        if (textMode()) {
+            running = false;
+            stage.hidden = true;
+            hero.classList.remove("hero--pipe");
+            waiting.remove("hero-wait");
+        } else if (!begun) {
+            begin();
+        } else {
+            stage.hidden = false;
+            hero.classList.add("hero--pipe");
+            readColors();
+            t0 = performance.now();
+            fit();
+        }
+    }
+
     function begin() {
+        if (!listening) { listening = true; window.addEventListener("textmodechange", onTextMode); }
+        if (textMode()) { waiting.remove("hero-wait"); return; }
         begun = true;
         readColors();
         stage.hidden = false;
