@@ -96,6 +96,20 @@
             </div>
         </section>
 
+        <!-- Lineage map: drawn by assets/lineage-map.js from models.json on wide screens; phones and no-JS visitors use the lists below -->
+        <section class="status-section lmap" aria-labelledby="cat-map" data-lineage-map hidden>
+            <header class="section-head">
+                <h2 class="section-head__title" id="cat-map">Lineage map</h2>
+                <span class="section-head__hint">Drag a table to pull its lineage; select one to open it below</span>
+            </header>
+            <div class="lmap__frame">
+                <ol class="lmap__cols" aria-hidden="true"><li>Raw</li><li>Staging</li><li>Mart</li></ol>
+                <div class="lmap__box" data-lineage-box>
+                    <svg class="lmap__edges" aria-hidden="true" focusable="false"></svg>
+                </div>
+            </div>
+        </section>
+
         <!-- catalog -->
         <section aria-labelledby="cat-tables" class="status-section">
             <header class="section-head">
@@ -374,5 +388,6 @@
     <script defer src="/assets/transition.min.js"></script>
     <script defer src="/assets/motion.min.js"></script>
     <script defer src="/assets/catalog.min.js"></script>
+    <script defer src="/assets/lineage-map.min.js"></script>
 </body>
 </html>

@@ -54,6 +54,14 @@ in text mode and print; under reduced motion it keeps the stage lights but
 drops the moving dot. Its three stages and links must match the hero's
 `.hero-pipe__stage` links. Regenerate the `.min.js` after editing it.
 
+The `/catalog` lineage map (`assets/lineage-map.js`, loaded as
+`lineage-map.min.js`, styles at the end of `catalog.css`) sits in
+hand-edited markup between the hero and the generated `<!-- catalog -->`
+block. It draws every node in `data/pipeline/models.json` and links each
+to its `#t-<name>` entry, so it needs no edits when tables change. It
+shows only from 880px wide and is hidden in text mode; phones keep the
+generated lists.
+
 The three featured project synopses (Quack Query, Fraud Detection Pipeline,
 Owl Park) are the same text on Home and `/projects` and stay at about two
 short lines each; the detail lives in the "How the data flows" diagrams.
