@@ -772,7 +772,7 @@ main.page > * { min-width: 0; }
  * one numbered row in a single frame: number, title, type and year, links.
  * The synopsis and tags are left out so the whole page fits in a glance;
  * the cards are one tap away. Numbers run 01 to the end across both lists. */
-.projects-list .page-projects { counter-reset: proj; }
+.projects-list .page-projects { counter-reset: sec proj; } /* keep the section-number counter too */
 .projects-list .page-projects .project-grid {
     grid-template-columns: 1fr;
     gap: 0;
