@@ -107,6 +107,14 @@
                 r.downs.forEach((m, j) => { if (rank[m.name] === undefined) rank[m.name] = rank[r.name] + 0.05 + 0.001 * j; });
             });
         });
+        /* A mart built from another mart sits just under its parent. */
+        for (let pass = 0; pass < 3; pass++) {
+            nodes.forEach((n) => {
+                if (rank[n.name] !== undefined) return;
+                const up = n.ups.find((u) => rank[u.name] !== undefined);
+                if (up) rank[n.name] = rank[up.name] + 0.0005;
+            });
+        }
         nodes.forEach((n) => { if (rank[n.name] === undefined) rank[n.name] = i++; });
         Object.keys(COLS).forEach((layer) => {
             const col = nodes.filter((n) => n.layer === layer).sort((a, b) => rank[a.name] - rank[b.name]);
@@ -179,6 +187,16 @@
             n.el.style.transform = 'translate(' + Math.round(n.x - n.w / 2) + 'px,' + Math.round(n.y - n.h / 2) + 'px)';
         });
         edges.forEach((e) => {
+            if (e.from.layer === e.to.layer) {
+                /* Same column (a mart built from a mart): a bracket on the right. */
+                const r1 = e.from.x + e.from.w / 2;
+                const r2 = e.to.x + e.to.w / 2;
+                const out = Math.max(r1, r2) + 28;
+                e.el.setAttribute('d', 'M' + r1.toFixed(1) + ',' + e.from.y.toFixed(1) +
+                    ' C' + out.toFixed(1) + ',' + e.from.y.toFixed(1) + ' ' + out.toFixed(1) + ',' + e.to.y.toFixed(1) +
+                    ' ' + r2.toFixed(1) + ',' + e.to.y.toFixed(1));
+                return;
+            }
             const x1 = e.from.x + e.from.w / 2;
             const x2 = e.to.x - e.to.w / 2;
             const mid = (x1 + x2) / 2;
