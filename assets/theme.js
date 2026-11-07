@@ -45,6 +45,70 @@
     } catch (e) { /* no-op */ }
 })();
 
+/* Reading preferences, kept per visitor in localStorage (both off by default):
+ *  - Text mode (`text-mode` on <html>): no animation anywhere, no hero
+ *    replay, no walking owl, no background texture; just the words. The
+ *    switch is the "Text" button in the top bar.
+ *  - Projects list view (`projects-list` on <html>): /projects shows a
+ *    numbered index (number, title, type, year, links) instead of cards.
+ *    The switch is the Cards / List control in the Projects intro.
+ * Both classes go on before the first paint (this file is render-blocking
+ * in <head>), so a page never flashes the other look. The buttons are
+ * `hidden` in the HTML and only shown here, so without JS nothing offers a
+ * switch that can't work. Changing text mode fires `textmodechange` on
+ * window (detail: { on }) for hero-pipeline.js and motion.js. */
+(function () {
+    var root = document.documentElement;
+    var TEXT_KEY = 'lm-text-mode';
+    var VIEW_KEY = 'lm-projects-view';
+    function get(k) { try { return window.localStorage.getItem(k); } catch (e) { return null; } }
+    function set(k, v) {
+        try {
+            if (v === null) window.localStorage.removeItem(k);
+            else window.localStorage.setItem(k, v);
+        } catch (e) { /* private mode: the choice lasts for this page only */ }
+    }
+    if (get(TEXT_KEY) === '1') root.classList.add('text-mode');
+    if (get(VIEW_KEY) === 'list') root.classList.add('projects-list');
+
+    function wire() {
+        Array.prototype.forEach.call(document.querySelectorAll('[data-text-mode-toggle]'), function (btn) {
+            var sync = function () { btn.setAttribute('aria-pressed', root.classList.contains('text-mode') ? 'true' : 'false'); };
+            sync();
+            btn.hidden = false;
+            btn.addEventListener('click', function () {
+                var on = !root.classList.contains('text-mode');
+                root.classList.toggle('text-mode', on);
+                if (on) root.classList.remove('hero-wait');
+                set(TEXT_KEY, on ? '1' : null);
+                sync();
+                try { window.dispatchEvent(new CustomEvent('textmodechange', { detail: { on: on } })); } catch (e) { /* old browser */ }
+            });
+        });
+        Array.prototype.forEach.call(document.querySelectorAll('[data-view-switch]'), function (group) {
+            var buttons = group.querySelectorAll('[data-view]');
+            var sync = function () {
+                var list = root.classList.contains('projects-list');
+                Array.prototype.forEach.call(buttons, function (b) {
+                    b.setAttribute('aria-pressed', (b.getAttribute('data-view') === 'list') === list ? 'true' : 'false');
+                });
+            };
+            sync();
+            group.hidden = false;
+            Array.prototype.forEach.call(buttons, function (b) {
+                b.addEventListener('click', function () {
+                    var list = b.getAttribute('data-view') === 'list';
+                    root.classList.toggle('projects-list', list);
+                    set(VIEW_KEY, list ? 'list' : null);
+                    sync();
+                });
+            });
+        });
+    }
+    if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', wire);
+    else wire();
+})();
+
 /* Home hero: hold the pipeline stage's place from the first paint.
  * hero-pipeline.js unhides the stage a moment after load; on a phone that
  * pushed the whole intro down by the stage's height (a big layout shift).
@@ -56,6 +120,8 @@
  * class does nothing there. */
 (function () {
     var root = document.documentElement;
+    /* Text mode shows the plain hero straight away: nothing to wait for. */
+    if (root.classList.contains('text-mode')) return;
     root.classList.add('hero-wait');
     setTimeout(function () {
         if (!document.querySelector('.hero--pipe')) root.classList.remove('hero-wait');

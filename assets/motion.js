@@ -35,7 +35,8 @@
     var BLINK_SRC = '/assets/owl-walker-blink.webp';
 
     var mql = window.matchMedia ? window.matchMedia('(prefers-reduced-motion: reduce)') : null;
-    function reduceMotion() { return !!(mql && mql.matches); }
+    // Text mode (theme.js) asks for the same stillness as reduced motion.
+    function reduceMotion() { return !!(mql && mql.matches) || document.documentElement.classList.contains('text-mode'); }
 
     /* ─── Styles ─── */
 

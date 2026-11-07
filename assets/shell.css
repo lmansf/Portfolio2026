@@ -132,6 +132,74 @@ header.topbar .topbar__brand .brand-mark .crow-mark { width: 21px; height: 17px;
 }
 .burger:hover { background: var(--surface-2); }
 .burger:active { transform: translateY(1px); box-shadow: none; }
+
+/* ─────────────────────────────────────────────────────────────
+ * Text mode switch (theme.js): a small pressed/unpressed button in the top
+ * bar. Phones: before the burger, "Text" only. Desktop: after the nav, a
+ * full-height block like the nav links, "Text mode".
+ * ───────────────────────────────────────────────────────────── */
+.mode-toggle {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.45rem;
+    align-self: center;
+    margin-left: auto;
+    min-height: 44px;
+    padding: 0 0.7rem;
+    font-family: var(--font-mono);
+    font-size: 0.74rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    color: var(--ink-1);
+    background: transparent;
+    border: var(--bw) solid var(--hairline);
+    border-radius: var(--r-sm);
+    cursor: pointer;
+    flex-shrink: 0;
+}
+.mode-toggle[hidden] { display: none; }
+.mode-toggle:hover { background: var(--surface-2); color: var(--accent-ink); }
+.mode-toggle__dot {
+    width: 0.6rem;
+    height: 0.6rem;
+    border-radius: 50%;
+    border: var(--bw) solid var(--hairline-strong);
+    background: transparent;
+}
+.mode-toggle[aria-pressed="true"] { color: var(--accent-ink); border-color: var(--accent); }
+.mode-toggle[aria-pressed="true"] .mode-toggle__dot { background: var(--accent); border-color: var(--accent); }
+.mode-toggle__more { display: none; }
+@media (min-width: 420px) { .mode-toggle__more { display: inline; } }
+header.topbar .mode-toggle + .burger { margin-left: 0; }
+@media (max-width: 767px) { header.topbar { gap: 0.6rem; } }
+@media (min-width: 768px) {
+    .mode-toggle {
+        align-self: stretch;
+        margin-left: 0;
+        min-height: 0;
+        padding: 0 1rem;
+        border: 0;
+        border-right: var(--bw) solid var(--hairline);
+        border-radius: 0;
+    }
+    .mode-toggle[aria-pressed="true"] { box-shadow: inset 0 -2px 0 var(--accent); }
+    header.topbar { gap: 0; }
+    header.topbar .topbar__brand { margin-right: 1rem; }
+}
+
+/* Text mode itself: nothing moves and nothing decorates; the words stay.
+ * hero-pipeline.js hides the hero replay, motion.js treats it as reduced
+ * motion; these rules catch everything else, including mid-way toggles. */
+html.text-mode { scroll-behavior: auto !important; }
+html.text-mode *,
+html.text-mode *::before,
+html.text-mode *::after {
+    animation: none !important;
+    transition: none !important;
+}
+html.text-mode [data-hero-pipe] { display: none !important; }
+html.text-mode .owl-lane { display: none !important; }
+html.text-mode .reveal { opacity: 1 !important; transform: none !important; }
 .burger__bar {
     display: block;
     width: 100%;
@@ -340,6 +408,10 @@ summary:focus-visible {
         ::view-transition-new(*) {
             animation-duration: 0s !important;
         }
+    }
+    html.text-mode::view-transition-old(*),
+    html.text-mode::view-transition-new(*) {
+        animation: none !important;
     }
 }
 

@@ -72,6 +72,7 @@
             <a href="/projects" aria-current="page">Projects</a>
             <a href="/assets/loganmansfield.pdf" target="_blank" rel="noopener">Résumé</a>
         </nav>
+        <button class="mode-toggle" type="button" data-text-mode-toggle aria-pressed="false" aria-label="Text mode: no animation" title="Text mode: no animation" hidden><span class="mode-toggle__dot" aria-hidden="true"></span>Text<span class="mode-toggle__more"> mode</span></button>
         <button class="burger" type="button" aria-label="Open navigation" aria-expanded="false" aria-controls="site-nav" data-burger>
             <span class="burger__bar"></span><span class="burger__bar"></span><span class="burger__bar"></span>
         </button>
@@ -92,6 +93,10 @@
                 <p class="eyebrow">Selected work · 2026</p>
                 <h1 class="hero__name" id="projects-title">Projects.</h1>
                 <p class="hero__role">Builds I&rsquo;m proud of: a fraud-detection pipeline, a multiplayer park, a plain-English SQL tool, a local-first desktop app, forecasting models, and a few smaller tools. Each one runs end to end, from source data to something a person can use.</p>
+                <div class="view-switch" role="group" aria-label="Show projects as" data-view-switch hidden>
+                    <button type="button" class="view-switch__btn" data-view="grid" aria-pressed="true">Cards</button>
+                    <button type="button" class="view-switch__btn" data-view="list" aria-pressed="false">List</button>
+                </div>
             </div>
         </section>
 

@@ -635,6 +635,105 @@ main.page > * { min-width: 0; }
     }
 }
 
+/* Cards / List switch in the Projects intro (theme.js shows it). */
+.view-switch {
+    display: inline-flex;
+    margin-top: 1.1rem;
+    border: var(--bw) solid var(--hairline-strong);
+    border-radius: var(--r-sm);
+    overflow: hidden;
+}
+.view-switch[hidden] { display: none; }
+.view-switch__btn {
+    min-height: 44px;
+    padding: 0 1rem;
+    font-family: var(--font-mono);
+    font-size: 0.78rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    color: var(--ink-1);
+    background: var(--surface-1);
+    border: 0;
+    cursor: pointer;
+}
+.view-switch__btn + .view-switch__btn { border-left: var(--bw) solid var(--hairline-strong); }
+.view-switch__btn:hover { background: var(--surface-2); color: var(--accent-ink); }
+.view-switch__btn[aria-pressed="true"] { background: var(--accent); color: var(--on-accent); }
+
+/* List view (`projects-list` on <html>): every project, featured or not, as
+ * one numbered row in a single frame: number, title, type and year, links.
+ * The synopsis and tags are left out so the whole page fits in a glance;
+ * the cards are one tap away. Numbers run 01 to the end across both lists. */
+.projects-list .page-projects { counter-reset: proj; }
+.projects-list .page-projects .project-grid {
+    grid-template-columns: 1fr;
+    gap: 0;
+    background: var(--surface-1);
+    border: var(--bw) solid var(--hairline);
+    border-radius: var(--r-lg);
+    overflow: hidden;
+    box-shadow: var(--shadow-sm);
+}
+.projects-list .page-projects .project {
+    counter-increment: proj;
+    border: 0;
+    border-top: var(--bw) solid var(--hairline);
+    border-radius: 0;
+    box-shadow: none;
+    background: transparent;
+}
+.projects-list .page-projects .project:first-child { border-top: 0; }
+.projects-list .page-projects .project:hover { transform: none; box-shadow: none; background: var(--accent-mist); }
+.projects-list .page-projects .project__body {
+    grid-template-columns: 2.4rem minmax(0, 1fr);
+    grid-template-areas:
+        "num title"
+        "num head"
+        "num links";
+    gap: 0.25rem 0.8rem;
+    padding: 0.85rem 1rem;
+}
+@media (min-width: 720px) {
+    .projects-list .page-projects .project__body {
+        grid-template-columns: 2.8rem minmax(0, 1fr) minmax(12rem, auto);
+        grid-template-areas:
+            "num title head"
+            "num links links";
+        align-items: baseline;
+        padding: 0.9rem 1.25rem;
+    }
+}
+.projects-list .page-projects .project__body::before {
+    content: counter(proj, decimal-leading-zero);
+    content: counter(proj, decimal-leading-zero) / "";
+    grid-area: num;
+    font-family: var(--font-mono);
+    font-size: 1rem;
+    font-weight: 600;
+    line-height: 1.5;
+    color: var(--accent-ink);
+}
+.projects-list .page-projects .project__title { grid-area: title; font-size: 1.15rem; }
+.projects-list .page-projects .project__head { grid-area: head; justify-content: flex-start; gap: 0.6rem; }
+@media (min-width: 720px) {
+    .projects-list .page-projects .project__head { justify-content: flex-end; }
+}
+.projects-list .page-projects .project__desc,
+.projects-list .page-projects .project__tags { display: none; }
+.projects-list .page-projects .project__links {
+    grid-area: links;
+    flex-direction: row;
+    align-items: center;
+    align-self: auto;
+    gap: 0.25rem 1.1rem;
+    margin-top: 0;
+    padding-top: 0.1rem;
+}
+.projects-list .page-projects .project--archived { border-style: dashed none none; }
+@media print {
+    .view-switch { display: none; }
+}
+
 /* Archived: quieter, with a dashed frame and no shadow */
 .project--archived {
     background: transparent;

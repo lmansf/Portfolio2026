@@ -35,6 +35,18 @@ in its reserved lane above the footer (it must never cover content or
 buttons), keep every animation off or static under `prefers-reduced-motion`,
 and leave the "Hide owl" choice in localStorage working.
 
+Two reading switches live in `assets/theme.js` (render-blocking, so the
+class is on `<html>` before the first paint) and are stored in
+localStorage: **Text mode** (`text-mode`; the "Text" button in every page's
+top bar) and the **Projects list view** (`projects-list`; the Cards / List
+switch in the `/projects` intro). Text mode must stop every animation: the
+hero replay (`hero-pipeline.js` listens for `textmodechange` and shows the
+plain h1), the owl and reveals (`motion.js` treats it as reduced motion),
+and anything else through the `html.text-mode` rules in `shell.css`. New
+motion should check it too. The list view is CSS only (`pages.css`): it
+hides each card's synopsis and tags, so the card markup must not change
+for it.
+
 The three featured project synopses (Quack Query, Fraud Detection Pipeline,
 Owl Park) are the same text on Home and `/projects` and stay at about two
 short lines each; the detail lives in the "How the data flows" diagrams.
