@@ -1,79 +1,49 @@
 {
-  "fetched_at": "2026-11-07T12:57:21Z",
+  "fetched_at": "2026-11-08T13:21:21Z",
   "user": "lmansf",
   "window_days": 30,
   "activity": [
     {
-      "day": "2026-11-02",
-      "repo": "lmansf/Portfolio2026",
-      "events": 4,
-      "pushes": 4
-    },
-    {
-      "day": "2026-11-02",
-      "repo": "lmansf/Welcome-to-Owl-Park",
-      "events": 37,
-      "pushes": 28
-    },
-    {
-      "day": "2026-11-03",
+      "day": "2026-11-05",
       "repo": "lmansf/Portfolio2026",
       "events": 3,
-      "pushes": 2
-    },
-    {
-      "day": "2026-11-03",
-      "repo": "lmansf/Welcome-to-Owl-Park",
-      "events": 9,
-      "pushes": 6
-    },
-    {
-      "day": "2026-11-04",
-      "repo": "lmansf/Portfolio2026",
-      "events": 7,
-      "pushes": 3
-    },
-    {
-      "day": "2026-11-04",
-      "repo": "lmansf/Welcome-to-Owl-Park",
-      "events": 8,
-      "pushes": 4
-    },
-    {
-      "day": "2026-11-05",
-      "repo": "lmansf/Portfolio2026",
-      "events": 20,
-      "pushes": 6
-    },
-    {
-      "day": "2026-11-05",
-      "repo": "lmansf/Welcome-to-Owl-Park",
-      "events": 72,
-      "pushes": 22
-    },
-    {
-      "day": "2026-11-05",
-      "repo": "lmansf/fraud-detection-pipeline",
-      "events": 4,
       "pushes": 1
+    },
+    {
+      "day": "2026-11-05",
+      "repo": "lmansf/Welcome-to-Owl-Park",
+      "events": 7,
+      "pushes": 4
     },
     {
       "day": "2026-11-06",
       "repo": "lmansf/Portfolio2026",
-      "events": 31,
+      "events": 25,
       "pushes": 11
     },
     {
       "day": "2026-11-06",
       "repo": "lmansf/Welcome-to-Owl-Park",
-      "events": 96,
-      "pushes": 22
+      "events": 104,
+      "pushes": 45
+    },
+    {
+      "day": "2026-11-07",
+      "repo": "lmansf/Portfolio2026",
+      "events": 19,
+      "pushes": 4
     },
     {
       "day": "2026-11-07",
       "repo": "lmansf/Welcome-to-Owl-Park",
-      "events": 9,
-      "pushes": 0
+      "events": 99,
+      "pushes": 34
+    },
+    {
+      "day": "2026-11-08",
+      "repo": "lmansf/Welcome-to-Owl-Park",
+      "events": 43,
+      "pushes": 13
     }
   ],
   "repos": [
@@ -249,7 +219,7 @@
       "repo": "lmansf/Portfolio2026",
       "language": "HTML",
       "stars": 1,
-      "pushed_on": "2026-11-06",
+      "pushed_on": "2026-11-07",
       "archived": false
     },
     {
@@ -326,7 +296,7 @@
       "repo": "lmansf/Welcome-to-Owl-Park",
       "language": "TypeScript",
       "stars": 1,
-      "pushed_on": "2026-11-07",
+      "pushed_on": "2026-11-08",
       "archived": false
     },
     {
