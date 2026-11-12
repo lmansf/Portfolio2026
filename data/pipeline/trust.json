@@ -1,9 +1,9 @@
 {
   "_about": "Written by scripts/data_run.py: one line per SQL source caption, for the trust badge beside it (assets/sql-source.js). Full detail is in run-log.json.",
-  "run_at": "2026-11-11T14:18:49Z",
+  "run_at": "2026-11-12T15:10:43Z",
   "pieces": {
     "now": {
-      "as_of": "2026-11-11T14:18:43Z",
+      "as_of": "2026-11-12T15:10:37Z",
       "max_hours": 36,
       "passed": 4,
       "total": 4,
@@ -11,7 +11,7 @@
       "failed": []
     },
     "featured": {
-      "as_of": "2026-11-11T14:18:43Z",
+      "as_of": "2026-11-12T15:10:37Z",
       "max_hours": 36,
       "passed": 8,
       "total": 8,
@@ -19,7 +19,7 @@
       "failed": []
     },
     "experience": {
-      "as_of": "2026-11-11T14:18:43Z",
+      "as_of": "2026-11-12T15:10:37Z",
       "max_hours": 36,
       "passed": 6,
       "total": 6,
@@ -27,7 +27,7 @@
       "failed": []
     },
     "credentials": {
-      "as_of": "2026-11-11T14:18:43Z",
+      "as_of": "2026-11-12T15:10:37Z",
       "max_hours": 36,
       "passed": 5,
       "total": 5,
@@ -35,7 +35,7 @@
       "failed": []
     },
     "toolkit": {
-      "as_of": "2026-11-11T14:18:43Z",
+      "as_of": "2026-11-12T15:10:37Z",
       "max_hours": 36,
       "passed": 6,
       "total": 6,
@@ -43,7 +43,7 @@
       "failed": []
     },
     "projects-featured": {
-      "as_of": "2026-11-11T14:18:43Z",
+      "as_of": "2026-11-12T15:10:37Z",
       "max_hours": 36,
       "passed": 8,
       "total": 8,
@@ -51,7 +51,7 @@
       "failed": []
     },
     "projects-more": {
-      "as_of": "2026-11-11T14:18:43Z",
+      "as_of": "2026-11-12T15:10:37Z",
       "max_hours": 36,
       "passed": 8,
       "total": 8,
