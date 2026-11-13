@@ -434,75 +434,133 @@ ORDER BY min(sort_order);</code></pre>
                         <span class="tl__head tl--databricks" style="--lane: 5">Databricks</span>
                     </div>
                     <div class="tl__axis">
-                        <span class="tl__tick" style="--at: 0%">2019</span>
-                        <span class="tl__tick" style="--at: 12.632%">2020</span>
-                        <span class="tl__tick" style="--at: 25.263%">2021</span>
-                        <span class="tl__tick" style="--at: 37.895%">2022</span>
-                        <span class="tl__tick" style="--at: 50.526%">2023</span>
-                        <span class="tl__tick" style="--at: 63.158%">2024</span>
-                        <span class="tl__tick" style="--at: 75.789%">2025</span>
-                        <span class="tl__tick" style="--at: 88.421%">2026</span>
-                        <span class="tl__tick tl__tick--now" style="--at: 100%">Now</span>
+                        <span class="tl__year" style="--at: 6.316%">2019</span>
+                        <span class="tl__year" style="--at: 18.947%">2020</span>
+                        <span class="tl__year" style="--at: 31.579%">2021</span>
+                        <span class="tl__year" style="--at: 44.211%">2022</span>
+                        <span class="tl__year" style="--at: 56.842%">2023</span>
+                        <span class="tl__year" style="--at: 69.474%">2024</span>
+                        <span class="tl__year" style="--at: 82.105%">2025</span>
+                        <span class="tl__year" style="--at: 94.211%">2026</span>
                     </div>
                     <div class="tl__plot">
-                        <span class="tl__guide" style="--lane: 0"></span>
-                        <span class="tl__guide" style="--lane: 1"></span>
-                        <span class="tl__guide" style="--lane: 2"></span>
-                        <span class="tl__guide" style="--lane: 3"></span>
-                        <span class="tl__guide" style="--lane: 4"></span>
-                        <span class="tl__guide" style="--lane: 5"></span>
+                        <span class="tl__band" style="--top: 0%; --h: 12.632%"></span>
+                        <span class="tl__band" style="--top: 25.263%; --h: 12.632%"></span>
+                        <span class="tl__band" style="--top: 50.526%; --h: 12.632%"></span>
+                        <span class="tl__band" style="--top: 75.789%; --h: 12.632%"></span>
                         <svg class="tl__links" viewBox="0 0 600 950" preserveAspectRatio="none" focusable="false">
-                            <path d="M84 90 L116 90"/>
-                            <path d="M116 430 L84 480"/>
-                            <path d="M84 620 L116 620"/>
-                            <path d="M184 620 L216 620"/>
-                            <path d="M284 740 L316 740"/>
-                            <path d="M384 740 L416 740"/>
-                            <path d="M484 740 L516 740"/>
+                            <path class="tl--sql" d="M50 70 C50 40 150 40 150 70" pathLength="1" style="--i: 1"/>
+                            <path class="tl--python" d="M150 430 C150 455 50 455 50 480" pathLength="1" style="--i: 2"/>
+                            <path class="tl--sql" d="M85 570 C150 570 150 570 150 600" pathLength="1" style="--i: 3"/>
+                            <path class="tl--powerbi" d="M150 600 C150 570 250 570 250 600" pathLength="1" style="--i: 4"/>
+                            <path class="tl--fabric" d="M285 690 C350 690 350 690 350 720" pathLength="1" style="--i: 5"/>
+                            <path class="tl--snowflake" d="M350 720 C350 690 450 690 450 720" pathLength="1" style="--i: 6"/>
+                            <path class="tl--databricks" d="M450 720 C450 690 550 690 550 720" pathLength="1" style="--i: 7"/>
                         </svg>
-                        <span class="tl__box tl--python" style="--lane: 0; --top: 7.368%; --h: 37.895%" title="Python · Aug 2019 – Jul 2022"></span>
-                        <span class="tl__box tl--python tl__box--now" style="--lane: 0; --top: 50.526%; --h: 49.474%" title="Python · 2023 – now"></span>
-                        <span class="tl__box tl--sql" style="--lane: 1; --top: 7.368%; --h: 37.895%" title="SQL · Aug 2019 – Jul 2022"></span>
-                        <span class="tl__box tl--sql tl__box--now" style="--lane: 1; --top: 63.158%; --h: 36.842%" title="SQL · 2024 – now"></span>
-                        <span class="tl__box tl--powerbi tl__box--now" style="--lane: 2; --top: 63.158%; --h: 36.842%" title="Power BI · 2024 – now"></span>
-                        <span class="tl__box tl--fabric" style="--lane: 3; --top: 75.789%; --h: 12.632%" title="Fabric · 2025"></span>
-                        <span class="tl__box tl--snowflake" style="--lane: 4; --top: 75.789%; --h: 12.632%" title="Snowflake · 2025"></span>
-                        <span class="tl__box tl--databricks tl__box--now" style="--lane: 5; --top: 75.789%; --h: 24.211%" title="Databricks · 2025 – now"></span>
+                        <span class="tl__box tl--python" style="--lane: 0; --top: 7.368%; --h: 37.895%; --i: 0">
+                            <span class="tl__name">Python</span>
+                            <span class="tl__years">2019–22</span>
+                            <span class="tl__tip">
+                                <span class="tl__tip-name">Python</span>
+                                <span class="tl__tip-when">Aug 2019 – Jul 2022 · 3 years</span>
+                                <span class="tl__tip-note">Data analyst years at Excel Esports</span>
+                            </span>
+                        </span>
+                        <span class="tl__box tl--python tl__box--now" style="--lane: 0; --top: 50.526%; --h: 49.474%; --i: 2">
+                            <span class="tl__name">Python</span>
+                            <span class="tl__years">2023–now</span>
+                            <span class="tl__tip">
+                                <span class="tl__tip-name">Python</span>
+                                <span class="tl__tip-when">2023 – now · 4 years so far</span>
+                                <span class="tl__tip-note">Picked back up for my own projects</span>
+                            </span>
+                        </span>
+                        <span class="tl__box tl--sql" style="--lane: 1; --top: 7.368%; --h: 37.895%; --i: 1">
+                            <span class="tl__name">SQL</span>
+                            <span class="tl__years">2019–22</span>
+                            <span class="tl__tip">
+                                <span class="tl__tip-name">SQL</span>
+                                <span class="tl__tip-when">Aug 2019 – Jul 2022 · 3 years</span>
+                                <span class="tl__tip-note">Data analyst years at Excel Esports</span>
+                            </span>
+                        </span>
+                        <span class="tl__box tl--sql tl__box--now" style="--lane: 1; --top: 63.158%; --h: 36.842%; --i: 3">
+                            <span class="tl__name">SQL</span>
+                            <span class="tl__years">2024–now</span>
+                            <span class="tl__tip">
+                                <span class="tl__tip-name">SQL</span>
+                                <span class="tl__tip-when">2024 – now · 3 years so far</span>
+                                <span class="tl__tip-note">Picked back up alongside Power BI</span>
+                            </span>
+                        </span>
+                        <span class="tl__box tl--powerbi tl__box--now" style="--lane: 2; --top: 63.158%; --h: 36.842%; --i: 4">
+                            <span class="tl__name">Power BI</span>
+                            <span class="tl__years">2024–now</span>
+                            <span class="tl__tip">
+                                <span class="tl__tip-name">Power BI</span>
+                                <span class="tl__tip-when">2024 – now · 3 years so far</span>
+                            </span>
+                        </span>
+                        <span class="tl__box tl--fabric tl__box--tip-left" style="--lane: 3; --top: 75.789%; --h: 12.632%; --i: 5">
+                            <span class="tl__name">Fabric</span>
+                            <span class="tl__years">2025</span>
+                            <span class="tl__tip">
+                                <span class="tl__tip-name">Fabric</span>
+                                <span class="tl__tip-when">2025 · 12 months</span>
+                            </span>
+                        </span>
+                        <span class="tl__box tl--snowflake tl__box--tip-left" style="--lane: 4; --top: 75.789%; --h: 12.632%; --i: 6">
+                            <span class="tl__name">Snowflake</span>
+                            <span class="tl__years">2025</span>
+                            <span class="tl__tip">
+                                <span class="tl__tip-name">Snowflake</span>
+                                <span class="tl__tip-when">2025 · 12 months</span>
+                            </span>
+                        </span>
+                        <span class="tl__box tl--databricks tl__box--now tl__box--tip-left" style="--lane: 5; --top: 75.789%; --h: 24.211%; --i: 7">
+                            <span class="tl__name">Databricks</span>
+                            <span class="tl__years">2025–now</span>
+                            <span class="tl__tip">
+                                <span class="tl__tip-name">Databricks</span>
+                                <span class="tl__tip-when">2025 – now · 2 years so far</span>
+                            </span>
+                        </span>
+                        <span class="tl__nowline"><span>Now</span></span>
                     </div>
                     <ol class="tl__rail">
-                        <li class="tl__ms tl__ms--role" style="--dot: 7.895%; --lab: 6%; --lab-w: 6.211%">
+                        <li class="tl__ms tl__ms--role" style="--dot: 7.895%; --lab: 6.368%; --lab-w: 6.474%; --i: 0">
                             <span class="tl__dot"></span>
                             <span class="tl__lab">
-                                <span class="tl__name">Data Analyst, Excel Esports</span>
+                                <span class="tl__ms-name">Data Analyst, Excel Esports</span>
                                 <span class="tl__when">Aug 2019</span>
                             </span>
                         </li>
-                        <li class="tl__ms tl__ms--role" style="--dot: 48.947%; --lab: 47.053%; --lab-w: 47.263%">
+                        <li class="tl__ms tl__ms--role" style="--dot: 48.947%; --lab: 47.421%; --lab-w: 47.526%; --i: 1">
                             <span class="tl__dot"></span>
                             <span class="tl__lab">
-                                <span class="tl__name">Joined ZooTampa</span>
+                                <span class="tl__ms-name">Joined ZooTampa</span>
                                 <span class="tl__when">Nov 2022</span>
                             </span>
                         </li>
-                        <li class="tl__ms tl__ms--role" style="--dot: 74.211%; --lab: 68.421%; --lab-w: 72.526%">
+                        <li class="tl__ms tl__ms--role" style="--dot: 74.211%; --lab: 68.211%; --lab-w: 72.789%; --i: 2">
                             <span class="tl__dot"></span>
                             <span class="tl__lab">
-                                <span class="tl__name">IT POS Systems Analyst</span>
+                                <span class="tl__ms-name">IT POS Systems Analyst</span>
                                 <span class="tl__when">Nov 2024</span>
                             </span>
                         </li>
-                        <li class="tl__ms tl__ms--credential" style="--dot: 82.105%; --lab: 81.053%; --lab-w: 80.421%">
+                        <li class="tl__ms tl__ms--credential" style="--dot: 82.105%; --lab: 79.053%; --lab-w: 80.684%; --i: 3">
                             <span class="tl__dot"></span>
                             <span class="tl__lab">
-                                <span class="tl__name">LearnSQL SQL certificate</span>
-                                <span class="tl__name">Fabric in a Day</span>
-                                <span class="tl__name">PL-300 (Power BI)</span>
+                                <span class="tl__ms-name">LearnSQL SQL certificate</span>
+                                <span class="tl__ms-name">Fabric in a Day</span>
+                                <span class="tl__ms-name">PL-300 (Power BI)</span>
                                 <span class="tl__when">2025</span>
                             </span>
                         </li>
                     </ol>
                 </div>
-                <figcaption class="tl__caption">Each box is a stretch of time I used that tool; the lines trace the order I picked them up. Hollow dots are roles, filled dots are certifications and workshops.</figcaption>
+                <figcaption class="tl__caption">Each box is a stretch of time I used that tool, and the links trace the order I picked them up. Roles and certifications run down the right.</figcaption>
             </figure>
             <details class="sql-src tl__source">
                 <summary class="sql-src__toggle" aria-label="Data source for the tools timeline">Data source</summary>

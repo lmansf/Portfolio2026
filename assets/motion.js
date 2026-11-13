@@ -20,6 +20,10 @@
  *  4. Count-up numbers ([data-countup]) the first time they scroll into view.
  *  5. Live pulse: a dot beside "Live numbers" links showing how fresh the
  *     /live snapshot is.
+ *  6. Tools timeline play-in: Home's "Tools over time" chart, when it starts
+ *     below the fold, draws itself once as it scrolls into view (boxes grow
+ *     in the order the tools were picked up, the links between them draw,
+ *     the rail lights up). Already on screen, it is left as it is.
  * Hover lift and press feedback on buttons and links are plain CSS in
  * motion.css. Everything is off or static with prefers-reduced-motion.
  * Page changes are full page loads that fade via the cross-document
@@ -568,13 +572,48 @@
         mountLivePulse();
     }
 
+    /* ─────────────────────────────────────────────────────────────
+     * 6. Tools timeline play-in
+     * The chart is complete in the HTML; this only adds tl--armed (hidden
+     * start state, motion.css) to a chart below the fold, then tl--play when
+     * it comes into view, and removes both once the play-in has finished, so
+     * the chart is back to its own static styles.
+     * ───────────────────────────────────────────────────────────── */
+    var TL_PLAY_MS = 2800;
+    var tlObserver = null;
+
+    function mountTimelines() {
+        if (reduceMotion() || !('IntersectionObserver' in window)) return;
+        var figs = document.querySelectorAll('[data-tool-timeline]');
+        if (!figs.length) return;
+        if (!tlObserver) {
+            tlObserver = new IntersectionObserver(function (entries) {
+                entries.forEach(function (e) {
+                    if (!e.isIntersecting) return;
+                    var fig = e.target;
+                    tlObserver.unobserve(fig);
+                    fig.classList.add('tl--play');
+                    setTimeout(function () { fig.classList.remove('tl--armed', 'tl--play'); }, TL_PLAY_MS);
+                });
+            }, { rootMargin: '0px 0px -12% 0px', threshold: 0.25 });
+        }
+        var fold = window.innerHeight || document.documentElement.clientHeight;
+        Array.prototype.forEach.call(figs, function (fig) {
+            if (fig.hasAttribute('data-tl-seen')) return;
+            fig.setAttribute('data-tl-seen', '');
+            if (fig.getBoundingClientRect().top < fold * 0.8) return; // already in view: leave it drawn
+            fig.classList.add('tl--armed');
+            tlObserver.observe(fig);
+        });
+    }
+
     function watchMainSwaps() {
         var main = document.querySelector('main');
         if (!main || !('MutationObserver' in window)) return;
         var pending = 0;
         new MutationObserver(function () {
             if (pending) return;
-            pending = requestAnimationFrame(function () { pending = 0; scanReveals(); enhanceMain(); });
+            pending = requestAnimationFrame(function () { pending = 0; scanReveals(); enhanceMain(); mountTimelines(); });
         }).observe(main, { childList: true });
     }
 
@@ -585,7 +624,7 @@
             flushPendingCounts();
             mountOwl();
             // Let transition.js's first-paint fade settle before measuring the fold.
-            requestAnimationFrame(function () { scanReveals(); enhanceMain(); });
+            requestAnimationFrame(function () { scanReveals(); enhanceMain(); mountTimelines(); });
             watchMainSwaps();
         });
     }
