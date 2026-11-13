@@ -1,0 +1,59 @@
+{
+  "_about": "Every date on Home's 'Tools over time' chart. Edit here, then run python3 scripts/build_tool_timeline.py (CI runs it with --check). Dates are YYYY-MM, or YYYY when only the year is known (a year-only start means January, a year-only end means December). \"to\": null means still in use. \"through\" is the month the chart's 'Now' line stands for: move it forward when you rebuild.",
+  "start": "2019",
+  "through": "2026-11",
+  "tools": [
+    {
+      "id": "python",
+      "name": "Python",
+      "spans": [
+        {"from": "2019-08", "to": "2022-07", "note": "Data analyst years at Excel Esports"},
+        {"from": "2023", "to": null, "note": "Picked back up for my own projects"}
+      ]
+    },
+    {
+      "id": "sql",
+      "name": "SQL",
+      "spans": [
+        {"from": "2019-08", "to": "2022-07", "note": "Data analyst years at Excel Esports"},
+        {"from": "2024", "to": null, "note": "Picked back up alongside Power BI"}
+      ]
+    },
+    {
+      "id": "powerbi",
+      "name": "Power BI",
+      "spans": [
+        {"from": "2024", "to": null}
+      ]
+    },
+    {
+      "id": "fabric",
+      "name": "Fabric",
+      "spans": [
+        {"from": "2025", "to": "2025"}
+      ]
+    },
+    {
+      "id": "snowflake",
+      "name": "Snowflake",
+      "spans": [
+        {"from": "2025", "to": "2025"}
+      ]
+    },
+    {
+      "id": "databricks",
+      "name": "Databricks",
+      "spans": [
+        {"from": "2025", "to": null}
+      ]
+    }
+  ],
+  "milestones": [
+    {"date": "2019-08", "kind": "role", "label": "Data Analyst, Excel Esports"},
+    {"date": "2022-11", "kind": "role", "label": "Joined ZooTampa", "detail": "Joined ZooTampa at Lowry Park"},
+    {"date": "2024-11", "kind": "role", "label": "IT POS Systems Analyst", "detail": "IT Point of Sale Systems Analyst, ZooTampa"},
+    {"date": "2025", "kind": "credential", "label": "LearnSQL SQL certificate", "detail": "SQL Certification of Competency, LearnSQL.com"},
+    {"date": "2025", "kind": "credential", "label": "Fabric in a Day", "detail": "Microsoft Fabric in a Day workshop"},
+    {"date": "2025", "kind": "credential", "label": "PL-300 (Power BI)", "detail": "Microsoft Certified: Power BI Data Analyst Associate (PL-300)"}
+  ]
+}
