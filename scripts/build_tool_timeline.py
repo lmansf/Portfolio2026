@@ -7,10 +7,14 @@ assets/pages.css), written into index.html between a pair of comments:
     ...generated <figure> and its data-source table...
     <!-- /tool-timeline -->
 
-Each tool is a lane, years run down the page, each span of use is a box,
-and thin lines trace the order the tools were picked up (spans sorted by
+Each tool is a lane with its own color, years run down the page in soft
+bands, each span of use is a box (hover one for its dates and note), and
+curved links trace the order the tools were picked up (spans sorted by
 start date, then lane). Roles and credentials sit on a rail to the right;
-milestones that share a date share one dot.
+milestones that share a date share one entry. assets/motion.js plays the
+chart in once when it scrolls into view (boxes grow, links draw, the rail
+lights up in date order, each step keyed by its --i); without it, or with
+reduced motion or text mode, the chart is simply drawn.
 
     python3 scripts/build_tool_timeline.py          # rewrite the block
     python3 scripts/build_tool_timeline.py --check  # fail if it is stale
@@ -33,15 +37,15 @@ REPO = "https://github.com/lmansf/Portfolio2026/blob/main"
 MARKER = re.compile(r"(?P<indent>[ \t]*)<!-- tool-timeline -->\n.*?<!-- /tool-timeline -->", re.S)
 MONTHS = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"]
 
-# Box edges inside a lane, as a share of the lane's width.
-BOX_L, BOX_R = 0.16, 0.84
+# Box edges inside a lane, as a share of the lane's width (pages.css draws
+# the boxes with the same numbers; the links' SVG uses these).
+BOX_L, BOX_R = 0.15, 0.85
 # Rail label layout, in months of chart height, once for narrow screens
 # and once from 960px up (pages.css switches between them). Each is
-# (months a label line takes, gap between labels, characters before a
-# label wraps): a phone draws about 4.6px a month with 11.5px labels in a
-# 7.2rem rail; from 960px it's 5.4px a month with 13px labels in a rail
-# of 15rem or more.
-LAYOUTS = {"lab": (3.6, 1.2, 17), "lab-w": (3.2, 1.0, 30)}
+# (months a text line takes, months a credential line takes, gap between
+# labels, characters before a label wraps). Tune these with the CSS if the
+# rail's sizes change.
+LAYOUTS = {"lab": (2.9, 3.4, 1.6, 15), "lab-w": (2.7, 3.2, 1.6, 26)}
 
 esc = html.escape
 
@@ -67,8 +71,30 @@ def span_text(span):
     return start if start == end else f"{start} – {end}"
 
 
+def span_short(span):
+    """The years only, as the box shows them: 2019–22, 2023–now, 2025."""
+    a = parse(span["from"])[0]
+    if span["to"] is None:
+        return f"{a}–now"
+    b = parse(span["to"])[0]
+    return str(a) if a == b else f"{a}–{str(b)[2:]}"
+
+
+def length_text(months, ongoing):
+    if months < 18:
+        text = f"{months} month" + ("s" if months != 1 else "")
+    else:
+        years = round(months / 12)
+        text = f"{years} years"
+    return text + (" so far" if ongoing else "")
+
+
 def pct(v, total):
     return f"{v / total * 100:.3f}".rstrip("0").rstrip(".") + "%"
+
+
+def num(v):
+    return f"{v:.1f}".rstrip("0").rstrip(".")
 
 
 def build_block(data, indent):
@@ -99,23 +125,38 @@ def build_block(data, indent):
                                  f"{data['start']} to {data['through']} or ends before it starts")
             boxes.append({"lane": lane, "tool": tool, "span": span, "a": a, "b": b})
 
-    # Connectors: the order each span was picked up.
+    # The order each span was picked up; it also sets the play-in order (--i).
     order = sorted(boxes, key=lambda x: (x["a"], x["lane"]))
-    paths = []
+    for i, bx in enumerate(order):
+        bx["i"] = i
+
+    # Curved links between consecutive pickups, in a viewBox of 100 units a
+    # lane by 10 units a month (stretched to the plot; strokes don't scale).
+    def cx(lane):
+        return (lane + 0.5) * 100
+
+    links = []
     for p, q in zip(order, order[1:]):
+        tx, ty_ = cx(q["lane"]), q["a"] * 10
         if p["lane"] == q["lane"]:
-            if q["a"] > p["b"]:
-                x = (p["lane"] + 0.5) * 100
-                paths.append((x, p["b"] * 10, x, q["a"] * 10))
-            continue
-        right = q["lane"] > p["lane"]
-        x1 = (p["lane"] + (BOX_R if right else BOX_L)) * 100
-        x2 = (q["lane"] + (BOX_L if right else BOX_R)) * 100
-        if p["b"] <= q["a"]:  # p ended first: corner to corner
-            paths.append((x1, p["b"] * 10, x2, q["a"] * 10))
-        else:  # p still running: a short hop into q's first months
-            y = (q["a"] + min(2, (q["b"] - q["a"]) / 3)) * 10
-            paths.append((x1, y, x2, y))
+            if q["a"] <= p["b"]:
+                continue
+            sx, sy = cx(p["lane"]), p["b"] * 10
+            d = f"M{num(sx)} {num(sy)} L{num(tx)} {num(ty_)}"
+        elif q["a"] >= p["b"]:  # p had ended: an S from p's foot to q's head
+            sx, sy = cx(p["lane"]), p["b"] * 10
+            mid = (sy + ty_) / 2
+            d = f"M{num(sx)} {num(sy)} C{num(sx)} {num(mid)} {num(tx)} {num(mid)} {num(tx)} {num(ty_)}"
+        elif q["a"] == p["a"]:  # picked up together: a small arch over both heads
+            sx, sy = cx(p["lane"]), p["a"] * 10
+            lift = sy - 30
+            d = f"M{num(sx)} {num(sy)} C{num(sx)} {num(lift)} {num(tx)} {num(lift)} {num(tx)} {num(ty_)}"
+        else:  # p still running: out of p's side, round the corner into q's head
+            right = q["lane"] > p["lane"]
+            sx = (p["lane"] + (BOX_R if right else BOX_L)) * 100
+            sy = max(q["a"] - 3, p["a"] + 1) * 10
+            d = f"M{num(sx)} {num(sy)} C{num(tx)} {num(sy)} {num(tx)} {num(sy)} {num(tx)} {num(ty_)}"
+        links.append((d, q["i"], q["tool"]["id"]))
 
     # Milestones: one rail entry per date, labels nudged apart so none overlap.
     groups = {}
@@ -127,12 +168,15 @@ def build_block(data, indent):
         dot = (y - y0) * 12 + ((m - 1) + 0.5 if m else 6)
         if not 0 <= dot <= total:
             raise SystemExit(f"tool-timeline.json: milestone date {date} is off the chart")
-        rail.append({"date": date, "items": items, "dot": dot})
+        kinds = {i["kind"] for i in items}
+        rail.append({"date": date, "items": items, "dot": dot,
+                     "kind": "credential" if kinds == {"credential"} else "role"})
     rail.sort(key=lambda r: r["dot"])
-    for key, (line, gap, chars) in LAYOUTS.items():
+    for key, (line, cred, gap, chars) in LAYOUTS.items():
         tops, heights = [], []
         for i, r in enumerate(rail):
-            h = (sum(math.ceil(len(it["label"]) / chars) for it in r["items"]) + 1) * line
+            each = cred if r["kind"] == "credential" else line
+            h = sum(math.ceil(len(it["label"]) / chars) for it in r["items"]) * each + line
             top = max(r["dot"] - line / 2, 0)
             if i:
                 top = max(top, tops[-1] + heights[-1] + gap)
@@ -154,40 +198,53 @@ def build_block(data, indent):
     w('        </div>')
     w('        <div class="tl__axis">')
     for year in range(y0, ty + 1):
-        at = (year - y0) * 12
-        if at < total:
-            w(f'            <span class="tl__tick" style="--at: {pct(at, total)}">{year}</span>')
-    w('            <span class="tl__tick tl__tick--now" style="--at: 100%">Now</span>')
+        a = (year - y0) * 12
+        b = min(a + 12, total)
+        if a < total:
+            w(f'            <span class="tl__year" style="--at: {pct((a + b) / 2, total)}">{year}</span>')
     w('        </div>')
     w('        <div class="tl__plot">')
-    for lane in range(lanes):
-        w(f'            <span class="tl__guide" style="--lane: {lane}"></span>')
+    for year in range(y0, ty + 1, 2):
+        a = (year - y0) * 12
+        if a < total:
+            w(f'            <span class="tl__band" style="--top: {pct(a, total)}; --h: {pct(min(12, total - a), total)}"></span>')
     w(f'            <svg class="tl__links" viewBox="0 0 {lanes * 100} {total * 10}" preserveAspectRatio="none" focusable="false">')
-    for x1, y1, x2, y2 in paths:
-        w(f'                <path d="M{x1:g} {y1:g} L{x2:g} {y2:g}"/>')
+    for d, i, tid in links:
+        w(f'                <path class="tl--{esc(tid)}" d="{d}" pathLength="1" style="--i: {i}"/>')
     w('            </svg>')
     for bx in boxes:
-        title = f'{bx["tool"]["name"]} · {span_text(bx["span"])}'
-        ongoing = " tl__box--now" if bx["span"]["to"] is None else ""
-        w(f'            <span class="tl__box tl--{esc(bx["tool"]["id"])}{ongoing}" '
-          f'style="--lane: {bx["lane"]}; --top: {pct(bx["a"], total)}; --h: {pct(bx["b"] - bx["a"], total)}" '
-          f'title="{esc(title)}"></span>')
+        tool, span = bx["tool"], bx["span"]
+        ongoing = span["to"] is None
+        cls = f'tl__box tl--{esc(tool["id"])}' + (" tl__box--now" if ongoing else "")
+        if bx["lane"] >= lanes / 2:
+            cls += " tl__box--tip-left"
+        w(f'            <span class="{cls}" style="--lane: {bx["lane"]}; --top: {pct(bx["a"], total)}; '
+          f'--h: {pct(bx["b"] - bx["a"], total)}; --i: {bx["i"]}">')
+        w(f'                <span class="tl__name">{esc(tool["name"])}</span>')
+        w(f'                <span class="tl__years">{esc(span_short(span))}</span>')
+        w('                <span class="tl__tip">')
+        w(f'                    <span class="tl__tip-name">{esc(tool["name"])}</span>')
+        w(f'                    <span class="tl__tip-when">{esc(span_text(span))} · {esc(length_text(bx["b"] - bx["a"], ongoing))}</span>')
+        if span.get("note"):
+            w(f'                    <span class="tl__tip-note">{esc(span["note"])}</span>')
+        w('                </span>')
+        w('            </span>')
+    w('            <span class="tl__nowline"><span>Now</span></span>')
     w('        </div>')
     w('        <ol class="tl__rail">')
-    for r in rail:
-        kinds = {i["kind"] for i in r["items"]}
-        kind = "credential" if kinds == {"credential"} else "role"
-        w(f'            <li class="tl__ms tl__ms--{kind}" style="--dot: {pct(r["dot"], total)}; --lab: {pct(r["lab"], total)}; --lab-w: {pct(r["lab-w"], total)}">')
+    for n, r in enumerate(rail):
+        w(f'            <li class="tl__ms tl__ms--{r["kind"]}" style="--dot: {pct(r["dot"], total)}; '
+          f'--lab: {pct(r["lab"], total)}; --lab-w: {pct(r["lab-w"], total)}; --i: {n}">')
         w('                <span class="tl__dot"></span>')
         w('                <span class="tl__lab">')
         for i in r["items"]:
-            w(f'                    <span class="tl__name">{esc(i["label"])}</span>')
+            w(f'                    <span class="tl__ms-name">{esc(i["label"])}</span>')
         w(f'                    <span class="tl__when">{esc(label(r["date"]))}</span>')
         w('                </span>')
         w('            </li>')
     w('        </ol>')
     w('    </div>')
-    w('    <figcaption class="tl__caption">Each box is a stretch of time I used that tool; the lines trace the order I picked them up. Hollow dots are roles, filled dots are certifications and workshops.</figcaption>')
+    w('    <figcaption class="tl__caption">Each box is a stretch of time I used that tool, and the links trace the order I picked them up. Roles and certifications run down the right.</figcaption>')
     w('</figure>')
     w('<details class="sql-src tl__source">')
     w('    <summary class="sql-src__toggle" aria-label="Data source for the tools timeline">Data source</summary>')
