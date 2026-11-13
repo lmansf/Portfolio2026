@@ -8,13 +8,15 @@ assets/pages.css), written into index.html between a pair of comments:
     <!-- /tool-timeline -->
 
 Each tool is a lane with its own color, years run down the page in soft
-bands, each span of use is a box (hover one for its dates and note), and
-curved links trace the order the tools were picked up (spans sorted by
-start date, then lane). Roles and credentials sit on a rail to the right;
-milestones that share a date share one entry. assets/motion.js plays the
-chart in once when it scrolls into view (boxes grow, links draw, the rail
-lights up in date order, each step keyed by its --i); without it, or with
-reduced motion or text mode, the chart is simply drawn.
+bands, and each span of use is a box: solid for paid work, outlined for
+personal projects (each span's "use"). Hovering a box shows its dates, how
+it was used and the projects built with it (its "built" list, each checked
+against the project titles on projects.html so nothing is made up). The
+chart never states a length of experience. Roles and credentials sit on a
+rail to the right; milestones that share a date share one entry.
+assets/motion.js plays the chart in once when it scrolls into view (boxes
+grow in start order, the rail lights up, each step keyed by its --i);
+without it, or with reduced motion or text mode, the chart is simply drawn.
 
     python3 scripts/build_tool_timeline.py          # rewrite the block
     python3 scripts/build_tool_timeline.py --check  # fail if it is stale
@@ -33,13 +35,12 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parent.parent
 DATA = ROOT / "data" / "tool-timeline.json"
 PAGE = ROOT / "index.html"
+PROJECTS = ROOT / "projects.html"
+USES = {"work": "Paid work", "projects": "Personal projects"}
 REPO = "https://github.com/lmansf/Portfolio2026/blob/main"
 MARKER = re.compile(r"(?P<indent>[ \t]*)<!-- tool-timeline -->\n.*?<!-- /tool-timeline -->", re.S)
 MONTHS = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"]
 
-# Box edges inside a lane, as a share of the lane's width (pages.css draws
-# the boxes with the same numbers; the links' SVG uses these).
-BOX_L, BOX_R = 0.15, 0.85
 # Rail label layout, in months of chart height, once for narrow screens
 # and once from 960px up (pages.css switches between them). Each is
 # (months a text line takes, months a credential line takes, gap between
@@ -80,13 +81,22 @@ def span_short(span):
     return str(a) if a == b else f"{a}–{str(b)[2:]}"
 
 
-def length_text(months, ongoing):
-    if months < 18:
-        text = f"{months} month" + ("s" if months != 1 else "")
-    else:
-        years = round(months / 12)
-        text = f"{years} years"
-    return text + (" so far" if ongoing else "")
+def project_titles():
+    """Project names as projects.html titles them (badges like "Live" left out)."""
+    page = PROJECTS.read_text(encoding="utf-8")
+    titles = set()
+    for m in re.finditer(r'<h3 class="project__title">(.*?)</h3>', page, re.S):
+        title = re.sub(r"<span[^>]*>.*?</span>", "", m[1], flags=re.S)
+        titles.add(html.unescape(re.sub(r"\s+", " ", title)).strip())
+    return titles
+
+
+def use_text(span):
+    """How a span was used, as the hover card and the table say it."""
+    text = USES[span["use"]]
+    if span.get("note"):
+        text += f", {span['note'][0].lower()}{span['note'][1:]}"
+    return text
 
 
 def pct(v, total):
@@ -116,47 +126,27 @@ def build_block(data, indent):
 
     tools = data["tools"]
     lanes = len(tools)
+    titles = project_titles()
     boxes = []
     for lane, tool in enumerate(tools):
         for span in tool["spans"]:
+            if span.get("use") not in USES:
+                raise SystemExit(f"tool-timeline.json: {tool['name']} span {span['from']} needs \"use\": "
+                                 '"work" or "projects"')
+            for name in span.get("built", []):
+                if name not in titles:
+                    raise SystemExit(f"tool-timeline.json: {tool['name']} lists {name!r} under \"built\", "
+                                     "but projects.html has no project with that title")
             a, b = start_of(span["from"]), end_of(span["to"])
             if not 0 <= a < b <= total:
                 raise SystemExit(f"tool-timeline.json: {tool['name']} span {span} is outside "
                                  f"{data['start']} to {data['through']} or ends before it starts")
             boxes.append({"lane": lane, "tool": tool, "span": span, "a": a, "b": b})
 
-    # The order each span was picked up; it also sets the play-in order (--i).
+    # The order each span was picked up sets the play-in order (--i).
     order = sorted(boxes, key=lambda x: (x["a"], x["lane"]))
     for i, bx in enumerate(order):
         bx["i"] = i
-
-    # Curved links between consecutive pickups, in a viewBox of 100 units a
-    # lane by 10 units a month (stretched to the plot; strokes don't scale).
-    def cx(lane):
-        return (lane + 0.5) * 100
-
-    links = []
-    for p, q in zip(order, order[1:]):
-        tx, ty_ = cx(q["lane"]), q["a"] * 10
-        if p["lane"] == q["lane"]:
-            if q["a"] <= p["b"]:
-                continue
-            sx, sy = cx(p["lane"]), p["b"] * 10
-            d = f"M{num(sx)} {num(sy)} L{num(tx)} {num(ty_)}"
-        elif q["a"] >= p["b"]:  # p had ended: an S from p's foot to q's head
-            sx, sy = cx(p["lane"]), p["b"] * 10
-            mid = (sy + ty_) / 2
-            d = f"M{num(sx)} {num(sy)} C{num(sx)} {num(mid)} {num(tx)} {num(mid)} {num(tx)} {num(ty_)}"
-        elif q["a"] == p["a"]:  # picked up together: a small arch over both heads
-            sx, sy = cx(p["lane"]), p["a"] * 10
-            lift = sy - 30
-            d = f"M{num(sx)} {num(sy)} C{num(sx)} {num(lift)} {num(tx)} {num(lift)} {num(tx)} {num(ty_)}"
-        else:  # p still running: out of p's side, round the corner into q's head
-            right = q["lane"] > p["lane"]
-            sx = (p["lane"] + (BOX_R if right else BOX_L)) * 100
-            sy = max(q["a"] - 3, p["a"] + 1) * 10
-            d = f"M{num(sx)} {num(sy)} C{num(tx)} {num(sy)} {num(tx)} {num(sy)} {num(tx)} {num(ty_)}"
-        links.append((d, q["i"], q["tool"]["id"]))
 
     # Milestones: one rail entry per date, labels nudged apart so none overlap.
     groups = {}
@@ -191,6 +181,10 @@ def build_block(data, indent):
     out = []
     w = out.append
     w(f'<figure class="tl" data-tool-timeline style="--tl-lanes: {lanes}; --tl-months: {total}">')
+    w('    <ul class="tl__legend">')
+    w('        <li class="tl__key tl__key--work">Paid work</li>')
+    w('        <li class="tl__key tl__key--projects">Personal projects</li>')
+    w('    </ul>')
     w('    <div class="tl__grid" aria-hidden="true">')
     w('        <div class="tl__heads">')
     for lane, tool in enumerate(tools):
@@ -208,14 +202,10 @@ def build_block(data, indent):
         a = (year - y0) * 12
         if a < total:
             w(f'            <span class="tl__band" style="--top: {pct(a, total)}; --h: {pct(min(12, total - a), total)}"></span>')
-    w(f'            <svg class="tl__links" viewBox="0 0 {lanes * 100} {total * 10}" preserveAspectRatio="none" focusable="false">')
-    for d, i, tid in links:
-        w(f'                <path class="tl--{esc(tid)}" d="{d}" pathLength="1" style="--i: {i}"/>')
-    w('            </svg>')
     for bx in boxes:
         tool, span = bx["tool"], bx["span"]
         ongoing = span["to"] is None
-        cls = f'tl__box tl--{esc(tool["id"])}' + (" tl__box--now" if ongoing else "")
+        cls = f'tl__box tl__box--{span["use"]} tl--{esc(tool["id"])}' + (" tl__box--now" if ongoing else "")
         if bx["lane"] >= lanes / 2:
             cls += " tl__box--tip-left"
         w(f'            <span class="{cls}" style="--lane: {bx["lane"]}; --top: {pct(bx["a"], total)}; '
@@ -224,9 +214,12 @@ def build_block(data, indent):
         w(f'                <span class="tl__years">{esc(span_short(span))}</span>')
         w('                <span class="tl__tip">')
         w(f'                    <span class="tl__tip-name">{esc(tool["name"])}</span>')
-        w(f'                    <span class="tl__tip-when">{esc(span_text(span))} · {esc(length_text(bx["b"] - bx["a"], ongoing))}</span>')
-        if span.get("note"):
-            w(f'                    <span class="tl__tip-note">{esc(span["note"])}</span>')
+        w(f'                    <span class="tl__tip-when">{esc(span_text(span))}</span>')
+        w(f'                    <span class="tl__tip-use">{esc(use_text(span))}</span>')
+        if span.get("built"):
+            w('                    <span class="tl__tip-built">Built with it:</span>')
+            for name in span["built"]:
+                w(f'                    <span class="tl__tip-item">{esc(name)}</span>')
         w('                </span>')
         w('            </span>')
     w('            <span class="tl__nowline"><span>Now</span></span>')
@@ -244,26 +237,28 @@ def build_block(data, indent):
         w('            </li>')
     w('        </ol>')
     w('    </div>')
-    w('    <figcaption class="tl__caption">Each box is a stretch of time I used that tool, and the links trace the order I picked them up. Roles and certifications run down the right.</figcaption>')
+    w('    <figcaption class="tl__caption">Solid boxes are paid work: SQL and Python as a data analyst at Excel Esports. Outlined boxes are tools I’ve used in my own projects: they show when I picked each one up, not years on the job. Hover a box, or open Data source below, to see what I built with each.</figcaption>')
     w('</figure>')
     w('<details class="sql-src tl__source">')
     w('    <summary class="sql-src__toggle" aria-label="Data source for the tools timeline">Data source</summary>')
     w('    <div class="sql-src__panel">')
     w('        <table class="tl__table">')
     w('            <caption class="visually-hidden">Tools and when I used them</caption>')
-    w('            <thead><tr><th scope="col">Tool</th><th scope="col">When</th></tr></thead>')
+    w('            <thead><tr><th scope="col">Tool</th><th scope="col">When</th><th scope="col">How</th></tr></thead>')
     w('            <tbody>')
     for tool in tools:
-        when = "<br>".join(esc(span_text(s)) for s in tool["spans"])
-        w(f'                <tr><th scope="row">{esc(tool["name"])}</th><td>{when}</td></tr>')
+        for n, s in enumerate(tool["spans"]):
+            how = esc(use_text(s)) + (": " + esc(", ".join(s["built"])) if s.get("built") else "")
+            head = f'<th scope="row" rowspan="{len(tool["spans"])}">{esc(tool["name"])}</th>' if n == 0 else ""
+            w(f'                <tr>{head}<td>{esc(span_text(s))}</td><td class="tl__how">{how}</td></tr>')
     w('            </tbody>')
     w('        </table>')
     w('        <table class="tl__table">')
     w('            <caption class="visually-hidden">Roles and credentials</caption>')
-    w('            <thead><tr><th scope="col">Milestone</th><th scope="col">When</th></tr></thead>')
+    w('            <thead><tr><th scope="col">Milestone</th><th scope="col" colspan="2">When</th></tr></thead>')
     w('            <tbody>')
     for ms in sorted(data["milestones"], key=lambda m: parse(m["date"])[0] * 12 + (parse(m["date"])[1] or 6)):
-        w(f'                <tr><th scope="row">{esc(ms.get("detail") or ms["label"])}</th><td>{esc(label(ms["date"]))}</td></tr>')
+        w(f'                <tr><th scope="row">{esc(ms.get("detail") or ms["label"])}</th><td colspan="2">{esc(label(ms["date"]))}</td></tr>')
     w('            </tbody>')
     w('        </table>')
     w(f'        <p class="sql-src__note">Drawn from <a href="{REPO}/data/tool-timeline.json" target="_blank" '

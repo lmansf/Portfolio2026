@@ -113,18 +113,15 @@
  * motion.js adds tl--armed to a "Tools over time" chart below the fold and
  * tl--play when it scrolls in: each box grows down from its start in the
  * order the tools were picked up (--i, set by scripts/build_tool_timeline.py),
- * the link into it draws just before, the lane chips and rail fade in and the
- * Now line runs across last. Both classes come off when it's done. Hover
+ * the lane chips and rail fade in and the Now line runs across last. Both classes come off when it's done. Hover
  * eases and the ongoing dots breathe; all of it is off with reduced motion. */
 @media (prefers-reduced-motion: no-preference) {
   .tl__box { transition: box-shadow 160ms ease, border-color 160ms ease, opacity 160ms ease; }
   .tl--armed .tl__box { opacity: 0; transform: scaleY(0); transform-origin: 50% 0; }
-  .tl--armed .tl__links path { stroke-dasharray: 1 1; stroke-dashoffset: 1; }
   .tl--armed .tl__head, .tl--armed .tl__ms, .tl--armed .tl__year { opacity: 0; }
   .tl--armed .tl__ms { transform: translateX(-6px); }
   .tl--armed .tl__nowline { transform: scaleX(0); transform-origin: 0 50%; }
   .tl--play .tl__box { opacity: 1; transform: none; transition: transform 640ms cubic-bezier(.2,.75,.25,1) calc(var(--i) * 170ms + 260ms), opacity 180ms ease calc(var(--i) * 170ms + 260ms); }
-  .tl--play .tl__links path { stroke-dashoffset: 0; transition: stroke-dashoffset 300ms ease-in-out calc(var(--i) * 170ms - 40ms); }
   .tl--play .tl__head { opacity: 1; transition: opacity 320ms ease calc(var(--lane) * 60ms); }
   .tl--play .tl__year { opacity: 1; transition: opacity 400ms ease 80ms; }
   .tl--play .tl__ms { opacity: 1; transform: none; transition: opacity 380ms ease calc(var(--i) * 380ms + 300ms), transform 380ms ease calc(var(--i) * 380ms + 300ms); }
@@ -132,4 +129,4 @@
   .tl__box--now::after { animation: tl-breathe 3.4s ease-in-out infinite; }
 }
 @keyframes tl-breathe { 0%, 100% { box-shadow: 0 0 0 3px var(--surface-1, #fff), 0 0 0 3px color-mix(in srgb, var(--tl-c) 0%, transparent); } 50% { box-shadow: 0 0 0 3px var(--surface-1, #fff), 0 0 0 7px color-mix(in srgb, var(--tl-c) 22%, transparent); } }
-@media print { .tl--armed .tl__box, .tl--armed .tl__head, .tl--armed .tl__ms, .tl--armed .tl__year, .tl--armed .tl__nowline { opacity: 1 !important; transform: none !important; } .tl--armed .tl__links path { stroke-dashoffset: 0 !important; } }
+@media print { .tl--armed .tl__box, .tl--armed .tl__head, .tl--armed .tl__ms, .tl--armed .tl__year, .tl--armed .tl__nowline { opacity: 1 !important; transform: none !important; } }

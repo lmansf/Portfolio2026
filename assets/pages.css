@@ -1654,10 +1654,12 @@ html.text-mode .scroll-pipe { display: none !important; }
  * the markup only carries positions (--lane, --top, --h, --at, --dot, --lab
  * as shares of the lane count and the chart's months) and the play-in order
  * (--i). Lanes are tools, each with its own color; years run down in soft
- * bands; each box is a span of use (hover for its dates and note); curved
- * links in the next tool's color trace the order they were picked up; the
- * rail on the right holds roles and credentials. Static here: the play-in
- * on scroll and the hover lift live in motion.css. */
+ * bands; each box is a span of use, solid for paid work (tl__box--work) and
+ * outlined with a light hatch for personal projects (tl__box--projects),
+ * with a legend above; hovering a box shows its dates, how it was used and
+ * what was built with it; the rail on the right holds roles and
+ * credentials. Static here: the play-in on scroll and the hover ease live
+ * in motion.css. */
 .tl {
     --tl-mo: 5.2px;                 /* chart height per month */
     --tl-axis: 2.3rem;
@@ -1699,6 +1701,36 @@ html.text-mode .scroll-pipe { display: none !important; }
     .tl--fabric     { --tl-c: #5fd59b; }
     .tl--snowflake  { --tl-c: #63c9f2; }
     .tl--databricks { --tl-c: #ff8a6b; }
+}
+
+/* Legend: what solid and outlined mean. In the flow above the chart on
+ * narrower screens; from 960px it sits in the empty corner over the rail. */
+.tl__legend {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.4rem 1.1rem;
+    margin: 0 0 0.9rem;
+    padding: 0 0 0 calc(var(--tl-axis) + 0.6rem);
+    list-style: none;
+    font-size: 0.74rem;
+    font-weight: 600;
+    color: var(--ink-2);
+}
+.tl__key { display: inline-flex; align-items: center; gap: 0.45rem; }
+.tl__key::before {
+    content: "";
+    width: 1.05rem;
+    height: 0.75rem;
+    border-radius: 4px;
+    box-sizing: border-box;
+    border: 1.5px solid var(--ink-2);
+}
+.tl__key--work::before { background: var(--ink-2); }
+.tl__key--projects::before {
+    background: repeating-linear-gradient(135deg, color-mix(in srgb, var(--ink-2) 28%, transparent) 0 1.5px, transparent 1.5px 4.5px);
+}
+@media (min-width: 960px) {
+    .tl__legend { position: absolute; top: 1.45rem; right: 1.6rem; margin: 0; padding: 0; }
 }
 
 .tl__grid {
@@ -1818,22 +1850,6 @@ html.text-mode .scroll-pipe { display: none !important; }
     .tl__nowline span { font-size: 0.72rem; right: calc(100% + 0.75rem); }
 }
 
-.tl__links {
-    position: absolute;
-    inset: 0;
-    width: 100%;
-    height: 100%;
-    overflow: visible;
-    pointer-events: none;
-}
-.tl__links path {
-    fill: none;
-    stroke: color-mix(in srgb, var(--tl-c) 60%, transparent);
-    stroke-width: 1.75;
-    stroke-linecap: round;
-    vector-effect: non-scaling-stroke;
-}
-
 .tl__box {
     position: absolute;
     left: calc((var(--lane) + (1 - var(--tl-box)) / 2) * 100% / var(--tl-lanes));
@@ -1846,35 +1862,40 @@ html.text-mode .scroll-pipe { display: none !important; }
     flex-direction: column;
     align-items: center;
     padding-top: 0.4rem;
-    border: 1px solid color-mix(in srgb, var(--tl-c) 50%, transparent);
-    border-top: 3px solid var(--tl-c);
+    /* Personal projects (the default): an outline in the tool's color over
+     * a light hatch, so it reads as lighter than paid work. */
+    border: 1.5px solid var(--tl-c);
+    border-top-width: 3px;
     border-radius: var(--r-md);
-    background: linear-gradient(180deg,
-        color-mix(in srgb, var(--tl-c) 24%, var(--surface-1)),
-        color-mix(in srgb, var(--tl-c) 11%, var(--surface-1)));
-    box-shadow: 0 8px 18px -12px color-mix(in srgb, var(--tl-c) 80%, transparent);
+    background:
+        repeating-linear-gradient(135deg, color-mix(in srgb, var(--tl-c) 16%, transparent) 0 2px, transparent 2px 8px),
+        color-mix(in srgb, var(--tl-c) 6%, var(--surface-1));
+    box-shadow: 0 8px 18px -14px color-mix(in srgb, var(--tl-c) 70%, transparent);
     cursor: default;
 }
-/* Still in use: deepens toward the Now line instead of fading. */
+/* Paid work: filled solid in the tool's color. */
+.tl__box--work {
+    --tl-on: #ffffff;
+    border-color: var(--tl-c);
+    background: linear-gradient(180deg, color-mix(in srgb, var(--tl-c) 88%, #ffffff), var(--tl-c));
+    box-shadow: 0 10px 22px -12px color-mix(in srgb, var(--tl-c) 85%, transparent);
+}
+/* Still in use: the box runs into the Now line, square at the foot. */
 .tl__box--now {
     border-bottom: 0;
     border-bottom-left-radius: 0;
     border-bottom-right-radius: 0;
-    background: linear-gradient(180deg,
-        color-mix(in srgb, var(--tl-c) 22%, var(--surface-1)),
-        color-mix(in srgb, var(--tl-c) 34%, var(--surface-1)));
 }
 @media (prefers-color-scheme: dark) {
     .tl__box {
-        background: linear-gradient(180deg,
-            color-mix(in srgb, var(--tl-c) 26%, var(--surface-1)),
-            color-mix(in srgb, var(--tl-c) 10%, var(--surface-1)));
-        box-shadow: 0 10px 22px -14px color-mix(in srgb, var(--tl-c) 70%, transparent);
+        background:
+            repeating-linear-gradient(135deg, color-mix(in srgb, var(--tl-c) 18%, transparent) 0 2px, transparent 2px 8px),
+            color-mix(in srgb, var(--tl-c) 8%, var(--surface-1));
+        box-shadow: 0 10px 22px -16px color-mix(in srgb, var(--tl-c) 60%, transparent);
     }
-    .tl__box--now {
-        background: linear-gradient(180deg,
-            color-mix(in srgb, var(--tl-c) 24%, var(--surface-1)),
-            color-mix(in srgb, var(--tl-c) 16%, var(--surface-1)));
+    .tl__box--work {
+        --tl-on: #0b1216;
+        background: linear-gradient(180deg, var(--tl-c), color-mix(in srgb, var(--tl-c) 82%, #0b1216));
     }
 }
 /* A dot of the tool's color sits where an ongoing box meets the Now line. */
@@ -1903,6 +1924,7 @@ html.text-mode .scroll-pipe { display: none !important; }
     white-space: nowrap;
     color: color-mix(in srgb, var(--tl-c) 50%, var(--ink-1));
 }
+.tl__box--work .tl__name { color: var(--tl-on); }
 .tl__years { display: none; }
 @media (min-width: 720px) {
     .tl__box { padding-top: 0.45rem; }
@@ -1917,6 +1939,9 @@ html.text-mode .scroll-pipe { display: none !important; }
         color: color-mix(in srgb, var(--tl-c) 45%, var(--ink-1));
         font-variant-numeric: tabular-nums;
     }
+}
+@media (min-width: 720px) {
+    .tl__box--work .tl__years { color: var(--tl-on); }
 }
 @media (min-width: 960px) {
     .tl__years { font-size: 0.7rem; }
@@ -1945,7 +1970,26 @@ html.text-mode .scroll-pipe { display: none !important; }
 .tl__box--tip-left .tl__tip { left: auto; right: calc(100% + 0.55rem); }
 .tl__tip-name { font-weight: 700; font-size: 0.82rem; color: var(--ink-1); }
 .tl__tip-when { font-family: var(--font-mono); font-size: 0.7rem; color: var(--ink-2); white-space: nowrap; }
-.tl__tip-note { font-size: 0.76rem; line-height: 1.35; color: var(--ink-3); }
+.tl__tip-use { font-size: 0.76rem; line-height: 1.35; color: var(--ink-2); }
+.tl__tip-built {
+    margin-top: 0.3rem;
+    font-family: var(--font-mono);
+    font-size: 0.62rem;
+    font-weight: 600;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--ink-3);
+}
+.tl__tip-item { display: flex; gap: 0.4rem; align-items: baseline; font-size: 0.78rem; line-height: 1.3; color: var(--ink-1); }
+.tl__tip-item::before {
+    content: "";
+    flex: none;
+    width: 0.38rem;
+    height: 0.38rem;
+    border-radius: 50%;
+    background: var(--tl-c);
+    transform: translateY(-0.08rem);
+}
 @media (hover: hover) {
     .tl__box:hover {
         z-index: 2;
@@ -2052,7 +2096,9 @@ html.text-mode .scroll-pipe { display: none !important; }
 }
 .tl__table tbody th { font-weight: 600; color: var(--ink-1); }
 .tl__table td { font-family: var(--font-mono); font-size: 0.8rem; color: var(--ink-2); white-space: nowrap; }
+.tl__table td.tl__how { font-family: var(--font-text); font-size: 0.84rem; white-space: normal; }
 @media print {
     .tl { box-shadow: none; break-inside: avoid; background: none; }
     .tl__tip { display: none; }
+    .tl__box--work { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
 }
