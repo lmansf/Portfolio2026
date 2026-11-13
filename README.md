@@ -113,7 +113,8 @@ The CSS `.min.css` files can be rebuilt with esbuild (`npx esbuild <src>
 Home's "Tools over time" chart shows when Logan used each tool and how: one
 lane per tool, each in its own color, years running down in soft alternating
 bands, and a box per span of use. Boxes are solid for paid work (SQL and
-Python as a data analyst at Excel Esports) and outlined with a light hatch
+Python as a data analyst at Excel Esports, Power BI from 2025 and SQL from
+2026 at ZooTampa) and outlined with a light hatch
 for personal projects, with a legend above the chart; it never states a
 length of experience. An ongoing box runs into the accent "Now" line and ends
 in a dot of its color. Hovering a box shows its dates, how it was used and
