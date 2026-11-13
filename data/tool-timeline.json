@@ -16,14 +16,16 @@
       "name": "SQL",
       "spans": [
         {"from": "2019-08", "to": "2022-07", "use": "work", "note": "Data analyst at Excel Esports"},
-        {"from": "2024", "to": null, "use": "projects", "built": ["Member Segmentation (RFM)", "Quack Query", "Owl Park"]}
+        {"from": "2024", "to": "2025", "use": "projects", "built": ["Member Segmentation (RFM)", "Quack Query", "Owl Park"]},
+        {"from": "2026", "to": null, "use": "work", "note": "At ZooTampa"}
       ]
     },
     {
       "id": "powerbi",
       "name": "Power BI",
       "spans": [
-        {"from": "2024", "to": null, "use": "projects", "built": ["Member Segmentation (RFM)", "Owl Park Data Architecture"]}
+        {"from": "2024", "to": "2024", "use": "projects", "built": ["Member Segmentation (RFM)", "Owl Park Data Architecture"]},
+        {"from": "2025", "to": null, "use": "work", "note": "At ZooTampa"}
       ]
     },
     {

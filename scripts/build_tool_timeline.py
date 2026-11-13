@@ -94,8 +94,11 @@ def project_titles():
 def use_text(span):
     """How a span was used, as the hover card and the table say it."""
     text = USES[span["use"]]
-    if span.get("note"):
-        text += f", {span['note'][0].lower()}{span['note'][1:]}"
+    note = span.get("note")
+    if note:
+        # "At ZooTampa" reads as "Paid work at ZooTampa"; a role reads after a comma.
+        sep = " " if note.startswith("At ") else ", "
+        text += f"{sep}{note[0].lower()}{note[1:]}"
     return text
 
 
@@ -237,7 +240,7 @@ def build_block(data, indent):
         w('            </li>')
     w('        </ol>')
     w('    </div>')
-    w('    <figcaption class="tl__caption">Solid boxes are paid work: SQL and Python as a data analyst at Excel Esports. Outlined boxes are tools I’ve used in my own projects: they show when I picked each one up, not years on the job. Hover a box, or open Data source below, to see what I built with each.</figcaption>')
+    w('    <figcaption class="tl__caption">Solid boxes are paid work: SQL and Python as a data analyst at Excel Esports, then Power BI and SQL at ZooTampa. Outlined boxes are tools I’ve used in my own projects: they show when I picked each one up, not years on the job. Hover a box, or open Data source below, to see what I built with each.</figcaption>')
     w('</figure>')
     w('<details class="sql-src tl__source">')
     w('    <summary class="sql-src__toggle" aria-label="Data source for the tools timeline">Data source</summary>')
