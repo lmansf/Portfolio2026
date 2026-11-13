@@ -110,21 +110,27 @@ The CSS `.min.css` files can be rebuilt with esbuild (`npx esbuild <src>
 
 ## Tools over time
 
-Home's "Tools over time" chart shows when Logan used each tool: one lane per
-tool, each in its own color, years running down in soft alternating bands, a
-box per span of use (an ongoing box runs into the accent "Now" line and ends
-in a dot of its color), curved links in the next tool's color tracing the
-order the tools were picked up, and a rail on the right with roles (ringed
-dots, bold labels) and certifications and workshops (accent chips). Hovering
-a box shows its tool, dates, length and note. Milestones that share a date
-share one entry. When the chart starts below the fold, `assets/motion.js`
-plays it in once as it scrolls into view (boxes grow in pickup order, links
-draw, the rail lights up, the Now line runs across); with reduced motion,
-text mode or no JavaScript it is simply drawn.
+Home's "Tools over time" chart shows when Logan used each tool and how: one
+lane per tool, each in its own color, years running down in soft alternating
+bands, and a box per span of use. Boxes are solid for paid work (SQL and
+Python as a data analyst at Excel Esports) and outlined with a light hatch
+for personal projects, with a legend above the chart; it never states a
+length of experience. An ongoing box runs into the accent "Now" line and ends
+in a dot of its color. Hovering a box shows its dates, how it was used and
+the projects built with it. The rail on the right holds roles (ringed dots,
+bold labels) and certifications and workshops (accent chips); milestones
+that share a date share one entry. When the chart starts below the fold,
+`assets/motion.js` plays it in once as it scrolls into view (boxes grow in
+start order, the rail lights up, the Now line runs across); with reduced
+motion, text mode or no JavaScript it is simply drawn.
 
 Every date lives in `data/tool-timeline.json` (`YYYY-MM`, or `YYYY` when only
 the year is known; `"to": null` means still in use; `"through"` is the month
-the chart's "Now" stands for, so move it forward when you rebuild).
+the chart's "Now" stands for, so move it forward when you rebuild). Each
+span has a `"use"` (`"work"` or `"projects"`) and an optional `"built"` list
+of projects; every name in `"built"` must match a project title on
+`projects.html`, or the check fails, so the chart can only point at projects
+that are on the site.
 `scripts/build_tool_timeline.py` writes the chart as plain HTML between the
 `<!-- tool-timeline -->` markers in `index.html` (never hand-edit inside
 them), and the `Console data` workflow runs it with `--check`. Styles are
@@ -134,7 +140,7 @@ phone each box carries its tool's name and there are no lane chips; from
 720px tinted chips name the lanes (two staggered rows until 960px) and the
 boxes show their years; the rail's label spacing is worked out in the script for both the narrow
 and the wide rail. The collapsed "Data source" caret under the chart holds
-the same dates as two tables (for screen readers too, since the drawing
+the same dates, uses and projects as two tables (for screen readers too, since the drawing
 itself is `aria-hidden`). Copy rules: SQL and Python are self-driven work,
 not day-job tools at ZooTampa.
 

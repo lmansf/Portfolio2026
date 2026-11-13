@@ -22,8 +22,8 @@
  *     /live snapshot is.
  *  6. Tools timeline play-in: Home's "Tools over time" chart, when it starts
  *     below the fold, draws itself once as it scrolls into view (boxes grow
- *     in the order the tools were picked up, the links between them draw,
- *     the rail lights up). Already on screen, it is left as it is.
+ *     in the order the tools were picked up, the rail lights up, the Now
+ *     line runs across). Already on screen, it is left as it is.
  * Hover lift and press feedback on buttons and links are plain CSS in
  * motion.css. Everything is off or static with prefers-reduced-motion.
  * Page changes are full page loads that fade via the cross-document

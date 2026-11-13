@@ -1,5 +1,5 @@
 {
-  "_about": "Every date on Home's 'Tools over time' chart. Edit here, then run python3 scripts/build_tool_timeline.py (CI runs it with --check). Dates are YYYY-MM, or YYYY when only the year is known (a year-only start means January, a year-only end means December). \"to\": null means still in use. \"through\" is the month the chart's 'Now' line stands for: move it forward when you rebuild.",
+  "_about": "Every date on Home's 'Tools over time' chart. Edit here, then run python3 scripts/build_tool_timeline.py (CI runs it with --check). Dates are YYYY-MM, or YYYY when only the year is known (a year-only start means January, a year-only end means December). \"to\": null means still in use. \"use\" is \"work\" (paid work, drawn solid) or \"projects\" (personal projects, drawn outlined). \"built\" lists projects from projects.html made with that tool (each name must match a project title there; the check fails otherwise), shown when a box is hovered and in the data-source table. \"through\" is the month the chart's 'Now' line stands for: move it forward when you rebuild.",
   "start": "2019",
   "through": "2026-11",
   "tools": [
@@ -7,44 +7,44 @@
       "id": "python",
       "name": "Python",
       "spans": [
-        {"from": "2019-08", "to": "2022-07", "note": "Data analyst years at Excel Esports"},
-        {"from": "2023", "to": null, "note": "Picked back up for my own projects"}
+        {"from": "2019-08", "to": "2022-07", "use": "work", "note": "Data analyst at Excel Esports"},
+        {"from": "2023", "to": null, "use": "projects", "built": ["Fraud Detection Pipeline", "Attendance Forecasting", "Roll Call"]}
       ]
     },
     {
       "id": "sql",
       "name": "SQL",
       "spans": [
-        {"from": "2019-08", "to": "2022-07", "note": "Data analyst years at Excel Esports"},
-        {"from": "2024", "to": null, "note": "Picked back up alongside Power BI"}
+        {"from": "2019-08", "to": "2022-07", "use": "work", "note": "Data analyst at Excel Esports"},
+        {"from": "2024", "to": null, "use": "projects", "built": ["Member Segmentation (RFM)", "Quack Query", "Owl Park"]}
       ]
     },
     {
       "id": "powerbi",
       "name": "Power BI",
       "spans": [
-        {"from": "2024", "to": null}
+        {"from": "2024", "to": null, "use": "projects", "built": ["Member Segmentation (RFM)", "Owl Park Data Architecture"]}
       ]
     },
     {
       "id": "fabric",
       "name": "Fabric",
       "spans": [
-        {"from": "2025", "to": "2025"}
+        {"from": "2025", "to": "2025", "use": "projects", "built": ["Owl Park Data Architecture"]}
       ]
     },
     {
       "id": "snowflake",
       "name": "Snowflake",
       "spans": [
-        {"from": "2025", "to": "2025"}
+        {"from": "2025", "to": "2025", "use": "projects"}
       ]
     },
     {
       "id": "databricks",
       "name": "Databricks",
       "spans": [
-        {"from": "2025", "to": null}
+        {"from": "2025", "to": null, "use": "projects", "built": ["Fraud Detection Pipeline"]}
       ]
     }
   ],
