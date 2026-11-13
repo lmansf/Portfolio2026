@@ -3,10 +3,12 @@
 # caption is stale or its query no longer returns what its page shows, or
 # when data/pipeline/metrics.sql is out of step with data/pipeline/metrics.json,
 # when catalog.html is out of step with models.json or metrics.json,
+# when Home's tools timeline is out of step with data/tool-timeline.json,
 # or when assets/sql-source.min.js, assets/live.min.js or assets/notfound.min.js wasn't rebuilt after
 # its sources changed.
 # Fix: python3 scripts/build_console_data.py && python3 scripts/build_sql_sources.py
-# && python3 scripts/build_metrics.py && python3 scripts/build_catalog.py (and the esbuild lines in the README's
+# && python3 scripts/build_metrics.py && python3 scripts/build_catalog.py
+# && python3 scripts/build_tool_timeline.py (and the esbuild lines in the README's
 # "SQL source captions" and "Metrics"), then commit the results.
 name: Console data
 
@@ -37,6 +39,8 @@ jobs:
         run: python3 scripts/build_catalog.py --check
       - name: Check the SQL source captions
         run: python3 scripts/build_sql_sources.py --check
+      - name: Check the tools timeline is current
+        run: python3 scripts/build_tool_timeline.py --check
       - name: Check the SQL source bundle is current
         run: |
           npx --yes esbuild@0.24.2 assets/sql-source.js --bundle --format=esm --minify --outfile="$RUNNER_TEMP/sql-source.min.js" --log-level=warning

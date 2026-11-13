@@ -14,7 +14,8 @@ page and one archived project page:
   featured projects, an experience timeline, credentials (certifications; the
   degree line is hidden for now, see "Hidden for now" below)
   and a toolkit grouped into data stack / forecasting & ML / platforms run at
-  ZooTampa, a short about, and the fastest ways to connect.
+  ZooTampa, a "Tools over time" chart (see "Tools over time" below), a short
+  about, and the fastest ways to connect.
 - **Projects** (`projects.html`, `/projects`) — featured: Quack Query (the
   latest build, first), the Fraud Detection Pipeline (running on a schedule;
   links to the branch that holds the code), and Owl Park (live at
@@ -106,6 +107,29 @@ and `/catalog`) without changing the desktop look, and the SQL editors use
 The CSS `.min.css` files can be rebuilt with esbuild (`npx esbuild <src>
 --minify --outfile=<min>`) or any CSS minifier; only the three JS bundles
 (`sql-source.min.js`, `live.min.js`, `notfound.min.js`) are byte-checked in CI.
+
+## Tools over time
+
+Home's "Tools over time" chart shows when Logan used each tool: one lane per
+tool, years running down, a box per span of use (a dashed bottom edge means
+still in use), thin lines tracing the order the tools were picked up, and a
+rail of roles (hollow dots) and certifications and workshops (filled dots)
+on the right. Milestones that share a date share one dot.
+
+Every date lives in `data/tool-timeline.json` (`YYYY-MM`, or `YYYY` when only
+the year is known; `"to": null` means still in use; `"through"` is the month
+the chart's "Now" stands for, so move it forward when you rebuild).
+`scripts/build_tool_timeline.py` writes the chart as plain HTML between the
+`<!-- tool-timeline -->` markers in `index.html` (never hand-edit inside
+them), and the `Console data` workflow runs it with `--check`. Styles are
+under "Tools over time" at the end of `assets/pages.css` (rebuild
+`pages.min.css` after editing): lane colors have Day and Night values, lane
+names turn on their side under 520px and step into three rows up to 960px,
+and the rail's label spacing is worked out in the script for both the narrow
+and the wide rail. The collapsed "Data source" caret under the chart holds
+the same dates as two tables (for screen readers too, since the drawing
+itself is `aria-hidden`). Copy rules: SQL and Python are self-driven work,
+not day-job tools at ZooTampa.
 
 ## Assets
 
