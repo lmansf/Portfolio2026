@@ -1,12 +1,12 @@
 {
   "_about": "Written by scripts/data_run.py on every data run. latest is the newest run in full; history is the last 30 runs, newest first. /status and the SQL source trust badges read it.",
   "latest": {
-    "id": "2026-11-12T15:10:37Z",
-    "started_at": "2026-11-12T15:10:37Z",
-    "finished_at": "2026-11-12T15:10:43Z",
-    "seconds": 6.0,
+    "id": "2026-11-13T14:32:07Z",
+    "started_at": "2026-11-13T14:32:07Z",
+    "finished_at": "2026-11-13T14:32:12Z",
+    "seconds": 5.0,
     "trigger": "nightly",
-    "commit": "9597c02",
+    "commit": "88a6678",
     "status": "failed",
     "passed": 76,
     "total": 81,
@@ -14,7 +14,7 @@
       {
         "name": "site_pages",
         "status": "ok",
-        "as_of": "2026-11-12T15:10:37Z",
+        "as_of": "2026-11-13T14:32:07Z",
         "detail": "Rebuilt the site tables from index.html and projects.html."
       },
       {
@@ -26,29 +26,29 @@
       {
         "name": "github",
         "status": "ok",
-        "as_of": "2026-11-12T15:10:37Z",
+        "as_of": "2026-11-13T14:32:07Z",
         "detail": "Pulled 300 public events and 67 public repositories."
       }
     ],
     "tables": {
       "projects": {
-        "as_of": "2026-11-12T15:10:37Z",
+        "as_of": "2026-11-13T14:32:07Z",
         "rows": 11
       },
       "experience": {
-        "as_of": "2026-11-12T15:10:37Z",
+        "as_of": "2026-11-13T14:32:07Z",
         "rows": 3
       },
       "skills": {
-        "as_of": "2026-11-12T15:10:37Z",
+        "as_of": "2026-11-13T14:32:07Z",
         "rows": 14
       },
       "credentials": {
-        "as_of": "2026-11-12T15:10:37Z",
+        "as_of": "2026-11-13T14:32:07Z",
         "rows": 3
       },
       "resume": {
-        "as_of": "2026-11-12T15:10:37Z",
+        "as_of": "2026-11-13T14:32:07Z",
         "rows": 1
       },
       "fraud_totals": {
@@ -72,11 +72,11 @@
         "rows": 7
       },
       "github_activity": {
-        "as_of": "2026-11-12T15:10:37Z",
-        "rows": 9
+        "as_of": "2026-11-13T14:32:07Z",
+        "rows": 8
       },
       "github_repos": {
-        "as_of": "2026-11-12T15:10:37Z",
+        "as_of": "2026-11-13T14:32:07Z",
         "rows": 67
       }
     },
@@ -296,7 +296,7 @@
         "node": "fraud_totals",
         "name": "updated within 36 hours",
         "status": "fail",
-        "detail": "10 days old"
+        "detail": "11 days old"
       },
       {
         "id": "fraud_daily.documented",
@@ -345,7 +345,7 @@
         "node": "fraud_daily",
         "name": "updated within 36 hours",
         "status": "fail",
-        "detail": "10 days old"
+        "detail": "11 days old"
       },
       {
         "id": "fraud_score_bins.documented",
@@ -387,7 +387,7 @@
         "node": "fraud_score_bins",
         "name": "updated within 36 hours",
         "status": "fail",
-        "detail": "10 days old"
+        "detail": "11 days old"
       },
       {
         "id": "fraud_patterns.documented",
@@ -429,7 +429,7 @@
         "node": "fraud_patterns",
         "name": "updated within 36 hours",
         "status": "fail",
-        "detail": "10 days old"
+        "detail": "11 days old"
       },
       {
         "id": "fraud_metrics.documented",
@@ -471,7 +471,7 @@
         "node": "fraud_metrics",
         "name": "updated within 36 hours",
         "status": "fail",
-        "detail": "10 days old"
+        "detail": "11 days old"
       },
       {
         "id": "github_activity.documented",
@@ -485,7 +485,7 @@
         "node": "github_activity",
         "name": "any number of rows",
         "status": "pass",
-        "detail": "9 rows"
+        "detail": "8 rows"
       },
       {
         "id": "github_activity.not_null",
@@ -662,7 +662,7 @@
     ],
     "pieces": {
       "now": {
-        "as_of": "2026-11-12T15:10:37Z",
+        "as_of": "2026-11-13T14:32:07Z",
         "max_hours": 36,
         "checks": [
           "resume.documented",
@@ -672,7 +672,7 @@
         ]
       },
       "featured": {
-        "as_of": "2026-11-12T15:10:37Z",
+        "as_of": "2026-11-13T14:32:07Z",
         "max_hours": 36,
         "checks": [
           "projects.documented",
@@ -686,7 +686,7 @@
         ]
       },
       "experience": {
-        "as_of": "2026-11-12T15:10:37Z",
+        "as_of": "2026-11-13T14:32:07Z",
         "max_hours": 36,
         "checks": [
           "experience.documented",
@@ -698,7 +698,7 @@
         ]
       },
       "credentials": {
-        "as_of": "2026-11-12T15:10:37Z",
+        "as_of": "2026-11-13T14:32:07Z",
         "max_hours": 36,
         "checks": [
           "credentials.documented",
@@ -709,7 +709,7 @@
         ]
       },
       "toolkit": {
-        "as_of": "2026-11-12T15:10:37Z",
+        "as_of": "2026-11-13T14:32:07Z",
         "max_hours": 36,
         "checks": [
           "skills.documented",
@@ -721,7 +721,7 @@
         ]
       },
       "projects-featured": {
-        "as_of": "2026-11-12T15:10:37Z",
+        "as_of": "2026-11-13T14:32:07Z",
         "max_hours": 36,
         "checks": [
           "projects.documented",
@@ -735,7 +735,7 @@
         ]
       },
       "projects-more": {
-        "as_of": "2026-11-12T15:10:37Z",
+        "as_of": "2026-11-13T14:32:07Z",
         "max_hours": 36,
         "checks": [
           "projects.documented",
@@ -805,6 +805,21 @@
     }
   },
   "history": [
+    {
+      "id": "2026-11-13T14:32:07Z",
+      "finished_at": "2026-11-13T14:32:12Z",
+      "trigger": "nightly",
+      "status": "failed",
+      "passed": 76,
+      "total": 81,
+      "failed": [
+        "fraud_totals.freshness",
+        "fraud_daily.freshness",
+        "fraud_score_bins.freshness",
+        "fraud_patterns.freshness",
+        "fraud_metrics.freshness"
+      ]
+    },
     {
       "id": "2026-11-12T15:10:37Z",
       "finished_at": "2026-11-12T15:10:43Z",
