@@ -7,7 +7,7 @@
       "id": "python",
       "name": "Python",
       "spans": [
-        {"from": "2019-08", "to": "2022-07", "use": "work", "note": "Data analyst at Excel Esports"},
+        {"from": "2021", "to": "2022-07", "use": "work", "note": "Data analyst at Excel Esports"},
         {"from": "2023", "to": null, "use": "projects", "built": ["Fraud Detection Pipeline", "Attendance Forecasting", "Roll Call"]}
       ]
     },
@@ -15,7 +15,7 @@
       "id": "sql",
       "name": "SQL",
       "spans": [
-        {"from": "2019-08", "to": "2022-07", "use": "work", "note": "Data analyst at Excel Esports"},
+        {"from": "2020", "to": "2022-07", "use": "work", "note": "Data analyst at Excel Esports"},
         {"from": "2024", "to": "2025", "use": "projects", "built": ["Member Segmentation (RFM)", "Quack Query", "Owl Park"]},
         {"from": "2026", "to": null, "use": "work", "note": "At ZooTampa"}
       ]
