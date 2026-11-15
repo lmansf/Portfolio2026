@@ -96,9 +96,16 @@ def problems(defs, tables=None):
             out.append(f"claim {c.get('quote')!r}: needs pages and a quote")
         if "table" in c:
             m, table = defs["metrics"].get(c.get("metric")), c["table"]
+            where = c.get("where", {})
+            if not isinstance(table, str):
+                out.append(f"claim {c.get('quote')!r}: table must be a table name")
+                table = repr(table)
+            if not isinstance(where, dict):
+                out.append(f"claim {c.get('quote')!r}: where must map column names to values")
+                where = {}
             if m and table not in m.get("tables", {}):
                 out.append(f"claim {c.get('quote')!r}: {c.get('metric')} isn't defined on {table}")
-            gone = [k for k in c.get("where", {}) if k not in tables.get(table, [])]
+            gone = [str(k) for k in where if k not in tables.get(table, [])]
             if table not in tables:
                 out.append(f"claim {c.get('quote')!r}: no table {table} in data/console/snapshot-tables.json")
             elif gone:

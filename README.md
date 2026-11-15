@@ -534,9 +534,12 @@ webstore checkouts). Nothing on the page talks to the database.
   one at a time. Its one-off batch rescore of older checkouts, which logs
   under 1 ms a row, is left out. `compare_day_one` is the same head-to-head
   over a fixed window, the model's first 24 hours live (checkouts placed
-  from 2026-11-14 22:27:41 UTC to 24 hours later). It reads the raw tables
-  directly rather than the 30-day base, so the counts the Home and Projects
-  copy quote never drift or age out.
+  from 2026-11-14 22:27:41 UTC to 24 hours later), with a fixed load/score
+  cutoff too: it counts only rows loaded, and model scores recorded, before
+  2026-11-15 22:57:41 UTC (the window end plus 30 minutes), so a later
+  re-score or late label can't move it. It reads the raw tables directly
+  rather than the 30-day base, so the counts the Home and Projects copy
+  quote never drift or age out.
 - **`.github/workflows/fraud-snapshot.yml`** — runs daily at 05:35 UTC (and
   on demand), checks the result against an allow-list of fields with `jq`,
   and commits the file on every run (the timestamp always moves, so the

@@ -184,14 +184,26 @@ compare_sweep as (
   cross join unnest(array[0.9, 0.5, 0.1, 0.01, 0.005]) as c(cutoff)
   group by c.cutoff
 ),
+day_one_scores as (
+  select distinct on (a.transaction_id)
+    a.transaction_id,
+    a.decision = 'FRAUD_FLAGGED' as model_flagged
+  from public.realtime_fraud_audit a
+  where a.latency_ms >= 1
+    and a.processed_at < timestamptz '2026-11-15 22:57:41+00'
+  order by a.transaction_id, a.processed_at desc, a.id desc
+),
 compare_day_one as (
   -- The model's first 24 hours live, frozen: checkouts placed from the first
   -- one it scored one at a time after going live (Nov 14, 22:27:41 UTC) to
   -- 24 hours later. (One stray Nov 10 order with a live score is left out.)
-  -- The site's copy quotes these counts, so the window is fixed rather than
-  -- rolling; metrics.json claims check the copy against them every night.
-  -- It reads the raw tables directly, so it doesn't age out of the 30-day
-  -- window the rest of the snapshot uses.
+  -- The site's copy quotes these counts, so both the order window and a
+  -- load/score cutoff (window end plus 30 minutes, Nov 15 22:57:41 UTC) are
+  -- fixed: rows loaded and scores recorded after the cutoff (a re-score, a
+  -- late label) can't change them. metrics.json claims check the copy
+  -- against them every night. It reads the raw tables directly, with its own
+  -- latest-score lookup, so it doesn't age out of the 30-day window the rest
+  -- of the snapshot uses.
   select
     s.scorer,
     to_char(timestamptz '2026-11-14 22:27:41+00' at time zone 'UTC', 'YYYY-MM-DD"T"HH24:MI:SS"Z"') as window_start,
@@ -204,11 +216,14 @@ compare_day_one as (
                        and case s.scorer when 'rules' then d.decision <> 'approve' else m.model_flagged end) as caught
   from public.raw_transactions x
   join public.raw_fraud_decisions d on d.transaction_id = x.transaction_id and d.model_version = 'rules-v0'
+                                    and d.created_at < timestamptz '2026-11-15 22:57:41+00'
   left join public.raw_fraud_truth t on t.transaction_id = x.transaction_id
-  join model_scores m on m.transaction_id = x.transaction_id::text
+                                    and t.created_at < timestamptz '2026-11-15 22:57:41+00'
+  join day_one_scores m on m.transaction_id = x.transaction_id::text
   cross join (values ('rules'), ('model')) as s(scorer)
   where x.event_ts >= timestamptz '2026-11-14 22:27:41+00'
     and x.event_ts <  timestamptz '2026-11-15 22:27:41+00'
+    and x.created_at < timestamptz '2026-11-15 22:57:41+00'
   group by s.scorer
 )
 select json_build_object(

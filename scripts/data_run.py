@@ -443,11 +443,20 @@ def metric_checks(con, add, broken):
                 if claim["quote"] not in " ".join((ROOT / pg).read_text(encoding="utf-8").split())]
         if "table" in claim:
             # Exact counts quoted from one row of a table, like the model's first day.
-            table = ident(claim["table"])
-            num_x, den_x = metric_defs.parts(m, table)
-            filt = claim.get("where", {})
-            cond = " AND ".join(f"{ident(k)} = {lit(v)}" for k, v in filt.items()) or "TRUE"
-            want_num, want_den = claim["numerator"], claim["denominator"]
+            try:
+                table = ident(claim["table"])
+                num_x, den_x = metric_defs.parts(m, table)
+                filt = claim.get("where", {})
+                cond = " AND ".join(f"{ident(k)} = {lit(v)}" for k, v in filt.items()) or "TRUE"
+                want_num, want_den = claim["numerator"], claim["denominator"]
+                if not all(isinstance(v, int) and not isinstance(v, bool) for v in (want_num, want_den)):
+                    raise ValueError("needs a whole-number numerator and denominator")
+            except (KeyError, ValueError, TypeError, AttributeError) as err:
+                node = "fraud_metrics"
+                name = f'{where} {say} "{claim["quote"]}": a claim on {claim.get("table")!r}'
+                add(f"{node}.claim_{slug(claim['quote'])}", node, name, False,
+                    f"malformed claim in metrics.json: {err}")
+                continue
             row_name = ", ".join(f"{k} {v}" for k, v in filt.items())
             node = table
             name = (f'{where} {say} "{claim["quote"]}": {m["label"].lower()} is '
