@@ -135,11 +135,11 @@
                 <article class="project project--featured" id="fraud">
                     <div class="project__body">
                         <div class="project__head">
-                            <p class="project__eyebrow">Data engineering · Fraud analytics</p>
+                            <p class="project__eyebrow">Data engineering · Fraud analytics · Chapter 2</p>
                             <span class="project__date">2026</span>
                         </div>
                         <h3 class="project__title">Fraud Detection Pipeline <span class="project__badge project__badge--live">Running</span></h3>
-                        <p class="project__desc">Scores simulated webstore checkouts into Supabase. Its baseline rules flagged about half the fraud and no legitimate orders; a new real-time model now scores the same checkouts and caught 110 of 111 fraudulent orders in its first 24 hours live, Nov 14 to 15.</p>
+                        <p class="project__desc">Chapter two: a new real-time model scores every simulated webstore checkout as it lands in Supabase, and caught 110 of 111 fraudulent orders in its first 24 hours live, Nov 14 to 15. Chapter one, the baseline rules it now runs beside, flagged about half the fraud and no legitimate orders.</p>
                         <ul class="project__tags"><li>Databricks</li><li>Python</li><li>PostgreSQL (Supabase)</li><li>SQL</li></ul>
                         <div class="project__links">
                             <a class="project__link" href="#fraud-flow" data-flow-open="fraud-flow">How the data flows</a>
@@ -151,13 +151,13 @@
                         <summary class="case__toggle">Case file<span class="case__hint"> · problem, fix, result</span></summary>
                         <dl class="case__rows">
                             <div class="case__row"><dt class="case__label">Problem</dt><dd class="case__text">Five fraud patterns hide in about 3% of webstore orders, and the true label only arrives 5 to 60 days later, the way a chargeback does.</dd></div>
-                            <div class="case__row"><dt class="case__label">Fix</dt><dd class="case__text">Weighted rules score each checkout in time order and give reason codes. A score that takes over 150 ms fails open, so a real guest is never left waiting. Since Nov 14 a new model also scores every checkout as it arrives and logs its fraud probability and scoring time to its own table, so the two can be measured on the same orders.</dd></div>
-                            <div class="case__row"><dt class="case__label">Result</dt><dd class="case__text">The baseline rules flagged about half the fraud and no legitimate orders, measured against the late labels. In its first 24 hours live (orders placed from 5:27 PM ET on Nov 14 to the same time on Nov 15), the new model caught 110 of 111 fraudulent orders where the rules caught 52, at a cost of 25 good orders flagged out of 1,964.</dd></div>
+                            <div class="case__row"><dt class="case__label">Fix</dt><dd class="case__text">Chapter two, since Nov 14: a new real-time model scores every checkout as it arrives and logs its fraud probability and scoring time to its own table, beside the rules, so the two are measured on the same orders. Chapter one is those rules: weighted rules score each checkout in time order and give reason codes, and a score that takes over 150 ms fails open, so a real guest is never left waiting.</dd></div>
+                            <div class="case__row"><dt class="case__label">Result</dt><dd class="case__text">In its first 24 hours live (orders placed from 5:27 PM ET on Nov 14 to the same time on Nov 15), the new model caught 110 of 111 fraudulent orders where the rules caught 52, at a cost of 25 good orders flagged out of 1,964. Before it, the baseline rules flagged about half the fraud and no legitimate orders, measured against the late labels.</dd></div>
                         </dl>
                         <ul class="case__metrics" aria-label="Measured result">
-                            <li class="case__metric"><span class="case__metric-label">Fraud flagged</span> <span class="case__metric-value">about half</span></li>
-                            <li class="case__metric"><span class="case__metric-label">Good orders declined</span> <span class="case__metric-value">0</span></li>
                             <li class="case__metric"><span class="case__metric-label">New model, first 24 hours</span> <span class="case__metric-value">110 of 111 caught</span></li>
+                            <li class="case__metric"><span class="case__metric-label">Rules, fraud flagged</span> <span class="case__metric-value">about half</span></li>
+                            <li class="case__metric"><span class="case__metric-label">Rules, good orders declined</span> <span class="case__metric-value">0</span></li>
                         </ul>
                     </details>
                 </article>

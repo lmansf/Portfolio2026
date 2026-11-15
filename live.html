@@ -93,10 +93,10 @@
             <div class="hero__main">
                 <p class="eyebrow">Live data · Fraud Detection Pipeline</p>
                 <h1 class="hero__name" id="live-title">Fraud, scored daily.</h1>
-                <p class="hero__role">These are the real outputs of my fraud-detection pipeline, refreshed every day. A generator plays out theme-park webstore checkouts, including five kinds of fraud; every order is scored by a rules model, and since November 14 a new model scores them too. The results land in Postgres on Supabase. A daily job runs one read-only SQL query over those tables and publishes only the totals you see here.</p>
+                <p class="hero__role">These are the real outputs of my fraud-detection pipeline, refreshed every day. Its newest chapter: since November 14 a real-time model scores every theme-park webstore checkout as it lands, and the first section below puts it head to head with the rules that scored them before. A generator plays out the checkouts, including five kinds of fraud, and the results land in Postgres on Supabase. A daily job runs one read-only SQL query over those tables and publishes only the totals you see here.</p>
                 <div class="live-meta" aria-live="polite">
                     <span class="live-pill live-pill--sim">Simulated data</span>
-                    <span class="live-pill" data-live-model>Model: rules-v0</span>
+                    <span class="live-pill" data-live-model>Rules: rules-v0</span>
                     <span class="live-meta__text" data-live-updated>Loading the latest numbers…</span>
                 </div>
                 <p class="live-stale" data-live-stale hidden></p>
@@ -109,316 +109,9 @@
 
         <p class="live-error" data-live-error hidden>The latest numbers didn&rsquo;t load. Try refreshing, or read <a href="/data/fraud-snapshot.json">the JSON file</a> directly.</p>
 
-        <!-- Headline numbers -->
-        <section aria-labelledby="live-kpis" class="live-section">
-            <header class="section-head">
-                <h2 class="section-head__title" id="live-kpis">The last 30 days</h2>
-                <span class="section-head__hint" data-live-window>Every checkout the pipeline scored</span>
-            </header>
-            <div class="live-kpis" data-sql-piece="live-totals">
-                <div class="live-kpi">
-                    <p class="live-kpi__label">Checkouts scored</p>
-                    <p class="live-kpi__value" data-kpi="checkouts">–</p>
-                    <p class="live-kpi__sub" data-kpi-sub="checkouts">&nbsp;</p>
-                </div>
-                <div class="live-kpi">
-                    <p class="live-kpi__label">Fraud caught</p>
-                    <p class="live-kpi__value" data-kpi="caught">–</p>
-                    <p class="live-kpi__sub" data-kpi-sub="caught">&nbsp;</p>
-                </div>
-                <div class="live-kpi">
-                    <p class="live-kpi__label">Good customers declined</p>
-                    <p class="live-kpi__value" data-kpi="false-declines">–</p>
-                    <p class="live-kpi__sub" data-kpi-sub="false-declines">&nbsp;</p>
-                </div>
-                <div class="live-kpi">
-                    <p class="live-kpi__label">Fraud dollars stopped</p>
-                    <p class="live-kpi__value" data-kpi="dollars">–</p>
-                    <p class="live-kpi__sub" data-kpi-sub="dollars">&nbsp;</p>
-                </div>
-                <div class="live-kpi">
-                    <p class="live-kpi__label">Scoring time, 95th percentile</p>
-                    <p class="live-kpi__value" data-kpi="latency">–</p>
-                    <p class="live-kpi__sub" data-kpi-sub="latency">&nbsp;</p>
-                </div>
-            </div>
-            <p class="section-note">&ldquo;Caught&rdquo; means the model sent the order to review or declined it. Fraud is measured against the generator&rsquo;s answer key; in production those labels arrive weeks later, as chargebacks.</p>
-            <!-- sql-source: live-totals -->
-            <details class="sql-src" data-sql-source="live-totals" data-sql-label="the last 30 days totals">
-                <summary class="sql-src__toggle" aria-label="SQL source for the last 30 days totals">SQL source<span class="sql-src__trust" data-sql-trust hidden></span></summary>
-                <div class="sql-src__panel">
-                    <pre class="sql-src__code" tabindex="0"><code>SELECT
-    checkouts, flagged, fraud, fraud_caught, legit, false_declines,
-    fraud_dollars_stopped, fraud_dollars_approved,
-    p95_scoring_ms, scoring_timeouts, active_days
-FROM fraud_totals;</code></pre>
-                    <ol class="sql-src__lineage" aria-label="Lineage, from raw source to the table this query reads"><li class="sql-src__step"><span class="sql-src__layer">raw</span> <a class="sql-src__node" href="/catalog#t-fraud_supabase" title="raw_transactions, raw_fraud_decisions, raw_fraud_truth, raw_checkout_responses">Supabase checkout tables</a></li><li class="sql-src__step"><span class="sql-src__layer">staging</span> <a class="sql-src__node" href="/catalog#t-stg_fraud_base" title="the base CTE in scripts/fraud-snapshot.sql">Scored checkouts, last 30 days</a></li><li class="sql-src__step"><span class="sql-src__layer">mart</span> <a class="sql-src__node" href="/catalog#t-fraud_totals" title="data/fraud-snapshot.json → totals"><code>fraud_totals</code></a></li></ol>
-                    <p class="sql-src__note">This query writes what&rsquo;s shown above, from the same aggregates-only snapshot the page draws; a check fails the build if it ever stops matching. <a href="/status#t-fraud_totals">See its checks</a>.</p>
-                    <details class="sql-src__upstream">
-                        <summary>Where the numbers come from</summary>
-                        <pre class="sql-src__code" tabindex="0"><code>with base as (
-  select
-    x.transaction_id,
-    x.event_ts,
-    (x.event_ts at time zone 'America/New_York')::date as day,
-    d.decision,
-    d.score,
-    r.fraud_scoring_ms,
-    r.total_latency_ms,
-    coalesce(r.fraud_timeout, false) as fraud_timeout,
-    coalesce(t.is_fraud, false) as is_fraud,
-    t.fraud_pattern,
-    coalesce(x.total, 0) as total
-  from public.raw_transactions x
-  join public.raw_fraud_decisions d using (transaction_id)
-  left join public.raw_fraud_truth t using (transaction_id)
-  left join public.raw_checkout_responses r using (transaction_id)
-  where x.event_ts &gt;= now() - interval '30 days'
-    and d.model_version = 'rules-v0'
-),
-totals as (
-  select
-    count(*) as checkouts,
-    count(*) filter (where decision &lt;&gt; 'approve') as flagged,
-    count(*) filter (where decision = 'decline') as declined,
-    count(*) filter (where decision = 'review') as reviewed,
-    count(*) filter (where is_fraud) as fraud,
-    count(*) filter (where is_fraud and decision &lt;&gt; 'approve') as fraud_caught,
-    count(*) filter (where not is_fraud and decision = 'decline') as false_declines,
-    count(*) filter (where not is_fraud) as legit,
-    round(sum(total) filter (where is_fraud and decision &lt;&gt; 'approve'), 2)::float8 as fraud_dollars_stopped,
-    round(sum(total) filter (where is_fraud and decision = 'approve'), 2)::float8 as fraud_dollars_approved,
-    round((percentile_cont(0.5) within group (order by fraud_scoring_ms))::numeric, 1)::float8 as p50_scoring_ms,
-    round((percentile_cont(0.95) within group (order by fraud_scoring_ms))::numeric, 1)::float8 as p95_scoring_ms,
-    round((percentile_cont(0.95) within group (order by total_latency_ms))::numeric, 0)::float8 as p95_checkout_ms,
-    count(*) filter (where fraud_timeout) as scoring_timeouts,
-    count(distinct day) as active_days
-  from base
-)
-select row_to_json(totals) as totals from totals;</code></pre>
-                        <p class="sql-src__note">Part of <a href="https://github.com/lmansf/Portfolio2026/blob/main/scripts/fraud-snapshot.sql" target="_blank" rel="noopener">the read-only query</a> that runs once a day on Supabase and publishes the snapshot.</p>
-                    </details>
-                </div>
-            </details>
-            <!-- /sql-source -->
-        </section>
-
-        <!-- Daily trend -->
-        <section aria-labelledby="live-daily" class="live-section">
-            <header class="section-head">
-                <h2 class="section-head__title" id="live-daily">Fraud per day</h2>
-                <span class="section-head__hint">Caught versus missed</span>
-            </header>
-            <div class="live-card" data-sql-piece="live-daily">
-                <ul class="live-legend" aria-label="Legend">
-                    <li><span class="live-swatch live-swatch--caught" aria-hidden="true"></span>Caught</li>
-                    <li><span class="live-swatch live-swatch--missed" aria-hidden="true"></span>Missed</li>
-                </ul>
-                <div class="live-chart" data-chart="daily" role="group" aria-label="Fraudulent checkouts per day, caught and missed"></div>
-                <p class="live-caption" data-caption="daily">&nbsp;</p>
-            </div>
-            <details class="live-table">
-                <summary>See the daily numbers as a table</summary>
-                <div class="live-table__scroll">
-                    <table>
-                        <thead>
-                            <tr>
-                                <th scope="col">Day</th>
-                                <th scope="col">Checkouts</th>
-                                <th scope="col">Reviewed</th>
-                                <th scope="col">Declined</th>
-                                <th scope="col">Fraud</th>
-                                <th scope="col">Caught</th>
-                                <th scope="col">Good customers declined</th>
-                                <th scope="col">Fraud $ stopped</th>
-                            </tr>
-                        </thead>
-                        <tbody data-table="daily"></tbody>
-                    </table>
-                </div>
-            </details>
-            <!-- sql-source: live-daily -->
-            <details class="sql-src" data-sql-source="live-daily" data-sql-label="the fraud per day chart">
-                <summary class="sql-src__toggle" aria-label="SQL source for the fraud per day chart">SQL source<span class="sql-src__trust" data-sql-trust hidden></span></summary>
-                <div class="sql-src__panel">
-                    <pre class="sql-src__code" tabindex="0"><code>SELECT
-    day, checkouts, reviewed, declined,
-    fraud, fraud_caught, false_declines, fraud_dollars_stopped
-FROM fraud_daily
-ORDER BY day;</code></pre>
-                    <ol class="sql-src__lineage" aria-label="Lineage, from raw source to the table this query reads"><li class="sql-src__step"><span class="sql-src__layer">raw</span> <a class="sql-src__node" href="/catalog#t-fraud_supabase" title="raw_transactions, raw_fraud_decisions, raw_fraud_truth, raw_checkout_responses">Supabase checkout tables</a></li><li class="sql-src__step"><span class="sql-src__layer">staging</span> <a class="sql-src__node" href="/catalog#t-stg_fraud_base" title="the base CTE in scripts/fraud-snapshot.sql">Scored checkouts, last 30 days</a></li><li class="sql-src__step"><span class="sql-src__layer">mart</span> <a class="sql-src__node" href="/catalog#t-fraud_daily" title="data/fraud-snapshot.json → daily"><code>fraud_daily</code></a></li></ol>
-                    <p class="sql-src__note">This query writes what&rsquo;s shown above, from the same aggregates-only snapshot the page draws; a check fails the build if it ever stops matching. <a href="/status#t-fraud_daily">See its checks</a>.</p>
-                    <details class="sql-src__upstream">
-                        <summary>Where the numbers come from</summary>
-                        <pre class="sql-src__code" tabindex="0"><code>with base as (
-  select
-    x.transaction_id,
-    x.event_ts,
-    (x.event_ts at time zone 'America/New_York')::date as day,
-    d.decision,
-    d.score,
-    r.fraud_scoring_ms,
-    r.total_latency_ms,
-    coalesce(r.fraud_timeout, false) as fraud_timeout,
-    coalesce(t.is_fraud, false) as is_fraud,
-    t.fraud_pattern,
-    coalesce(x.total, 0) as total
-  from public.raw_transactions x
-  join public.raw_fraud_decisions d using (transaction_id)
-  left join public.raw_fraud_truth t using (transaction_id)
-  left join public.raw_checkout_responses r using (transaction_id)
-  where x.event_ts &gt;= now() - interval '30 days'
-    and d.model_version = 'rules-v0'
-),
-daily as (
-  select
-    day,
-    count(*) as checkouts,
-    count(*) filter (where decision = 'approve') as approved,
-    count(*) filter (where decision = 'review') as reviewed,
-    count(*) filter (where decision = 'decline') as declined,
-    count(*) filter (where is_fraud) as fraud,
-    count(*) filter (where is_fraud and decision &lt;&gt; 'approve') as fraud_caught,
-    count(*) filter (where not is_fraud and decision = 'decline') as false_declines,
-    round(sum(total) filter (where is_fraud and decision &lt;&gt; 'approve'), 2)::float8 as fraud_dollars_stopped,
-    round(sum(total) filter (where is_fraud and decision = 'approve'), 2)::float8 as fraud_dollars_approved,
-    round((percentile_cont(0.95) within group (order by fraud_scoring_ms))::numeric, 1)::float8 as p95_scoring_ms
-  from base
-  group by day
-)
-select coalesce(json_agg(daily order by day), '[]'::json) as daily from daily;</code></pre>
-                        <p class="sql-src__note">Part of <a href="https://github.com/lmansf/Portfolio2026/blob/main/scripts/fraud-snapshot.sql" target="_blank" rel="noopener">the read-only query</a> that runs once a day on Supabase and publishes the snapshot.</p>
-                    </details>
-                </div>
-            </details>
-            <!-- /sql-source -->
-        </section>
-
-        <!-- Score distribution -->
-        <section aria-labelledby="live-scores" class="live-section">
-            <header class="section-head">
-                <h2 class="section-head__title" id="live-scores">Where the model&rsquo;s scores fall</h2>
-                <span class="section-head__hint">Share of each group by risk score</span>
-            </header>
-            <div class="live-card" data-sql-piece="live-scores">
-                <ul class="live-legend" aria-label="Legend">
-                    <li><span class="live-swatch live-swatch--legit" aria-hidden="true"></span>Good customers</li>
-                    <li><span class="live-swatch live-swatch--fraud" aria-hidden="true"></span>Fraud</li>
-                </ul>
-                <div class="live-chart" data-chart="scores" role="group" aria-label="Distribution of risk scores for good customers and for fraud"></div>
-                <p class="live-caption" data-caption="scores">&nbsp;</p>
-            </div>
-            <!-- sql-source: live-scores -->
-            <details class="sql-src" data-sql-source="live-scores" data-sql-label="the score distribution chart">
-                <summary class="sql-src__toggle" aria-label="SQL source for the score distribution chart">SQL source<span class="sql-src__trust" data-sql-trust hidden></span></summary>
-                <div class="sql-src__panel">
-                    <pre class="sql-src__code" tabindex="0"><code>SELECT score_from, score_to, legit, fraud
-FROM fraud_score_bins
-ORDER BY score_from;</code></pre>
-                    <ol class="sql-src__lineage" aria-label="Lineage, from raw source to the table this query reads"><li class="sql-src__step"><span class="sql-src__layer">raw</span> <a class="sql-src__node" href="/catalog#t-fraud_supabase" title="raw_transactions, raw_fraud_decisions, raw_fraud_truth, raw_checkout_responses">Supabase checkout tables</a></li><li class="sql-src__step"><span class="sql-src__layer">staging</span> <a class="sql-src__node" href="/catalog#t-stg_fraud_base" title="the base CTE in scripts/fraud-snapshot.sql">Scored checkouts, last 30 days</a></li><li class="sql-src__step"><span class="sql-src__layer">mart</span> <a class="sql-src__node" href="/catalog#t-fraud_score_bins" title="data/fraud-snapshot.json → score_bins"><code>fraud_score_bins</code></a></li></ol>
-                    <p class="sql-src__note">This query writes what&rsquo;s shown above, from the same aggregates-only snapshot the page draws; a check fails the build if it ever stops matching. <a href="/status#t-fraud_score_bins">See its checks</a>.</p>
-                    <details class="sql-src__upstream">
-                        <summary>Where the numbers come from</summary>
-                        <pre class="sql-src__code" tabindex="0"><code>with base as (
-  select
-    x.transaction_id,
-    x.event_ts,
-    (x.event_ts at time zone 'America/New_York')::date as day,
-    d.decision,
-    d.score,
-    r.fraud_scoring_ms,
-    r.total_latency_ms,
-    coalesce(r.fraud_timeout, false) as fraud_timeout,
-    coalesce(t.is_fraud, false) as is_fraud,
-    t.fraud_pattern,
-    coalesce(x.total, 0) as total
-  from public.raw_transactions x
-  join public.raw_fraud_decisions d using (transaction_id)
-  left join public.raw_fraud_truth t using (transaction_id)
-  left join public.raw_checkout_responses r using (transaction_id)
-  where x.event_ts &gt;= now() - interval '30 days'
-    and d.model_version = 'rules-v0'
-),
-bins as (
-  select
-    least(floor(score * 20)::int, 19) as bin,
-    count(*) filter (where not is_fraud) as legit,
-    count(*) filter (where is_fraud) as fraud
-  from base
-  group by 1
-)
-select coalesce(json_agg(json_build_object(
-         'from', round(bin / 20.0, 2)::float8, 'to', round((bin + 1) / 20.0, 2)::float8,
-         'legit', legit, 'fraud', fraud) order by bin), '[]'::json) as score_bins
-from bins;</code></pre>
-                        <p class="sql-src__note">Part of <a href="https://github.com/lmansf/Portfolio2026/blob/main/scripts/fraud-snapshot.sql" target="_blank" rel="noopener">the read-only query</a> that runs once a day on Supabase and publishes the snapshot.</p>
-                    </details>
-                </div>
-            </details>
-            <!-- /sql-source -->
-        </section>
-
-        <!-- Patterns -->
-        <section aria-labelledby="live-patterns" class="live-section">
-            <header class="section-head">
-                <h2 class="section-head__title" id="live-patterns">Catch rate by fraud pattern</h2>
-                <span class="section-head__hint">Where the next model should focus</span>
-            </header>
-            <div class="live-card" data-sql-piece="live-patterns">
-                <div class="live-bars" data-chart="patterns"></div>
-                <p class="live-caption" data-caption="patterns">&nbsp;</p>
-            </div>
-            <!-- sql-source: live-patterns -->
-            <details class="sql-src" data-sql-source="live-patterns" data-sql-label="the catch rate by fraud pattern table">
-                <summary class="sql-src__toggle" aria-label="SQL source for the catch rate by fraud pattern table">SQL source<span class="sql-src__trust" data-sql-trust hidden></span></summary>
-                <div class="sql-src__panel">
-                    <pre class="sql-src__code" tabindex="0"><code>SELECT pattern, fraud, caught
-FROM fraud_patterns
-ORDER BY fraud DESC, pattern;</code></pre>
-                    <ol class="sql-src__lineage" aria-label="Lineage, from raw source to the table this query reads"><li class="sql-src__step"><span class="sql-src__layer">raw</span> <a class="sql-src__node" href="/catalog#t-fraud_supabase" title="raw_transactions, raw_fraud_decisions, raw_fraud_truth, raw_checkout_responses">Supabase checkout tables</a></li><li class="sql-src__step"><span class="sql-src__layer">staging</span> <a class="sql-src__node" href="/catalog#t-stg_fraud_base" title="the base CTE in scripts/fraud-snapshot.sql">Scored checkouts, last 30 days</a></li><li class="sql-src__step"><span class="sql-src__layer">mart</span> <a class="sql-src__node" href="/catalog#t-fraud_patterns" title="data/fraud-snapshot.json → patterns"><code>fraud_patterns</code></a></li></ol>
-                    <p class="sql-src__note">This query writes what&rsquo;s shown above, from the same aggregates-only snapshot the page draws; a check fails the build if it ever stops matching. <a href="/status#t-fraud_patterns">See its checks</a>.</p>
-                    <details class="sql-src__upstream">
-                        <summary>Where the numbers come from</summary>
-                        <pre class="sql-src__code" tabindex="0"><code>with base as (
-  select
-    x.transaction_id,
-    x.event_ts,
-    (x.event_ts at time zone 'America/New_York')::date as day,
-    d.decision,
-    d.score,
-    r.fraud_scoring_ms,
-    r.total_latency_ms,
-    coalesce(r.fraud_timeout, false) as fraud_timeout,
-    coalesce(t.is_fraud, false) as is_fraud,
-    t.fraud_pattern,
-    coalesce(x.total, 0) as total
-  from public.raw_transactions x
-  join public.raw_fraud_decisions d using (transaction_id)
-  left join public.raw_fraud_truth t using (transaction_id)
-  left join public.raw_checkout_responses r using (transaction_id)
-  where x.event_ts &gt;= now() - interval '30 days'
-    and d.model_version = 'rules-v0'
-),
-patterns as (
-  select
-    fraud_pattern as pattern,
-    count(*) as fraud,
-    count(*) filter (where decision &lt;&gt; 'approve') as caught
-  from base
-  where is_fraud and fraud_pattern is not null
-  group by 1
-)
-select coalesce(json_agg(patterns order by fraud desc, pattern collate "C"), '[]'::json) as patterns
-from patterns;</code></pre>
-                        <p class="sql-src__note">Part of <a href="https://github.com/lmansf/Portfolio2026/blob/main/scripts/fraud-snapshot.sql" target="_blank" rel="noopener">the read-only query</a> that runs once a day on Supabase and publishes the snapshot.</p>
-                    </details>
-                </div>
-            </details>
-            <!-- /sql-source -->
-        </section>
-
         <!-- New model vs the rules -->
         <section aria-labelledby="live-compare" class="live-section" data-compare hidden>
+            <p class="eyebrow live-chapter">Chapter 2 · The real-time model</p>
             <header class="section-head">
                 <h2 class="section-head__title" id="live-compare">New model vs the rules</h2>
                 <span class="section-head__hint" data-compare-window>Same checkouts, scored by both</span>
@@ -687,6 +380,315 @@ from compare_sweep;</code></pre>
             </details>
             <!-- /sql-source -->
             <p class="section-note" data-compare-note>Flagged means the rules sent the order to review or declined it, or the new model marked it as fraud. Only checkouts the new model scored live, one at a time, are compared, so this is an early read on a small sample. A one-off batch rescore of older orders on Nov 14 is left out, because it gave nearly every order the same score. Checkouts also paused on Nov 15 from about 8:30 AM to 3 PM ET.</p>
+        </section>
+
+        <!-- Headline numbers -->
+        <section aria-labelledby="live-kpis" class="live-section">
+            <p class="eyebrow live-chapter">Chapter 1 · The rules</p>
+            <header class="section-head">
+                <h2 class="section-head__title" id="live-kpis">The last 30 days</h2>
+                <span class="section-head__hint" data-live-window>Every checkout the pipeline scored</span>
+            </header>
+            <div class="live-kpis" data-sql-piece="live-totals">
+                <div class="live-kpi">
+                    <p class="live-kpi__label">Checkouts scored</p>
+                    <p class="live-kpi__value" data-kpi="checkouts">–</p>
+                    <p class="live-kpi__sub" data-kpi-sub="checkouts">&nbsp;</p>
+                </div>
+                <div class="live-kpi">
+                    <p class="live-kpi__label">Fraud caught</p>
+                    <p class="live-kpi__value" data-kpi="caught">–</p>
+                    <p class="live-kpi__sub" data-kpi-sub="caught">&nbsp;</p>
+                </div>
+                <div class="live-kpi">
+                    <p class="live-kpi__label">Good customers declined</p>
+                    <p class="live-kpi__value" data-kpi="false-declines">–</p>
+                    <p class="live-kpi__sub" data-kpi-sub="false-declines">&nbsp;</p>
+                </div>
+                <div class="live-kpi">
+                    <p class="live-kpi__label">Fraud dollars stopped</p>
+                    <p class="live-kpi__value" data-kpi="dollars">–</p>
+                    <p class="live-kpi__sub" data-kpi-sub="dollars">&nbsp;</p>
+                </div>
+                <div class="live-kpi">
+                    <p class="live-kpi__label">Scoring time, 95th percentile</p>
+                    <p class="live-kpi__value" data-kpi="latency">–</p>
+                    <p class="live-kpi__sub" data-kpi-sub="latency">&nbsp;</p>
+                </div>
+            </div>
+            <p class="section-note">&ldquo;Caught&rdquo; means the model sent the order to review or declined it. Fraud is measured against the generator&rsquo;s answer key; in production those labels arrive weeks later, as chargebacks.</p>
+            <!-- sql-source: live-totals -->
+            <details class="sql-src" data-sql-source="live-totals" data-sql-label="the last 30 days totals">
+                <summary class="sql-src__toggle" aria-label="SQL source for the last 30 days totals">SQL source<span class="sql-src__trust" data-sql-trust hidden></span></summary>
+                <div class="sql-src__panel">
+                    <pre class="sql-src__code" tabindex="0"><code>SELECT
+    checkouts, flagged, fraud, fraud_caught, legit, false_declines,
+    fraud_dollars_stopped, fraud_dollars_approved,
+    p95_scoring_ms, scoring_timeouts, active_days
+FROM fraud_totals;</code></pre>
+                    <ol class="sql-src__lineage" aria-label="Lineage, from raw source to the table this query reads"><li class="sql-src__step"><span class="sql-src__layer">raw</span> <a class="sql-src__node" href="/catalog#t-fraud_supabase" title="raw_transactions, raw_fraud_decisions, raw_fraud_truth, raw_checkout_responses">Supabase checkout tables</a></li><li class="sql-src__step"><span class="sql-src__layer">staging</span> <a class="sql-src__node" href="/catalog#t-stg_fraud_base" title="the base CTE in scripts/fraud-snapshot.sql">Scored checkouts, last 30 days</a></li><li class="sql-src__step"><span class="sql-src__layer">mart</span> <a class="sql-src__node" href="/catalog#t-fraud_totals" title="data/fraud-snapshot.json → totals"><code>fraud_totals</code></a></li></ol>
+                    <p class="sql-src__note">This query writes what&rsquo;s shown above, from the same aggregates-only snapshot the page draws; a check fails the build if it ever stops matching. <a href="/status#t-fraud_totals">See its checks</a>.</p>
+                    <details class="sql-src__upstream">
+                        <summary>Where the numbers come from</summary>
+                        <pre class="sql-src__code" tabindex="0"><code>with base as (
+  select
+    x.transaction_id,
+    x.event_ts,
+    (x.event_ts at time zone 'America/New_York')::date as day,
+    d.decision,
+    d.score,
+    r.fraud_scoring_ms,
+    r.total_latency_ms,
+    coalesce(r.fraud_timeout, false) as fraud_timeout,
+    coalesce(t.is_fraud, false) as is_fraud,
+    t.fraud_pattern,
+    coalesce(x.total, 0) as total
+  from public.raw_transactions x
+  join public.raw_fraud_decisions d using (transaction_id)
+  left join public.raw_fraud_truth t using (transaction_id)
+  left join public.raw_checkout_responses r using (transaction_id)
+  where x.event_ts &gt;= now() - interval '30 days'
+    and d.model_version = 'rules-v0'
+),
+totals as (
+  select
+    count(*) as checkouts,
+    count(*) filter (where decision &lt;&gt; 'approve') as flagged,
+    count(*) filter (where decision = 'decline') as declined,
+    count(*) filter (where decision = 'review') as reviewed,
+    count(*) filter (where is_fraud) as fraud,
+    count(*) filter (where is_fraud and decision &lt;&gt; 'approve') as fraud_caught,
+    count(*) filter (where not is_fraud and decision = 'decline') as false_declines,
+    count(*) filter (where not is_fraud) as legit,
+    round(sum(total) filter (where is_fraud and decision &lt;&gt; 'approve'), 2)::float8 as fraud_dollars_stopped,
+    round(sum(total) filter (where is_fraud and decision = 'approve'), 2)::float8 as fraud_dollars_approved,
+    round((percentile_cont(0.5) within group (order by fraud_scoring_ms))::numeric, 1)::float8 as p50_scoring_ms,
+    round((percentile_cont(0.95) within group (order by fraud_scoring_ms))::numeric, 1)::float8 as p95_scoring_ms,
+    round((percentile_cont(0.95) within group (order by total_latency_ms))::numeric, 0)::float8 as p95_checkout_ms,
+    count(*) filter (where fraud_timeout) as scoring_timeouts,
+    count(distinct day) as active_days
+  from base
+)
+select row_to_json(totals) as totals from totals;</code></pre>
+                        <p class="sql-src__note">Part of <a href="https://github.com/lmansf/Portfolio2026/blob/main/scripts/fraud-snapshot.sql" target="_blank" rel="noopener">the read-only query</a> that runs once a day on Supabase and publishes the snapshot.</p>
+                    </details>
+                </div>
+            </details>
+            <!-- /sql-source -->
+        </section>
+
+        <!-- Daily trend -->
+        <section aria-labelledby="live-daily" class="live-section">
+            <header class="section-head">
+                <h2 class="section-head__title" id="live-daily">Fraud per day</h2>
+                <span class="section-head__hint">Caught versus missed</span>
+            </header>
+            <div class="live-card" data-sql-piece="live-daily">
+                <ul class="live-legend" aria-label="Legend">
+                    <li><span class="live-swatch live-swatch--caught" aria-hidden="true"></span>Caught</li>
+                    <li><span class="live-swatch live-swatch--missed" aria-hidden="true"></span>Missed</li>
+                </ul>
+                <div class="live-chart" data-chart="daily" role="group" aria-label="Fraudulent checkouts per day, caught and missed"></div>
+                <p class="live-caption" data-caption="daily">&nbsp;</p>
+            </div>
+            <details class="live-table">
+                <summary>See the daily numbers as a table</summary>
+                <div class="live-table__scroll">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th scope="col">Day</th>
+                                <th scope="col">Checkouts</th>
+                                <th scope="col">Reviewed</th>
+                                <th scope="col">Declined</th>
+                                <th scope="col">Fraud</th>
+                                <th scope="col">Caught</th>
+                                <th scope="col">Good customers declined</th>
+                                <th scope="col">Fraud $ stopped</th>
+                            </tr>
+                        </thead>
+                        <tbody data-table="daily"></tbody>
+                    </table>
+                </div>
+            </details>
+            <!-- sql-source: live-daily -->
+            <details class="sql-src" data-sql-source="live-daily" data-sql-label="the fraud per day chart">
+                <summary class="sql-src__toggle" aria-label="SQL source for the fraud per day chart">SQL source<span class="sql-src__trust" data-sql-trust hidden></span></summary>
+                <div class="sql-src__panel">
+                    <pre class="sql-src__code" tabindex="0"><code>SELECT
+    day, checkouts, reviewed, declined,
+    fraud, fraud_caught, false_declines, fraud_dollars_stopped
+FROM fraud_daily
+ORDER BY day;</code></pre>
+                    <ol class="sql-src__lineage" aria-label="Lineage, from raw source to the table this query reads"><li class="sql-src__step"><span class="sql-src__layer">raw</span> <a class="sql-src__node" href="/catalog#t-fraud_supabase" title="raw_transactions, raw_fraud_decisions, raw_fraud_truth, raw_checkout_responses">Supabase checkout tables</a></li><li class="sql-src__step"><span class="sql-src__layer">staging</span> <a class="sql-src__node" href="/catalog#t-stg_fraud_base" title="the base CTE in scripts/fraud-snapshot.sql">Scored checkouts, last 30 days</a></li><li class="sql-src__step"><span class="sql-src__layer">mart</span> <a class="sql-src__node" href="/catalog#t-fraud_daily" title="data/fraud-snapshot.json → daily"><code>fraud_daily</code></a></li></ol>
+                    <p class="sql-src__note">This query writes what&rsquo;s shown above, from the same aggregates-only snapshot the page draws; a check fails the build if it ever stops matching. <a href="/status#t-fraud_daily">See its checks</a>.</p>
+                    <details class="sql-src__upstream">
+                        <summary>Where the numbers come from</summary>
+                        <pre class="sql-src__code" tabindex="0"><code>with base as (
+  select
+    x.transaction_id,
+    x.event_ts,
+    (x.event_ts at time zone 'America/New_York')::date as day,
+    d.decision,
+    d.score,
+    r.fraud_scoring_ms,
+    r.total_latency_ms,
+    coalesce(r.fraud_timeout, false) as fraud_timeout,
+    coalesce(t.is_fraud, false) as is_fraud,
+    t.fraud_pattern,
+    coalesce(x.total, 0) as total
+  from public.raw_transactions x
+  join public.raw_fraud_decisions d using (transaction_id)
+  left join public.raw_fraud_truth t using (transaction_id)
+  left join public.raw_checkout_responses r using (transaction_id)
+  where x.event_ts &gt;= now() - interval '30 days'
+    and d.model_version = 'rules-v0'
+),
+daily as (
+  select
+    day,
+    count(*) as checkouts,
+    count(*) filter (where decision = 'approve') as approved,
+    count(*) filter (where decision = 'review') as reviewed,
+    count(*) filter (where decision = 'decline') as declined,
+    count(*) filter (where is_fraud) as fraud,
+    count(*) filter (where is_fraud and decision &lt;&gt; 'approve') as fraud_caught,
+    count(*) filter (where not is_fraud and decision = 'decline') as false_declines,
+    round(sum(total) filter (where is_fraud and decision &lt;&gt; 'approve'), 2)::float8 as fraud_dollars_stopped,
+    round(sum(total) filter (where is_fraud and decision = 'approve'), 2)::float8 as fraud_dollars_approved,
+    round((percentile_cont(0.95) within group (order by fraud_scoring_ms))::numeric, 1)::float8 as p95_scoring_ms
+  from base
+  group by day
+)
+select coalesce(json_agg(daily order by day), '[]'::json) as daily from daily;</code></pre>
+                        <p class="sql-src__note">Part of <a href="https://github.com/lmansf/Portfolio2026/blob/main/scripts/fraud-snapshot.sql" target="_blank" rel="noopener">the read-only query</a> that runs once a day on Supabase and publishes the snapshot.</p>
+                    </details>
+                </div>
+            </details>
+            <!-- /sql-source -->
+        </section>
+
+        <!-- Score distribution -->
+        <section aria-labelledby="live-scores" class="live-section">
+            <header class="section-head">
+                <h2 class="section-head__title" id="live-scores">Where the model&rsquo;s scores fall</h2>
+                <span class="section-head__hint">Share of each group by risk score</span>
+            </header>
+            <div class="live-card" data-sql-piece="live-scores">
+                <ul class="live-legend" aria-label="Legend">
+                    <li><span class="live-swatch live-swatch--legit" aria-hidden="true"></span>Good customers</li>
+                    <li><span class="live-swatch live-swatch--fraud" aria-hidden="true"></span>Fraud</li>
+                </ul>
+                <div class="live-chart" data-chart="scores" role="group" aria-label="Distribution of risk scores for good customers and for fraud"></div>
+                <p class="live-caption" data-caption="scores">&nbsp;</p>
+            </div>
+            <!-- sql-source: live-scores -->
+            <details class="sql-src" data-sql-source="live-scores" data-sql-label="the score distribution chart">
+                <summary class="sql-src__toggle" aria-label="SQL source for the score distribution chart">SQL source<span class="sql-src__trust" data-sql-trust hidden></span></summary>
+                <div class="sql-src__panel">
+                    <pre class="sql-src__code" tabindex="0"><code>SELECT score_from, score_to, legit, fraud
+FROM fraud_score_bins
+ORDER BY score_from;</code></pre>
+                    <ol class="sql-src__lineage" aria-label="Lineage, from raw source to the table this query reads"><li class="sql-src__step"><span class="sql-src__layer">raw</span> <a class="sql-src__node" href="/catalog#t-fraud_supabase" title="raw_transactions, raw_fraud_decisions, raw_fraud_truth, raw_checkout_responses">Supabase checkout tables</a></li><li class="sql-src__step"><span class="sql-src__layer">staging</span> <a class="sql-src__node" href="/catalog#t-stg_fraud_base" title="the base CTE in scripts/fraud-snapshot.sql">Scored checkouts, last 30 days</a></li><li class="sql-src__step"><span class="sql-src__layer">mart</span> <a class="sql-src__node" href="/catalog#t-fraud_score_bins" title="data/fraud-snapshot.json → score_bins"><code>fraud_score_bins</code></a></li></ol>
+                    <p class="sql-src__note">This query writes what&rsquo;s shown above, from the same aggregates-only snapshot the page draws; a check fails the build if it ever stops matching. <a href="/status#t-fraud_score_bins">See its checks</a>.</p>
+                    <details class="sql-src__upstream">
+                        <summary>Where the numbers come from</summary>
+                        <pre class="sql-src__code" tabindex="0"><code>with base as (
+  select
+    x.transaction_id,
+    x.event_ts,
+    (x.event_ts at time zone 'America/New_York')::date as day,
+    d.decision,
+    d.score,
+    r.fraud_scoring_ms,
+    r.total_latency_ms,
+    coalesce(r.fraud_timeout, false) as fraud_timeout,
+    coalesce(t.is_fraud, false) as is_fraud,
+    t.fraud_pattern,
+    coalesce(x.total, 0) as total
+  from public.raw_transactions x
+  join public.raw_fraud_decisions d using (transaction_id)
+  left join public.raw_fraud_truth t using (transaction_id)
+  left join public.raw_checkout_responses r using (transaction_id)
+  where x.event_ts &gt;= now() - interval '30 days'
+    and d.model_version = 'rules-v0'
+),
+bins as (
+  select
+    least(floor(score * 20)::int, 19) as bin,
+    count(*) filter (where not is_fraud) as legit,
+    count(*) filter (where is_fraud) as fraud
+  from base
+  group by 1
+)
+select coalesce(json_agg(json_build_object(
+         'from', round(bin / 20.0, 2)::float8, 'to', round((bin + 1) / 20.0, 2)::float8,
+         'legit', legit, 'fraud', fraud) order by bin), '[]'::json) as score_bins
+from bins;</code></pre>
+                        <p class="sql-src__note">Part of <a href="https://github.com/lmansf/Portfolio2026/blob/main/scripts/fraud-snapshot.sql" target="_blank" rel="noopener">the read-only query</a> that runs once a day on Supabase and publishes the snapshot.</p>
+                    </details>
+                </div>
+            </details>
+            <!-- /sql-source -->
+        </section>
+
+        <!-- Patterns -->
+        <section aria-labelledby="live-patterns" class="live-section">
+            <header class="section-head">
+                <h2 class="section-head__title" id="live-patterns">Catch rate by fraud pattern</h2>
+                <span class="section-head__hint">Where the rules fell short</span>
+            </header>
+            <div class="live-card" data-sql-piece="live-patterns">
+                <div class="live-bars" data-chart="patterns"></div>
+                <p class="live-caption" data-caption="patterns">&nbsp;</p>
+            </div>
+            <!-- sql-source: live-patterns -->
+            <details class="sql-src" data-sql-source="live-patterns" data-sql-label="the catch rate by fraud pattern table">
+                <summary class="sql-src__toggle" aria-label="SQL source for the catch rate by fraud pattern table">SQL source<span class="sql-src__trust" data-sql-trust hidden></span></summary>
+                <div class="sql-src__panel">
+                    <pre class="sql-src__code" tabindex="0"><code>SELECT pattern, fraud, caught
+FROM fraud_patterns
+ORDER BY fraud DESC, pattern;</code></pre>
+                    <ol class="sql-src__lineage" aria-label="Lineage, from raw source to the table this query reads"><li class="sql-src__step"><span class="sql-src__layer">raw</span> <a class="sql-src__node" href="/catalog#t-fraud_supabase" title="raw_transactions, raw_fraud_decisions, raw_fraud_truth, raw_checkout_responses">Supabase checkout tables</a></li><li class="sql-src__step"><span class="sql-src__layer">staging</span> <a class="sql-src__node" href="/catalog#t-stg_fraud_base" title="the base CTE in scripts/fraud-snapshot.sql">Scored checkouts, last 30 days</a></li><li class="sql-src__step"><span class="sql-src__layer">mart</span> <a class="sql-src__node" href="/catalog#t-fraud_patterns" title="data/fraud-snapshot.json → patterns"><code>fraud_patterns</code></a></li></ol>
+                    <p class="sql-src__note">This query writes what&rsquo;s shown above, from the same aggregates-only snapshot the page draws; a check fails the build if it ever stops matching. <a href="/status#t-fraud_patterns">See its checks</a>.</p>
+                    <details class="sql-src__upstream">
+                        <summary>Where the numbers come from</summary>
+                        <pre class="sql-src__code" tabindex="0"><code>with base as (
+  select
+    x.transaction_id,
+    x.event_ts,
+    (x.event_ts at time zone 'America/New_York')::date as day,
+    d.decision,
+    d.score,
+    r.fraud_scoring_ms,
+    r.total_latency_ms,
+    coalesce(r.fraud_timeout, false) as fraud_timeout,
+    coalesce(t.is_fraud, false) as is_fraud,
+    t.fraud_pattern,
+    coalesce(x.total, 0) as total
+  from public.raw_transactions x
+  join public.raw_fraud_decisions d using (transaction_id)
+  left join public.raw_fraud_truth t using (transaction_id)
+  left join public.raw_checkout_responses r using (transaction_id)
+  where x.event_ts &gt;= now() - interval '30 days'
+    and d.model_version = 'rules-v0'
+),
+patterns as (
+  select
+    fraud_pattern as pattern,
+    count(*) as fraud,
+    count(*) filter (where decision &lt;&gt; 'approve') as caught
+  from base
+  where is_fraud and fraud_pattern is not null
+  group by 1
+)
+select coalesce(json_agg(patterns order by fraud desc, pattern collate "C"), '[]'::json) as patterns
+from patterns;</code></pre>
+                        <p class="sql-src__note">Part of <a href="https://github.com/lmansf/Portfolio2026/blob/main/scripts/fraud-snapshot.sql" target="_blank" rel="noopener">the read-only query</a> that runs once a day on Supabase and publishes the snapshot.</p>
+                    </details>
+                </div>
+            </details>
+            <!-- /sql-source -->
         </section>
 
         <!-- How it works -->
