@@ -1,82 +1,98 @@
 {
   "_about": "Written by scripts/data_run.py on every data run. latest is the newest run in full; history is the last 30 runs, newest first. /status and the SQL source trust badges read it.",
   "latest": {
-    "id": "2026-11-15T13:59:00Z",
-    "started_at": "2026-11-15T13:59:00Z",
-    "finished_at": "2026-11-15T13:59:07Z",
-    "seconds": 7.0,
-    "trigger": "nightly",
-    "commit": "072e087",
-    "status": "failed",
-    "passed": 76,
-    "total": 81,
+    "id": "2026-11-15T23:18:07Z",
+    "started_at": "2026-11-15T23:18:07Z",
+    "finished_at": "2026-11-15T23:18:11Z",
+    "seconds": 4.0,
+    "trigger": "after a merge",
+    "commit": "37c2f8f",
+    "status": "passed",
+    "passed": 122,
+    "total": 122,
     "sources": [
       {
         "name": "site_pages",
         "status": "ok",
-        "as_of": "2026-11-15T13:59:00Z",
+        "as_of": "2026-11-15T23:18:07Z",
         "detail": "Rebuilt the site tables from index.html and projects.html."
       },
       {
         "name": "fraud_snapshot",
         "status": "ok",
-        "as_of": "2026-11-02T17:19:37Z",
+        "as_of": "2026-11-15T22:27:45Z",
         "detail": "Read data/fraud-snapshot.json, published from Supabase by the Fraud snapshot job."
       },
       {
         "name": "github",
         "status": "ok",
-        "as_of": "2026-11-15T13:59:00Z",
+        "as_of": "2026-11-15T23:18:07Z",
         "detail": "Pulled 300 public events and 68 public repositories."
       }
     ],
     "tables": {
       "projects": {
-        "as_of": "2026-11-15T13:59:00Z",
+        "as_of": "2026-11-15T23:18:07Z",
         "rows": 11
       },
       "experience": {
-        "as_of": "2026-11-15T13:59:00Z",
+        "as_of": "2026-11-15T23:18:07Z",
         "rows": 3
       },
       "skills": {
-        "as_of": "2026-11-15T13:59:00Z",
+        "as_of": "2026-11-15T23:18:07Z",
         "rows": 14
       },
       "credentials": {
-        "as_of": "2026-11-15T13:59:00Z",
+        "as_of": "2026-11-15T23:18:07Z",
         "rows": 3
       },
       "resume": {
-        "as_of": "2026-11-15T13:59:00Z",
+        "as_of": "2026-11-15T23:18:07Z",
         "rows": 1
       },
       "fraud_totals": {
-        "as_of": "2026-11-02T17:19:37Z",
+        "as_of": "2026-11-15T22:27:45Z",
         "rows": 1
       },
       "fraud_daily": {
-        "as_of": "2026-11-02T17:19:37Z",
-        "rows": 15
+        "as_of": "2026-11-15T22:27:45Z",
+        "rows": 23
       },
       "fraud_score_bins": {
-        "as_of": "2026-11-02T17:19:37Z",
+        "as_of": "2026-11-15T22:27:45Z",
         "rows": 16
       },
       "fraud_patterns": {
-        "as_of": "2026-11-02T17:19:37Z",
+        "as_of": "2026-11-15T22:27:45Z",
         "rows": 5
       },
+      "fraud_compare": {
+        "as_of": "2026-11-15T22:27:45Z",
+        "rows": 2
+      },
+      "fraud_compare_patterns": {
+        "as_of": "2026-11-15T22:27:45Z",
+        "rows": 10
+      },
+      "fraud_compare_sweep": {
+        "as_of": "2026-11-15T22:27:45Z",
+        "rows": 10
+      },
+      "fraud_compare_day_one": {
+        "as_of": "2026-11-15T22:27:45Z",
+        "rows": 2
+      },
       "fraud_metrics": {
-        "as_of": "2026-11-02T17:19:37Z",
-        "rows": 7
+        "as_of": "2026-11-15T22:27:45Z",
+        "rows": 9
       },
       "github_activity": {
-        "as_of": "2026-11-15T13:59:00Z",
+        "as_of": "2026-11-15T23:18:07Z",
         "rows": 11
       },
       "github_repos": {
-        "as_of": "2026-11-15T13:59:00Z",
+        "as_of": "2026-11-15T23:18:07Z",
         "rows": 68
       }
     },
@@ -295,8 +311,8 @@
         "id": "fraud_totals.freshness",
         "node": "fraud_totals",
         "name": "updated within 36 hours",
-        "status": "fail",
-        "detail": "13 days old"
+        "status": "pass",
+        "detail": "under an hour old"
       },
       {
         "id": "fraud_daily.documented",
@@ -310,7 +326,7 @@
         "node": "fraud_daily",
         "name": "at least 1 row",
         "status": "pass",
-        "detail": "15 rows"
+        "detail": "23 rows"
       },
       {
         "id": "fraud_daily.not_null",
@@ -344,8 +360,8 @@
         "id": "fraud_daily.freshness",
         "node": "fraud_daily",
         "name": "updated within 36 hours",
-        "status": "fail",
-        "detail": "13 days old"
+        "status": "pass",
+        "detail": "under an hour old"
       },
       {
         "id": "fraud_score_bins.documented",
@@ -386,8 +402,8 @@
         "id": "fraud_score_bins.freshness",
         "node": "fraud_score_bins",
         "name": "updated within 36 hours",
-        "status": "fail",
-        "detail": "13 days old"
+        "status": "pass",
+        "detail": "under an hour old"
       },
       {
         "id": "fraud_patterns.documented",
@@ -428,8 +444,239 @@
         "id": "fraud_patterns.freshness",
         "node": "fraud_patterns",
         "name": "updated within 36 hours",
-        "status": "fail",
-        "detail": "13 days old"
+        "status": "pass",
+        "detail": "under an hour old"
+      },
+      {
+        "id": "fraud_compare.documented",
+        "node": "fraud_compare",
+        "name": "every column is described",
+        "status": "pass",
+        "detail": "9 columns described"
+      },
+      {
+        "id": "fraud_compare.row_count",
+        "node": "fraud_compare",
+        "name": "exactly 2 rows",
+        "status": "pass",
+        "detail": "2 rows"
+      },
+      {
+        "id": "fraud_compare.unique_scorer",
+        "node": "fraud_compare",
+        "name": "scorer is unique",
+        "status": "pass",
+        "detail": "no repeats"
+      },
+      {
+        "id": "fraud_compare.accepted_values",
+        "node": "fraud_compare",
+        "name": "scorer is one of rules, model",
+        "status": "pass",
+        "detail": "all expected"
+      },
+      {
+        "id": "fraud_compare.not_null",
+        "node": "fraud_compare",
+        "name": "no blanks in scorer, checkouts, fraud, legit, flagged, caught",
+        "status": "pass",
+        "detail": "none blank"
+      },
+      {
+        "id": "fraud_compare.fraud_plus_legit_equals_checkouts",
+        "node": "fraud_compare",
+        "name": "fraud plus legit equals checkouts",
+        "status": "pass",
+        "detail": "holds on every row"
+      },
+      {
+        "id": "fraud_compare.caught_fraud_is_no_more_than_flagged_or_all_fraud",
+        "node": "fraud_compare",
+        "name": "caught fraud is no more than flagged or all fraud",
+        "status": "pass",
+        "detail": "holds on every row"
+      },
+      {
+        "id": "fraud_compare.both_scorers_saw_the_same_checkouts",
+        "node": "fraud_compare",
+        "name": "both scorers saw the same checkouts",
+        "status": "pass",
+        "detail": "holds"
+      },
+      {
+        "id": "fraud_compare.freshness",
+        "node": "fraud_compare",
+        "name": "updated within 36 hours",
+        "status": "pass",
+        "detail": "under an hour old"
+      },
+      {
+        "id": "fraud_compare_patterns.documented",
+        "node": "fraud_compare_patterns",
+        "name": "every column is described",
+        "status": "pass",
+        "detail": "4 columns described"
+      },
+      {
+        "id": "fraud_compare_patterns.row_count",
+        "node": "fraud_compare_patterns",
+        "name": "at least 2 rows",
+        "status": "pass",
+        "detail": "10 rows"
+      },
+      {
+        "id": "fraud_compare_patterns.unique_pattern_scorer",
+        "node": "fraud_compare_patterns",
+        "name": "pattern and scorer are unique together",
+        "status": "pass",
+        "detail": "no repeats"
+      },
+      {
+        "id": "fraud_compare_patterns.accepted_values",
+        "node": "fraud_compare_patterns",
+        "name": "scorer is one of rules, model",
+        "status": "pass",
+        "detail": "all expected"
+      },
+      {
+        "id": "fraud_compare_patterns.accepted_values_",
+        "node": "fraud_compare_patterns",
+        "name": "pattern is one of card_testing, stolen_card_resale, gift_card_cashout, account_takeover, fraud_ring",
+        "status": "pass",
+        "detail": "all expected"
+      },
+      {
+        "id": "fraud_compare_patterns.caught_fraud_is_no_more_than_all_fraud",
+        "node": "fraud_compare_patterns",
+        "name": "caught fraud is no more than all fraud",
+        "status": "pass",
+        "detail": "holds on every row"
+      },
+      {
+        "id": "fraud_compare_patterns.the_patterns_add_up_to_each_scorer_s_catches",
+        "node": "fraud_compare_patterns",
+        "name": "the patterns add up to each scorer's catches",
+        "status": "pass",
+        "detail": "holds"
+      },
+      {
+        "id": "fraud_compare_patterns.freshness",
+        "node": "fraud_compare_patterns",
+        "name": "updated within 36 hours",
+        "status": "pass",
+        "detail": "under an hour old"
+      },
+      {
+        "id": "fraud_compare_sweep.documented",
+        "node": "fraud_compare_sweep",
+        "name": "every column is described",
+        "status": "pass",
+        "detail": "4 columns described"
+      },
+      {
+        "id": "fraud_compare_sweep.row_count",
+        "node": "fraud_compare_sweep",
+        "name": "at least 2 rows",
+        "status": "pass",
+        "detail": "10 rows"
+      },
+      {
+        "id": "fraud_compare_sweep.unique_scorer_cutoff",
+        "node": "fraud_compare_sweep",
+        "name": "scorer and cutoff are unique together",
+        "status": "pass",
+        "detail": "no repeats"
+      },
+      {
+        "id": "fraud_compare_sweep.accepted_values",
+        "node": "fraud_compare_sweep",
+        "name": "scorer is one of rules, model",
+        "status": "pass",
+        "detail": "all expected"
+      },
+      {
+        "id": "fraud_compare_sweep.cutoffs_sit_between_0_and_1",
+        "node": "fraud_compare_sweep",
+        "name": "cutoffs sit between 0 and 1",
+        "status": "pass",
+        "detail": "holds on every row"
+      },
+      {
+        "id": "fraud_compare_sweep.caught_fraud_is_no_more_than_flagged",
+        "node": "fraud_compare_sweep",
+        "name": "caught fraud is no more than flagged",
+        "status": "pass",
+        "detail": "holds on every row"
+      },
+      {
+        "id": "fraud_compare_sweep.freshness",
+        "node": "fraud_compare_sweep",
+        "name": "updated within 36 hours",
+        "status": "pass",
+        "detail": "under an hour old"
+      },
+      {
+        "id": "fraud_compare_day_one.documented",
+        "node": "fraud_compare_day_one",
+        "name": "every column is described",
+        "status": "pass",
+        "detail": "8 columns described"
+      },
+      {
+        "id": "fraud_compare_day_one.row_count",
+        "node": "fraud_compare_day_one",
+        "name": "exactly 2 rows",
+        "status": "pass",
+        "detail": "2 rows"
+      },
+      {
+        "id": "fraud_compare_day_one.unique_scorer",
+        "node": "fraud_compare_day_one",
+        "name": "scorer is unique",
+        "status": "pass",
+        "detail": "no repeats"
+      },
+      {
+        "id": "fraud_compare_day_one.accepted_values",
+        "node": "fraud_compare_day_one",
+        "name": "scorer is one of rules, model",
+        "status": "pass",
+        "detail": "all expected"
+      },
+      {
+        "id": "fraud_compare_day_one.not_null",
+        "node": "fraud_compare_day_one",
+        "name": "no blanks in scorer, window_start, window_end, checkouts, fraud, legit, flagged, caught",
+        "status": "pass",
+        "detail": "none blank"
+      },
+      {
+        "id": "fraud_compare_day_one.fraud_plus_legit_equals_checkouts",
+        "node": "fraud_compare_day_one",
+        "name": "fraud plus legit equals checkouts",
+        "status": "pass",
+        "detail": "holds on every row"
+      },
+      {
+        "id": "fraud_compare_day_one.caught_fraud_is_no_more_than_flagged_or_all_fraud",
+        "node": "fraud_compare_day_one",
+        "name": "caught fraud is no more than flagged or all fraud",
+        "status": "pass",
+        "detail": "holds on every row"
+      },
+      {
+        "id": "fraud_compare_day_one.the_window_is_the_fixed_first_24_hours",
+        "node": "fraud_compare_day_one",
+        "name": "the window is the fixed first 24 hours",
+        "status": "pass",
+        "detail": "holds on every row"
+      },
+      {
+        "id": "fraud_compare_day_one.freshness",
+        "node": "fraud_compare_day_one",
+        "name": "updated within 36 hours",
+        "status": "pass",
+        "detail": "under an hour old"
       },
       {
         "id": "fraud_metrics.documented",
@@ -470,8 +717,8 @@
         "id": "fraud_metrics.freshness",
         "node": "fraud_metrics",
         "name": "updated within 36 hours",
-        "status": "fail",
-        "detail": "13 days old"
+        "status": "pass",
+        "detail": "under an hour old"
       },
       {
         "id": "github_activity.documented",
@@ -555,21 +802,56 @@
         "node": "fraud_metrics",
         "name": "a row for every metric in metrics.json",
         "status": "pass",
-        "detail": "7 metrics"
+        "detail": "9 metrics"
       },
       {
         "id": "fraud_metrics.claim_flagged_about_half_the_fraud",
         "node": "fraud_metrics",
         "name": "Home and Projects say \"flagged about half the fraud\": catch rate is between 40% and 60%",
         "status": "pass",
-        "detail": "50.4% (1,128 of 2,237)"
+        "detail": "51% (1,668 of 3,269)"
       },
       {
         "id": "fraud_metrics.claim_and_no_legitimate_orders",
         "node": "fraud_metrics",
         "name": "Home and Projects say \"and no legitimate orders\": good customers flagged is 0%",
         "status": "pass",
-        "detail": "0% (0 of 36,679)"
+        "detail": "0% (0 of 52,548)"
+      },
+      {
+        "id": "fraud_compare_day_one.claim_caught_110_of_111_fraudulent_orders_in_its_first_24_hours_li",
+        "node": "fraud_compare_day_one",
+        "name": "Home and Projects say \"caught 110 of 111 fraudulent orders in its first 24 hours live\": catch rate is 110 of 111 on fraud_compare_day_one (scorer model)",
+        "status": "pass",
+        "detail": "110 of 111"
+      },
+      {
+        "id": "fraud_compare_day_one.claim_the_new_model_caught_110_of_111_fraudulent_orders",
+        "node": "fraud_compare_day_one",
+        "name": "Projects says \"the new model caught 110 of 111 fraudulent orders\": catch rate is 110 of 111 on fraud_compare_day_one (scorer model)",
+        "status": "pass",
+        "detail": "110 of 111"
+      },
+      {
+        "id": "fraud_compare_day_one.claim_where_the_rules_caught_52",
+        "node": "fraud_compare_day_one",
+        "name": "Projects says \"where the rules caught 52\": catch rate is 52 of 111 on fraud_compare_day_one (scorer rules)",
+        "status": "pass",
+        "detail": "52 of 111"
+      },
+      {
+        "id": "fraud_compare_day_one.claim_25_good_orders_flagged_out_of_1_964",
+        "node": "fraud_compare_day_one",
+        "name": "Projects says \"25 good orders flagged out of 1,964\": good customers flagged is 25 of 1,964 on fraud_compare_day_one (scorer model)",
+        "status": "pass",
+        "detail": "25 of 1,964"
+      },
+      {
+        "id": "fraud_compare_day_one.claim_110_of_111_caught",
+        "node": "fraud_compare_day_one",
+        "name": "Projects says \"110 of 111 caught\": catch rate is 110 of 111 on fraud_compare_day_one (scorer model)",
+        "status": "pass",
+        "detail": "110 of 111"
       },
       {
         "id": "now.matches_page",
@@ -658,11 +940,35 @@
         "status": "pass",
         "detail": "matches",
         "piece": "live-patterns"
+      },
+      {
+        "id": "live-compare.matches_page",
+        "node": "fraud_compare",
+        "name": "Live data: the SQL source for the new model vs rules table returns the snapshot's numbers",
+        "status": "pass",
+        "detail": "matches",
+        "piece": "live-compare"
+      },
+      {
+        "id": "live-compare-patterns.matches_page",
+        "node": "fraud_compare_patterns",
+        "name": "Live data: the SQL source for the new model vs rules by fraud pattern chart returns the snapshot's numbers",
+        "status": "pass",
+        "detail": "matches",
+        "piece": "live-compare-patterns"
+      },
+      {
+        "id": "live-compare-sweep.matches_page",
+        "node": "fraud_compare_sweep",
+        "name": "Live data: the SQL source for the other cutoffs table returns the snapshot's numbers",
+        "status": "pass",
+        "detail": "matches",
+        "piece": "live-compare-sweep"
       }
     ],
     "pieces": {
       "now": {
-        "as_of": "2026-11-15T13:59:00Z",
+        "as_of": "2026-11-15T23:18:07Z",
         "max_hours": 36,
         "checks": [
           "resume.documented",
@@ -672,7 +978,7 @@
         ]
       },
       "featured": {
-        "as_of": "2026-11-15T13:59:00Z",
+        "as_of": "2026-11-15T23:18:07Z",
         "max_hours": 36,
         "checks": [
           "projects.documented",
@@ -686,7 +992,7 @@
         ]
       },
       "experience": {
-        "as_of": "2026-11-15T13:59:00Z",
+        "as_of": "2026-11-15T23:18:07Z",
         "max_hours": 36,
         "checks": [
           "experience.documented",
@@ -698,7 +1004,7 @@
         ]
       },
       "credentials": {
-        "as_of": "2026-11-15T13:59:00Z",
+        "as_of": "2026-11-15T23:18:07Z",
         "max_hours": 36,
         "checks": [
           "credentials.documented",
@@ -709,7 +1015,7 @@
         ]
       },
       "toolkit": {
-        "as_of": "2026-11-15T13:59:00Z",
+        "as_of": "2026-11-15T23:18:07Z",
         "max_hours": 36,
         "checks": [
           "skills.documented",
@@ -721,7 +1027,7 @@
         ]
       },
       "projects-featured": {
-        "as_of": "2026-11-15T13:59:00Z",
+        "as_of": "2026-11-15T23:18:07Z",
         "max_hours": 36,
         "checks": [
           "projects.documented",
@@ -735,7 +1041,7 @@
         ]
       },
       "projects-more": {
-        "as_of": "2026-11-15T13:59:00Z",
+        "as_of": "2026-11-15T23:18:07Z",
         "max_hours": 36,
         "checks": [
           "projects.documented",
@@ -749,7 +1055,7 @@
         ]
       },
       "live-totals": {
-        "as_of": "2026-11-02T17:19:37Z",
+        "as_of": "2026-11-15T22:27:45Z",
         "max_hours": 36,
         "checks": [
           "fraud_totals.documented",
@@ -763,7 +1069,7 @@
         ]
       },
       "live-daily": {
-        "as_of": "2026-11-02T17:19:37Z",
+        "as_of": "2026-11-15T22:27:45Z",
         "max_hours": 36,
         "checks": [
           "fraud_daily.documented",
@@ -777,7 +1083,7 @@
         ]
       },
       "live-scores": {
-        "as_of": "2026-11-02T17:19:37Z",
+        "as_of": "2026-11-15T22:27:45Z",
         "max_hours": 36,
         "checks": [
           "fraud_score_bins.documented",
@@ -790,7 +1096,7 @@
         ]
       },
       "live-patterns": {
-        "as_of": "2026-11-02T17:19:37Z",
+        "as_of": "2026-11-15T22:27:45Z",
         "max_hours": 36,
         "checks": [
           "fraud_patterns.documented",
@@ -801,10 +1107,64 @@
           "fraud_patterns.freshness",
           "live-patterns.matches_page"
         ]
+      },
+      "live-compare": {
+        "as_of": "2026-11-15T22:27:45Z",
+        "max_hours": 36,
+        "checks": [
+          "fraud_compare.documented",
+          "fraud_compare.row_count",
+          "fraud_compare.unique_scorer",
+          "fraud_compare.accepted_values",
+          "fraud_compare.not_null",
+          "fraud_compare.fraud_plus_legit_equals_checkouts",
+          "fraud_compare.caught_fraud_is_no_more_than_flagged_or_all_fraud",
+          "fraud_compare.both_scorers_saw_the_same_checkouts",
+          "fraud_compare.freshness",
+          "live-compare.matches_page"
+        ]
+      },
+      "live-compare-patterns": {
+        "as_of": "2026-11-15T22:27:45Z",
+        "max_hours": 36,
+        "checks": [
+          "fraud_compare_patterns.documented",
+          "fraud_compare_patterns.row_count",
+          "fraud_compare_patterns.unique_pattern_scorer",
+          "fraud_compare_patterns.accepted_values",
+          "fraud_compare_patterns.accepted_values_",
+          "fraud_compare_patterns.caught_fraud_is_no_more_than_all_fraud",
+          "fraud_compare_patterns.the_patterns_add_up_to_each_scorer_s_catches",
+          "fraud_compare_patterns.freshness",
+          "live-compare-patterns.matches_page"
+        ]
+      },
+      "live-compare-sweep": {
+        "as_of": "2026-11-15T22:27:45Z",
+        "max_hours": 36,
+        "checks": [
+          "fraud_compare_sweep.documented",
+          "fraud_compare_sweep.row_count",
+          "fraud_compare_sweep.unique_scorer_cutoff",
+          "fraud_compare_sweep.accepted_values",
+          "fraud_compare_sweep.cutoffs_sit_between_0_and_1",
+          "fraud_compare_sweep.caught_fraud_is_no_more_than_flagged",
+          "fraud_compare_sweep.freshness",
+          "live-compare-sweep.matches_page"
+        ]
       }
     }
   },
   "history": [
+    {
+      "id": "2026-11-15T23:18:07Z",
+      "finished_at": "2026-11-15T23:18:11Z",
+      "trigger": "after a merge",
+      "status": "passed",
+      "passed": 122,
+      "total": 122,
+      "failed": []
+    },
     {
       "id": "2026-11-15T13:59:00Z",
       "finished_at": "2026-11-15T13:59:07Z",

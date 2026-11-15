@@ -1,9 +1,9 @@
 {
   "_about": "Written by scripts/data_run.py: one line per SQL source caption, for the trust badge beside it (assets/sql-source.js). Full detail is in run-log.json.",
-  "run_at": "2026-11-15T13:59:07Z",
+  "run_at": "2026-11-15T23:18:11Z",
   "pieces": {
     "now": {
-      "as_of": "2026-11-15T13:59:00Z",
+      "as_of": "2026-11-15T23:18:07Z",
       "max_hours": 36,
       "passed": 4,
       "total": 4,
@@ -11,7 +11,7 @@
       "failed": []
     },
     "featured": {
-      "as_of": "2026-11-15T13:59:00Z",
+      "as_of": "2026-11-15T23:18:07Z",
       "max_hours": 36,
       "passed": 8,
       "total": 8,
@@ -19,7 +19,7 @@
       "failed": []
     },
     "experience": {
-      "as_of": "2026-11-15T13:59:00Z",
+      "as_of": "2026-11-15T23:18:07Z",
       "max_hours": 36,
       "passed": 6,
       "total": 6,
@@ -27,7 +27,7 @@
       "failed": []
     },
     "credentials": {
-      "as_of": "2026-11-15T13:59:00Z",
+      "as_of": "2026-11-15T23:18:07Z",
       "max_hours": 36,
       "passed": 5,
       "total": 5,
@@ -35,7 +35,7 @@
       "failed": []
     },
     "toolkit": {
-      "as_of": "2026-11-15T13:59:00Z",
+      "as_of": "2026-11-15T23:18:07Z",
       "max_hours": 36,
       "passed": 6,
       "total": 6,
@@ -43,7 +43,7 @@
       "failed": []
     },
     "projects-featured": {
-      "as_of": "2026-11-15T13:59:00Z",
+      "as_of": "2026-11-15T23:18:07Z",
       "max_hours": 36,
       "passed": 8,
       "total": 8,
@@ -51,7 +51,7 @@
       "failed": []
     },
     "projects-more": {
-      "as_of": "2026-11-15T13:59:00Z",
+      "as_of": "2026-11-15T23:18:07Z",
       "max_hours": 36,
       "passed": 8,
       "total": 8,
@@ -59,44 +59,60 @@
       "failed": []
     },
     "live-totals": {
-      "as_of": "2026-11-02T17:19:37Z",
+      "as_of": "2026-11-15T22:27:45Z",
       "max_hours": 36,
-      "passed": 7,
+      "passed": 8,
       "total": 8,
       "table": "fraud_totals",
-      "failed": [
-        "updated within 36 hours"
-      ]
+      "failed": []
     },
     "live-daily": {
-      "as_of": "2026-11-02T17:19:37Z",
+      "as_of": "2026-11-15T22:27:45Z",
       "max_hours": 36,
-      "passed": 7,
+      "passed": 8,
       "total": 8,
       "table": "fraud_daily",
-      "failed": [
-        "updated within 36 hours"
-      ]
+      "failed": []
     },
     "live-scores": {
-      "as_of": "2026-11-02T17:19:37Z",
+      "as_of": "2026-11-15T22:27:45Z",
       "max_hours": 36,
-      "passed": 6,
+      "passed": 7,
       "total": 7,
       "table": "fraud_score_bins",
-      "failed": [
-        "updated within 36 hours"
-      ]
+      "failed": []
     },
     "live-patterns": {
-      "as_of": "2026-11-02T17:19:37Z",
+      "as_of": "2026-11-15T22:27:45Z",
       "max_hours": 36,
-      "passed": 6,
+      "passed": 7,
       "total": 7,
       "table": "fraud_patterns",
-      "failed": [
-        "updated within 36 hours"
-      ]
+      "failed": []
+    },
+    "live-compare": {
+      "as_of": "2026-11-15T22:27:45Z",
+      "max_hours": 36,
+      "passed": 10,
+      "total": 10,
+      "table": "fraud_compare",
+      "failed": []
+    },
+    "live-compare-patterns": {
+      "as_of": "2026-11-15T22:27:45Z",
+      "max_hours": 36,
+      "passed": 9,
+      "total": 9,
+      "table": "fraud_compare_patterns",
+      "failed": []
+    },
+    "live-compare-sweep": {
+      "as_of": "2026-11-15T22:27:45Z",
+      "max_hours": 36,
+      "passed": 8,
+      "total": 8,
+      "table": "fraud_compare_sweep",
+      "failed": []
     }
   }
 }

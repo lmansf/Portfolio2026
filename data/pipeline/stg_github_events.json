@@ -1,37 +1,7 @@
 {
-  "fetched_at": "2026-11-15T13:59:00Z",
+  "fetched_at": "2026-11-15T23:18:07Z",
   "user": "lmansf",
   "events": [
-    {
-      "id": "26742124282",
-      "type": "PushEvent",
-      "repo": "lmansf/Welcome-to-Owl-Park",
-      "created_at": "2026-11-08T19:53:09Z"
-    },
-    {
-      "id": "26744090439",
-      "type": "PushEvent",
-      "repo": "lmansf/Welcome-to-Owl-Park",
-      "created_at": "2026-11-08T20:20:12Z"
-    },
-    {
-      "id": "26739263972",
-      "type": "PushEvent",
-      "repo": "lmansf/Welcome-to-Owl-Park",
-      "created_at": "2026-11-08T20:59:13Z"
-    },
-    {
-      "id": "26752224795",
-      "type": "PushEvent",
-      "repo": "lmansf/Welcome-to-Owl-Park",
-      "created_at": "2026-11-08T22:18:48Z"
-    },
-    {
-      "id": "26762174667",
-      "type": "PushEvent",
-      "repo": "lmansf/Welcome-to-Owl-Park",
-      "created_at": "2026-11-09T12:44:37Z"
-    },
     {
       "id": "26813587950",
       "type": "PushEvent",
@@ -51,18 +21,6 @@
       "created_at": "2026-11-09T13:07:23Z"
     },
     {
-      "id": "26744511421",
-      "type": "PushEvent",
-      "repo": "lmansf/Welcome-to-Owl-Park",
-      "created_at": "2026-11-09T15:53:34Z"
-    },
-    {
-      "id": "26739862311",
-      "type": "CreateEvent",
-      "repo": "lmansf/Welcome-to-Owl-Park",
-      "created_at": "2026-11-09T15:59:43Z"
-    },
-    {
       "id": "26802284063",
       "type": "CreateEvent",
       "repo": "lmansf/Welcome-to-Owl-Park",
@@ -73,30 +31,6 @@
       "type": "PushEvent",
       "repo": "lmansf/Welcome-to-Owl-Park",
       "created_at": "2026-11-09T18:28:47Z"
-    },
-    {
-      "id": "26748241888",
-      "type": "PushEvent",
-      "repo": "lmansf/Welcome-to-Owl-Park",
-      "created_at": "2026-11-09T20:09:12Z"
-    },
-    {
-      "id": "26781075157",
-      "type": "CreateEvent",
-      "repo": "lmansf/Welcome-to-Owl-Park",
-      "created_at": "2026-11-09T22:09:09Z"
-    },
-    {
-      "id": "26751686117",
-      "type": "PushEvent",
-      "repo": "lmansf/Welcome-to-Owl-Park",
-      "created_at": "2026-11-09T22:11:08Z"
-    },
-    {
-      "id": "26761980690",
-      "type": "PushEvent",
-      "repo": "lmansf/Welcome-to-Owl-Park",
-      "created_at": "2026-11-09T22:11:10Z"
     },
     {
       "id": "26873345891",
@@ -111,40 +45,10 @@
       "created_at": "2026-11-09T22:11:21Z"
     },
     {
-      "id": "26751718182",
-      "type": "PushEvent",
-      "repo": "lmansf/Welcome-to-Owl-Park",
-      "created_at": "2026-11-09T22:11:25Z"
-    },
-    {
-      "id": "26781427521",
-      "type": "PushEvent",
-      "repo": "lmansf/Welcome-to-Owl-Park",
-      "created_at": "2026-11-09T22:13:01Z"
-    },
-    {
-      "id": "26786783458",
-      "type": "CreateEvent",
-      "repo": "lmansf/Welcome-to-Owl-Park",
-      "created_at": "2026-11-09T22:13:06Z"
-    },
-    {
       "id": "26873946132",
       "type": "CreateEvent",
       "repo": "lmansf/Welcome-to-Owl-Park",
       "created_at": "2026-11-09T22:18:12Z"
-    },
-    {
-      "id": "26752162007",
-      "type": "PushEvent",
-      "repo": "lmansf/Welcome-to-Owl-Park",
-      "created_at": "2026-11-09T22:26:49Z"
-    },
-    {
-      "id": "26788716469",
-      "type": "PushEvent",
-      "repo": "lmansf/Welcome-to-Owl-Park",
-      "created_at": "2026-11-09T22:32:45Z"
     },
     {
       "id": "26827674320",
@@ -159,88 +63,16 @@
       "created_at": "2026-11-09T22:33:49Z"
     },
     {
-      "id": "26754763818",
-      "type": "CreateEvent",
-      "repo": "lmansf/Welcome-to-Owl-Park",
-      "created_at": "2026-11-09T22:56:04Z"
-    },
-    {
-      "id": "26742489811",
-      "type": "PushEvent",
-      "repo": "lmansf/Welcome-to-Owl-Park",
-      "created_at": "2026-11-09T23:28:25Z"
-    },
-    {
-      "id": "26758810662",
-      "type": "PushEvent",
-      "repo": "lmansf/Welcome-to-Owl-Park",
-      "created_at": "2026-11-09T23:28:29Z"
-    },
-    {
-      "id": "26762351425",
-      "type": "PushEvent",
-      "repo": "lmansf/Welcome-to-Owl-Park",
-      "created_at": "2026-11-10T00:24:55Z"
-    },
-    {
-      "id": "26739405552",
-      "type": "PushEvent",
-      "repo": "lmansf/Welcome-to-Owl-Park",
-      "created_at": "2026-11-10T00:26:51Z"
-    },
-    {
       "id": "26837704552",
       "type": "PushEvent",
       "repo": "lmansf/Welcome-to-Owl-Park",
       "created_at": "2026-11-10T00:27:19Z"
     },
     {
-      "id": "26739580296",
-      "type": "PushEvent",
-      "repo": "lmansf/Welcome-to-Owl-Park",
-      "created_at": "2026-11-10T00:29:28Z"
-    },
-    {
       "id": "26884943076",
       "type": "PushEvent",
       "repo": "lmansf/Welcome-to-Owl-Park",
       "created_at": "2026-11-10T00:29:42Z"
-    },
-    {
-      "id": "26745143505",
-      "type": "PushEvent",
-      "repo": "lmansf/Welcome-to-Owl-Park",
-      "created_at": "2026-11-10T00:30:57Z"
-    },
-    {
-      "id": "26745789038",
-      "type": "PushEvent",
-      "repo": "lmansf/Welcome-to-Owl-Park",
-      "created_at": "2026-11-10T00:37:57Z"
-    },
-    {
-      "id": "26745794825",
-      "type": "PushEvent",
-      "repo": "lmansf/Welcome-to-Owl-Park",
-      "created_at": "2026-11-10T00:38:01Z"
-    },
-    {
-      "id": "26745894560",
-      "type": "PushEvent",
-      "repo": "lmansf/Welcome-to-Owl-Park",
-      "created_at": "2026-11-10T00:39:10Z"
-    },
-    {
-      "id": "26775365728",
-      "type": "PushEvent",
-      "repo": "lmansf/Welcome-to-Owl-Park",
-      "created_at": "2026-11-10T00:39:16Z"
-    },
-    {
-      "id": "26742671961",
-      "type": "PushEvent",
-      "repo": "lmansf/Welcome-to-Owl-Park",
-      "created_at": "2026-11-10T01:06:01Z"
     },
     {
       "id": "26798094658",
@@ -261,12 +93,6 @@
       "created_at": "2026-11-10T01:58:30Z"
     },
     {
-      "id": "26748209604",
-      "type": "PushEvent",
-      "repo": "lmansf/Welcome-to-Owl-Park",
-      "created_at": "2026-11-10T02:11:46Z"
-    },
-    {
       "id": "26893066900",
       "type": "PushEvent",
       "repo": "lmansf/Welcome-to-Owl-Park",
@@ -277,12 +103,6 @@
       "type": "CreateEvent",
       "repo": "lmansf/Welcome-to-Owl-Park",
       "created_at": "2026-11-10T12:02:34Z"
-    },
-    {
-      "id": "19662655014",
-      "type": "PullRequestEvent",
-      "repo": "lmansf/Welcome-to-Owl-Park",
-      "created_at": "2026-11-10T12:02:44Z"
     },
     {
       "id": "26800505119",
@@ -297,40 +117,10 @@
       "created_at": "2026-11-10T13:18:28Z"
     },
     {
-      "id": "19668623215",
-      "type": "PullRequestEvent",
-      "repo": "lmansf/Welcome-to-Owl-Park",
-      "created_at": "2026-11-10T13:18:48Z"
-    },
-    {
       "id": "26820779710",
       "type": "CreateEvent",
       "repo": "lmansf/Welcome-to-Owl-Park",
       "created_at": "2026-11-10T13:19:55Z"
-    },
-    {
-      "id": "19668712162",
-      "type": "PullRequestEvent",
-      "repo": "lmansf/Welcome-to-Owl-Park",
-      "created_at": "2026-11-10T13:20:05Z"
-    },
-    {
-      "id": "19668733294",
-      "type": "PullRequestEvent",
-      "repo": "lmansf/Welcome-to-Owl-Park",
-      "created_at": "2026-11-10T13:20:05Z"
-    },
-    {
-      "id": "19671762368",
-      "type": "PullRequestEvent",
-      "repo": "lmansf/Welcome-to-Owl-Park",
-      "created_at": "2026-11-10T13:55:46Z"
-    },
-    {
-      "id": "19672223608",
-      "type": "PullRequestEvent",
-      "repo": "lmansf/Welcome-to-Owl-Park",
-      "created_at": "2026-11-10T14:04:18Z"
     },
     {
       "id": "26813254562",
@@ -343,24 +133,6 @@
       "type": "CreateEvent",
       "repo": "lmansf/Welcome-to-Owl-Park",
       "created_at": "2026-11-10T15:00:52Z"
-    },
-    {
-      "id": "19676836452",
-      "type": "PullRequestEvent",
-      "repo": "lmansf/Welcome-to-Owl-Park",
-      "created_at": "2026-11-10T15:01:04Z"
-    },
-    {
-      "id": "19676867128",
-      "type": "PullRequestEvent",
-      "repo": "lmansf/Welcome-to-Owl-Park",
-      "created_at": "2026-11-10T15:01:04Z"
-    },
-    {
-      "id": "19681573808",
-      "type": "PullRequestEvent",
-      "repo": "lmansf/Welcome-to-Owl-Park",
-      "created_at": "2026-11-10T15:24:08Z"
     },
     {
       "id": "26910985860",
@@ -1227,6 +999,12 @@
       "created_at": "2026-11-13T07:21:04Z"
     },
     {
+      "id": "27257060898",
+      "type": "PushEvent",
+      "repo": "lmansf/Welcome-to-Owl-Park",
+      "created_at": "2026-11-13T08:08:11Z"
+    },
+    {
       "id": "19992848819",
       "type": "PullRequestEvent",
       "repo": "lmansf/Welcome-to-Owl-Park",
@@ -1245,10 +1023,22 @@
       "created_at": "2026-11-13T08:37:30Z"
     },
     {
+      "id": "27247227972",
+      "type": "PushEvent",
+      "repo": "lmansf/Welcome-to-Owl-Park",
+      "created_at": "2026-11-13T08:41:07Z"
+    },
+    {
       "id": "20001219116",
       "type": "PullRequestEvent",
       "repo": "lmansf/Welcome-to-Owl-Park",
       "created_at": "2026-11-13T09:53:14Z"
+    },
+    {
+      "id": "27248281181",
+      "type": "CreateEvent",
+      "repo": "lmansf/Welcome-to-Owl-Park",
+      "created_at": "2026-11-13T11:03:30Z"
     },
     {
       "id": "20006653300",
@@ -1275,6 +1065,12 @@
       "created_at": "2026-11-13T13:52:03Z"
     },
     {
+      "id": "27267965233",
+      "type": "PushEvent",
+      "repo": "lmansf/Welcome-to-Owl-Park",
+      "created_at": "2026-11-13T14:12:18Z"
+    },
+    {
       "id": "20025030813",
       "type": "PullRequestEvent",
       "repo": "lmansf/Welcome-to-Owl-Park",
@@ -1293,10 +1089,28 @@
       "created_at": "2026-11-13T14:37:24Z"
     },
     {
+      "id": "27273250422",
+      "type": "PushEvent",
+      "repo": "lmansf/Welcome-to-Owl-Park",
+      "created_at": "2026-11-13T14:37:26Z"
+    },
+    {
+      "id": "27275608488",
+      "type": "CreateEvent",
+      "repo": "lmansf/Welcome-to-Owl-Park",
+      "created_at": "2026-11-13T14:57:03Z"
+    },
+    {
       "id": "20026936557",
       "type": "PullRequestEvent",
       "repo": "lmansf/Welcome-to-Owl-Park",
       "created_at": "2026-11-13T14:57:13Z"
+    },
+    {
+      "id": "27276582774",
+      "type": "CreateEvent",
+      "repo": "lmansf/Portfolio2026",
+      "created_at": "2026-11-13T15:05:38Z"
     },
     {
       "id": "20027784553",
@@ -1317,6 +1131,12 @@
       "created_at": "2026-11-13T15:11:30Z"
     },
     {
+      "id": "27278664374",
+      "type": "CreateEvent",
+      "repo": "lmansf/Portfolio2026",
+      "created_at": "2026-11-13T15:25:41Z"
+    },
+    {
       "id": "20029751120",
       "type": "PullRequestEvent",
       "repo": "lmansf/Portfolio2026",
@@ -1327,6 +1147,12 @@
       "type": "PullRequestEvent",
       "repo": "lmansf/Welcome-to-Owl-Park",
       "created_at": "2026-11-13T15:41:56Z"
+    },
+    {
+      "id": "27279022536",
+      "type": "PushEvent",
+      "repo": "lmansf/Welcome-to-Owl-Park",
+      "created_at": "2026-11-13T15:41:57Z"
     },
     {
       "id": "20031920580",
@@ -1347,10 +1173,22 @@
       "created_at": "2026-11-13T15:48:54Z"
     },
     {
+      "id": "27285034163",
+      "type": "PushEvent",
+      "repo": "lmansf/Portfolio2026",
+      "created_at": "2026-11-13T15:48:55Z"
+    },
+    {
       "id": "20032541894",
       "type": "PullRequestEvent",
       "repo": "lmansf/Welcome-to-Owl-Park",
       "created_at": "2026-11-13T15:55:11Z"
+    },
+    {
+      "id": "27283042828",
+      "type": "PushEvent",
+      "repo": "lmansf/Welcome-to-Owl-Park",
+      "created_at": "2026-11-13T16:01:51Z"
     },
     {
       "id": "27141772327",
@@ -1377,16 +1215,34 @@
       "created_at": "2026-11-13T17:16:16Z"
     },
     {
+      "id": "27270191464",
+      "type": "PushEvent",
+      "repo": "lmansf/Portfolio2026",
+      "created_at": "2026-11-13T17:16:17Z"
+    },
+    {
       "id": "20040482842",
       "type": "PullRequestEvent",
       "repo": "lmansf/Welcome-to-Owl-Park",
       "created_at": "2026-11-13T17:16:33Z"
     },
     {
+      "id": "27270219978",
+      "type": "PushEvent",
+      "repo": "lmansf/Welcome-to-Owl-Park",
+      "created_at": "2026-11-13T17:16:34Z"
+    },
+    {
       "id": "20040539014",
       "type": "PullRequestEvent",
       "repo": "lmansf/Welcome-to-Owl-Park",
       "created_at": "2026-11-13T17:17:08Z"
+    },
+    {
+      "id": "27273683150",
+      "type": "CreateEvent",
+      "repo": "lmansf/Portfolio2026",
+      "created_at": "2026-11-13T17:49:58Z"
     },
     {
       "id": "20043640435",
@@ -1429,6 +1285,12 @@
       "type": "PullRequestEvent",
       "repo": "lmansf/Welcome-to-Owl-Park",
       "created_at": "2026-11-13T18:16:44Z"
+    },
+    {
+      "id": "27277465850",
+      "type": "CreateEvent",
+      "repo": "lmansf/Portfolio2026",
+      "created_at": "2026-11-13T18:23:13Z"
     },
     {
       "id": "20046705427",
@@ -1623,6 +1485,12 @@
       "created_at": "2026-11-14T10:56:12Z"
     },
     {
+      "id": "27257704515",
+      "type": "CreateEvent",
+      "repo": "lmansf/Welcome-to-Owl-Park",
+      "created_at": "2026-11-14T10:56:40Z"
+    },
+    {
       "id": "20108459403",
       "type": "PullRequestEvent",
       "repo": "lmansf/Welcome-to-Owl-Park",
@@ -1633,6 +1501,12 @@
       "type": "PullRequestEvent",
       "repo": "lmansf/fraud-detection-pipeline",
       "created_at": "2026-11-14T10:57:24Z"
+    },
+    {
+      "id": "27257770771",
+      "type": "PushEvent",
+      "repo": "lmansf/fraud-detection-pipeline",
+      "created_at": "2026-11-14T10:57:25Z"
     },
     {
       "id": "20109306477",
@@ -1749,6 +1623,12 @@
       "created_at": "2026-11-15T10:33:39Z"
     },
     {
+      "id": "27282862388",
+      "type": "CreateEvent",
+      "repo": "lmansf/Welcome-to-Owl-Park",
+      "created_at": "2026-11-15T10:58:51Z"
+    },
+    {
       "id": "20173756037",
       "type": "PullRequestEvent",
       "repo": "lmansf/Welcome-to-Owl-Park",
@@ -1791,6 +1671,12 @@
       "created_at": "2026-11-15T13:15:50Z"
     },
     {
+      "id": "27250549675",
+      "type": "CreateEvent",
+      "repo": "lmansf/Welcome-to-Owl-Park",
+      "created_at": "2026-11-15T13:36:35Z"
+    },
+    {
       "id": "20180918935",
       "type": "PullRequestEvent",
       "repo": "lmansf/Welcome-to-Owl-Park",
@@ -1801,6 +1687,120 @@
       "type": "PullRequestEvent",
       "repo": "lmansf/Welcome-to-Owl-Park",
       "created_at": "2026-11-15T13:47:03Z"
+    },
+    {
+      "id": "20189780936",
+      "type": "PullRequestEvent",
+      "repo": "lmansf/Welcome-to-Owl-Park",
+      "created_at": "2026-11-15T16:30:34Z"
+    },
+    {
+      "id": "20189790750",
+      "type": "PullRequestEvent",
+      "repo": "lmansf/Welcome-to-Owl-Park",
+      "created_at": "2026-11-15T16:30:44Z"
+    },
+    {
+      "id": "20190693938",
+      "type": "PullRequestEvent",
+      "repo": "lmansf/Welcome-to-Owl-Park",
+      "created_at": "2026-11-15T16:47:58Z"
+    },
+    {
+      "id": "20191015712",
+      "type": "PullRequestEvent",
+      "repo": "lmansf/Welcome-to-Owl-Park",
+      "created_at": "2026-11-15T16:54:11Z"
+    },
+    {
+      "id": "20191214906",
+      "type": "PullRequestEvent",
+      "repo": "lmansf/Welcome-to-Owl-Park",
+      "created_at": "2026-11-15T16:58:03Z"
+    },
+    {
+      "id": "27270412069",
+      "type": "CreateEvent",
+      "repo": "lmansf/Welcome-to-Owl-Park",
+      "created_at": "2026-11-15T17:04:45Z"
+    },
+    {
+      "id": "20191567131",
+      "type": "PullRequestEvent",
+      "repo": "lmansf/Welcome-to-Owl-Park",
+      "created_at": "2026-11-15T17:04:55Z"
+    },
+    {
+      "id": "20191946301",
+      "type": "PullRequestEvent",
+      "repo": "lmansf/Welcome-to-Owl-Park",
+      "created_at": "2026-11-15T17:12:05Z"
+    },
+    {
+      "id": "20192126179",
+      "type": "PullRequestEvent",
+      "repo": "lmansf/Welcome-to-Owl-Park",
+      "created_at": "2026-11-15T17:15:31Z"
+    },
+    {
+      "id": "20193031832",
+      "type": "PullRequestEvent",
+      "repo": "lmansf/Welcome-to-Owl-Park",
+      "created_at": "2026-11-15T17:33:08Z"
+    },
+    {
+      "id": "20198501022",
+      "type": "PullRequestEvent",
+      "repo": "lmansf/Welcome-to-Owl-Park",
+      "created_at": "2026-11-15T19:18:26Z"
+    },
+    {
+      "id": "20200966744",
+      "type": "PullRequestEvent",
+      "repo": "lmansf/Welcome-to-Owl-Park",
+      "created_at": "2026-11-15T20:06:34Z"
+    },
+    {
+      "id": "20200973670",
+      "type": "PullRequestEvent",
+      "repo": "lmansf/Welcome-to-Owl-Park",
+      "created_at": "2026-11-15T20:06:41Z"
+    },
+    {
+      "id": "20200978333",
+      "type": "PullRequestEvent",
+      "repo": "lmansf/Welcome-to-Owl-Park",
+      "created_at": "2026-11-15T20:06:47Z"
+    },
+    {
+      "id": "20203542122",
+      "type": "PullRequestEvent",
+      "repo": "lmansf/Welcome-to-Owl-Park",
+      "created_at": "2026-11-15T20:56:47Z"
+    },
+    {
+      "id": "27284307368",
+      "type": "PushEvent",
+      "repo": "lmansf/Welcome-to-Owl-Park",
+      "created_at": "2026-11-15T22:01:35Z"
+    },
+    {
+      "id": "20208558583",
+      "type": "PullRequestEvent",
+      "repo": "lmansf/Welcome-to-Owl-Park",
+      "created_at": "2026-11-15T22:36:09Z"
+    },
+    {
+      "id": "20208853049",
+      "type": "PullRequestEvent",
+      "repo": "lmansf/Portfolio2026",
+      "created_at": "2026-11-15T22:42:12Z"
+    },
+    {
+      "id": "20210625169",
+      "type": "PullRequestEvent",
+      "repo": "lmansf/Portfolio2026",
+      "created_at": "2026-11-15T23:17:58Z"
     }
   ]
 }
