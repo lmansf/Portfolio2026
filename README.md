@@ -366,8 +366,9 @@ How it works:
   visitor's own query gets a faint dashed frame until Reset.
 - **`/live`** draws from `data/fraud-snapshot.json` as before. Its editors
   query `fraud_totals`, `fraud_daily`, `fraud_score_bins`,
-  `fraud_patterns`, `fraud_compare`, `fraud_compare_patterns` and
-  `fraud_compare_sweep`, which the engine builds in the browser from that same
+  `fraud_patterns`, `fraud_compare`, `fraud_compare_patterns`,
+  `fraud_compare_sweep` and `fraud_compare_day_one`, which the engine builds
+  in the browser from that same
   snapshot (the columns are listed once, in
   `data/console/snapshot-tables.json`). A result becomes a changed snapshot
   that `live.js` redraws (the `live:render` event), falling back to the
@@ -539,7 +540,9 @@ webstore checkouts). Nothing on the page talks to the database.
   2026-11-15 22:57:41 UTC (the window end plus 30 minutes), so a later
   re-score or late label can't move it. It reads the raw tables directly
   rather than the 30-day base, so the counts the Home and Projects copy
-  quote never drift or age out.
+  quote never drift or age out. `/live` doesn't draw it (its charts and
+  tables keep the rolling `compare*` entries); it backs the copy's claims
+  and is queryable as `fraud_compare_day_one` in the SQL source editors.
 - **`.github/workflows/fraud-snapshot.yml`** — runs daily at 05:35 UTC (and
   on demand), checks the result against an allow-list of fields with `jq`,
   and commits the file on every run (the timestamp always moves, so the
