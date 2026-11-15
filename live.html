@@ -474,11 +474,12 @@ model_scores as (
   -- score, so the comparison keeps only orders scored one at a time, which
   -- record a real per-order time of a few milliseconds.
   select distinct on (a.transaction_id)
-    a.transaction_id::uuid as transaction_id,
+    a.transaction_id,
     a.decision = 'FRAUD_FLAGGED' as model_flagged,
     a.fraud_probability,
     a.latency_ms
   from public.realtime_fraud_audit a
+  where a.latency_ms &gt;= 1
   order by a.transaction_id, a.processed_at desc, a.id desc
 ),
 compare_base as (
@@ -486,8 +487,7 @@ compare_base as (
   -- both scorers' verdicts.
   select b.*, m.model_flagged, m.fraud_probability, m.latency_ms
   from base b
-  join model_scores m using (transaction_id)
-  where m.latency_ms &gt;= 1
+  join model_scores m on m.transaction_id = b.transaction_id::text
 ),
 compare as (
   select
@@ -567,11 +567,12 @@ model_scores as (
   -- score, so the comparison keeps only orders scored one at a time, which
   -- record a real per-order time of a few milliseconds.
   select distinct on (a.transaction_id)
-    a.transaction_id::uuid as transaction_id,
+    a.transaction_id,
     a.decision = 'FRAUD_FLAGGED' as model_flagged,
     a.fraud_probability,
     a.latency_ms
   from public.realtime_fraud_audit a
+  where a.latency_ms &gt;= 1
   order by a.transaction_id, a.processed_at desc, a.id desc
 ),
 compare_base as (
@@ -579,8 +580,7 @@ compare_base as (
   -- both scorers' verdicts.
   select b.*, m.model_flagged, m.fraud_probability, m.latency_ms
   from base b
-  join model_scores m using (transaction_id)
-  where m.latency_ms &gt;= 1
+  join model_scores m on m.transaction_id = b.transaction_id::text
 ),
 compare_patterns as (
   select fraud_pattern as pattern, 'rules' as scorer, count(*) as fraud,
@@ -647,11 +647,12 @@ model_scores as (
   -- score, so the comparison keeps only orders scored one at a time, which
   -- record a real per-order time of a few milliseconds.
   select distinct on (a.transaction_id)
-    a.transaction_id::uuid as transaction_id,
+    a.transaction_id,
     a.decision = 'FRAUD_FLAGGED' as model_flagged,
     a.fraud_probability,
     a.latency_ms
   from public.realtime_fraud_audit a
+  where a.latency_ms &gt;= 1
   order by a.transaction_id, a.processed_at desc, a.id desc
 ),
 compare_base as (
@@ -659,8 +660,7 @@ compare_base as (
   -- both scorers' verdicts.
   select b.*, m.model_flagged, m.fraud_probability, m.latency_ms
   from base b
-  join model_scores m using (transaction_id)
-  where m.latency_ms &gt;= 1
+  join model_scores m on m.transaction_id = b.transaction_id::text
 ),
 compare_sweep as (
   -- What each scorer would flag at other cutoffs: the rules on their 0-1

@@ -115,11 +115,12 @@ model_scores as (
   -- score, so the comparison keeps only orders scored one at a time, which
   -- record a real per-order time of a few milliseconds.
   select distinct on (a.transaction_id)
-    a.transaction_id::uuid as transaction_id,
+    a.transaction_id,
     a.decision = 'FRAUD_FLAGGED' as model_flagged,
     a.fraud_probability,
     a.latency_ms
   from public.realtime_fraud_audit a
+  where a.latency_ms >= 1
   order by a.transaction_id, a.processed_at desc, a.id desc
 ),
 compare_base as (
@@ -127,8 +128,7 @@ compare_base as (
   -- both scorers' verdicts.
   select b.*, m.model_flagged, m.fraud_probability, m.latency_ms
   from base b
-  join model_scores m using (transaction_id)
-  where m.latency_ms >= 1
+  join model_scores m on m.transaction_id = b.transaction_id::text
 ),
 compare as (
   select
@@ -199,7 +199,8 @@ select json_build_object(
                     'from', round(bin / 20.0, 2)::float8, 'to', round((bin + 1) / 20.0, 2)::float8,
                     'legit', legit, 'fraud', fraud) order by bin), '[]'::json) from bins),
   'patterns', (select coalesce(json_agg(patterns order by fraud desc, pattern collate "C"), '[]'::json) from patterns),
-  'model_started_at', (select to_char(min(processed_at) at time zone 'UTC', 'YYYY-MM-DD"T"HH24:MI:SS"Z"')
+  'model_started_at', (select to_char(greatest(min(processed_at), now() - interval '30 days') at time zone 'UTC',
+                                       'YYYY-MM-DD"T"HH24:MI:SS"Z"')
                          from public.realtime_fraud_audit where latency_ms >= 1),
   'compare', (select coalesce(json_agg(compare order by scorer desc), '[]'::json) from compare),
   'compare_patterns', (select coalesce(json_agg(compare_patterns

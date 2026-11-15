@@ -478,7 +478,7 @@ import { metric } from './metrics.js';
     const fmtMs = (n) => (Number.isFinite(n) ? `${n.toFixed(1)} ms` : '–');
     const ofText = (a, b) => (Number.isFinite(a) && Number.isFinite(b) ? `${fmtInt(a)} of ${fmtInt(b)}` : '');
 
-    function renderCompare(s) {
+    function renderCompare(s, quiet) {
         const section = root.querySelector('[data-compare]');
         if (!section) return;
         const rows = Array.isArray(s.compare) ? s.compare : [];
@@ -486,6 +486,7 @@ import { metric } from './metrics.js';
         const rules = by.rules;
         const model = by.model;
         if (!rules || !model) {
+            if (quiet) throw new Error('The comparison needs a rules row and a model row');
             section.hidden = true;
             return;
         }
@@ -531,7 +532,8 @@ import { metric } from './metrics.js';
         if (lead) {
             const goodModel = model.flagged - model.caught;
             const goodRules = rules.flagged - rules.caught;
-            let text = `On the same ${fmtInt(model.checkouts)} checkouts, the new model caught ${fmtInt(model.caught)} of ${fmtInt(model.fraud)} fraudulent orders (${fmtPct(rate('catch_rate', model))}); the rules caught ${fmtInt(rules.caught)} (${fmtPct(rate('catch_rate', rules))}).`;
+            const same = Number.isFinite(model.checkouts) ? `On the same ${fmtInt(model.checkouts)} checkouts` : 'On the same checkouts';
+            let text = `${same}, the new model caught ${fmtInt(model.caught)} of ${fmtInt(model.fraud)} fraudulent orders (${fmtPct(rate('catch_rate', model))}); the rules caught ${fmtInt(rules.caught)} (${fmtPct(rate('catch_rate', rules))}).`;
             if (Number.isFinite(goodModel) && Number.isFinite(goodRules)) {
                 const noun = (n) => `${fmtInt(n)} good ${n === 1 ? 'customer' : 'customers'}`;
                 if (goodModel > goodRules) {
@@ -673,7 +675,7 @@ import { metric } from './metrics.js';
         renderDaily(s, todayEt);
         renderScores(s);
         renderPatterns(s);
-        renderCompare(s);
+        renderCompare(s, quiet);
         renderTable(s, todayEt);
     }
 
