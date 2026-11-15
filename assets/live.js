@@ -478,15 +478,23 @@ import { metric } from './metrics.js';
     const fmtMs = (n) => (Number.isFinite(n) ? `${n.toFixed(1)} ms` : '–');
     const ofText = (a, b) => (Number.isFinite(a) && Number.isFinite(b) ? `${fmtInt(a)} of ${fmtInt(b)}` : '');
 
+    const compareRows = (s) => {
+        const rows = s && Array.isArray(s.compare) ? s.compare : [];
+        return Object.fromEntries(rows.map((r) => [String(r && r.scorer), r]));
+    };
+    const hasCompare = (s) => {
+        const by = compareRows(s);
+        return Boolean(by.rules && by.model);
+    };
+
     function renderCompare(s, quiet) {
         const section = root.querySelector('[data-compare]');
         if (!section) return;
-        const rows = Array.isArray(s.compare) ? s.compare : [];
-        const by = Object.fromEntries(rows.map((r) => [String(r.scorer), r]));
+        const by = compareRows(s);
         const rules = by.rules;
         const model = by.model;
         if (!rules || !model) {
-            if (quiet) throw new Error('The comparison needs a rules row and a model row');
+            if (quiet && hasCompare(window.__liveSnapshot)) throw new Error('The comparison needs a rules row and a model row');
             section.hidden = true;
             return;
         }
