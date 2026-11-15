@@ -21,12 +21,25 @@
             "where": "raw_transactions, raw_fraud_decisions, raw_fraud_truth, raw_checkout_responses",
             "description": "The fraud pipeline's four raw Postgres tables of simulated webstore checkouts. They stay in Supabase: nothing row-level ever reaches this site."
         },
+        "fraud_model_audit": {
+            "layer": "raw",
+            "label": "Supabase model scores",
+            "where": "realtime_fraud_audit",
+            "description": "The new model's scoring log: one row each time it scored a checkout, with its fraud probability, its decision and how long it took. It stays in Supabase: nothing row-level ever reaches this site."
+        },
         "stg_fraud_base": {
             "layer": "staging",
             "label": "Scored checkouts, last 30 days",
             "upstream": ["fraud_supabase"],
             "where": "the base CTE in scripts/fraud-snapshot.sql",
             "description": "One row per scored checkout in the last 30 America/New_York days, joined to the generator's answer key. Built inside a read-only transaction on Supabase; only the aggregates below leave it, as data/fraud-snapshot.json."
+        },
+        "stg_fraud_compare_base": {
+            "layer": "staging",
+            "label": "Checkouts both scorers saw",
+            "upstream": ["stg_fraud_base", "fraud_model_audit"],
+            "where": "the model_scores and compare_base CTEs in scripts/fraud-snapshot.sql",
+            "description": "Scored checkouts the new model also scored live, one at a time, joined to its latest score. A one-off batch rescore of older orders on Nov 14 is left out: it ran in bulk and gave every order nearly the same score."
         },
         "github_api": {
             "layer": "raw",
@@ -258,6 +271,82 @@
                 {"type": "freshness"}
             ]
         },
+        "fraud_compare": {
+            "layer": "mart",
+            "label": "fraud_compare",
+            "upstream": ["stg_fraud_compare_base"],
+            "where": "data/fraud-snapshot.json → compare",
+            "freshness": {"from": "fraud_snapshot", "max_hours": 36},
+            "description": "The rules and the new model side by side on the same checkouts: one row per scorer.",
+            "columns": {
+                "scorer": "rules or model.",
+                "checkouts": "Checkouts both scorers saw.",
+                "fraud": "Of those, how many the answer key marks as fraud.",
+                "legit": "Of those, how many are legitimate.",
+                "flagged": "Checkouts this scorer flagged (sent to review or declined).",
+                "caught": "Fraudulent checkouts this scorer flagged.",
+                "cutoff": "The lowest score this scorer flagged at: the rules' risk score, or the model's fraud probability.",
+                "p50_ms": "Median scoring time, in milliseconds.",
+                "p95_ms": "95th-percentile scoring time, in milliseconds."
+            },
+            "tests": [
+                {"type": "row_count", "min": 2, "max": 2},
+                {"type": "unique", "columns": ["scorer"]},
+                {"type": "accepted_values", "column": "scorer", "values": ["rules", "model"]},
+                {"type": "not_null", "columns": ["scorer", "checkouts", "fraud", "legit", "flagged", "caught"]},
+                {"type": "expression", "name": "fraud plus legit equals checkouts", "sql": "fraud + legit = checkouts"},
+                {"type": "expression", "name": "caught fraud is no more than flagged or all fraud", "sql": "caught <= flagged AND caught <= fraud"},
+                {"type": "expression", "name": "both scorers saw the same checkouts", "scalar": true,
+                 "sql": "(SELECT count(DISTINCT checkouts) = 1 AND count(DISTINCT fraud) = 1 FROM fraud_compare)"},
+                {"type": "freshness"}
+            ]
+        },
+        "fraud_compare_patterns": {
+            "layer": "mart",
+            "label": "fraud_compare_patterns",
+            "upstream": ["stg_fraud_compare_base"],
+            "where": "data/fraud-snapshot.json → compare_patterns",
+            "freshness": {"from": "fraud_snapshot", "max_hours": 36},
+            "description": "Fraud caught by each scorer, by the generator's fraud pattern, on the checkouts both scorers saw.",
+            "columns": {
+                "pattern": "The kind of fraud the generator played out.",
+                "scorer": "rules or model.",
+                "fraud": "Fraudulent checkouts of that pattern.",
+                "caught": "Of those, how many this scorer flagged."
+            },
+            "tests": [
+                {"type": "row_count", "min": 2},
+                {"type": "unique", "columns": ["pattern", "scorer"]},
+                {"type": "accepted_values", "column": "scorer", "values": ["rules", "model"]},
+                {"type": "accepted_values", "column": "pattern", "values": ["card_testing", "stolen_card_resale", "gift_card_cashout", "account_takeover", "fraud_ring"]},
+                {"type": "expression", "name": "caught fraud is no more than all fraud", "sql": "caught <= fraud"},
+                {"type": "expression", "name": "the patterns add up to each scorer's catches", "scalar": true,
+                 "sql": "(SELECT bool_and(ok) FROM (SELECT p.scorer, sum(p.caught) = any_value(c.caught) AS ok FROM fraud_compare_patterns p JOIN fraud_compare c USING (scorer) GROUP BY p.scorer))"},
+                {"type": "freshness"}
+            ]
+        },
+        "fraud_compare_sweep": {
+            "layer": "mart",
+            "label": "fraud_compare_sweep",
+            "upstream": ["stg_fraud_compare_base"],
+            "where": "data/fraud-snapshot.json → compare_sweep",
+            "freshness": {"from": "fraud_snapshot", "max_hours": 36},
+            "description": "What each scorer would flag at a few other cutoffs, on the checkouts both scorers saw.",
+            "columns": {
+                "scorer": "rules or model.",
+                "cutoff": "Flag every checkout scored at or above this.",
+                "flagged": "Checkouts that cutoff would flag.",
+                "caught": "Fraudulent checkouts that cutoff would flag."
+            },
+            "tests": [
+                {"type": "row_count", "min": 2},
+                {"type": "unique", "columns": ["scorer", "cutoff"]},
+                {"type": "accepted_values", "column": "scorer", "values": ["rules", "model"]},
+                {"type": "expression", "name": "cutoffs sit between 0 and 1", "sql": "cutoff > 0 AND cutoff <= 1"},
+                {"type": "expression", "name": "caught fraud is no more than flagged", "sql": "caught <= flagged"},
+                {"type": "freshness"}
+            ]
+        },
         "fraud_metrics": {
             "layer": "mart",
             "label": "fraud_metrics",
@@ -344,6 +433,9 @@
         "live-totals": {"page": "Live data", "label": "the last 30 days totals", "tables": ["fraud_totals"]},
         "live-daily": {"page": "Live data", "label": "the fraud per day chart", "tables": ["fraud_daily"]},
         "live-scores": {"page": "Live data", "label": "the score distribution chart", "tables": ["fraud_score_bins"]},
-        "live-patterns": {"page": "Live data", "label": "the catch rate by fraud pattern table", "tables": ["fraud_patterns"]}
+        "live-patterns": {"page": "Live data", "label": "the catch rate by fraud pattern table", "tables": ["fraud_patterns"]},
+        "live-compare": {"page": "Live data", "label": "the new model vs rules table", "tables": ["fraud_compare"]},
+        "live-compare-patterns": {"page": "Live data", "label": "the new model vs rules by fraud pattern chart", "tables": ["fraud_compare_patterns"]},
+        "live-compare-sweep": {"page": "Live data", "label": "the other cutoffs table", "tables": ["fraud_compare_sweep"]}
     }
 }

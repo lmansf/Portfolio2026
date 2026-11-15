@@ -132,6 +132,9 @@ LIVE_SOURCES = {
     "live-daily": (["base", "daily"], "daily"),
     "live-scores": (["base", "bins"], "score_bins"),
     "live-patterns": (["base", "patterns"], "patterns"),
+    "live-compare": (["base", "model_scores", "compare_base", "compare"], "compare"),
+    "live-compare-patterns": (["base", "model_scores", "compare_base", "compare_patterns"], "compare_patterns"),
+    "live-compare-sweep": (["base", "model_scores", "compare_base", "compare_sweep"], "compare_sweep"),
 }
 
 # Every caption's piece, as data/pipeline/models.json describes it: the

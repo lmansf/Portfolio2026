@@ -93,7 +93,7 @@
             <div class="hero__main">
                 <p class="eyebrow">Live data · Fraud Detection Pipeline</p>
                 <h1 class="hero__name" id="live-title">Fraud, scored daily.</h1>
-                <p class="hero__role">These are the real outputs of my fraud-detection pipeline, refreshed every day. A generator plays out theme-park webstore checkouts, including five kinds of fraud; every order is scored by a rules model, and the results land in Postgres on Supabase. A daily job runs one read-only SQL query over those tables and publishes only the totals you see here.</p>
+                <p class="hero__role">These are the real outputs of my fraud-detection pipeline, refreshed every day. A generator plays out theme-park webstore checkouts, including five kinds of fraud; every order is scored by a rules model, and since November 14 a new model scores them too. The results land in Postgres on Supabase. A daily job runs one read-only SQL query over those tables and publishes only the totals you see here.</p>
                 <div class="live-meta" aria-live="polite">
                     <span class="live-pill live-pill--sim">Simulated data</span>
                     <span class="live-pill" data-live-model>Model: rules-v0</span>
@@ -158,6 +158,8 @@ FROM fraud_totals;</code></pre>
                         <summary>Where the numbers come from</summary>
                         <pre class="sql-src__code" tabindex="0"><code>with base as (
   select
+    x.transaction_id,
+    x.event_ts,
     (x.event_ts at time zone 'America/New_York')::date as day,
     d.decision,
     d.score,
@@ -172,6 +174,7 @@ FROM fraud_totals;</code></pre>
   left join public.raw_fraud_truth t using (transaction_id)
   left join public.raw_checkout_responses r using (transaction_id)
   where x.event_ts &gt;= now() - interval '30 days'
+    and d.model_version = 'rules-v0'
 ),
 totals as (
   select
@@ -249,6 +252,8 @@ ORDER BY day;</code></pre>
                         <summary>Where the numbers come from</summary>
                         <pre class="sql-src__code" tabindex="0"><code>with base as (
   select
+    x.transaction_id,
+    x.event_ts,
     (x.event_ts at time zone 'America/New_York')::date as day,
     d.decision,
     d.score,
@@ -263,6 +268,7 @@ ORDER BY day;</code></pre>
   left join public.raw_fraud_truth t using (transaction_id)
   left join public.raw_checkout_responses r using (transaction_id)
   where x.event_ts &gt;= now() - interval '30 days'
+    and d.model_version = 'rules-v0'
 ),
 daily as (
   select
@@ -315,6 +321,8 @@ ORDER BY score_from;</code></pre>
                         <summary>Where the numbers come from</summary>
                         <pre class="sql-src__code" tabindex="0"><code>with base as (
   select
+    x.transaction_id,
+    x.event_ts,
     (x.event_ts at time zone 'America/New_York')::date as day,
     d.decision,
     d.score,
@@ -329,6 +337,7 @@ ORDER BY score_from;</code></pre>
   left join public.raw_fraud_truth t using (transaction_id)
   left join public.raw_checkout_responses r using (transaction_id)
   where x.event_ts &gt;= now() - interval '30 days'
+    and d.model_version = 'rules-v0'
 ),
 bins as (
   select
@@ -372,6 +381,8 @@ ORDER BY fraud DESC, pattern;</code></pre>
                         <summary>Where the numbers come from</summary>
                         <pre class="sql-src__code" tabindex="0"><code>with base as (
   select
+    x.transaction_id,
+    x.event_ts,
     (x.event_ts at time zone 'America/New_York')::date as day,
     d.decision,
     d.score,
@@ -386,6 +397,7 @@ ORDER BY fraud DESC, pattern;</code></pre>
   left join public.raw_fraud_truth t using (transaction_id)
   left join public.raw_checkout_responses r using (transaction_id)
   where x.event_ts &gt;= now() - interval '30 days'
+    and d.model_version = 'rules-v0'
 ),
 patterns as (
   select
@@ -403,6 +415,278 @@ from patterns;</code></pre>
                 </div>
             </details>
             <!-- /sql-source -->
+        </section>
+
+        <!-- New model vs the rules -->
+        <section aria-labelledby="live-compare" class="live-section" data-compare hidden>
+            <header class="section-head">
+                <h2 class="section-head__title" id="live-compare">New model vs the rules</h2>
+                <span class="section-head__hint" data-compare-window>Same checkouts, scored by both</span>
+            </header>
+            <p class="section-note live-compare__lead" data-caption="compare">&nbsp;</p>
+            <div class="live-card" data-sql-piece="live-compare">
+                <div class="live-vs__scroll">
+                    <table class="live-vs">
+                        <caption class="visually-hidden">The rules and the new model on the same checkouts</caption>
+                        <thead>
+                            <tr><th scope="col"><span class="visually-hidden">Measure</span></th><th scope="col"><span class="live-swatch live-swatch--rules" aria-hidden="true"></span>Rules</th><th scope="col"><span class="live-swatch live-swatch--model" aria-hidden="true"></span>New model</th></tr>
+                        </thead>
+                        <tbody data-table="compare"></tbody>
+                    </table>
+                </div>
+            </div>
+            <!-- sql-source: live-compare -->
+            <details class="sql-src" data-sql-source="live-compare" data-sql-label="the new model vs rules table">
+                <summary class="sql-src__toggle" aria-label="SQL source for the new model vs rules table">SQL source<span class="sql-src__trust" data-sql-trust hidden></span></summary>
+                <div class="sql-src__panel">
+                    <pre class="sql-src__code" tabindex="0"><code>SELECT scorer, checkouts, fraud, legit, flagged, caught, cutoff, p50_ms, p95_ms
+FROM fraud_compare
+ORDER BY scorer DESC;</code></pre>
+                    <ol class="sql-src__lineage" aria-label="Lineage, from raw source to the table this query reads"><li class="sql-src__step"><span class="sql-src__layer">raw</span> <a class="sql-src__node" href="/catalog#t-fraud_supabase" title="raw_transactions, raw_fraud_decisions, raw_fraud_truth, raw_checkout_responses">Supabase checkout tables</a></li><li class="sql-src__step"><span class="sql-src__layer">raw</span> <a class="sql-src__node" href="/catalog#t-fraud_model_audit" title="realtime_fraud_audit">Supabase model scores</a></li><li class="sql-src__step"><span class="sql-src__layer">staging</span> <a class="sql-src__node" href="/catalog#t-stg_fraud_base" title="the base CTE in scripts/fraud-snapshot.sql">Scored checkouts, last 30 days</a></li><li class="sql-src__step"><span class="sql-src__layer">staging</span> <a class="sql-src__node" href="/catalog#t-stg_fraud_compare_base" title="the model_scores and compare_base CTEs in scripts/fraud-snapshot.sql">Checkouts both scorers saw</a></li><li class="sql-src__step"><span class="sql-src__layer">mart</span> <a class="sql-src__node" href="/catalog#t-fraud_compare" title="data/fraud-snapshot.json → compare"><code>fraud_compare</code></a></li></ol>
+                    <p class="sql-src__note">This query writes what&rsquo;s shown above, from the same aggregates-only snapshot the page draws; a check fails the build if it ever stops matching. <a href="/status#t-fraud_compare">See its checks</a>.</p>
+                    <details class="sql-src__upstream">
+                        <summary>Where the numbers come from</summary>
+                        <pre class="sql-src__code" tabindex="0"><code>with base as (
+  select
+    x.transaction_id,
+    x.event_ts,
+    (x.event_ts at time zone 'America/New_York')::date as day,
+    d.decision,
+    d.score,
+    r.fraud_scoring_ms,
+    r.total_latency_ms,
+    coalesce(r.fraud_timeout, false) as fraud_timeout,
+    coalesce(t.is_fraud, false) as is_fraud,
+    t.fraud_pattern,
+    coalesce(x.total, 0) as total
+  from public.raw_transactions x
+  join public.raw_fraud_decisions d using (transaction_id)
+  left join public.raw_fraud_truth t using (transaction_id)
+  left join public.raw_checkout_responses r using (transaction_id)
+  where x.event_ts &gt;= now() - interval '30 days'
+    and d.model_version = 'rules-v0'
+),
+model_scores as (
+  -- The real-time model's latest score per checkout (it can re-score one;
+  -- transaction_id is text in this table). Its one-off batch run over the
+  -- older checkouts on Nov 14 records about 0.003 ms a row (the batch's
+  -- time split across its rows) and gave every order nearly the same tiny
+  -- score, so the comparison keeps only orders scored one at a time, which
+  -- record a real per-order time of a few milliseconds.
+  select distinct on (a.transaction_id)
+    a.transaction_id::uuid as transaction_id,
+    a.decision = 'FRAUD_FLAGGED' as model_flagged,
+    a.fraud_probability,
+    a.latency_ms
+  from public.realtime_fraud_audit a
+  order by a.transaction_id, a.processed_at desc, a.id desc
+),
+compare_base as (
+  -- Checkouts in the window that the model scored one at a time, each with
+  -- both scorers' verdicts.
+  select b.*, m.model_flagged, m.fraud_probability, m.latency_ms
+  from base b
+  join model_scores m using (transaction_id)
+  where m.latency_ms &gt;= 1
+),
+compare as (
+  select
+    'rules' as scorer,
+    count(*) as checkouts,
+    count(*) filter (where is_fraud) as fraud,
+    count(*) filter (where not is_fraud) as legit,
+    count(*) filter (where decision &lt;&gt; 'approve') as flagged,
+    count(*) filter (where is_fraud and decision &lt;&gt; 'approve') as caught,
+    round(min(score) filter (where decision &lt;&gt; 'approve')::numeric, 4)::float8 as cutoff,
+    round((percentile_cont(0.5) within group (order by fraud_scoring_ms))::numeric, 1)::float8 as p50_ms,
+    round((percentile_cont(0.95) within group (order by fraud_scoring_ms))::numeric, 1)::float8 as p95_ms
+  from compare_base
+  union all
+  select
+    'model',
+    count(*),
+    count(*) filter (where is_fraud),
+    count(*) filter (where not is_fraud),
+    count(*) filter (where model_flagged),
+    count(*) filter (where is_fraud and model_flagged),
+    round(min(fraud_probability) filter (where model_flagged)::numeric, 4)::float8,
+    round((percentile_cont(0.5) within group (order by latency_ms))::numeric, 1)::float8,
+    round((percentile_cont(0.95) within group (order by latency_ms))::numeric, 1)::float8
+  from compare_base
+)
+select coalesce(json_agg(compare order by scorer desc), '[]'::json) as compare
+from compare;</code></pre>
+                        <p class="sql-src__note">Part of <a href="https://github.com/lmansf/Portfolio2026/blob/main/scripts/fraud-snapshot.sql" target="_blank" rel="noopener">the read-only query</a> that runs once a day on Supabase and publishes the snapshot.</p>
+                    </details>
+                </div>
+            </details>
+            <!-- /sql-source -->
+
+            <h3 class="live-subhead">Fraud caught, by pattern</h3>
+            <div class="live-card" data-sql-piece="live-compare-patterns">
+                <ul class="live-legend" aria-hidden="true"><li><span class="live-swatch live-swatch--rules"></span>Rules</li><li><span class="live-swatch live-swatch--model"></span>New model</li></ul>
+                <div class="live-bars" data-chart="compare-patterns"></div>
+                <p class="live-caption" data-caption="compare-patterns">&nbsp;</p>
+            </div>
+            <!-- sql-source: live-compare-patterns -->
+            <details class="sql-src" data-sql-source="live-compare-patterns" data-sql-label="the new model vs rules by fraud pattern chart">
+                <summary class="sql-src__toggle" aria-label="SQL source for the new model vs rules by fraud pattern chart">SQL source<span class="sql-src__trust" data-sql-trust hidden></span></summary>
+                <div class="sql-src__panel">
+                    <pre class="sql-src__code" tabindex="0"><code>SELECT pattern, scorer, fraud, caught
+FROM fraud_compare_patterns
+ORDER BY fraud DESC, pattern, scorer DESC;</code></pre>
+                    <ol class="sql-src__lineage" aria-label="Lineage, from raw source to the table this query reads"><li class="sql-src__step"><span class="sql-src__layer">raw</span> <a class="sql-src__node" href="/catalog#t-fraud_supabase" title="raw_transactions, raw_fraud_decisions, raw_fraud_truth, raw_checkout_responses">Supabase checkout tables</a></li><li class="sql-src__step"><span class="sql-src__layer">raw</span> <a class="sql-src__node" href="/catalog#t-fraud_model_audit" title="realtime_fraud_audit">Supabase model scores</a></li><li class="sql-src__step"><span class="sql-src__layer">staging</span> <a class="sql-src__node" href="/catalog#t-stg_fraud_base" title="the base CTE in scripts/fraud-snapshot.sql">Scored checkouts, last 30 days</a></li><li class="sql-src__step"><span class="sql-src__layer">staging</span> <a class="sql-src__node" href="/catalog#t-stg_fraud_compare_base" title="the model_scores and compare_base CTEs in scripts/fraud-snapshot.sql">Checkouts both scorers saw</a></li><li class="sql-src__step"><span class="sql-src__layer">mart</span> <a class="sql-src__node" href="/catalog#t-fraud_compare_patterns" title="data/fraud-snapshot.json → compare_patterns"><code>fraud_compare_patterns</code></a></li></ol>
+                    <p class="sql-src__note">This query writes what&rsquo;s shown above, from the same aggregates-only snapshot the page draws; a check fails the build if it ever stops matching. <a href="/status#t-fraud_compare_patterns">See its checks</a>.</p>
+                    <details class="sql-src__upstream">
+                        <summary>Where the numbers come from</summary>
+                        <pre class="sql-src__code" tabindex="0"><code>with base as (
+  select
+    x.transaction_id,
+    x.event_ts,
+    (x.event_ts at time zone 'America/New_York')::date as day,
+    d.decision,
+    d.score,
+    r.fraud_scoring_ms,
+    r.total_latency_ms,
+    coalesce(r.fraud_timeout, false) as fraud_timeout,
+    coalesce(t.is_fraud, false) as is_fraud,
+    t.fraud_pattern,
+    coalesce(x.total, 0) as total
+  from public.raw_transactions x
+  join public.raw_fraud_decisions d using (transaction_id)
+  left join public.raw_fraud_truth t using (transaction_id)
+  left join public.raw_checkout_responses r using (transaction_id)
+  where x.event_ts &gt;= now() - interval '30 days'
+    and d.model_version = 'rules-v0'
+),
+model_scores as (
+  -- The real-time model's latest score per checkout (it can re-score one;
+  -- transaction_id is text in this table). Its one-off batch run over the
+  -- older checkouts on Nov 14 records about 0.003 ms a row (the batch's
+  -- time split across its rows) and gave every order nearly the same tiny
+  -- score, so the comparison keeps only orders scored one at a time, which
+  -- record a real per-order time of a few milliseconds.
+  select distinct on (a.transaction_id)
+    a.transaction_id::uuid as transaction_id,
+    a.decision = 'FRAUD_FLAGGED' as model_flagged,
+    a.fraud_probability,
+    a.latency_ms
+  from public.realtime_fraud_audit a
+  order by a.transaction_id, a.processed_at desc, a.id desc
+),
+compare_base as (
+  -- Checkouts in the window that the model scored one at a time, each with
+  -- both scorers' verdicts.
+  select b.*, m.model_flagged, m.fraud_probability, m.latency_ms
+  from base b
+  join model_scores m using (transaction_id)
+  where m.latency_ms &gt;= 1
+),
+compare_patterns as (
+  select fraud_pattern as pattern, 'rules' as scorer, count(*) as fraud,
+         count(*) filter (where decision &lt;&gt; 'approve') as caught
+  from compare_base
+  where is_fraud and fraud_pattern is not null
+  group by 1
+  union all
+  select fraud_pattern, 'model', count(*), count(*) filter (where model_flagged)
+  from compare_base
+  where is_fraud and fraud_pattern is not null
+  group by 1
+)
+select coalesce(json_agg(compare_patterns
+         order by fraud desc, pattern collate "C", scorer desc), '[]'::json) as compare_patterns
+from compare_patterns;</code></pre>
+                        <p class="sql-src__note">Part of <a href="https://github.com/lmansf/Portfolio2026/blob/main/scripts/fraud-snapshot.sql" target="_blank" rel="noopener">the read-only query</a> that runs once a day on Supabase and publishes the snapshot.</p>
+                    </details>
+                </div>
+            </details>
+            <!-- /sql-source -->
+
+            <h3 class="live-subhead">At other cutoffs</h3>
+            <div class="live-card" data-sql-piece="live-compare-sweep">
+                <p class="live-caption live-caption--top" data-caption="compare-sweep">&nbsp;</p>
+                <div class="live-sweeps" data-chart="compare-sweep"></div>
+            </div>
+            <!-- sql-source: live-compare-sweep -->
+            <details class="sql-src" data-sql-source="live-compare-sweep" data-sql-label="the other cutoffs table">
+                <summary class="sql-src__toggle" aria-label="SQL source for the other cutoffs table">SQL source<span class="sql-src__trust" data-sql-trust hidden></span></summary>
+                <div class="sql-src__panel">
+                    <pre class="sql-src__code" tabindex="0"><code>SELECT scorer, cutoff, flagged, caught
+FROM fraud_compare_sweep
+ORDER BY scorer DESC, cutoff DESC;</code></pre>
+                    <ol class="sql-src__lineage" aria-label="Lineage, from raw source to the table this query reads"><li class="sql-src__step"><span class="sql-src__layer">raw</span> <a class="sql-src__node" href="/catalog#t-fraud_supabase" title="raw_transactions, raw_fraud_decisions, raw_fraud_truth, raw_checkout_responses">Supabase checkout tables</a></li><li class="sql-src__step"><span class="sql-src__layer">raw</span> <a class="sql-src__node" href="/catalog#t-fraud_model_audit" title="realtime_fraud_audit">Supabase model scores</a></li><li class="sql-src__step"><span class="sql-src__layer">staging</span> <a class="sql-src__node" href="/catalog#t-stg_fraud_base" title="the base CTE in scripts/fraud-snapshot.sql">Scored checkouts, last 30 days</a></li><li class="sql-src__step"><span class="sql-src__layer">staging</span> <a class="sql-src__node" href="/catalog#t-stg_fraud_compare_base" title="the model_scores and compare_base CTEs in scripts/fraud-snapshot.sql">Checkouts both scorers saw</a></li><li class="sql-src__step"><span class="sql-src__layer">mart</span> <a class="sql-src__node" href="/catalog#t-fraud_compare_sweep" title="data/fraud-snapshot.json → compare_sweep"><code>fraud_compare_sweep</code></a></li></ol>
+                    <p class="sql-src__note">This query writes what&rsquo;s shown above, from the same aggregates-only snapshot the page draws; a check fails the build if it ever stops matching. <a href="/status#t-fraud_compare_sweep">See its checks</a>.</p>
+                    <details class="sql-src__upstream">
+                        <summary>Where the numbers come from</summary>
+                        <pre class="sql-src__code" tabindex="0"><code>with base as (
+  select
+    x.transaction_id,
+    x.event_ts,
+    (x.event_ts at time zone 'America/New_York')::date as day,
+    d.decision,
+    d.score,
+    r.fraud_scoring_ms,
+    r.total_latency_ms,
+    coalesce(r.fraud_timeout, false) as fraud_timeout,
+    coalesce(t.is_fraud, false) as is_fraud,
+    t.fraud_pattern,
+    coalesce(x.total, 0) as total
+  from public.raw_transactions x
+  join public.raw_fraud_decisions d using (transaction_id)
+  left join public.raw_fraud_truth t using (transaction_id)
+  left join public.raw_checkout_responses r using (transaction_id)
+  where x.event_ts &gt;= now() - interval '30 days'
+    and d.model_version = 'rules-v0'
+),
+model_scores as (
+  -- The real-time model's latest score per checkout (it can re-score one;
+  -- transaction_id is text in this table). Its one-off batch run over the
+  -- older checkouts on Nov 14 records about 0.003 ms a row (the batch's
+  -- time split across its rows) and gave every order nearly the same tiny
+  -- score, so the comparison keeps only orders scored one at a time, which
+  -- record a real per-order time of a few milliseconds.
+  select distinct on (a.transaction_id)
+    a.transaction_id::uuid as transaction_id,
+    a.decision = 'FRAUD_FLAGGED' as model_flagged,
+    a.fraud_probability,
+    a.latency_ms
+  from public.realtime_fraud_audit a
+  order by a.transaction_id, a.processed_at desc, a.id desc
+),
+compare_base as (
+  -- Checkouts in the window that the model scored one at a time, each with
+  -- both scorers' verdicts.
+  select b.*, m.model_flagged, m.fraud_probability, m.latency_ms
+  from base b
+  join model_scores m using (transaction_id)
+  where m.latency_ms &gt;= 1
+),
+compare_sweep as (
+  -- What each scorer would flag at other cutoffs: the rules on their 0-1
+  -- risk score, the model on its fraud probability.
+  select 'rules' as scorer, c.cutoff::float8 as cutoff,
+         count(*) filter (where b.score &gt;= c.cutoff) as flagged,
+         count(*) filter (where b.score &gt;= c.cutoff and b.is_fraud) as caught
+  from compare_base b
+  cross join unnest(array[0.86, 0.7, 0.5, 0.3, 0.2]) as c(cutoff)
+  group by c.cutoff
+  union all
+  select 'model', c.cutoff::float8,
+         count(*) filter (where b.fraud_probability &gt;= c.cutoff),
+         count(*) filter (where b.fraud_probability &gt;= c.cutoff and b.is_fraud)
+  from compare_base b
+  cross join unnest(array[0.9, 0.5, 0.1, 0.01, 0.005]) as c(cutoff)
+  group by c.cutoff
+)
+select coalesce(json_agg(compare_sweep order by scorer desc, cutoff desc), '[]'::json) as compare_sweep
+from compare_sweep;</code></pre>
+                        <p class="sql-src__note">Part of <a href="https://github.com/lmansf/Portfolio2026/blob/main/scripts/fraud-snapshot.sql" target="_blank" rel="noopener">the read-only query</a> that runs once a day on Supabase and publishes the snapshot.</p>
+                    </details>
+                </div>
+            </details>
+            <!-- /sql-source -->
+            <p class="section-note" data-compare-note>Flagged means the rules sent the order to review or declined it, or the new model marked it as fraud. Only checkouts the new model scored live, one at a time, are compared, so this is an early read on a small sample. A one-off batch rescore of older orders on Nov 14 is left out, because it gave nearly every order the same score. Checkouts also paused on Nov 15 from about 8:30 AM to 3 PM ET.</p>
         </section>
 
         <!-- How it works -->

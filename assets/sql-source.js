@@ -243,7 +243,10 @@ const PIECES = {
     'live-totals': { kind: 'live', key: 'totals' },
     'live-daily': { kind: 'live', key: 'daily', need: ['day', 'checkouts', 'fraud', 'fraud_caught'] },
     'live-scores': { kind: 'live', key: 'score_bins', need: ['score_from', 'score_to', 'legit', 'fraud'] },
-    'live-patterns': { kind: 'live', key: 'patterns', need: ['pattern', 'fraud', 'caught'] }
+    'live-patterns': { kind: 'live', key: 'patterns', need: ['pattern', 'fraud', 'caught'] },
+    'live-compare': { kind: 'live', key: 'compare', need: ['scorer', 'fraud', 'legit', 'flagged', 'caught'] },
+    'live-compare-patterns': { kind: 'live', key: 'compare_patterns', need: ['pattern', 'scorer', 'fraud', 'caught'] },
+    'live-compare-sweep': { kind: 'live', key: 'compare_sweep', need: ['scorer', 'cutoff', 'flagged', 'caught'] }
 };
 
 /* ── The engine, shared by every editor on the page ── */
@@ -625,8 +628,15 @@ function drawLive(state, result, cols) {
         } else {
             value = raw.map((r) => {
                 const row = {};
-                need.map((c) => rename[c] || c).forEach((k) => { row[k] = r[k] === null || r[k] === undefined ? 0 : r[k]; });
-                if (key === 'patterns') row.pattern = text(r.pattern);
+                need.map((c) => rename[c] || c).forEach((k) => {
+                    if (types[k] === 'VARCHAR') row[k] = text(r[k]);
+                    else row[k] = r[k] === null || r[k] === undefined ? 0 : r[k];
+                });
+                // Optional columns the result also has (a cutoff, a p95) come along as they are.
+                spec.columns.forEach(([c, , k]) => {
+                    const name = k || c;
+                    if (!(name in row) && name in r) row[name] = r[name];
+                });
                 return row;
             });
             if (key === 'score_bins' && value.some((b) => b.from < 0 || b.from > 1)) {

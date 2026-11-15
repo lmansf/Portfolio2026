@@ -524,7 +524,13 @@ webstore checkouts). Nothing on the page talks to the database.
   measured against the generator's answer key in `raw_fraud_truth`,
   including labels whose `label_available_at` is still in the future (the
   page says so). It never selects an id, email, card, IP, or name into the
-  output.
+  output. Since a new model started scoring checkouts too (its log is
+  `realtime_fraud_audit`), the totals, daily, score_bins and patterns
+  entries read only the rules (`model_version = 'rules-v0'`), and the
+  `compare`, `compare_patterns` and `compare_sweep` entries put the rules
+  and the new model side by side on the checkouts the model scored live,
+  one at a time. Its one-off batch rescore of older checkouts, which logs
+  under 1 ms a row, is left out.
 - **`.github/workflows/fraud-snapshot.yml`** — runs daily at 05:35 UTC (and
   on demand), checks the result against an allow-list of fields with `jq`,
   and commits the file on every run (the timestamp always moves, so the
@@ -536,7 +542,7 @@ webstore checkouts). Nothing on the page talks to the database.
 - **`supabase/fraud_snapshot_reader.sql`** — creates that login role, run
   once by hand in the Supabase SQL editor (it is not applied by anything in
   this repo). The role is read-only, may SELECT only the columns the
-  snapshot query reads from its four tables, and gets an RLS SELECT policy
+  snapshot query reads from its five tables, and gets an RLS SELECT policy
   that applies to it alone.
 - **`assets/live.js` / `assets/live.css`** — plain SVG charts, stat tiles,
   and a table view. Series colors are validated separately for Day and

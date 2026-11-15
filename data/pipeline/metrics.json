@@ -3,13 +3,15 @@
     "metrics": {
         "catch_rate": {
             "label": "Catch rate",
-            "description": "Share of fraudulent orders the rules flagged (sent to review or declined).",
+            "description": "Share of fraudulent orders flagged: sent to review or declined by the rules, or marked as fraud by the new model.",
             "numerator": "fraud_caught",
             "denominator": "fraud",
             "tables": {
                 "fraud_totals": {},
                 "fraud_daily": {},
-                "fraud_patterns": { "numerator": "caught" }
+                "fraud_patterns": { "numerator": "caught" },
+                "fraud_compare": { "numerator": "caught" },
+                "fraud_compare_patterns": { "numerator": "caught" }
             }
         },
         "miss_rate": {
@@ -32,10 +34,34 @@
         },
         "legit_flag_rate": {
             "label": "Good customers flagged",
-            "description": "Share of legitimate orders the rules sent to review or declined.",
+            "description": "Share of legitimate orders flagged: sent to review or declined by the rules, or marked as fraud by the new model.",
             "numerator": "flagged - fraud_caught",
             "denominator": "legit",
-            "tables": { "fraud_totals": {} }
+            "tables": {
+                "fraud_totals": {},
+                "fraud_compare": { "numerator": "flagged - caught" }
+            }
+        },
+        "flag_precision": {
+            "label": "Flags that were fraud",
+            "description": "Share of flagged orders that were really fraud (precision).",
+            "numerator": "fraud_caught",
+            "denominator": "flagged",
+            "tables": {
+                "fraud_totals": {},
+                "fraud_compare": { "numerator": "caught" },
+                "fraud_compare_sweep": { "numerator": "caught" }
+            }
+        },
+        "flag_rate": {
+            "label": "Orders flagged",
+            "description": "Share of all orders flagged: sent to review or declined by the rules, or marked as fraud by the new model.",
+            "numerator": "flagged",
+            "denominator": "checkouts",
+            "tables": {
+                "fraud_totals": {},
+                "fraud_compare": {}
+            }
         },
         "dollars_stopped_share": {
             "label": "Fraud dollars stopped",
