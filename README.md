@@ -39,7 +39,8 @@ page and one archived project page:
 - **Owl Park** (`owl-park-infographic.html`, `/owl-park`) — a standalone
   infographic of the archived end-to-end data pipeline.
 - **Live data** (`live.html`, `/live`) — daily numbers from the fraud
-  pipeline (see "Live fraud data" below).
+  pipeline, and the new real-time model side by side with the rules (see
+  "Live fraud data" below).
 - **Data status** (`status.html`, `/status`) — the nightly data run's
   latest results: each source, every check grouped by table (failures
   first), and recent runs (see "The nightly data run" below).
@@ -324,7 +325,7 @@ a reload, puts back the default query and the page as published.
 |---|---|
 | Home | the "now" strip, featured projects, experience, credentials, toolkit |
 | Projects | featured, more builds |
-| `/live` | the 30-day totals, fraud per day, the score distribution, catch rate by pattern |
+| `/live` | the 30-day totals, fraud per day, the score distribution, catch rate by pattern, and the new model vs the rules (the head-to-head table, catch rate by pattern for each, other cutoffs) |
 
 How it works:
 
@@ -364,8 +365,10 @@ How it works:
   only accept `https://` and same-site paths. A piece drawn from the
   visitor's own query gets a faint dashed frame until Reset.
 - **`/live`** draws from `data/fraud-snapshot.json` as before. Its editors
-  query `fraud_totals`, `fraud_daily`, `fraud_score_bins` and
-  `fraud_patterns`, which the engine builds in the browser from that same
+  query `fraud_totals`, `fraud_daily`, `fraud_score_bins`,
+  `fraud_patterns`, `fraud_compare`, `fraud_compare_patterns`,
+  `fraud_compare_sweep` and `fraud_compare_day_one`, which the engine builds
+  in the browser from that same
   snapshot (the columns are listed once, in
   `data/console/snapshot-tables.json`). A result becomes a changed snapshot
   that `live.js` redraws (the `live:render` event), falling back to the
@@ -524,7 +527,22 @@ webstore checkouts). Nothing on the page talks to the database.
   measured against the generator's answer key in `raw_fraud_truth`,
   including labels whose `label_available_at` is still in the future (the
   page says so). It never selects an id, email, card, IP, or name into the
-  output.
+  output. Since a new model started scoring checkouts too (its log is
+  `realtime_fraud_audit`), the totals, daily, score_bins and patterns
+  entries read only the rules (`model_version = 'rules-v0'`), and the
+  `compare`, `compare_patterns` and `compare_sweep` entries put the rules
+  and the new model side by side on the checkouts the model scored live,
+  one at a time. Its one-off batch rescore of older checkouts, which logs
+  under 1 ms a row, is left out. `compare_day_one` is the same head-to-head
+  over a fixed window, the model's first 24 hours live (checkouts placed
+  from 2026-11-14 22:27:41 UTC to 24 hours later), with a fixed load/score
+  cutoff too: it counts only rows loaded, and model scores recorded, before
+  2026-11-15 22:57:41 UTC (the window end plus 30 minutes), so a later
+  re-score or late label can't move it. It reads the raw tables directly
+  rather than the 30-day base, so the counts the Home and Projects copy
+  quote never drift or age out. `/live` doesn't draw it (its charts and
+  tables keep the rolling `compare*` entries); it backs the copy's claims
+  and is queryable as `fraud_compare_day_one` in the SQL source editors.
 - **`.github/workflows/fraud-snapshot.yml`** — runs daily at 05:35 UTC (and
   on demand), checks the result against an allow-list of fields with `jq`,
   and commits the file on every run (the timestamp always moves, so the
@@ -536,13 +554,14 @@ webstore checkouts). Nothing on the page talks to the database.
 - **`supabase/fraud_snapshot_reader.sql`** — creates that login role, run
   once by hand in the Supabase SQL editor (it is not applied by anything in
   this repo). The role is read-only, may SELECT only the columns the
-  snapshot query reads from its four tables, and gets an RLS SELECT policy
+  snapshot query reads from its five tables, and gets an RLS SELECT policy
   that applies to it alone.
 - **`assets/live.js` / `assets/live.css`** — plain SVG charts, stat tiles,
   and a table view. Series colors are validated separately for Day and
   Night. The page warns visitors when the snapshot is more than 36 hours
   old or the generator has been paused (no checkout for 6 hours before the
-  snapshot was taken).
+  snapshot was taken). The "New model vs the rules" section is `hidden` in
+  the HTML and only shows when the snapshot has `compare` rows.
 
 To add a field, change the SQL, add the field to the workflow's
 allow-list, then read it in `live.js` (and list it in
@@ -632,14 +651,16 @@ without its database secret or over an empty window), and that shows on
 
 Every rate the site shows is defined once, in
 **`data/pipeline/metrics.json`**: catch rate, fraud approved, good customers
-declined and flagged, fraud dollars stopped, fraud rate and scoring
-timeouts, each as a numerator over a denominator in `fraud_*` columns
-(columns joined by `+` or `-`), on `fraud_totals` and on any other table it
-applies to (`fraud_daily`, `fraud_patterns`, where catch rate reads
+declined and flagged, flags that were fraud (precision), orders flagged,
+fraud dollars stopped, fraud rate and scoring timeouts, each as a numerator
+over a denominator in `fraud_*` columns (columns joined by `+` or `-`), on
+`fraud_totals` and on any other table it applies to (`fraud_daily`,
+`fraud_patterns` and the `fraud_compare*` tables, where catch rate reads
 `caught / fraud`). Three things read it:
 
 - `assets/metrics.js` (`metric('catch_rate', row, 'fraud_daily')`) for every
-  rate on `/live`: tiles, tooltips, captions and the pattern bars.
+  rate on `/live`: tiles, tooltips, captions, the pattern bars and the new
+  model vs rules section.
 - `scripts/build_metrics.py` writes **`data/pipeline/metrics.sql`**: a DuckDB
   macro per metric, so `SELECT day, catch_rate(fraud_caught, fraud) FROM
   fraud_daily` uses the site's own definition, and the `fraud_metrics` view,
@@ -650,7 +671,11 @@ applies to (`fraud_daily`, `fraud_patterns`, where catch rate reads
   Projects synopsis says the rules "flagged about half the fraud and no
   legitimate orders", so the data run checks that catch rate is between 40%
   and 60% and good customers flagged is 0%, and that both pages still say
-  it. When the numbers move, `/status` says the copy needs updating.
+  it. When the numbers move, `/status` says the copy needs updating. A claim
+  with a `table` quotes exact counts instead: it names a row (`where`, like
+  `{"scorer": "model"}`) and the `numerator` and `denominator` the copy
+  states, so "caught 110 of 111 fraudulent orders in its first 24 hours
+  live" is checked against `fraud_compare_day_one` every night.
 
 After changing `metrics.json` or `live.js`:
 

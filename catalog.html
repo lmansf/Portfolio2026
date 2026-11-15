@@ -114,7 +114,7 @@
         <section aria-labelledby="cat-tables" class="status-section">
             <header class="section-head">
                 <h2 class="section-head__title" id="cat-tables">Tables</h2>
-                <span class="section-head__hint">12 tables, each queryable in any SQL source</span>
+                <span class="section-head__hint">16 tables, each queryable in any SQL source</span>
             </header>
             <div class="cat-tables">
                 <details class="cat-table" id="t-projects">
@@ -268,6 +268,67 @@
                         <p class="cat-tests">Tested for: at least 1 row; pattern is unique; pattern is one of card_testing, stolen_card_resale, gift_card_cashout, account_takeover, fraud_ring; the patterns add up to all fraud; updated within 36 hours; every column is described. <a href="/status#t-fraud_patterns">Latest results</a>.</p>
                     </div>
                 </details>
+                <details class="cat-table" id="t-fraud_compare">
+                    <summary class="cat-table__head"><code class="cat-table__name">fraud_compare</code><span class="cat-table__fresh" data-cat-fresh="fraud_compare" data-max-hours="36" hidden></span><span class="cat-table__desc">The rules and the new model side by side on the same checkouts: one row per scorer.</span></summary>
+                    <div class="cat-table__body">
+                        <dl class="cat-facts"><div class="cat-fact"><dt>Owner</dt><dd>Logan Mansfield</dd></div><div class="cat-fact"><dt>Built from</dt><dd><a href="#t-fraud_supabase">Supabase checkout tables</a> → <a href="#t-fraud_model_audit">Supabase model scores</a> → <a href="#t-stg_fraud_base">Scored checkouts, last 30 days</a> → <a href="#t-stg_fraud_compare_base">Checkouts both scorers saw</a></dd></div><div class="cat-fact"><dt>Lives in</dt><dd>data/fraud-snapshot.json → compare</dd></div><div class="cat-fact"><dt>Freshness</dt><dd>Rebuilt every run; expected within 36 hours of the fraud snapshot</dd></div><div class="cat-fact"><dt>Shown on</dt><dd>Live data: the new model vs rules table</dd></div></dl>
+                        <ul class="cat-cols" aria-label="Columns of fraud_compare">
+                            <li class="cat-col"><code class="cat-col__name">scorer</code><span class="cat-col__type">VARCHAR</span><span class="cat-col__desc">rules or model.</span></li>
+                            <li class="cat-col"><code class="cat-col__name">checkouts</code><span class="cat-col__type">INTEGER</span><span class="cat-col__desc">Checkouts both scorers saw.</span></li>
+                            <li class="cat-col"><code class="cat-col__name">fraud</code><span class="cat-col__type">INTEGER</span><span class="cat-col__desc">Of those, how many the answer key marks as fraud.</span></li>
+                            <li class="cat-col"><code class="cat-col__name">legit</code><span class="cat-col__type">INTEGER</span><span class="cat-col__desc">Of those, how many are legitimate.</span></li>
+                            <li class="cat-col"><code class="cat-col__name">flagged</code><span class="cat-col__type">INTEGER</span><span class="cat-col__desc">Checkouts this scorer flagged (sent to review or declined).</span></li>
+                            <li class="cat-col"><code class="cat-col__name">caught</code><span class="cat-col__type">INTEGER</span><span class="cat-col__desc">Fraudulent checkouts this scorer flagged.</span></li>
+                            <li class="cat-col"><code class="cat-col__name">cutoff</code><span class="cat-col__type">DOUBLE</span><span class="cat-col__desc">The lowest score this scorer flagged at: the rules&#x27; risk score, or the model&#x27;s fraud probability.</span></li>
+                            <li class="cat-col"><code class="cat-col__name">p50_ms</code><span class="cat-col__type">DOUBLE</span><span class="cat-col__desc">Median scoring time, in milliseconds.</span></li>
+                            <li class="cat-col"><code class="cat-col__name">p95_ms</code><span class="cat-col__type">DOUBLE</span><span class="cat-col__desc">95th-percentile scoring time, in milliseconds.</span></li>
+                        </ul>
+                        <p class="cat-tests">Tested for: exactly 2 rows; scorer is unique; scorer is one of rules, model; no blanks in scorer, checkouts, fraud, legit, flagged, caught; fraud plus legit equals checkouts; caught fraud is no more than flagged or all fraud; both scorers saw the same checkouts; updated within 36 hours; every column is described. <a href="/status#t-fraud_compare">Latest results</a>.</p>
+                    </div>
+                </details>
+                <details class="cat-table" id="t-fraud_compare_patterns">
+                    <summary class="cat-table__head"><code class="cat-table__name">fraud_compare_patterns</code><span class="cat-table__fresh" data-cat-fresh="fraud_compare_patterns" data-max-hours="36" hidden></span><span class="cat-table__desc">Fraud caught by each scorer, by the generator&#x27;s fraud pattern, on the checkouts both scorers saw.</span></summary>
+                    <div class="cat-table__body">
+                        <dl class="cat-facts"><div class="cat-fact"><dt>Owner</dt><dd>Logan Mansfield</dd></div><div class="cat-fact"><dt>Built from</dt><dd><a href="#t-fraud_supabase">Supabase checkout tables</a> → <a href="#t-fraud_model_audit">Supabase model scores</a> → <a href="#t-stg_fraud_base">Scored checkouts, last 30 days</a> → <a href="#t-stg_fraud_compare_base">Checkouts both scorers saw</a></dd></div><div class="cat-fact"><dt>Lives in</dt><dd>data/fraud-snapshot.json → compare_patterns</dd></div><div class="cat-fact"><dt>Freshness</dt><dd>Rebuilt every run; expected within 36 hours of the fraud snapshot</dd></div><div class="cat-fact"><dt>Shown on</dt><dd>Live data: the new model vs rules by fraud pattern chart</dd></div></dl>
+                        <ul class="cat-cols" aria-label="Columns of fraud_compare_patterns">
+                            <li class="cat-col"><code class="cat-col__name">pattern</code><span class="cat-col__type">VARCHAR</span><span class="cat-col__desc">The kind of fraud the generator played out.</span></li>
+                            <li class="cat-col"><code class="cat-col__name">scorer</code><span class="cat-col__type">VARCHAR</span><span class="cat-col__desc">rules or model.</span></li>
+                            <li class="cat-col"><code class="cat-col__name">fraud</code><span class="cat-col__type">INTEGER</span><span class="cat-col__desc">Fraudulent checkouts of that pattern.</span></li>
+                            <li class="cat-col"><code class="cat-col__name">caught</code><span class="cat-col__type">INTEGER</span><span class="cat-col__desc">Of those, how many this scorer flagged.</span></li>
+                        </ul>
+                        <p class="cat-tests">Tested for: at least 2 rows; pattern and scorer are unique together; scorer is one of rules, model; pattern is one of card_testing, stolen_card_resale, gift_card_cashout, account_takeover, fraud_ring; caught fraud is no more than all fraud; the patterns add up to each scorer&#x27;s catches; updated within 36 hours; every column is described. <a href="/status#t-fraud_compare_patterns">Latest results</a>.</p>
+                    </div>
+                </details>
+                <details class="cat-table" id="t-fraud_compare_sweep">
+                    <summary class="cat-table__head"><code class="cat-table__name">fraud_compare_sweep</code><span class="cat-table__fresh" data-cat-fresh="fraud_compare_sweep" data-max-hours="36" hidden></span><span class="cat-table__desc">What each scorer would flag at a few other cutoffs, on the checkouts both scorers saw.</span></summary>
+                    <div class="cat-table__body">
+                        <dl class="cat-facts"><div class="cat-fact"><dt>Owner</dt><dd>Logan Mansfield</dd></div><div class="cat-fact"><dt>Built from</dt><dd><a href="#t-fraud_supabase">Supabase checkout tables</a> → <a href="#t-fraud_model_audit">Supabase model scores</a> → <a href="#t-stg_fraud_base">Scored checkouts, last 30 days</a> → <a href="#t-stg_fraud_compare_base">Checkouts both scorers saw</a></dd></div><div class="cat-fact"><dt>Lives in</dt><dd>data/fraud-snapshot.json → compare_sweep</dd></div><div class="cat-fact"><dt>Freshness</dt><dd>Rebuilt every run; expected within 36 hours of the fraud snapshot</dd></div><div class="cat-fact"><dt>Shown on</dt><dd>Live data: the other cutoffs table</dd></div></dl>
+                        <ul class="cat-cols" aria-label="Columns of fraud_compare_sweep">
+                            <li class="cat-col"><code class="cat-col__name">scorer</code><span class="cat-col__type">VARCHAR</span><span class="cat-col__desc">rules or model.</span></li>
+                            <li class="cat-col"><code class="cat-col__name">cutoff</code><span class="cat-col__type">DOUBLE</span><span class="cat-col__desc">Flag every checkout scored at or above this.</span></li>
+                            <li class="cat-col"><code class="cat-col__name">flagged</code><span class="cat-col__type">INTEGER</span><span class="cat-col__desc">Checkouts that cutoff would flag.</span></li>
+                            <li class="cat-col"><code class="cat-col__name">caught</code><span class="cat-col__type">INTEGER</span><span class="cat-col__desc">Fraudulent checkouts that cutoff would flag.</span></li>
+                        </ul>
+                        <p class="cat-tests">Tested for: at least 2 rows; scorer and cutoff are unique together; scorer is one of rules, model; cutoffs sit between 0 and 1; caught fraud is no more than flagged; updated within 36 hours; every column is described. <a href="/status#t-fraud_compare_sweep">Latest results</a>.</p>
+                    </div>
+                </details>
+                <details class="cat-table" id="t-fraud_compare_day_one">
+                    <summary class="cat-table__head"><code class="cat-table__name">fraud_compare_day_one</code><span class="cat-table__fresh" data-cat-fresh="fraud_compare_day_one" data-max-hours="36" hidden></span><span class="cat-table__desc">The rules and the new model over the model&#x27;s first 24 hours live, a fixed window (orders placed from Nov 14, 22:27:41 UTC, to 24 hours later), counting only rows loaded and model scores recorded before Nov 15, 22:57:41 UTC (the window end plus 30 minutes). The site&#x27;s copy quotes these counts, so both the order window and the load/score cutoff are fixed; claims in metrics.json check the copy against them.</span></summary>
+                    <div class="cat-table__body">
+                        <dl class="cat-facts"><div class="cat-fact"><dt>Owner</dt><dd>Logan Mansfield</dd></div><div class="cat-fact"><dt>Built from</dt><dd><a href="#t-fraud_model_audit">Supabase model scores</a> → <a href="#t-fraud_supabase">Supabase checkout tables</a></dd></div><div class="cat-fact"><dt>Lives in</dt><dd>data/fraud-snapshot.json → compare_day_one</dd></div><div class="cat-fact"><dt>Freshness</dt><dd>Rebuilt every run; expected within 36 hours of the fraud snapshot</dd></div></dl>
+                        <ul class="cat-cols" aria-label="Columns of fraud_compare_day_one">
+                            <li class="cat-col"><code class="cat-col__name">scorer</code><span class="cat-col__type">VARCHAR</span><span class="cat-col__desc">rules or model.</span></li>
+                            <li class="cat-col"><code class="cat-col__name">window_start</code><span class="cat-col__type">VARCHAR</span><span class="cat-col__desc">Start of the window (UTC, inclusive).</span></li>
+                            <li class="cat-col"><code class="cat-col__name">window_end</code><span class="cat-col__type">VARCHAR</span><span class="cat-col__desc">End of the window (UTC, exclusive).</span></li>
+                            <li class="cat-col"><code class="cat-col__name">checkouts</code><span class="cat-col__type">INTEGER</span><span class="cat-col__desc">Checkouts in the window both scorers saw.</span></li>
+                            <li class="cat-col"><code class="cat-col__name">fraud</code><span class="cat-col__type">INTEGER</span><span class="cat-col__desc">Of those, how many the answer key marks as fraud.</span></li>
+                            <li class="cat-col"><code class="cat-col__name">legit</code><span class="cat-col__type">INTEGER</span><span class="cat-col__desc">Of those, how many are legitimate.</span></li>
+                            <li class="cat-col"><code class="cat-col__name">flagged</code><span class="cat-col__type">INTEGER</span><span class="cat-col__desc">Checkouts this scorer flagged.</span></li>
+                            <li class="cat-col"><code class="cat-col__name">caught</code><span class="cat-col__type">INTEGER</span><span class="cat-col__desc">Fraudulent checkouts this scorer flagged.</span></li>
+                        </ul>
+                        <p class="cat-tests">Tested for: exactly 2 rows; scorer is unique; scorer is one of rules, model; no blanks in scorer, window_start, window_end, checkouts, fraud, legit, flagged, caught; fraud plus legit equals checkouts; caught fraud is no more than flagged or all fraud; the window is the fixed first 24 hours; updated within 36 hours; every column is described. <a href="/status#t-fraud_compare_day_one">Latest results</a>.</p>
+                    </div>
+                </details>
                 <details class="cat-table" id="t-fraud_metrics">
                     <summary class="cat-table__head"><code class="cat-table__name">fraud_metrics</code><span class="cat-table__fresh" data-cat-fresh="fraud_metrics" data-max-hours="36" hidden></span><span class="cat-table__desc">One row per site metric over fraud_totals: the definitions every page reads, with today&#x27;s value. Each metric is also a macro, like catch_rate(fraud_caught, fraud).</span></summary>
                     <div class="cat-table__body">
@@ -321,8 +382,12 @@
             <ul class="cat-metrics">
                 <li class="cat-metric" id="m-catch_rate">
                     <p class="cat-metric__head"><span class="cat-metric__label">Catch rate</span> <code class="cat-metric__sig">catch_rate(fraud_caught, fraud)</code></p>
-                    <p class="cat-metric__desc">Share of fraudulent orders the rules flagged (sent to review or declined). <code>fraud_caught / fraud</code>, on <code>fraud_totals</code>, <code>fraud_daily</code>, <code>fraud_patterns</code> as <code>caught / fraud</code>.</p>
+                    <p class="cat-metric__desc">Share of fraudulent orders flagged: sent to review or declined by the rules, or marked as fraud by the new model. <code>fraud_caught / fraud</code>, on <code>fraud_totals</code>, <code>fraud_daily</code>, <code>fraud_patterns</code> as <code>caught / fraud</code>, <code>fraud_compare</code> as <code>caught / fraud</code>, <code>fraud_compare_patterns</code> as <code>caught / fraud</code>, <code>fraud_compare_day_one</code> as <code>caught / fraud</code>.</p>
                     <p class="cat-metric__claim">Home and Projects quote it as &ldquo;flagged about half the fraud&rdquo;; the nightly run checks it stays 40% to 60%.</p>
+                    <p class="cat-metric__claim">Home and Projects quote it as &ldquo;caught 110 of 111 fraudulent orders in its first 24 hours live&rdquo;; the nightly run checks it is still 110 of 111 on <code>fraud_compare_day_one</code> (scorer model).</p>
+                    <p class="cat-metric__claim">Projects quote it as &ldquo;the new model caught 110 of 111 fraudulent orders&rdquo;; the nightly run checks it is still 110 of 111 on <code>fraud_compare_day_one</code> (scorer model).</p>
+                    <p class="cat-metric__claim">Projects quote it as &ldquo;where the rules caught 52&rdquo;; the nightly run checks it is still 52 of 111 on <code>fraud_compare_day_one</code> (scorer rules).</p>
+                    <p class="cat-metric__claim">Projects quote it as &ldquo;110 of 111 caught&rdquo;; the nightly run checks it is still 110 of 111 on <code>fraud_compare_day_one</code> (scorer model).</p>
                 </li>
                 <li class="cat-metric" id="m-miss_rate">
                     <p class="cat-metric__head"><span class="cat-metric__label">Fraud approved</span> <code class="cat-metric__sig">miss_rate(fraud, fraud_caught)</code></p>
@@ -334,8 +399,17 @@
                 </li>
                 <li class="cat-metric" id="m-legit_flag_rate">
                     <p class="cat-metric__head"><span class="cat-metric__label">Good customers flagged</span> <code class="cat-metric__sig">legit_flag_rate(flagged, fraud_caught, legit)</code></p>
-                    <p class="cat-metric__desc">Share of legitimate orders the rules sent to review or declined. <code>(flagged - fraud_caught) / legit</code>, on <code>fraud_totals</code>.</p>
+                    <p class="cat-metric__desc">Share of legitimate orders flagged: sent to review or declined by the rules, or marked as fraud by the new model. <code>(flagged - fraud_caught) / legit</code>, on <code>fraud_totals</code>, <code>fraud_compare</code> as <code>(flagged - caught) / legit</code>, <code>fraud_compare_day_one</code> as <code>(flagged - caught) / legit</code>.</p>
                     <p class="cat-metric__claim">Home and Projects quote it as &ldquo;and no legitimate orders&rdquo;; the nightly run checks it stays 0%.</p>
+                    <p class="cat-metric__claim">Projects quote it as &ldquo;25 good orders flagged out of 1,964&rdquo;; the nightly run checks it is still 25 of 1,964 on <code>fraud_compare_day_one</code> (scorer model).</p>
+                </li>
+                <li class="cat-metric" id="m-flag_precision">
+                    <p class="cat-metric__head"><span class="cat-metric__label">Flags that were fraud</span> <code class="cat-metric__sig">flag_precision(fraud_caught, flagged)</code></p>
+                    <p class="cat-metric__desc">Share of flagged orders that were really fraud (precision). <code>fraud_caught / flagged</code>, on <code>fraud_totals</code>, <code>fraud_compare</code> as <code>caught / flagged</code>, <code>fraud_compare_sweep</code> as <code>caught / flagged</code>.</p>
+                </li>
+                <li class="cat-metric" id="m-flag_rate">
+                    <p class="cat-metric__head"><span class="cat-metric__label">Orders flagged</span> <code class="cat-metric__sig">flag_rate(flagged, checkouts)</code></p>
+                    <p class="cat-metric__desc">Share of all orders flagged: sent to review or declined by the rules, or marked as fraud by the new model. <code>flagged / checkouts</code>, on <code>fraud_totals</code>, <code>fraud_compare</code>.</p>
                 </li>
                 <li class="cat-metric" id="m-dollars_stopped_share">
                     <p class="cat-metric__head"><span class="cat-metric__label">Fraud dollars stopped</span> <code class="cat-metric__sig">dollars_stopped_share(fraud_dollars_stopped, fraud_dollars_approved)</code></p>
@@ -360,7 +434,9 @@
                 <li class="cat-source" id="t-site_pages"><p class="cat-source__head"><span class="cat-layer">raw</span> <span class="cat-source__name">Page markup</span></p><p class="cat-source__desc">The Home and Projects pages as published. They are the source of truth for the site&#x27;s own tables, so a table can never say something the pages don&#x27;t.</p><p class="cat-source__where">index.html, projects.html</p></li>
                 <li class="cat-source" id="t-stg_site_rows"><p class="cat-source__head"><span class="cat-layer">staging</span> <span class="cat-source__name">Parsed page rows</span></p><p class="cat-source__desc">Each card, role, skill, credential and the hero, read out of the page markup into typed rows (dates parsed, badges split from titles).</p><p class="cat-source__where">scripts/build_console_data.py</p></li>
                 <li class="cat-source" id="t-fraud_supabase"><p class="cat-source__head"><span class="cat-layer">raw</span> <span class="cat-source__name">Supabase checkout tables</span></p><p class="cat-source__desc">The fraud pipeline&#x27;s four raw Postgres tables of simulated webstore checkouts. They stay in Supabase: nothing row-level ever reaches this site.</p><p class="cat-source__where">raw_transactions, raw_fraud_decisions, raw_fraud_truth, raw_checkout_responses</p></li>
+                <li class="cat-source" id="t-fraud_model_audit"><p class="cat-source__head"><span class="cat-layer">raw</span> <span class="cat-source__name">Supabase model scores</span></p><p class="cat-source__desc">The new model&#x27;s scoring log: one row each time it scored a checkout, with its fraud probability, its decision and how long it took. It stays in Supabase: nothing row-level ever reaches this site.</p><p class="cat-source__where">realtime_fraud_audit</p></li>
                 <li class="cat-source" id="t-stg_fraud_base"><p class="cat-source__head"><span class="cat-layer">staging</span> <span class="cat-source__name">Scored checkouts, last 30 days</span></p><p class="cat-source__desc">One row per scored checkout in the last 30 America/New_York days, joined to the generator&#x27;s answer key. Built inside a read-only transaction on Supabase; only the aggregates below leave it, as data/fraud-snapshot.json.</p><p class="cat-source__where">the base CTE in scripts/fraud-snapshot.sql</p></li>
+                <li class="cat-source" id="t-stg_fraud_compare_base"><p class="cat-source__head"><span class="cat-layer">staging</span> <span class="cat-source__name">Checkouts both scorers saw</span></p><p class="cat-source__desc">Scored checkouts the new model also scored live, one at a time, joined to its latest score. A one-off batch rescore of older orders on Nov 14 is left out: it ran in bulk and gave every order nearly the same score.</p><p class="cat-source__where">the model_scores and compare_base CTEs in scripts/fraud-snapshot.sql</p></li>
                 <li class="cat-source" id="t-github_api"><p class="cat-source__head"><span class="cat-layer">raw</span> <span class="cat-source__name">GitHub public API</span></p><p class="cat-source__desc">Public activity and public repositories for github.com/lmansf. Private work never appears here.</p><p class="cat-source__where">api.github.com /users/lmansf/events/public and /users/lmansf/repos</p></li>
                 <li class="cat-source" id="t-stg_github_events"><p class="cat-source__head"><span class="cat-layer">staging</span> <span class="cat-source__name">Public GitHub events</span></p><p class="cat-source__desc">One row per public event in the last 30 days, keeping only its id, type, repository and time (no commit messages, names or emails).</p><p class="cat-source__where">data/pipeline/stg_github_events.json, written by scripts/data_run.py</p></li>
             </ul>

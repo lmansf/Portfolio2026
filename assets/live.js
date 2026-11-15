@@ -18,7 +18,8 @@
  * carries, falling back to the published numbers if that doesn't draw.
  *
  * Every rate here (catch rate, good customers declined, dollars stopped,
- * timeouts, catch rate by day and by pattern) comes from metric() in
+ * timeouts, catch rate by day and by pattern, and the new model vs rules
+ * section) comes from metric() in
  * metrics.js, so it's the definition in data/pipeline/metrics.json that the
  * SQL editors, the nightly data run and the site copy use too. Built with
  * esbuild --bundle --format=iife (see the README).
@@ -466,6 +467,203 @@ import { metric } from './metrics.js';
         }
     }
 
+    /* ── New model vs the rules ── */
+    // Only checkouts both scorers saw. Every rate is a metric() over the
+    // fraud_compare* tables; the section stays hidden in a snapshot without them.
+    const SCORERS = [
+        { id: 'rules', name: 'Rules' },
+        { id: 'model', name: 'New model' }
+    ];
+    const fmtCut = (c) => (!Number.isFinite(c) ? '–' : c >= 0.1 ? c.toFixed(2) : String(Number(c.toPrecision(2))));
+    const fmtMs = (n) => (Number.isFinite(n) ? `${n.toFixed(1)} ms` : '–');
+    const ofText = (a, b) => (Number.isFinite(a) && Number.isFinite(b) ? `${fmtInt(a)} of ${fmtInt(b)}` : '');
+
+    const compareRows = (s) => {
+        const rows = s && Array.isArray(s.compare) ? s.compare : [];
+        return Object.fromEntries(rows.map((r) => [String(r && r.scorer), r]));
+    };
+    const hasCompare = (s) => {
+        const by = compareRows(s);
+        return Boolean(by.rules && by.model);
+    };
+
+    function renderCompare(s, quiet) {
+        const section = root.querySelector('[data-compare]');
+        if (!section) return;
+        const by = compareRows(s);
+        const rules = by.rules;
+        const model = by.model;
+        if (!rules || !model) {
+            if (quiet && hasCompare(window.__liveSnapshot)) throw new Error('The comparison needs a rules row and a model row');
+            section.hidden = true;
+            return;
+        }
+        section.hidden = false;
+
+        const win = root.querySelector('[data-compare-window]');
+        if (win && s.model_started_at) {
+            const end = s.latest_event_at || s.generated_at;
+            const hours = (Date.parse(end) - Date.parse(s.model_started_at)) / 36e5;
+            const span = hours < 36 ? 'About a day of data' : hours < 24 * 7 ? `About ${Math.round(hours / 24)} days of data` : 'Same checkouts, scored by both';
+            win.textContent = `${span}: ${fmtStamp(s.model_started_at)} to ${fmtStamp(end)}`;
+        }
+
+        const rate = (name, r) => metric(name, r, 'fraud_compare');
+        const lines = [
+            { label: 'Fraud caught', value: (r) => rate('catch_rate', r), of: (r) => ofText(r.caught, r.fraud), better: 'high' },
+            { label: 'Good customers flagged', value: (r) => rate('legit_flag_rate', r), digits: 1, of: (r) => ofText(r.flagged - r.caught, r.legit), better: 'low' },
+            { label: 'Flags that were fraud', value: (r) => rate('flag_precision', r), of: (r) => ofText(r.caught, r.flagged), better: 'high' },
+            { label: 'Orders flagged', value: (r) => rate('flag_rate', r), digits: 1, of: (r) => ofText(r.flagged, r.checkouts) },
+            { label: 'Lowest score flagged', text: (r) => fmtCut(r.cutoff), of: (r) => (r.scorer === 'model' ? 'fraud probability' : 'risk score') },
+            { label: 'Scoring time (95th percentile)', value: (r) => r.p95_ms, text: (r) => fmtMs(r.p95_ms), of: (r) => (Number.isFinite(r.p50_ms) ? `median ${fmtMs(r.p50_ms)}` : ''), better: 'low' }
+        ];
+        const body = root.querySelector('[data-table="compare"]');
+        if (body) {
+            body.innerHTML = lines.map((line) => {
+                const vals = [rules, model].map((r) => (line.value ? line.value(r) : NaN));
+                let best = -1;
+                if (line.better && vals.every(Number.isFinite) && vals[0] !== vals[1]) {
+                    best = line.better === 'high' ? (vals[0] > vals[1] ? 0 : 1) : (vals[0] < vals[1] ? 0 : 1);
+                }
+                const cells = [rules, model].map((r, i) => {
+                    const main = line.text ? line.text(r) : fmtPct(vals[i], vals[i] === 0 ? 0 : line.digits || 0);
+                    const sub = line.of(r);
+                    return `<td${i === best ? ' class="is-better"' : ''}><span class="live-vs__value">${esc(main)}</span>` +
+                        (sub ? `<span class="live-vs__of">${esc(sub)}</span>` : '') +
+                        (i === best ? '<span class="visually-hidden"> (better)</span>' : '') + '</td>';
+                }).join('');
+                return `<tr><th scope="row">${esc(line.label)}</th>${cells}</tr>`;
+            }).join('');
+        }
+
+        const lead = root.querySelector('[data-caption="compare"]');
+        if (lead) {
+            const goodModel = model.flagged - model.caught;
+            const goodRules = rules.flagged - rules.caught;
+            const same = Number.isFinite(model.checkouts) ? `On the same ${fmtInt(model.checkouts)} checkouts` : 'On the same checkouts';
+            let text = `${same}, the new model caught ${fmtInt(model.caught)} of ${fmtInt(model.fraud)} fraudulent orders (${fmtPct(rate('catch_rate', model))}); the rules caught ${fmtInt(rules.caught)} (${fmtPct(rate('catch_rate', rules))}).`;
+            if (Number.isFinite(goodModel) && Number.isFinite(goodRules)) {
+                const noun = (n) => `${fmtInt(n)} good ${n === 1 ? 'customer' : 'customers'}`;
+                if (goodModel > goodRules) {
+                    text += ` The cost is ${noun(goodModel)} flagged (${fmtPct(rate('legit_flag_rate', model), 1)}), where the rules flagged ${goodRules === 0 ? 'none' : fmtInt(goodRules)}.`;
+                } else {
+                    text += ` It flagged ${noun(goodModel)}, against ${fmtInt(goodRules)} for the rules.`;
+                }
+            }
+            lead.textContent = text;
+        }
+
+        renderComparePatterns(s);
+        renderCompareSweep(s, by);
+    }
+
+    function renderComparePatterns(s) {
+        const host = root.querySelector('[data-chart="compare-patterns"]');
+        if (!host) return;
+        host.textContent = '';
+        const groups = new Map();
+        (Array.isArray(s.compare_patterns) ? s.compare_patterns : []).forEach((r) => {
+            const key = String(r.pattern);
+            if (!groups.has(key)) groups.set(key, { pattern: key, fraud: 0, by: {} });
+            const g = groups.get(key);
+            g.fraud = Math.max(g.fraud, Number(r.fraud) || 0);
+            g.by[String(r.scorer)] = r;
+        });
+        const list = [...groups.values()].filter((g) => g.fraud > 0).sort((a, b) => b.fraud - a.fraud);
+        list.forEach((g) => {
+            const name = PATTERN_NAMES[g.pattern] || g.pattern.replace(/_/g, ' ');
+            const bars = SCORERS.map((sc) => {
+                const r = g.by[sc.id];
+                const v = r ? metric('catch_rate', r, 'fraud_compare_patterns') : NaN;
+                const w = Number.isFinite(v) ? Math.max(0, Math.min(1, v)) * 100 : 0;
+                const label = r ? `${fmtPct(v)} · ${fmtInt(r.caught)}` : '–';
+                return `<div class="live-pair"><span class="live-pair__who">${esc(sc.name)}</span>` +
+                    `<div class="live-bar__track" role="img" aria-label="${esc(sc.name)}: ${esc(r ? `${fmtPct(v)} caught, ${fmtInt(r.caught)} of ${fmtInt(r.fraud)}` : 'no data')}">` +
+                    `<div class="live-bar__fill live-bar__fill--${sc.id}" style="width:${w.toFixed(1)}%"></div></div>` +
+                    `<span class="live-pair__value">${esc(label)}</span></div>`;
+            }).join('');
+            const row = document.createElement('div');
+            row.className = 'live-bar live-bar--pair';
+            row.innerHTML = `<div class="live-bar__head"><span class="live-bar__name">${esc(name)}</span>` +
+                `<span class="live-bar__value">${fmtInt(g.fraud)} fraudulent ${g.fraud === 1 ? 'order' : 'orders'}</span></div>${bars}`;
+            host.appendChild(row);
+        });
+        const caption = root.querySelector('[data-caption="compare-patterns"]');
+        if (caption) {
+            let widest = null;
+            list.forEach((g) => {
+                const a = g.by.rules;
+                const b = g.by.model;
+                if (!a || !b) return;
+                const gap = metric('catch_rate', b, 'fraud_compare_patterns') - metric('catch_rate', a, 'fraud_compare_patterns');
+                if (Number.isFinite(gap) && (!widest || gap > widest.gap)) widest = { g, gap, a, b };
+            });
+            if (widest && widest.gap > 0) {
+                const name = (PATTERN_NAMES[widest.g.pattern] || widest.g.pattern.replace(/_/g, ' ')).toLowerCase();
+                let text = `The biggest gain is on ${name}: the rules caught ${fmtInt(widest.a.caught)} of ${fmtInt(widest.g.fraud)}, the new model ${fmtInt(widest.b.caught)}.`;
+                if (CROSS_ACCOUNT_PATTERNS.has(widest.g.pattern)) text += ' That fraud is spread across many accounts, which rules looking at one order at a time miss.';
+                caption.textContent = text;
+            } else {
+                caption.textContent = '';
+            }
+        }
+    }
+
+    function renderCompareSweep(s, by) {
+        const host = root.querySelector('[data-chart="compare-sweep"]');
+        if (!host) return;
+        host.textContent = '';
+        const all = Array.isArray(s.compare_sweep) ? s.compare_sweep : [];
+        const fraud = by.model ? by.model.fraud : by.rules ? by.rules.fraud : NaN;
+        const facts = {};
+        SCORERS.forEach((sc) => {
+            const rows = all.filter((r) => String(r.scorer) === sc.id).slice();
+            if (!rows.length) return;
+            // Today's line: a sweep row that matches today's decisions, or else
+            // today's decisions themselves as their own row.
+            const cur = by[sc.id];
+            const same = (r) => cur && r.flagged === cur.flagged && r.caught === cur.caught && Math.abs(r.cutoff - cur.cutoff) < 0.01;
+            if (cur && Number.isFinite(cur.cutoff) && !rows.some(same)) {
+                rows.push({ scorer: sc.id, cutoff: cur.cutoff, flagged: cur.flagged, caught: cur.caught });
+            }
+            rows.sort((a, b) => b.cutoff - a.cutoff);
+            const near = rows.findIndex(same);
+            const card = document.createElement('div');
+            card.className = 'live-sweep';
+            card.innerHTML =
+                `<h4 class="live-sweep__title"><span class="live-swatch live-swatch--${sc.id}" aria-hidden="true"></span>${esc(sc.name)}</h4>` +
+                '<div class="live-vs__scroll"><table class="live-vs live-vs--sweep">' +
+                `<caption class="visually-hidden">${esc(sc.name)} at other cutoffs</caption>` +
+                '<thead><tr><th scope="col">Flag from</th><th scope="col">Fraud caught</th><th scope="col">Good customers flagged</th><th scope="col">Flags that were fraud</th></tr></thead><tbody>' +
+                rows.map((r, i) => {
+                    const good = r.flagged - r.caught;
+                    const isNow = i === near;
+                    return `<tr${isNow ? ' class="is-current"' : ''}><th scope="row">${esc(fmtCut(r.cutoff))}${isNow ? ' <span class="live-vs__tag">today</span>' : ''}</th>` +
+                        `<td>${esc(ofText(r.caught, fraud) || fmtInt(r.caught))}</td><td>${fmtInt(good)}</td>` +
+                        `<td>${fmtPct(metric('flag_precision', r, 'fraud_compare_sweep'))}</td></tr>`;
+                }).join('') +
+                '</tbody></table></div>';
+            host.appendChild(card);
+            facts[sc.id] = rows;
+        });
+
+        const caption = root.querySelector('[data-caption="compare-sweep"]');
+        if (!caption) return;
+        caption.textContent = '';
+        const m = by.model;
+        const rows = facts.model;
+        if (!m || !rows) return;
+        const clean = rows.filter((r) => r.flagged === r.caught).sort((a, b) => b.caught - a.caught || a.cutoff - b.cutoff)[0];
+        const goodNow = m.flagged - m.caught;
+        if (clean && goodNow > 0 && clean.caught <= m.caught) {
+            const extra = m.caught - clean.caught;
+            caption.textContent = `Moved up to ${fmtCut(clean.cutoff)}, the new model would still catch ${fmtInt(clean.caught)} of ${fmtInt(m.fraud)} and flag no good customers. ` +
+                `Its line today, about ${fmtCut(m.cutoff)}, catches ${extra === 0 ? 'nothing more' : `${fmtInt(extra)} more`} for ${fmtInt(goodNow)} good ${goodNow === 1 ? 'customer' : 'customers'} flagged.`;
+        } else {
+            caption.textContent = 'Each row is what that scorer would flag if it drew its line at that score.';
+        }
+    }
+
     /* ── Table view ── */
     function renderTable(s, todayEt) {
         const body = root.querySelector('[data-table="daily"]');
@@ -485,6 +683,7 @@ import { metric } from './metrics.js';
         renderDaily(s, todayEt);
         renderScores(s);
         renderPatterns(s);
+        renderCompare(s, quiet);
         renderTable(s, todayEt);
     }
 

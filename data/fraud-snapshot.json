@@ -1,26 +1,26 @@
 {
-  "generated_at": "2026-11-02T17:19:37Z",
+  "generated_at": "2026-11-15T22:27:45Z",
   "timezone": "America/New_York",
   "window_days": 30,
   "simulated": true,
   "model_versions": "rules-v0",
-  "latest_event_at": "2026-11-02T16:27:52Z",
+  "latest_event_at": "2026-11-15T22:27:11Z",
   "totals": {
-    "checkouts": 38916,
-    "flagged": 1128,
-    "declined": 939,
-    "reviewed": 189,
-    "fraud": 2237,
-    "fraud_caught": 1128,
+    "checkouts": 55817,
+    "flagged": 1668,
+    "declined": 1403,
+    "reviewed": 265,
+    "fraud": 3269,
+    "fraud_caught": 1668,
     "false_declines": 0,
-    "legit": 36679,
-    "fraud_dollars_stopped": 317047.8,
-    "fraud_dollars_approved": 866908.93,
-    "p50_scoring_ms": 9.1,
+    "legit": 52548,
+    "fraud_dollars_stopped": 446126.52,
+    "fraud_dollars_approved": 1195150.72,
+    "p50_scoring_ms": 9,
     "p95_scoring_ms": 14.5,
-    "p95_checkout_ms": 373,
-    "scoring_timeouts": 181,
-    "active_days": 15
+    "p95_checkout_ms": 374,
+    "scoring_timeouts": 260,
+    "active_days": 23
   },
   "thresholds": {
     "review_from": 0.6225,
@@ -28,43 +28,17 @@
   },
   "daily": [
     {
-      "day": "2026-10-14",
-      "checkouts": 938,
-      "approved": 926,
-      "reviewed": 6,
-      "declined": 6,
-      "fraud": 37,
-      "fraud_caught": 12,
-      "false_declines": 0,
-      "fraud_dollars_stopped": 3638.38,
-      "fraud_dollars_approved": 32661.64,
-      "p95_scoring_ms": 14.3
-    },
-    {
-      "day": "2026-10-15",
-      "checkouts": 3023,
-      "approved": 2948,
-      "reviewed": 13,
-      "declined": 62,
-      "fraud": 162,
-      "fraud_caught": 75,
-      "false_declines": 0,
-      "fraud_dollars_stopped": 24439.22,
-      "fraud_dollars_approved": 79782.19,
-      "p95_scoring_ms": 14.5
-    },
-    {
       "day": "2026-10-16",
-      "checkouts": 3039,
-      "approved": 2975,
-      "reviewed": 11,
-      "declined": 53,
-      "fraud": 154,
-      "fraud_caught": 64,
+      "checkouts": 732,
+      "approved": 715,
+      "reviewed": 3,
+      "declined": 14,
+      "fraud": 38,
+      "fraud_caught": 17,
       "false_declines": 0,
-      "fraud_dollars_stopped": 17325.69,
-      "fraud_dollars_approved": 69993.93,
-      "p95_scoring_ms": 14.4
+      "fraud_dollars_stopped": 2861.14,
+      "fraud_dollars_approved": 11778.63,
+      "p95_scoring_ms": 14.3
     },
     {
       "day": "2026-10-17",
@@ -211,15 +185,145 @@
     },
     {
       "day": "2026-11-02",
-      "checkouts": 1492,
-      "approved": 1473,
-      "reviewed": 9,
-      "declined": 10,
-      "fraud": 66,
-      "fraud_caught": 19,
+      "checkouts": 3122,
+      "approved": 3043,
+      "reviewed": 21,
+      "declined": 58,
+      "fraud": 178,
+      "fraud_caught": 79,
       "false_declines": 0,
-      "fraud_dollars_stopped": 17263.47,
-      "fraud_dollars_approved": 51191.32,
+      "fraud_dollars_stopped": 25816.46,
+      "fraud_dollars_approved": 80545.44,
+      "p95_scoring_ms": 14.5
+    },
+    {
+      "day": "2026-11-03",
+      "checkouts": 1506,
+      "approved": 1473,
+      "reviewed": 7,
+      "declined": 26,
+      "fraud": 81,
+      "fraud_caught": 33,
+      "false_declines": 0,
+      "fraud_dollars_stopped": 6123.63,
+      "fraud_dollars_approved": 43592.65,
+      "p95_scoring_ms": 14.5
+    },
+    {
+      "day": "2026-11-06",
+      "checkouts": 920,
+      "approved": 891,
+      "reviewed": 4,
+      "declined": 25,
+      "fraud": 55,
+      "fraud_caught": 29,
+      "false_declines": 0,
+      "fraud_dollars_stopped": 7008.56,
+      "fraud_dollars_approved": 12140.5,
+      "p95_scoring_ms": 14.4
+    },
+    {
+      "day": "2026-11-07",
+      "checkouts": 2990,
+      "approved": 2901,
+      "reviewed": 8,
+      "declined": 81,
+      "fraud": 179,
+      "fraud_caught": 89,
+      "false_declines": 0,
+      "fraud_dollars_stopped": 21156.05,
+      "fraud_dollars_approved": 73277.53,
+      "p95_scoring_ms": 14.3
+    },
+    {
+      "day": "2026-11-08",
+      "checkouts": 3100,
+      "approved": 3008,
+      "reviewed": 20,
+      "declined": 72,
+      "fraud": 169,
+      "fraud_caught": 92,
+      "false_declines": 0,
+      "fraud_dollars_stopped": 32248.54,
+      "fraud_dollars_approved": 46973.4,
+      "p95_scoring_ms": 14.5
+    },
+    {
+      "day": "2026-11-09",
+      "checkouts": 3023,
+      "approved": 2949,
+      "reviewed": 4,
+      "declined": 70,
+      "fraud": 163,
+      "fraud_caught": 74,
+      "false_declines": 0,
+      "fraud_dollars_stopped": 20469.96,
+      "fraud_dollars_approved": 62202.73,
+      "p95_scoring_ms": 14.4
+    },
+    {
+      "day": "2026-11-10",
+      "checkouts": 1462,
+      "approved": 1414,
+      "reviewed": 5,
+      "declined": 43,
+      "fraud": 95,
+      "fraud_caught": 48,
+      "false_declines": 0,
+      "fraud_dollars_stopped": 8147.55,
+      "fraud_dollars_approved": 39506.47,
+      "p95_scoring_ms": 14.3
+    },
+    {
+      "day": "2026-11-12",
+      "checkouts": 964,
+      "approved": 935,
+      "reviewed": 3,
+      "declined": 26,
+      "fraud": 59,
+      "fraud_caught": 29,
+      "false_declines": 0,
+      "fraud_dollars_stopped": 4612.02,
+      "fraud_dollars_approved": 28141.84,
+      "p95_scoring_ms": 14.6
+    },
+    {
+      "day": "2026-11-13",
+      "checkouts": 3104,
+      "approved": 3021,
+      "reviewed": 19,
+      "declined": 64,
+      "fraud": 169,
+      "fraud_caught": 83,
+      "false_declines": 0,
+      "fraud_dollars_stopped": 23645.64,
+      "fraud_dollars_approved": 75889.29,
+      "p95_scoring_ms": 14.5
+    },
+    {
+      "day": "2026-11-14",
+      "checkouts": 3200,
+      "approved": 3099,
+      "reviewed": 15,
+      "declined": 86,
+      "fraud": 190,
+      "fraud_caught": 101,
+      "false_declines": 0,
+      "fraud_dollars_stopped": 28051.27,
+      "fraud_dollars_approved": 62098.5,
+      "p95_scoring_ms": 14.5
+    },
+    {
+      "day": "2026-11-15",
+      "checkouts": 1270,
+      "approved": 1234,
+      "reviewed": 6,
+      "declined": 30,
+      "fraud": 75,
+      "fraud_caught": 36,
+      "false_declines": 0,
+      "fraud_dollars_stopped": 11604.66,
+      "fraud_dollars_approved": 25723.89,
       "p95_scoring_ms": 14.5
     }
   ],
@@ -227,125 +331,296 @@
     {
       "from": 0,
       "to": 0.05,
-      "legit": 30501,
-      "fraud": 29
+      "legit": 43694,
+      "fraud": 45
     },
     {
       "from": 0.05,
       "to": 0.1,
-      "legit": 3893,
+      "legit": 5628,
       "fraud": 0
     },
     {
       "from": 0.1,
       "to": 0.15,
-      "legit": 2014,
-      "fraud": 183
+      "legit": 2858,
+      "fraud": 261
     },
     {
       "from": 0.15,
       "to": 0.2,
-      "legit": 8,
-      "fraud": 55
+      "legit": 12,
+      "fraud": 83
     },
     {
       "from": 0.2,
       "to": 0.25,
-      "legit": 263,
-      "fraud": 38
+      "legit": 353,
+      "fraud": 60
     },
     {
       "from": 0.3,
       "to": 0.35,
-      "legit": 0,
-      "fraud": 37
+      "legit": 2,
+      "fraud": 45
     },
     {
       "from": 0.35,
       "to": 0.4,
-      "legit": 0,
-      "fraud": 490
+      "legit": 1,
+      "fraud": 749
     },
     {
       "from": 0.5,
       "to": 0.55,
       "legit": 0,
-      "fraud": 176
+      "fraud": 234
     },
     {
       "from": 0.55,
       "to": 0.6,
       "legit": 0,
-      "fraud": 97
+      "fraud": 116
     },
     {
       "from": 0.6,
       "to": 0.65,
       "legit": 0,
-      "fraud": 1
+      "fraud": 6
     },
     {
       "from": 0.65,
       "to": 0.7,
       "legit": 0,
-      "fraud": 87
+      "fraud": 115
     },
     {
       "from": 0.7,
       "to": 0.75,
       "legit": 0,
-      "fraud": 60
+      "fraud": 91
     },
     {
       "from": 0.8,
       "to": 0.85,
       "legit": 0,
-      "fraud": 42
+      "fraud": 54
     },
     {
       "from": 0.85,
       "to": 0.9,
       "legit": 0,
-      "fraud": 240
+      "fraud": 346
     },
     {
       "from": 0.9,
       "to": 0.95,
       "legit": 0,
-      "fraud": 87
+      "fraud": 128
     },
     {
       "from": 0.95,
       "to": 1,
       "legit": 0,
-      "fraud": 615
+      "fraud": 936
     }
   ],
   "patterns": [
     {
       "pattern": "card_testing",
-      "fraud": 1314,
-      "caught": 927
+      "fraud": 1981,
+      "caught": 1381
     },
     {
       "pattern": "fraud_ring",
-      "fraud": 280,
-      "caught": 20
-    },
-    {
-      "pattern": "gift_card_cashout",
-      "fraud": 264,
-      "caught": 112
-    },
-    {
-      "pattern": "stolen_card_resale",
-      "fraud": 256,
+      "fraud": 431,
       "caught": 40
     },
     {
+      "pattern": "gift_card_cashout",
+      "fraud": 327,
+      "caught": 142
+    },
+    {
+      "pattern": "stolen_card_resale",
+      "fraud": 324,
+      "caught": 58
+    },
+    {
       "pattern": "account_takeover",
-      "fraud": 123,
-      "caught": 29
+      "fraud": 206,
+      "caught": 47
+    }
+  ],
+  "model_started_at": "2026-11-14T20:37:40Z",
+  "compare": [
+    {
+      "scorer": "rules",
+      "checkouts": 2076,
+      "fraud": 111,
+      "legit": 1965,
+      "flagged": 52,
+      "caught": 52,
+      "cutoff": 0.6225,
+      "p50_ms": 9,
+      "p95_ms": 14.5
+    },
+    {
+      "scorer": "model",
+      "checkouts": 2076,
+      "fraud": 111,
+      "legit": 1965,
+      "flagged": 135,
+      "caught": 110,
+      "cutoff": 0.0101,
+      "p50_ms": 10.3,
+      "p95_ms": 13.3
+    }
+  ],
+  "compare_patterns": [
+    {
+      "pattern": "card_testing",
+      "scorer": "rules",
+      "fraud": 57,
+      "caught": 36
+    },
+    {
+      "pattern": "card_testing",
+      "scorer": "model",
+      "fraud": 57,
+      "caught": 57
+    },
+    {
+      "pattern": "fraud_ring",
+      "scorer": "rules",
+      "fraud": 24,
+      "caught": 6
+    },
+    {
+      "pattern": "fraud_ring",
+      "scorer": "model",
+      "fraud": 24,
+      "caught": 24
+    },
+    {
+      "pattern": "gift_card_cashout",
+      "scorer": "rules",
+      "fraud": 14,
+      "caught": 5
+    },
+    {
+      "pattern": "gift_card_cashout",
+      "scorer": "model",
+      "fraud": 14,
+      "caught": 14
+    },
+    {
+      "pattern": "stolen_card_resale",
+      "scorer": "rules",
+      "fraud": 11,
+      "caught": 4
+    },
+    {
+      "pattern": "stolen_card_resale",
+      "scorer": "model",
+      "fraud": 11,
+      "caught": 11
+    },
+    {
+      "pattern": "account_takeover",
+      "scorer": "rules",
+      "fraud": 5,
+      "caught": 1
+    },
+    {
+      "pattern": "account_takeover",
+      "scorer": "model",
+      "fraud": 5,
+      "caught": 4
+    }
+  ],
+  "compare_sweep": [
+    {
+      "scorer": "rules",
+      "cutoff": 0.86,
+      "flagged": 41,
+      "caught": 41
+    },
+    {
+      "scorer": "rules",
+      "cutoff": 0.7,
+      "flagged": 49,
+      "caught": 49
+    },
+    {
+      "scorer": "rules",
+      "cutoff": 0.5,
+      "flagged": 66,
+      "caught": 66
+    },
+    {
+      "scorer": "rules",
+      "cutoff": 0.3,
+      "flagged": 94,
+      "caught": 93
+    },
+    {
+      "scorer": "rules",
+      "cutoff": 0.2,
+      "flagged": 104,
+      "caught": 94
+    },
+    {
+      "scorer": "model",
+      "cutoff": 0.9,
+      "flagged": 108,
+      "caught": 108
+    },
+    {
+      "scorer": "model",
+      "cutoff": 0.5,
+      "flagged": 109,
+      "caught": 109
+    },
+    {
+      "scorer": "model",
+      "cutoff": 0.1,
+      "flagged": 110,
+      "caught": 109
+    },
+    {
+      "scorer": "model",
+      "cutoff": 0.01,
+      "flagged": 135,
+      "caught": 110
+    },
+    {
+      "scorer": "model",
+      "cutoff": 0.005,
+      "flagged": 527,
+      "caught": 111
+    }
+  ],
+  "compare_day_one": [
+    {
+      "scorer": "rules",
+      "window_start": "2026-11-14T22:27:41Z",
+      "window_end": "2026-11-15T22:27:41Z",
+      "checkouts": 2075,
+      "fraud": 111,
+      "legit": 1964,
+      "flagged": 52,
+      "caught": 52
+    },
+    {
+      "scorer": "model",
+      "window_start": "2026-11-14T22:27:41Z",
+      "window_end": "2026-11-15T22:27:41Z",
+      "checkouts": 2075,
+      "fraud": 111,
+      "legit": 1964,
+      "flagged": 135,
+      "caught": 110
     }
   ]
 }

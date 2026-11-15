@@ -27,5 +27,29 @@
     "fraud_patterns": {
         "snapshot": "patterns",
         "columns": [["pattern", "VARCHAR"], ["fraud", "INTEGER"], ["caught", "INTEGER"]]
+    },
+    "fraud_compare": {
+        "snapshot": "compare",
+        "columns": [
+            ["scorer", "VARCHAR"], ["checkouts", "INTEGER"], ["fraud", "INTEGER"], ["legit", "INTEGER"],
+            ["flagged", "INTEGER"], ["caught", "INTEGER"], ["cutoff", "DOUBLE"],
+            ["p50_ms", "DOUBLE"], ["p95_ms", "DOUBLE"]
+        ]
+    },
+    "fraud_compare_patterns": {
+        "snapshot": "compare_patterns",
+        "columns": [["pattern", "VARCHAR"], ["scorer", "VARCHAR"], ["fraud", "INTEGER"], ["caught", "INTEGER"]]
+    },
+    "fraud_compare_sweep": {
+        "snapshot": "compare_sweep",
+        "columns": [["scorer", "VARCHAR"], ["cutoff", "DOUBLE"], ["flagged", "INTEGER"], ["caught", "INTEGER"]]
+    },
+    "fraud_compare_day_one": {
+        "snapshot": "compare_day_one",
+        "columns": [
+            ["scorer", "VARCHAR"], ["window_start", "VARCHAR"], ["window_end", "VARCHAR"],
+            ["checkouts", "INTEGER"], ["fraud", "INTEGER"], ["legit", "INTEGER"],
+            ["flagged", "INTEGER"], ["caught", "INTEGER"]
+        ]
     }
 }

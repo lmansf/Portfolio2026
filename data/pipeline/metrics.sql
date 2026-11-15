@@ -5,14 +5,18 @@
 --   SELECT day, catch_rate(fraud_caught, fraud) FROM fraud_daily;
 -- and fraud_metrics: every metric over fraud_totals, one row each.
 
--- Catch rate: Share of fraudulent orders the rules flagged (sent to review or declined).
+-- Catch rate: Share of fraudulent orders flagged: sent to review or declined by the rules, or marked as fraud by the new model.
 CREATE OR REPLACE MACRO catch_rate(fraud_caught, fraud) AS CAST(fraud_caught AS DOUBLE) / nullif(fraud, 0);
 -- Fraud approved: Share of fraudulent orders the rules approved: the fraud that got through.
 CREATE OR REPLACE MACRO miss_rate(fraud, fraud_caught) AS CAST(fraud - fraud_caught AS DOUBLE) / nullif(fraud, 0);
 -- Good customers declined: Share of legitimate orders the rules declined outright.
 CREATE OR REPLACE MACRO false_decline_rate(false_declines, legit) AS CAST(false_declines AS DOUBLE) / nullif(legit, 0);
--- Good customers flagged: Share of legitimate orders the rules sent to review or declined.
+-- Good customers flagged: Share of legitimate orders flagged: sent to review or declined by the rules, or marked as fraud by the new model.
 CREATE OR REPLACE MACRO legit_flag_rate(flagged, fraud_caught, legit) AS CAST(flagged - fraud_caught AS DOUBLE) / nullif(legit, 0);
+-- Flags that were fraud: Share of flagged orders that were really fraud (precision).
+CREATE OR REPLACE MACRO flag_precision(fraud_caught, flagged) AS CAST(fraud_caught AS DOUBLE) / nullif(flagged, 0);
+-- Orders flagged: Share of all orders flagged: sent to review or declined by the rules, or marked as fraud by the new model.
+CREATE OR REPLACE MACRO flag_rate(flagged, checkouts) AS CAST(flagged AS DOUBLE) / nullif(checkouts, 0);
 -- Fraud dollars stopped: Share of attempted fraud dollars on orders the rules flagged.
 CREATE OR REPLACE MACRO dollars_stopped_share(fraud_dollars_stopped, fraud_dollars_approved) AS CAST(fraud_dollars_stopped AS DOUBLE) / nullif(fraud_dollars_stopped + fraud_dollars_approved, 0);
 -- Fraud rate: Share of all checkouts that were fraudulent.
@@ -43,6 +47,18 @@ SELECT 'legit_flag_rate' AS metric, 'Good customers flagged' AS label,
        '(flagged - fraud_caught) / legit' AS definition,
        CAST(flagged - fraud_caught AS DOUBLE) AS numerator, CAST(legit AS DOUBLE) AS denominator,
        legit_flag_rate(flagged, fraud_caught, legit) AS value
+FROM fraud_totals
+UNION ALL
+SELECT 'flag_precision' AS metric, 'Flags that were fraud' AS label,
+       'fraud_caught / flagged' AS definition,
+       CAST(fraud_caught AS DOUBLE) AS numerator, CAST(flagged AS DOUBLE) AS denominator,
+       flag_precision(fraud_caught, flagged) AS value
+FROM fraud_totals
+UNION ALL
+SELECT 'flag_rate' AS metric, 'Orders flagged' AS label,
+       'flagged / checkouts' AS definition,
+       CAST(flagged AS DOUBLE) AS numerator, CAST(checkouts AS DOUBLE) AS denominator,
+       flag_rate(flagged, checkouts) AS value
 FROM fraud_totals
 UNION ALL
 SELECT 'dollars_stopped_share' AS metric, 'Fraud dollars stopped' AS label,

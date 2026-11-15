@@ -161,10 +161,16 @@ def metric_item(name, m, claims, ind):
              f'<code>{esc(metric_defs.definition(m))}</code>, on {", ".join(tables)}.</p>']
     for c in claims:
         where = " and ".join(data_run.PAGE_NAMES.get(p, p) for p in c["pages"])
-        bound = (f"{data_run.pct(c['min'])}" if c["min"] == c["max"]
-                 else f"{data_run.pct(c['min'])} to {data_run.pct(c['max'])}")
+        if "table" in c:
+            row = ", ".join(f"{k} {v}" for k, v in c.get("where", {}).items())
+            check = (f"the nightly run checks it is still {c['numerator']:,} of {c['denominator']:,} "
+                     f"on <code>{esc(c['table'])}</code>" + (f" ({esc(row)})" if row else ""))
+        else:
+            bound = (f"{data_run.pct(c['min'])}" if c["min"] == c["max"]
+                     else f"{data_run.pct(c['min'])} to {data_run.pct(c['max'])}")
+            check = f"the nightly run checks it stays {esc(bound)}"
         lines.append(f'{ind}    <p class="cat-metric__claim">{esc(where)} quote it as '
-                     f'&ldquo;{esc(c["quote"])}&rdquo;; the nightly run checks it stays {esc(bound)}.</p>')
+                     f'&ldquo;{esc(c["quote"])}&rdquo;; {check}.</p>')
     lines.append(f'{ind}</li>')
     return "\n".join(lines)
 

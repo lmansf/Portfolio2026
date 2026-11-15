@@ -94,7 +94,26 @@ def problems(defs, tables=None):
             out.append(f"claim {c.get('quote')!r}: no metric {c.get('metric')!r}")
         if not c.get("pages") or not c.get("quote"):
             out.append(f"claim {c.get('quote')!r}: needs pages and a quote")
-        if not isinstance(c.get("min"), (int, float)) or not isinstance(c.get("max"), (int, float)):
+        if "table" in c:
+            m, table = defs["metrics"].get(c.get("metric")), c["table"]
+            where = c.get("where", {})
+            if not isinstance(table, str):
+                out.append(f"claim {c.get('quote')!r}: table must be a table name")
+                table = repr(table)
+            if not isinstance(where, dict):
+                out.append(f"claim {c.get('quote')!r}: where must map column names to values")
+                where = {}
+            if m and table not in m.get("tables", {}):
+                out.append(f"claim {c.get('quote')!r}: {c.get('metric')} isn't defined on {table}")
+            gone = [str(k) for k in where if k not in tables.get(table, [])]
+            if table not in tables:
+                out.append(f"claim {c.get('quote')!r}: no table {table} in data/console/snapshot-tables.json")
+            elif gone:
+                out.append(f"claim {c.get('quote')!r}: {table} has no column {', '.join(gone)}")
+            if not all(isinstance(c.get(k), int) and not isinstance(c.get(k), bool)
+                       for k in ("numerator", "denominator")):
+                out.append(f"claim {c.get('quote')!r}: a claim on a table needs a whole-number numerator and denominator")
+        elif not isinstance(c.get("min"), (int, float)) or not isinstance(c.get("max"), (int, float)):
             out.append(f"claim {c.get('quote')!r}: needs a numeric min and max")
     return out
 

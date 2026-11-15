@@ -7,6 +7,7 @@
  *   .live-legend / .live-swatch series legend
  *   .live-bars                  catch rate by pattern (HTML bars)
  *   .live-table                 table view of the daily numbers
+ *   .live-vs / .live-pair       new model vs rules: table, paired bars, cutoffs
  *   .live-tooltip               hover / focus tooltip
  *
  * Series colors were checked with the dataviz palette validator
@@ -19,11 +20,14 @@
     --live-fraud:  #ff4f00;   /* fraud / missed: a warning orange, apart from the teal */
     --live-grid:   var(--rule-soft);
     --live-axis:   var(--ink-3);
+    --live-rules:  #8a959d;   /* new model vs rules: the rules, a light graphite (3:1 on panels) */
+    --live-model:  var(--accent);   /* the new model: the site's teal, darker, so the pair splits by lightness */
 }
 @media (prefers-color-scheme: dark) {
     :root {
         --live-legit: #a1adb3;
         --live-fraud: #ff6a2b;
+        --live-rules: #66737b;
     }
 }
 
@@ -258,6 +262,126 @@
     background: var(--surface-2);
 }
 .live-table tbody tr:last-child td { border-bottom: 0; }
+
+/* ── New model vs the rules ── */
+.live-swatch--rules { background: var(--live-rules); }
+.live-swatch--model { background: var(--live-model); }
+.live-subhead {
+    margin-top: 1.75rem;
+    margin-bottom: 0.6rem;
+    font-size: 1rem;
+    font-weight: 600;
+    color: var(--ink-1);
+}
+.live-compare__lead {
+    margin-top: 0;
+    margin-bottom: 0.9rem;
+    max-width: 68ch;
+    color: var(--ink-1);
+}
+.live-vs__scroll { overflow-x: auto; }
+.live-vs {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.9rem;
+    font-variant-numeric: tabular-nums;
+}
+.live-vs th,
+.live-vs td {
+    padding: 0.6rem 0.75rem;
+    text-align: right;
+    vertical-align: top;
+    border-bottom: var(--bw) solid var(--hairline);
+}
+.live-vs tbody tr:last-child th,
+.live-vs tbody tr:last-child td { border-bottom: 0; }
+.live-vs th:first-child { text-align: left; padding-left: 0; }
+.live-vs tbody th {
+    font-weight: 500;
+    color: var(--ink-2);
+}
+.live-vs thead th {
+    font-family: var(--font-mono);
+    font-size: 0.74rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    color: var(--ink-3);
+    white-space: nowrap;
+}
+.live-vs thead .live-swatch { margin-right: 0.4rem; vertical-align: -0.05rem; }
+.live-vs__value {
+    display: block;
+    font-weight: 600;
+    color: var(--ink-1);
+    white-space: nowrap;
+}
+.live-vs__of {
+    display: block;
+    font-size: 0.78rem;
+    color: var(--ink-3);
+    white-space: nowrap;
+}
+.live-vs td.is-better .live-vs__value { color: var(--accent-ink); }
+.live-vs td.is-better .live-vs__value::before {
+    content: "▲ ";
+    font-size: 0.7em;
+    vertical-align: 0.1em;
+}
+
+.live-bar--pair { gap: 0.35rem; }
+.live-bar--pair + .live-bar--pair {
+    padding-top: 0.85rem;
+    border-top: var(--bw) solid var(--hairline);
+}
+.live-pair {
+    display: grid;
+    grid-template-columns: 5.5rem minmax(0, 1fr) 5.5rem;
+    align-items: center;
+    gap: 0.6rem;
+    font-size: 0.82rem;
+}
+.live-pair__who { color: var(--ink-3); }
+.live-pair__value {
+    text-align: right;
+    color: var(--ink-2);
+    font-variant-numeric: tabular-nums;
+    white-space: nowrap;
+}
+.live-bar__fill--rules { background: var(--live-rules); }
+.live-bar__fill--model { background: var(--live-model); }
+
+.live-caption--top { margin-bottom: 0.25rem; }
+.live-sweeps {
+    display: grid;
+    gap: 1.25rem;
+}
+@media (min-width: 760px) {
+    .live-sweeps { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+.live-sweep__title {
+    display: flex;
+    align-items: center;
+    gap: 0.45rem;
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: var(--ink-1);
+    margin-bottom: 0.25rem;
+}
+.live-vs--sweep { font-size: 0.84rem; }
+.live-vs--sweep thead th { white-space: normal; vertical-align: bottom; }
+.live-vs--sweep th,
+.live-vs--sweep td { padding: 0.45rem 0.5rem; }
+.live-vs--sweep tbody th { font-weight: 600; color: var(--ink-1); white-space: nowrap; }
+.live-vs--sweep tr.is-current th,
+.live-vs--sweep tr.is-current td { background: var(--accent-mist); }
+.live-vs__tag {
+    font-family: var(--font-mono);
+    font-size: 0.66rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    color: var(--accent-ink);
+    margin-left: 0.25rem;
+}
 
 /* ── How it works ── */
 .live-steps {
