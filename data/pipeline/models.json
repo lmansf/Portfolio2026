@@ -347,6 +347,34 @@
                 {"type": "freshness"}
             ]
         },
+        "fraud_compare_day_one": {
+            "layer": "mart",
+            "label": "fraud_compare_day_one",
+            "upstream": ["fraud_supabase", "fraud_model_audit"],
+            "where": "data/fraud-snapshot.json → compare_day_one",
+            "freshness": {"from": "fraud_snapshot", "max_hours": 36},
+            "description": "The rules and the new model over the model's first 24 hours live, a fixed window (orders placed from Nov 14, 22:27:41 UTC, to 24 hours later). The site's copy quotes these counts, so the window never moves; claims in metrics.json check the copy against them.",
+            "columns": {
+                "scorer": "rules or model.",
+                "window_start": "Start of the window (UTC, inclusive).",
+                "window_end": "End of the window (UTC, exclusive).",
+                "checkouts": "Checkouts in the window both scorers saw.",
+                "fraud": "Of those, how many the answer key marks as fraud.",
+                "legit": "Of those, how many are legitimate.",
+                "flagged": "Checkouts this scorer flagged.",
+                "caught": "Fraudulent checkouts this scorer flagged."
+            },
+            "tests": [
+                {"type": "row_count", "min": 2, "max": 2},
+                {"type": "unique", "columns": ["scorer"]},
+                {"type": "accepted_values", "column": "scorer", "values": ["rules", "model"]},
+                {"type": "not_null", "columns": ["scorer", "window_start", "window_end", "checkouts", "fraud", "legit", "flagged", "caught"]},
+                {"type": "expression", "name": "fraud plus legit equals checkouts", "sql": "fraud + legit = checkouts"},
+                {"type": "expression", "name": "caught fraud is no more than flagged or all fraud", "sql": "caught <= flagged AND caught <= fraud"},
+                {"type": "expression", "name": "the window is the fixed first 24 hours", "sql": "window_start = '2026-11-14T22:27:41Z' AND window_end = '2026-11-15T22:27:41Z'"},
+                {"type": "freshness"}
+            ]
+        },
         "fraud_metrics": {
             "layer": "mart",
             "label": "fraud_metrics",

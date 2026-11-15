@@ -438,21 +438,50 @@ def metric_checks(con, add, broken):
         if not m:
             continue
         where = " and ".join(PAGE_NAMES.get(pg, pg) for pg in claim["pages"])
-        lo, hi = claim["min"], claim["max"]
-        bound = f"is {pct(lo)}" if lo == hi else f"is between {pct(lo)} and {pct(hi)}"
         say = "say" if len(claim["pages"]) > 1 else "says"
-        name = f'{where} {say} "{claim["quote"]}": {m["label"].lower()} {bound}'
         gone = [pg for pg in claim["pages"]
                 if claim["quote"] not in " ".join((ROOT / pg).read_text(encoding="utf-8").split())]
-        value, num, den = rows.get(claim["metric"], (None, None, None))
-        if gone:
-            passed, detail = False, f"{', '.join(gone)} no longer {'say' if len(gone) > 1 else 'says'} it: update the claim in metrics.json"
-        elif value is None:
-            passed, detail = False, "no value to check (the snapshot is empty)"
+        if "table" in claim:
+            # Exact counts quoted from one row of a table, like the model's first day.
+            table = ident(claim["table"])
+            num_x, den_x = metric_defs.parts(m, table)
+            filt = claim.get("where", {})
+            cond = " AND ".join(f"{ident(k)} = {lit(v)}" for k, v in filt.items()) or "TRUE"
+            want_num, want_den = claim["numerator"], claim["denominator"]
+            row_name = ", ".join(f"{k} {v}" for k, v in filt.items())
+            node = table
+            name = (f'{where} {say} "{claim["quote"]}": {m["label"].lower()} is '
+                    f'{want_num:,} of {want_den:,} on {table}' + (f" ({row_name})" if row_name else ""))
+            found, read_err = None, None
+            try:
+                found = con.execute(f"SELECT CAST({num_x} AS DOUBLE), CAST({den_x} AS DOUBLE) "
+                                    f"FROM {table} WHERE {cond}").fetchall()
+            except duckdb.Error as err:
+                read_err = str(err).splitlines()[0]
+            if gone:
+                passed, detail = False, f"{', '.join(gone)} no longer {'say' if len(gone) > 1 else 'says'} it: update the claim in metrics.json"
+            elif found is None:
+                passed, detail = False, f"couldn't read {table}: {read_err}"
+            elif len(found) != 1:
+                passed, detail = False, f"expected one matching row in {table}, found {len(found)}"
+            else:
+                num, den = found[0]
+                passed = num == want_num and den == want_den
+                detail = f"{num:,.0f} of {den:,.0f}" + ("" if passed else ": the copy needs updating")
         else:
-            passed = lo - 1e-9 <= value <= hi + 1e-9
-            detail = f"{pct(value)} ({num:,.0f} of {den:,.0f})" + ("" if passed else ": the copy needs updating")
-        add(f"fraud_metrics.claim_{slug(claim['quote'])}", "fraud_metrics", name, passed, detail)
+            node = "fraud_metrics"
+            lo, hi = claim["min"], claim["max"]
+            bound = f"is {pct(lo)}" if lo == hi else f"is between {pct(lo)} and {pct(hi)}"
+            name = f'{where} {say} "{claim["quote"]}": {m["label"].lower()} {bound}'
+            value, num, den = rows.get(claim["metric"], (None, None, None))
+            if gone:
+                passed, detail = False, f"{', '.join(gone)} no longer {'say' if len(gone) > 1 else 'says'} it: update the claim in metrics.json"
+            elif value is None:
+                passed, detail = False, "no value to check (the snapshot is empty)"
+            else:
+                passed = lo - 1e-9 <= value <= hi + 1e-9
+                detail = f"{pct(value)} ({num:,.0f} of {den:,.0f})" + ("" if passed else ": the copy needs updating")
+        add(f"{node}.claim_{slug(claim['quote'])}", node, name, passed, detail)
 
 
 def validate(models):

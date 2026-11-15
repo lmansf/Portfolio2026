@@ -183,6 +183,33 @@ compare_sweep as (
   from compare_base b
   cross join unnest(array[0.9, 0.5, 0.1, 0.01, 0.005]) as c(cutoff)
   group by c.cutoff
+),
+compare_day_one as (
+  -- The model's first 24 hours live, frozen: checkouts placed from the first
+  -- one it scored one at a time after going live (Nov 14, 22:27:41 UTC) to
+  -- 24 hours later. (One stray Nov 10 order with a live score is left out.)
+  -- The site's copy quotes these counts, so the window is fixed rather than
+  -- rolling; metrics.json claims check the copy against them every night.
+  -- It reads the raw tables directly, so it doesn't age out of the 30-day
+  -- window the rest of the snapshot uses.
+  select
+    s.scorer,
+    to_char(timestamptz '2026-11-14 22:27:41+00' at time zone 'UTC', 'YYYY-MM-DD"T"HH24:MI:SS"Z"') as window_start,
+    to_char(timestamptz '2026-11-15 22:27:41+00' at time zone 'UTC', 'YYYY-MM-DD"T"HH24:MI:SS"Z"') as window_end,
+    count(*) as checkouts,
+    count(*) filter (where coalesce(t.is_fraud, false)) as fraud,
+    count(*) filter (where not coalesce(t.is_fraud, false)) as legit,
+    count(*) filter (where case s.scorer when 'rules' then d.decision <> 'approve' else m.model_flagged end) as flagged,
+    count(*) filter (where coalesce(t.is_fraud, false)
+                       and case s.scorer when 'rules' then d.decision <> 'approve' else m.model_flagged end) as caught
+  from public.raw_transactions x
+  join public.raw_fraud_decisions d on d.transaction_id = x.transaction_id and d.model_version = 'rules-v0'
+  left join public.raw_fraud_truth t on t.transaction_id = x.transaction_id
+  join model_scores m on m.transaction_id = x.transaction_id::text
+  cross join (values ('rules'), ('model')) as s(scorer)
+  where x.event_ts >= timestamptz '2026-11-14 22:27:41+00'
+    and x.event_ts <  timestamptz '2026-11-15 22:27:41+00'
+  group by s.scorer
 )
 select json_build_object(
   'generated_at', to_char(now() at time zone 'UTC', 'YYYY-MM-DD"T"HH24:MI:SS"Z"'),
@@ -207,7 +234,9 @@ select json_build_object(
                          order by fraud desc, pattern collate "C", scorer desc), '[]'::json)
                        from compare_patterns),
   'compare_sweep', (select coalesce(json_agg(compare_sweep order by scorer desc, cutoff desc), '[]'::json)
-                    from compare_sweep)
+                    from compare_sweep),
+  'compare_day_one', (select coalesce(json_agg(compare_day_one order by scorer desc), '[]'::json)
+                      from compare_day_one)
 ) as snapshot;
 
 commit;

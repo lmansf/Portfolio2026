@@ -600,5 +600,27 @@
       "flagged": 527,
       "caught": 111
     }
+  ],
+  "compare_day_one": [
+    {
+      "scorer": "rules",
+      "window_start": "2026-11-14T22:27:41Z",
+      "window_end": "2026-11-15T22:27:41Z",
+      "checkouts": 2075,
+      "fraud": 111,
+      "legit": 1964,
+      "flagged": 52,
+      "caught": 52
+    },
+    {
+      "scorer": "model",
+      "window_start": "2026-11-14T22:27:41Z",
+      "window_end": "2026-11-15T22:27:41Z",
+      "checkouts": 2075,
+      "fraud": 111,
+      "legit": 1964,
+      "flagged": 135,
+      "caught": 110
+    }
   ]
 }

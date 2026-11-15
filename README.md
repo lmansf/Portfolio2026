@@ -532,7 +532,11 @@ webstore checkouts). Nothing on the page talks to the database.
   `compare`, `compare_patterns` and `compare_sweep` entries put the rules
   and the new model side by side on the checkouts the model scored live,
   one at a time. Its one-off batch rescore of older checkouts, which logs
-  under 1 ms a row, is left out.
+  under 1 ms a row, is left out. `compare_day_one` is the same head-to-head
+  over a fixed window, the model's first 24 hours live (checkouts placed
+  from 2026-11-14 22:27:41 UTC to 24 hours later). It reads the raw tables
+  directly rather than the 30-day base, so the counts the Home and Projects
+  copy quote never drift or age out.
 - **`.github/workflows/fraud-snapshot.yml`** — runs daily at 05:35 UTC (and
   on demand), checks the result against an allow-list of fields with `jq`,
   and commits the file on every run (the timestamp always moves, so the
@@ -661,7 +665,11 @@ over a denominator in `fraud_*` columns (columns joined by `+` or `-`), on
   Projects synopsis says the rules "flagged about half the fraud and no
   legitimate orders", so the data run checks that catch rate is between 40%
   and 60% and good customers flagged is 0%, and that both pages still say
-  it. When the numbers move, `/status` says the copy needs updating.
+  it. When the numbers move, `/status` says the copy needs updating. A claim
+  with a `table` quotes exact counts instead: it names a row (`where`, like
+  `{"scorer": "model"}`) and the `numerator` and `denominator` the copy
+  states, so "caught 110 of 111 fraudulent orders in its first 24 hours
+  live" is checked against `fraud_compare_day_one` every night.
 
 After changing `metrics.json` or `live.js`:
 

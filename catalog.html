@@ -114,7 +114,7 @@
         <section aria-labelledby="cat-tables" class="status-section">
             <header class="section-head">
                 <h2 class="section-head__title" id="cat-tables">Tables</h2>
-                <span class="section-head__hint">15 tables, each queryable in any SQL source</span>
+                <span class="section-head__hint">16 tables, each queryable in any SQL source</span>
             </header>
             <div class="cat-tables">
                 <details class="cat-table" id="t-projects">
@@ -312,6 +312,23 @@
                         <p class="cat-tests">Tested for: at least 2 rows; scorer and cutoff are unique together; scorer is one of rules, model; cutoffs sit between 0 and 1; caught fraud is no more than flagged; updated within 36 hours; every column is described. <a href="/status#t-fraud_compare_sweep">Latest results</a>.</p>
                     </div>
                 </details>
+                <details class="cat-table" id="t-fraud_compare_day_one">
+                    <summary class="cat-table__head"><code class="cat-table__name">fraud_compare_day_one</code><span class="cat-table__fresh" data-cat-fresh="fraud_compare_day_one" data-max-hours="36" hidden></span><span class="cat-table__desc">The rules and the new model over the model&#x27;s first 24 hours live, a fixed window (orders placed from Nov 14, 22:27:41 UTC, to 24 hours later). The site&#x27;s copy quotes these counts, so the window never moves; claims in metrics.json check the copy against them.</span></summary>
+                    <div class="cat-table__body">
+                        <dl class="cat-facts"><div class="cat-fact"><dt>Owner</dt><dd>Logan Mansfield</dd></div><div class="cat-fact"><dt>Built from</dt><dd><a href="#t-fraud_model_audit">Supabase model scores</a> → <a href="#t-fraud_supabase">Supabase checkout tables</a></dd></div><div class="cat-fact"><dt>Lives in</dt><dd>data/fraud-snapshot.json → compare_day_one</dd></div><div class="cat-fact"><dt>Freshness</dt><dd>Rebuilt every run; expected within 36 hours of the fraud snapshot</dd></div></dl>
+                        <ul class="cat-cols" aria-label="Columns of fraud_compare_day_one">
+                            <li class="cat-col"><code class="cat-col__name">scorer</code><span class="cat-col__type">VARCHAR</span><span class="cat-col__desc">rules or model.</span></li>
+                            <li class="cat-col"><code class="cat-col__name">window_start</code><span class="cat-col__type">VARCHAR</span><span class="cat-col__desc">Start of the window (UTC, inclusive).</span></li>
+                            <li class="cat-col"><code class="cat-col__name">window_end</code><span class="cat-col__type">VARCHAR</span><span class="cat-col__desc">End of the window (UTC, exclusive).</span></li>
+                            <li class="cat-col"><code class="cat-col__name">checkouts</code><span class="cat-col__type">INTEGER</span><span class="cat-col__desc">Checkouts in the window both scorers saw.</span></li>
+                            <li class="cat-col"><code class="cat-col__name">fraud</code><span class="cat-col__type">INTEGER</span><span class="cat-col__desc">Of those, how many the answer key marks as fraud.</span></li>
+                            <li class="cat-col"><code class="cat-col__name">legit</code><span class="cat-col__type">INTEGER</span><span class="cat-col__desc">Of those, how many are legitimate.</span></li>
+                            <li class="cat-col"><code class="cat-col__name">flagged</code><span class="cat-col__type">INTEGER</span><span class="cat-col__desc">Checkouts this scorer flagged.</span></li>
+                            <li class="cat-col"><code class="cat-col__name">caught</code><span class="cat-col__type">INTEGER</span><span class="cat-col__desc">Fraudulent checkouts this scorer flagged.</span></li>
+                        </ul>
+                        <p class="cat-tests">Tested for: exactly 2 rows; scorer is unique; scorer is one of rules, model; no blanks in scorer, window_start, window_end, checkouts, fraud, legit, flagged, caught; fraud plus legit equals checkouts; caught fraud is no more than flagged or all fraud; the window is the fixed first 24 hours; updated within 36 hours; every column is described. <a href="/status#t-fraud_compare_day_one">Latest results</a>.</p>
+                    </div>
+                </details>
                 <details class="cat-table" id="t-fraud_metrics">
                     <summary class="cat-table__head"><code class="cat-table__name">fraud_metrics</code><span class="cat-table__fresh" data-cat-fresh="fraud_metrics" data-max-hours="36" hidden></span><span class="cat-table__desc">One row per site metric over fraud_totals: the definitions every page reads, with today&#x27;s value. Each metric is also a macro, like catch_rate(fraud_caught, fraud).</span></summary>
                     <div class="cat-table__body">
@@ -365,8 +382,12 @@
             <ul class="cat-metrics">
                 <li class="cat-metric" id="m-catch_rate">
                     <p class="cat-metric__head"><span class="cat-metric__label">Catch rate</span> <code class="cat-metric__sig">catch_rate(fraud_caught, fraud)</code></p>
-                    <p class="cat-metric__desc">Share of fraudulent orders flagged: sent to review or declined by the rules, or marked as fraud by the new model. <code>fraud_caught / fraud</code>, on <code>fraud_totals</code>, <code>fraud_daily</code>, <code>fraud_patterns</code> as <code>caught / fraud</code>, <code>fraud_compare</code> as <code>caught / fraud</code>, <code>fraud_compare_patterns</code> as <code>caught / fraud</code>.</p>
+                    <p class="cat-metric__desc">Share of fraudulent orders flagged: sent to review or declined by the rules, or marked as fraud by the new model. <code>fraud_caught / fraud</code>, on <code>fraud_totals</code>, <code>fraud_daily</code>, <code>fraud_patterns</code> as <code>caught / fraud</code>, <code>fraud_compare</code> as <code>caught / fraud</code>, <code>fraud_compare_patterns</code> as <code>caught / fraud</code>, <code>fraud_compare_day_one</code> as <code>caught / fraud</code>.</p>
                     <p class="cat-metric__claim">Home and Projects quote it as &ldquo;flagged about half the fraud&rdquo;; the nightly run checks it stays 40% to 60%.</p>
+                    <p class="cat-metric__claim">Home and Projects quote it as &ldquo;caught 110 of 111 fraudulent orders in its first 24 hours live&rdquo;; the nightly run checks it is still 110 of 111 on <code>fraud_compare_day_one</code> (scorer model).</p>
+                    <p class="cat-metric__claim">Projects quote it as &ldquo;the new model caught 110 of 111 fraudulent orders&rdquo;; the nightly run checks it is still 110 of 111 on <code>fraud_compare_day_one</code> (scorer model).</p>
+                    <p class="cat-metric__claim">Projects quote it as &ldquo;where the rules caught 52&rdquo;; the nightly run checks it is still 52 of 111 on <code>fraud_compare_day_one</code> (scorer rules).</p>
+                    <p class="cat-metric__claim">Projects quote it as &ldquo;110 of 111 caught&rdquo;; the nightly run checks it is still 110 of 111 on <code>fraud_compare_day_one</code> (scorer model).</p>
                 </li>
                 <li class="cat-metric" id="m-miss_rate">
                     <p class="cat-metric__head"><span class="cat-metric__label">Fraud approved</span> <code class="cat-metric__sig">miss_rate(fraud, fraud_caught)</code></p>
@@ -378,8 +399,9 @@
                 </li>
                 <li class="cat-metric" id="m-legit_flag_rate">
                     <p class="cat-metric__head"><span class="cat-metric__label">Good customers flagged</span> <code class="cat-metric__sig">legit_flag_rate(flagged, fraud_caught, legit)</code></p>
-                    <p class="cat-metric__desc">Share of legitimate orders flagged: sent to review or declined by the rules, or marked as fraud by the new model. <code>(flagged - fraud_caught) / legit</code>, on <code>fraud_totals</code>, <code>fraud_compare</code> as <code>(flagged - caught) / legit</code>.</p>
+                    <p class="cat-metric__desc">Share of legitimate orders flagged: sent to review or declined by the rules, or marked as fraud by the new model. <code>(flagged - fraud_caught) / legit</code>, on <code>fraud_totals</code>, <code>fraud_compare</code> as <code>(flagged - caught) / legit</code>, <code>fraud_compare_day_one</code> as <code>(flagged - caught) / legit</code>.</p>
                     <p class="cat-metric__claim">Home and Projects quote it as &ldquo;and no legitimate orders&rdquo;; the nightly run checks it stays 0%.</p>
+                    <p class="cat-metric__claim">Projects quote it as &ldquo;25 good orders flagged out of 1,964&rdquo;; the nightly run checks it is still 25 of 1,964 on <code>fraud_compare_day_one</code> (scorer model).</p>
                 </li>
                 <li class="cat-metric" id="m-flag_precision">
                     <p class="cat-metric__head"><span class="cat-metric__label">Flags that were fraud</span> <code class="cat-metric__sig">flag_precision(fraud_caught, flagged)</code></p>

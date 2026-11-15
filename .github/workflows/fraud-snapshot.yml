@@ -90,7 +90,7 @@ jobs:
             def only($keys): (keys - $keys) == [];
             .simulated == true
             and (.totals.checkouts | type == "number" and . > 0)
-            and only(["generated_at","timezone","window_days","simulated","model_versions","latest_event_at","totals","thresholds","daily","score_bins","patterns","model_started_at","compare","compare_patterns","compare_sweep"])
+            and only(["generated_at","timezone","window_days","simulated","model_versions","latest_event_at","totals","thresholds","daily","score_bins","patterns","model_started_at","compare","compare_patterns","compare_sweep","compare_day_one"])
             and (.totals | only(["checkouts","flagged","declined","reviewed","fraud","fraud_caught","false_declines","legit","fraud_dollars_stopped","fraud_dollars_approved","p50_scoring_ms","p95_scoring_ms","p95_checkout_ms","scoring_timeouts","active_days"]))
             and (.thresholds | only(["review_from","decline_from"]))
             and all(.daily[]; only(["day","checkouts","approved","reviewed","declined","fraud","fraud_caught","false_declines","fraud_dollars_stopped","fraud_dollars_approved","p95_scoring_ms"]))
@@ -99,6 +99,7 @@ jobs:
             and all((.compare // [])[]; only(["scorer","checkouts","fraud","legit","flagged","caught","cutoff","p50_ms","p95_ms"]))
             and all((.compare_patterns // [])[]; only(["pattern","scorer","fraud","caught"]))
             and all((.compare_sweep // [])[]; only(["scorer","cutoff","flagged","caught"]))
+            and all((.compare_day_one // [])[]; only(["scorer","window_start","window_end","checkouts","fraud","legit","flagged","caught"]))
           ' "$RUNNER_TEMP/raw.json" > /dev/null
           jq '.' "$RUNNER_TEMP/raw.json" > data/fraud-snapshot.json
 

@@ -1,5 +1,5 @@
 {
-    "_about": "The site's metrics, defined once. Each is numerator / denominator, written as columns joined by + or -, over the table it's defined on (fraud_totals unless a table says otherwise). assets/metrics.js computes them for the /live page; scripts/build_metrics.py turns them into data/pipeline/metrics.sql (a DuckDB macro per metric and the fraud_metrics view), which the SQL source editors and the nightly data run both load; the catalog lists them. claims tie a sentence of site copy to a metric, and the data run fails a check when the sentence and the number stop agreeing.",
+    "_about": "The site's metrics, defined once. Each is numerator / denominator, written as columns joined by + or -, over the table it's defined on (fraud_totals unless a table says otherwise). assets/metrics.js computes them for the /live page; scripts/build_metrics.py turns them into data/pipeline/metrics.sql (a DuckDB macro per metric and the fraud_metrics view), which the SQL source editors and the nightly data run both load; the catalog lists them. claims tie a sentence of site copy to a metric, and the data run fails a check when the sentence and the number stop agreeing. A claim checks the metric over fraud_totals against a min and max, or, with a table, an optional where (column: value) and an exact numerator and denominator, checks the counts the copy quotes on that table's matching row.",
     "metrics": {
         "catch_rate": {
             "label": "Catch rate",
@@ -11,7 +11,8 @@
                 "fraud_daily": {},
                 "fraud_patterns": { "numerator": "caught" },
                 "fraud_compare": { "numerator": "caught" },
-                "fraud_compare_patterns": { "numerator": "caught" }
+                "fraud_compare_patterns": { "numerator": "caught" },
+                "fraud_compare_day_one": { "numerator": "caught" }
             }
         },
         "miss_rate": {
@@ -39,7 +40,8 @@
             "denominator": "legit",
             "tables": {
                 "fraud_totals": {},
-                "fraud_compare": { "numerator": "flagged - caught" }
+                "fraud_compare": { "numerator": "flagged - caught" },
+                "fraud_compare_day_one": { "numerator": "flagged - caught" }
             }
         },
         "flag_precision": {
@@ -99,6 +101,51 @@
             "metric": "legit_flag_rate",
             "min": 0,
             "max": 0
+        },
+        {
+            "pages": ["index.html", "projects.html"],
+            "quote": "caught 110 of 111 fraudulent orders in its first 24 hours live",
+            "metric": "catch_rate",
+            "table": "fraud_compare_day_one",
+            "where": { "scorer": "model" },
+            "numerator": 110,
+            "denominator": 111
+        },
+        {
+            "pages": ["projects.html"],
+            "quote": "the new model caught 110 of 111 fraudulent orders",
+            "metric": "catch_rate",
+            "table": "fraud_compare_day_one",
+            "where": { "scorer": "model" },
+            "numerator": 110,
+            "denominator": 111
+        },
+        {
+            "pages": ["projects.html"],
+            "quote": "where the rules caught 52",
+            "metric": "catch_rate",
+            "table": "fraud_compare_day_one",
+            "where": { "scorer": "rules" },
+            "numerator": 52,
+            "denominator": 111
+        },
+        {
+            "pages": ["projects.html"],
+            "quote": "25 good orders flagged out of 1,964",
+            "metric": "legit_flag_rate",
+            "table": "fraud_compare_day_one",
+            "where": { "scorer": "model" },
+            "numerator": 25,
+            "denominator": 1964
+        },
+        {
+            "pages": ["projects.html"],
+            "quote": "110 of 111 caught",
+            "metric": "catch_rate",
+            "table": "fraud_compare_day_one",
+            "where": { "scorer": "model" },
+            "numerator": 110,
+            "denominator": 111
         }
     ]
 }

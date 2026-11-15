@@ -43,5 +43,13 @@
     "fraud_compare_sweep": {
         "snapshot": "compare_sweep",
         "columns": [["scorer", "VARCHAR"], ["cutoff", "DOUBLE"], ["flagged", "INTEGER"], ["caught", "INTEGER"]]
+    },
+    "fraud_compare_day_one": {
+        "snapshot": "compare_day_one",
+        "columns": [
+            ["scorer", "VARCHAR"], ["window_start", "VARCHAR"], ["window_end", "VARCHAR"],
+            ["checkouts", "INTEGER"], ["fraud", "INTEGER"], ["legit", "INTEGER"],
+            ["flagged", "INTEGER"], ["caught", "INTEGER"]
+        ]
     }
 }
