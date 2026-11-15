@@ -7,8 +7,10 @@
 --   * log in and run read-only transactions only;
 --   * SELECT the few columns scripts/fraud-snapshot.sql reads from the four
 --     raw tables and the real-time model's realtime_fraud_audit: ids to join
---     on, timestamps, the decision, score, probability and model version,
---     the fraud label and pattern, the order total, and timings.
+--     on, timestamps (including created_at, the load time the frozen
+--     first-24-hours comparison cuts off on), the decision, score,
+--     probability and model version, the fraud label and pattern, the
+--     order total, and timings.
 --     It cannot read email, phone, card, IP, billing or payload columns;
 --   * nothing else: no writes, no other tables, no other schemas.
 --
@@ -17,7 +19,12 @@
 -- table with RLS enabled.
 --
 -- If the role already exists (you ran an earlier version of this file),
--- run just the realtime_fraud_audit grant and policy below.
+-- run just the realtime_fraud_audit grant and policy below (if you hadn't
+-- yet), plus these three column grants for the frozen first-24-hours
+-- comparison:
+--   grant select (created_at) on public.raw_transactions to fraud_snapshot_reader;
+--   grant select (created_at) on public.raw_fraud_decisions to fraud_snapshot_reader;
+--   grant select (created_at) on public.raw_fraud_truth to fraud_snapshot_reader;
 --
 -- Afterwards, set the repo secret FRAUD_DB_URL to the Session pooler string
 -- with this role's user and password (Supabase: Connect, then Session pooler):
@@ -34,11 +41,11 @@ alter role fraud_snapshot_reader set statement_timeout = '60s';
 
 grant usage on schema public to fraud_snapshot_reader;
 
-grant select (transaction_id, event_ts, total)
+grant select (transaction_id, event_ts, created_at, total)
     on public.raw_transactions to fraud_snapshot_reader;
-grant select (transaction_id, decided_at, decision, score, model_version)
+grant select (transaction_id, decided_at, created_at, decision, score, model_version)
     on public.raw_fraud_decisions to fraud_snapshot_reader;
-grant select (transaction_id, is_fraud, fraud_pattern)
+grant select (transaction_id, is_fraud, fraud_pattern, created_at)
     on public.raw_fraud_truth to fraud_snapshot_reader;
 grant select (transaction_id, fraud_scoring_ms, total_latency_ms, fraud_timeout)
     on public.raw_checkout_responses to fraud_snapshot_reader;
