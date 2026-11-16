@@ -426,3 +426,8 @@
     .live-chart .bar--caught,
     .live-chart .bar--legit { fill: CanvasText; }
 }
+
+/* Chapter label over the first section of each chapter (real-time model, then the rules). */
+.live-chapter {
+    margin-bottom: 0.7rem;
+}

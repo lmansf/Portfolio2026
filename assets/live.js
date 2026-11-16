@@ -176,7 +176,7 @@ import { metric } from './metrics.js';
             updated.textContent = `Updated ${fmtStamp(s.generated_at)}${latest}`;
         }
         const model = root.querySelector('[data-live-model]');
-        if (model && s.model_versions) model.textContent = `Model: ${s.model_versions}`;
+        if (model && s.model_versions) model.textContent = `Rules: ${s.model_versions}`;
 
         const win = root.querySelector('[data-live-window]');
         if (win && s.daily.length) {
