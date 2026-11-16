@@ -4,7 +4,7 @@
  * the left margin with the same three stages as the hero (Ingest, Transform,
  * Serve, linking to the same pages). One checkout dot travels down it as
  * the visitor scrolls Home: it starts grey like the hero's raw dots, turns
- * teal once it has passed the fraud rules, and reaches Serve at the end of
+ * teal once it has passed the real-time model, and reaches Serve at the end of
  * the page. Each stage lights when the dot reaches it.
  *
  * Progressive enhancement and opt-outs:
@@ -25,7 +25,7 @@
     var wide = window.matchMedia("(min-width: 1280px)");
     var STAGES = [
         { kind: "Ingest", what: "Owl Park webstore", href: "/projects#owl-park" },
-        { kind: "Transform", what: "Fraud rules", href: "/projects#fraud" },
+        { kind: "Transform", what: "Real-time model", href: "/projects#fraud" },
         { kind: "Serve", what: "Live numbers", href: "/live" }
     ];
 

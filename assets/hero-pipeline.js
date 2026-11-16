@@ -1,12 +1,15 @@
 /* hero-pipeline.js: the Home hero, a replay of the fraud pipeline.
  *
- * The dots are checkouts from the fraud pipeline's own snapshot
- * (/data/fraud-snapshot.json, the same aggregates /live draws). They
- * arrive from Owl Park's webstore and gather into an owl (ingest), stream
- * through the scoring gate where the fraud share turns amber and the share
- * the rules caught drops into a "flagged" tray (transform), and the rest,
- * missed fraud included, settle into the name (serve). Each stage label
- * links to the project that does that step and counts up its real number.
+ * The dots are checkouts from the real-time model's first 24 hours live
+ * (Nov 14 to 15), read from the fraud pipeline's own snapshot
+ * (/data/fraud-snapshot.json, compare_day_one: the same fixed window the
+ * project copy quotes). They arrive from Owl Park's webstore and gather
+ * into an owl (ingest), stream through the scoring gate where the fraud
+ * share turns amber and everything the model flagged drops into a
+ * "flagged" tray (transform): the fraud it caught in amber, the good orders
+ * it flagged in teal. The rest, missed fraud included, settle into the
+ * name (serve). Each stage label links to the project that does that step
+ * and counts up its real number.
  * Once settled, the pointer pushes points aside and they spring back.
  *
  * Progressive enhancement: the stage ships `hidden` and the real <h1>
@@ -16,7 +19,9 @@
  * `hero--pipe` to the hero, which keeps the <h1> for screen readers and
  * search but hides it visually (the canvas is aria-hidden; the stage links
  * carry the numbers as text). If the snapshot can't be read, the dots run
- * the same path with no fraud split and the labels show no numbers.
+ * the same path with no fraud split and the labels show no numbers; that
+ * includes a snapshot without the model's row, so the rules' numbers are
+ * never shown under the model's name.
  * Under prefers-reduced-motion the finished state is drawn once, with no
  * animation and no Replay button. The loop only runs while the stage is
  * on screen and the tab is visible.
@@ -111,13 +116,15 @@
         return a;
     }
 
-    /* Shares from the snapshot: what fraction of checkouts were fraud, and
-     * what fraction of the fraud the rules caught (reviewed or declined). */
+    /* Shares from the snapshot: what fraction of checkouts were fraud, what
+     * fraction of the fraud the model caught, and what fraction of all
+     * checkouts were good orders it flagged anyway. */
     function shares() {
-        if (!snap) return { fraud: 0, caught: 0 };
+        if (!snap) return { fraud: 0, caught: 0, goodFlagged: 0 };
         return {
             fraud: snap.checkouts > 0 ? Math.min(1, snap.fraud / snap.checkouts) : 0,
-            caught: snap.fraud > 0 ? Math.min(1, snap.fraud_caught / snap.fraud) : 0
+            caught: snap.fraud > 0 ? Math.min(1, snap.fraud_caught / snap.fraud) : 0,
+            goodFlagged: snap.checkouts > 0 ? Math.min(1, snap.good_flagged / snap.checkouts) : 0
         };
     }
 
@@ -146,11 +153,14 @@
             namePts = keep;
         }
 
-        /* Caught fraud goes to the tray instead of the name, so add that many
-         * extra points; missed fraud is a random share of the name's points. */
+        /* Everything flagged (caught fraud, plus good orders flagged) goes to
+         * the tray instead of the name, so add that many extra points; missed
+         * fraud is a random share of the name's points. */
         var sh = shares();
         var caughtShare = sh.fraud * sh.caught;
-        var nTray = Math.round(namePts.length * caughtShare / Math.max(0.01, 1 - caughtShare));
+        var trayShare = Math.min(0.95, caughtShare + sh.goodFlagged);
+        var nTray = Math.round(namePts.length * trayShare / Math.max(0.05, 1 - trayShare));
+        var nTrayGood = trayShare > 0 ? Math.round(nTray * sh.goodFlagged / trayShare) : 0;
         var nMissed = Math.min(namePts.length, Math.round((namePts.length + nTray) * sh.fraud * (1 - sh.caught)));
         var trayStep = phone ? 4 : 5, trayCols = Math.max(1, Math.ceil(Math.sqrt(nTray * 3)));
         TRAY = [w / 2, h - (phone ? 52 : 58)];
@@ -172,7 +182,9 @@
         shuffle(targets.map(function (_, i) { return i; })).slice(0, nMissed).forEach(function (i) {
             targets[i].kind = "missed";
         });
-        trayPts.forEach(function (p) { targets.push({ x: p[0], y: p[1], kind: "caught" }); });
+        shuffle(trayPts).forEach(function (p, t) {
+            targets.push({ x: p[0], y: p[1], kind: t < nTrayGood ? "ok" : "caught" });
+        });
         shuffle(targets);
 
         var lanes = 7, gate = w * 0.5;
@@ -215,7 +227,7 @@
         setNum("ingest", fmt(snap.checkouts * ease(k1)) + " checkouts");
         var k2 = clamp01((T - HOLD_END - GATE_DUR) / (0.9 + OUT_DUR * 0.5));
         setNum("transform", k2 > 0 ? fmt(snap.fraud_caught * ease(k2)) + " of " + fmt(snap.fraud * ease(k2)) + " fraud caught" : "", k2 > 0);
-        setNum("serve", T >= END - 0.4 ? fmt(snap.false_declines) + " good orders declined" : "");
+        setNum("serve", T >= END - 0.4 ? fmt(snap.good_flagged) + " good orders flagged" : "");
     }
 
     function draw(T, still) {
@@ -335,9 +347,10 @@
     function showNote() {
         if (!note || !snap || !P.length) return;
         /* Phones get the short form so the note stays on one line under the tray. */
-        var per = "1 dot ≈ " + fmt(snap.checkouts / P.length) + " checkouts";
-        note.textContent = (W < 640 ? snap.window_days + "-day snapshot · " :
-            "Replaying the fraud pipeline's " + snap.window_days + "-day snapshot of simulated checkouts · ") + per;
+        var each = Math.max(1, Math.round(snap.checkouts / P.length));
+        var per = "1 dot ≈ " + fmt(each) + (each === 1 ? " checkout" : " checkouts");
+        note.textContent = (W < 640 ? "First 24 hours live · " :
+            "Replaying the real-time model's first 24 hours live, Nov 14 to 15, on simulated checkouts · ") + per;
         note.hidden = false;
     }
 
@@ -421,16 +434,18 @@
         if (mqMotion.addEventListener) mqMotion.addEventListener("change", onMotion);
     }
 
-    /* Read the snapshot's totals: aggregate counts only, the same file /live draws. */
+    /* Read the model's row of the fixed first-24-hours window: aggregate
+     * counts only, from the same file /live draws. */
     var dataReady = window.fetch
         ? fetch(SNAPSHOT_URL, { credentials: "omit" }).then(function (r) {
             return r.ok ? r.json() : null;
         }).then(function (d) {
-            var t = d && d.totals;
-            if (t && t.checkouts > 0 && t.fraud >= 0 && t.fraud_caught >= 0) {
+            var rows = (d && d.compare_day_one) || [], m = null;
+            for (var i = 0; i < rows.length; i++) if (rows[i] && rows[i].scorer === "model") m = rows[i];
+            if (m && m.checkouts > 0 && m.fraud >= 0 && m.caught >= 0 && m.flagged >= m.caught) {
                 snap = {
-                    checkouts: +t.checkouts, fraud: +t.fraud, fraud_caught: +t.fraud_caught,
-                    false_declines: +t.false_declines || 0, window_days: +d.window_days || 30
+                    checkouts: +m.checkouts, fraud: +m.fraud, fraud_caught: +m.caught,
+                    good_flagged: +m.flagged - +m.caught
                 };
             }
         }).catch(function () {})
