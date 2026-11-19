@@ -130,10 +130,13 @@ M365/D365 admin; titles and dates unchanged; LinkedIn is `in/lmansf96`.
 
 The nest-box hunt (README, "The nest-box hunt"; contract in
 `docs/egg-codes.md`) runs from the SQL source editors: keep
-`api/egg/verify.js` and `api/egg/claim.js` working (Owl Park calls verify),
+`api/egg/verify.js` and `api/egg/claim.js` working, keep the signed-code
+format in `api/egg/_signed.js` byte-for-byte equal to Owl Park's
+`packages/shared/src/eggCode.ts` (`node --test scripts/test_egg_codes.js`),
 keep the shard order in `data/console/extra.sql` in step with the Owl Park
-products' list prices in `data/playground/`, and never put `EGG_CODE_SECRET`
-in the repo; it lives only in Vercel's environment variables.
+products' list prices in `data/playground/`, and never put `EGG_SIGNING_KEY`
+or `EGG_CODE_SECRET` in the repo; they live only in Vercel's environment
+variables.
 
 The `/live` page (`live.html`, `assets/live.*`) is fed by
 `data/fraud-snapshot.json`, which the `fraud-snapshot` GitHub Action

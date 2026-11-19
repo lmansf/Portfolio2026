@@ -442,12 +442,16 @@ The hidden `nest_box` table is queryable from every "SQL source" editor.
 The Home toolkit's default query opens with a comment that not every table
 makes it onto a page; `SHOW ALL TABLES` turns it up, and its riddle spells a
 `claim_egg('…')` call. Running that in any editor asks `/api/egg/claim` for
-a one-time egg code, shown with a Copy button and kept in `localStorage`.
+a signed egg code, shown with a Copy button and kept in `localStorage`.
 
-- `api/egg/claim.js` and `api/egg/verify.js` (Owl Park calls
-  `/api/egg/verify`) use `EGG_CODE_SECRET`, which lives only in Vercel. The
-  trail, the code format and the endpoints are in
-  [`docs/egg-codes.md`](docs/egg-codes.md).
+- `api/egg/claim.js` signs each code with the Ed25519 private key in
+  `EGG_SIGNING_KEY`, which lives only in Vercel; Owl Park checks codes with
+  the public key (`api/egg/_signed.js`; make the pair with
+  `node scripts/egg-keypair.js`). Until that key is set, the older HMAC
+  codes from `EGG_CODE_SECRET` are issued instead, which the park doesn't
+  take. The trail, the code format, the endpoints and the setup are in
+  [`docs/egg-codes.md`](docs/egg-codes.md); `node --test
+  scripts/test_egg_codes.js` tests them.
 - `data/console/extra.sql` holds the table and the `claim_egg` macro, and
   `data/playground/owl_park.duckdb.gz` the synthetic Owl Park tables whose
   list prices order the shards (written by `data/playground/generate.py`).
