@@ -25,7 +25,7 @@
  *
  * The nest box: one default query hints that not every table makes it onto
  * a page. The riddle in that table spells a claim_egg('…') call; running it
- * in any editor asks /api/egg/claim for a one-time code (docs/egg-codes.md).
+ * in any editor asks /api/egg/claim for a signed egg code (docs/egg-codes.md).
  * ───────────────────────────────────────────────────────────── */
 
 import { createEngine, toObjects, cleanError, formatMs, SNAPSHOT_TABLES } from './sql-engine.js';
@@ -33,7 +33,10 @@ import { createEngine, toObjects, cleanError, formatMs, SNAPSHOT_TABLES } from '
 const EGG_KEY = 'sqlc-egg';
 const EGG_FOUND = 'You found the nest.';
 const EGG_CLAIM_URL = '/api/egg/claim';
-const EGG_CODE = /^EGG-[0-9A-Z-]{20,30}$/;
+// Signed codes (107 characters, base64url) are the ones Owl Park takes; the
+// older grouped one-time codes are still shown while the site issues them.
+const EGG_SIGNED = /^EGG-[A-Za-z0-9_-]{103}$/;
+const EGG_CODE = /^EGG-(?:[0-9A-Z-]{20,30}|[A-Za-z0-9_-]{103})$/;
 const HIDDEN_TABLES = new Set(['nest_box']);
 const MAX_ITEMS = 60;
 const MAX_TABLE_ROWS = 50;
@@ -824,7 +827,9 @@ export function maybeEgg(state, result, sql) {
     state.out.replaceChildren(card);
     let saved = null;
     try { saved = JSON.parse(store.get(EGG_KEY) || 'null'); } catch { saved = null; }
-    if (saved && typeof saved.code === 'string' && EGG_CODE.test(saved.code)) showEggCode(card, saved, true);
+    // A browser that kept an older one-time code claims again, so it gets a
+    // signed code the park takes once the site signs them.
+    if (saved && typeof saved.code === 'string' && EGG_SIGNED.test(saved.code)) showEggCode(card, saved, true);
     else claimEgg(card, m[1]);
     return true;
 }
@@ -877,7 +882,9 @@ function showEggCode(card, saved, again) {
     });
     card.replaceChildren(
         el('p', { class: 'sql-egg__title', text: again ? 'You already found the egg. Here’s your code again.' : 'You found the egg.' }),
-        el('p', { class: 'sql-egg__text', text: 'Take this code to Owl Park to adopt a painted egg. It works once, so keep it to yourself.' }),
+        el('p', { class: 'sql-egg__text', text: EGG_SIGNED.test(saved.code)
+            ? 'Copy this code and paste it into Owl Park to adopt a painted egg. It works once, so keep it to yourself.'
+            : 'Take this code to Owl Park to adopt a painted egg. It works once, so keep it to yourself.' }),
         el('div', { class: 'sql-egg__row' }, code, copy),
         saved.issued ? el('p', { class: 'sql-egg__meta', text: `Issued ${saved.issued}` }) : null);
 }

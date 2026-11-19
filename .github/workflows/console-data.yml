@@ -4,6 +4,7 @@
 # when data/pipeline/metrics.sql is out of step with data/pipeline/metrics.json,
 # when catalog.html is out of step with models.json or metrics.json,
 # when Home's tools timeline is out of step with data/tool-timeline.json,
+# when the egg code tests fail (node --test scripts/test_egg_codes.js),
 # or when assets/sql-source.min.js, assets/live.min.js or assets/notfound.min.js wasn't rebuilt after
 # its sources changed.
 # Fix: python3 scripts/build_console_data.py && python3 scripts/build_sql_sources.py
@@ -31,6 +32,11 @@ jobs:
           python-version: "3.12"
       - name: Install DuckDB
         run: python3 -m pip install duckdb==1.5.6
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+      - name: Test the egg code endpoints
+        run: node --test scripts/test_egg_codes.js
       - name: Check site.sql is current
         run: python3 scripts/build_console_data.py --check
       - name: Check metrics.sql is current
